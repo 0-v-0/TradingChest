@@ -161,7 +161,7 @@ export default class DefaultDatafeed implements Datafeed {
     this._prevTicker = symbol.ticker
   }
 
-  unsubscribe(symbol: SymbolInfo, period: Period): void {
+  unsubscribe(symbol: SymbolInfo, _period: Period): void {
     this._callback = undefined
     if (this._ws) {
       try {

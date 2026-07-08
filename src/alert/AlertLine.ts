@@ -1,4 +1,4 @@
-import { OverlayTemplate } from 'klinecharts'
+import { OverlayTemplate, DeepPartial, OverlayStyle } from 'klinecharts'
 
 const alertLine: OverlayTemplate = {
   name: 'alertLine',
@@ -7,7 +7,7 @@ const alertLine: OverlayTemplate = {
   needDefaultXAxisFigure: false,
   needDefaultYAxisFigure: true,
   createPointFigures: ({ coordinates, overlay, bounding }) => {
-    const color = (overlay.styles as any)?.line?.color ?? '#ff9800'
+    const color = (overlay.styles as DeepPartial<OverlayStyle>)?.line?.color ?? '#ff9800'
     if (coordinates.length < 1) return []
     const y = coordinates[0].y
     return [

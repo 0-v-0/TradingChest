@@ -52,7 +52,7 @@ const textAnnotation: OverlayTemplate = {
     return true
   },
   // 双击编辑文字
-  onClick: ({ overlay }) => {
+  onClick: ({ overlay: _overlay }) => {
     // 右键或特殊操作才编辑，普通点击不处理
     return false
   },

@@ -14,6 +14,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type DpoResult = { dpo: number | undefined }
+
 const dpo: IndicatorTemplate = {
   name: 'DPO',
   shortName: 'DPO',
@@ -24,7 +26,7 @@ const dpo: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: DpoResult[] = []
 
     // 偏移量
     const shift = Math.floor(period / 2) + 1

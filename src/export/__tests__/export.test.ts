@@ -10,6 +10,7 @@ function mockChart(dataList: Record<string, unknown>[] = [], visibleRange = { fr
     getDataList: () => dataList,
     getVisibleRange: () => visibleRange,
     getConvertPictureUrl: vi.fn(() => 'data:image/png;base64,FAKE'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any
 }
 
@@ -23,9 +24,11 @@ let clickedLink: HTMLAnchorElement | null = null
 
 // jsdom 不提供 URL.createObjectURL / revokeObjectURL，手动补充
 if (typeof URL.createObjectURL !== 'function') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(URL as any).createObjectURL = () => ''
 }
 if (typeof URL.revokeObjectURL !== 'function') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(URL as any).revokeObjectURL = () => {}
 }
 
@@ -34,6 +37,7 @@ beforeEach(() => {
   vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url')
   vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
   vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const el = { tagName: tag, href: '', download: '', click: vi.fn() } as any
     if (tag === 'a') clickedLink = el
     return el
@@ -135,6 +139,7 @@ describe('exportScreenshot', () => {
   it('getConvertPictureUrl 异常返回 false', () => {
     const chart = {
       getConvertPictureUrl: () => { throw new Error('canvas error') },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
     expect(exportScreenshot(chart)).toBe(false)
   })

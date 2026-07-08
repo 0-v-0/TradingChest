@@ -67,6 +67,7 @@ describe('tradeVisualization.calc', () => {
 
   it('returns empty info for empty trades', () => {
     const bars = [makeBar(100), makeBar(200), makeBar(300)]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades: [] } } as any
     const result = calc(bars, indicator)
     expect(result).toHaveLength(3)
@@ -77,6 +78,7 @@ describe('tradeVisualization.calc', () => {
 
   it('returns empty info when no extendData', () => {
     const bars = [makeBar(100)]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: undefined } as any
     const result = calc(bars, indicator)
     expect(result).toHaveLength(1)
@@ -88,6 +90,7 @@ describe('tradeVisualization.calc', () => {
     const trades = makeTrades({
       entryTs: 200, exitTs: 400, entryPrice: 50, exitPrice: 60, pnl: 10, direction: 'long'
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
     const result = calc(bars, indicator)
 
@@ -118,6 +121,7 @@ describe('tradeVisualization.calc', () => {
     const trades = makeTrades({
       entryTs: 200, exitTs: 200, entryPrice: 50, exitPrice: 55, pnl: 5, direction: 'short'
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
     const result = calc(bars, indicator)
 
@@ -134,6 +138,7 @@ describe('tradeVisualization.calc', () => {
       { entryTs: 100, exitTs: 300, entryPrice: 50, exitPrice: 60, pnl: 10, direction: 'long' },
       { entryTs: 200, exitTs: 400, entryPrice: 55, exitPrice: 45, pnl: -10, direction: 'short' }
     )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
     const result = calc(bars, indicator)
 
@@ -146,6 +151,7 @@ describe('tradeVisualization.calc', () => {
     const trades: TradeRecord[] = [
       { entryTs: 100, exitTs: 200, entryPrice: 10, exitPrice: 20, pnl: 10, direction: 'long' }
     ]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: trades } as any
     const result = calc(bars, indicator)
 
@@ -159,6 +165,7 @@ describe('tradeVisualization.calc', () => {
     const trades = makeTrades({
       entryTs: 190, exitTs: 310, entryPrice: 50, exitPrice: 60, pnl: 10, direction: 'long'
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
     const result = calc(bars, indicator)
 

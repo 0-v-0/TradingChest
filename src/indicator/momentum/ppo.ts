@@ -8,6 +8,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type PpoResult = { ppo: number | undefined; signal: number | undefined; histogram: number | undefined }
+
 const ppo: IndicatorTemplate = {
   name: 'PPO',
   shortName: 'PPO',
@@ -23,7 +25,7 @@ const ppo: IndicatorTemplate = {
     const slowPeriod = params[1] as number
     const signalPeriod = params[2] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: PpoResult[] = []
 
     // ---- 计算快速 EMA ----
     const emaFast: (number | null)[] = new Array(len).fill(null)

@@ -4,6 +4,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type HistoricalVolatilityResult = { hv: number | undefined }
+
 const historicalVolatility: IndicatorTemplate = {
   name: 'HV',
   shortName: 'HV',
@@ -14,7 +16,7 @@ const historicalVolatility: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: HistoricalVolatilityResult[] = []
 
     // 年化因子：sqrt(252 个交易日)
     const annualizationFactor = Math.sqrt(252)

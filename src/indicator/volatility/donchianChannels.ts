@@ -4,6 +4,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type DonchianChannelsResult = { upper: number | undefined; lower: number | undefined; middle: number | undefined }
+
 const donchianChannels: IndicatorTemplate = {
   name: 'DC',
   shortName: 'DC',
@@ -16,7 +18,7 @@ const donchianChannels: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: DonchianChannelsResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
       if (i < period - 1) {

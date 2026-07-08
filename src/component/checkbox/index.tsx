@@ -61,16 +61,16 @@ const Checkbox: Component<CheckboxProps> = props => {
       role="checkbox"
       aria-checked={innerChecked()}
       tabIndex={0}
-      onClick={_ => {
+      onClick={_e => {
         const ck = !innerChecked();
-        props.onChange && props.onChange(ck);
+        void props.onChange?.(ck);
         setInnderChecked(ck);
       }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           const ck = !innerChecked()
-          props.onChange && props.onChange(ck)
+          void props.onChange?.(ck)
           setInnderChecked(ck)
         }
       }}>

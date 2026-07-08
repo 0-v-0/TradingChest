@@ -5,6 +5,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type VwapResult = { vwap: number | undefined }
+
 const vwap: IndicatorTemplate = {
   name: 'VWAP',
   shortName: 'VWAP',
@@ -12,8 +14,8 @@ const vwap: IndicatorTemplate = {
   figures: [
     { key: 'vwap', title: 'VWAP: ', type: 'line' }
   ],
-  calc: (dataList: KLineData[], _indicator) => {
-    const result: any[] = []
+  calc: (dataList: KLineData[]) => {
+    const result: VwapResult[] = []
     // 累计典型价格 * 成交量
     let cumTpv = 0
     // 累计成交量

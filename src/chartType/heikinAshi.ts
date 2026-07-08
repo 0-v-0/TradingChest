@@ -12,6 +12,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type HeikinAshiResult = { haOpen: number; haHigh: number; haLow: number; haClose: number }
+
 const heikinAshi: IndicatorTemplate = {
   name: 'HeikinAshi',
   shortName: 'HA',
@@ -23,7 +25,7 @@ const heikinAshi: IndicatorTemplate = {
     { key: 'haClose', title: 'C: ', type: 'line' }
   ],
   calc: (dataList: KLineData[]) => {
-    const result: any[] = []
+    const result: HeikinAshiResult[] = []
     let prevHaOpen = 0
     let prevHaClose = 0
 

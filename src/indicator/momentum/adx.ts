@@ -13,6 +13,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type AdxResult = { adx: number | undefined; plusDi: number | undefined; minusDi: number | undefined }
+
 const adx: IndicatorTemplate = {
   name: 'ADX',
   shortName: 'ADX',
@@ -25,7 +27,7 @@ const adx: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: AdxResult[] = []
 
     if (len === 0) return result
 

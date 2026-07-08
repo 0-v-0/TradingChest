@@ -14,6 +14,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type KstResult = { kst: number | undefined; signal: number | undefined }
+
 const kst: IndicatorTemplate = {
   name: 'KST',
   shortName: 'KST',
@@ -29,7 +31,7 @@ const kst: IndicatorTemplate = {
     const signalPeriod = p[8] as number
     const weights = [1, 2, 3, 4]
     const len = dataList.length
-    const result: any[] = []
+    const result: KstResult[] = []
 
     // ---- 计算四条 ROC 序列 ----
     const rocs: (number | null)[][] = []
@@ -50,35 +52,12 @@ const kst: IndicatorTemplate = {
     for (let r = 0; r < 4; r++) {
       const smoothed: (number | null)[] = new Array(len).fill(null)
       const smaP = smaPeriods[r]
-      const rocP = rocPeriods[r]
-      // ROC 从索引 rocP 开始有效，SMA 需要再等 smaP-1 个有效值
-      // 使用滑动窗口计算
-      let windowSum = 0
-      let windowCount = 0
 
-      for (let i = 0; i < len; i++) {
-        if (rocs[r][i] !== null) {
-          windowSum += rocs[r][i] as number
-          windowCount++
-
-          if (windowCount > smaP) {
-            // 需要减去窗口最旧的值
-            // 找到第 (windowCount - smaP) 个有效值的索引
-            // 更可靠的方法：维护一个有效值索引队列
-          }
-        }
-      }
-
-      // 重新实现：使用有效值索引缓冲区
+      // 使用有效值索引缓冲区
       const validIndices: number[] = []
-      let runSum = 0
       for (let i = 0; i < len; i++) {
         if (rocs[r][i] !== null) {
           validIndices.push(i)
-          runSum += rocs[r][i] as number
-          if (validIndices.length > smaP) {
-            runSum -= rocs[r][validIndices[validIndices.length - smaP - 1]] as number
-          }
           if (validIndices.length >= smaP) {
             // 精确计算避免浮点漂移
             let s = 0
@@ -129,8 +108,8 @@ const kst: IndicatorTemplate = {
     // ---- 组装输出 ----
     for (let i = 0; i < len; i++) {
       result.push({
-        kst: kstLine[i] !== null ? kstLine[i] : undefined,
-        signal: signalLine[i] !== null ? signalLine[i] : undefined
+        kst: kstLine[i] ?? undefined,
+        signal: signalLine[i] ?? undefined
       })
     }
 

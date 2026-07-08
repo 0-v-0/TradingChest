@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Component, from } from 'solid-js'
+import { Component } from 'solid-js'
 
 import horizontalStraightLine from './horizontalStraightLine'
 import horizontalRayLine from './horizontalRayLine'

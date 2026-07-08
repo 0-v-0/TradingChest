@@ -13,6 +13,16 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type PivotPointsResult = {
+  pivot: number | undefined
+  r1: number | undefined
+  r2: number | undefined
+  r3: number | undefined
+  s1: number | undefined
+  s2: number | undefined
+  s3: number | undefined
+}
+
 const pivotPoints: IndicatorTemplate = {
   name: 'PIVOTPOINTS',
   shortName: 'PivotPoints',
@@ -26,8 +36,8 @@ const pivotPoints: IndicatorTemplate = {
     { key: 's2', title: 'S2: ', type: 'line' },
     { key: 's3', title: 'S3: ', type: 'line' }
   ],
-  calc: (dataList: KLineData[], _indicator) => {
-    const result: any[] = []
+  calc: (dataList: KLineData[]) => {
+    const result: PivotPointsResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
       if (i === 0) {

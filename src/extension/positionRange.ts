@@ -4,7 +4,7 @@
  * 专为程序化创建设计（非用户绘图），totalStep 设为 0 表示无需用户交互
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import { OverlayTemplate, OverlayFigure } from 'klinecharts'
 
 const positionRange: OverlayTemplate = {
   name: 'positionRange',
@@ -25,7 +25,7 @@ const positionRange: OverlayTemplate = {
     const maxX = Math.max(x1, x2)
     const maxY = Math.max(y1, y2)
 
-    const figures: any[] = []
+    const figures: OverlayFigure[] = []
 
     // 半透明填充矩形
     figures.push({

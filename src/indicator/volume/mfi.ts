@@ -13,6 +13,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type MfiResult = { mfi: number | undefined }
+
 const mfi: IndicatorTemplate = {
   name: 'MFI',
   shortName: 'MFI',
@@ -23,7 +25,7 @@ const mfi: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: MfiResult[] = []
 
     // 预先计算每根 K 线的典型价格和原始资金流量
     const typicalPrices: number[] = []

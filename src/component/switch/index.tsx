@@ -26,8 +26,8 @@ const Switch: Component<SwitchProps> = props => {
     <div
       style={props.style}
       class={`klinecharts-pro-switch ${props.open ? 'turn-on' : 'turn-off'} ${props.class ?? ''}`}
-      onClick={_ => {
-        props.onChange && props.onChange()
+      onClick={_e => {
+        void props.onChange?.()
       }}>
       <i
         class="thumb"/>

@@ -12,6 +12,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type TwiggsMfResult = { tmf: number | undefined }
+
 const twiggsMf: IndicatorTemplate = {
   name: 'TMF',
   shortName: 'TMF',
@@ -22,7 +24,7 @@ const twiggsMf: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: TwiggsMfResult[] = []
 
     if (len === 0) return result
 

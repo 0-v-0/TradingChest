@@ -10,6 +10,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type UltimateOscillatorResult = { uo: number | undefined }
+
 const ultimateOscillator: IndicatorTemplate = {
   name: 'UO',
   shortName: 'UO',
@@ -24,7 +26,7 @@ const ultimateOscillator: IndicatorTemplate = {
     const period3 = params[2] as number
     const maxPeriod = Math.max(period1, period2, period3)
     const len = dataList.length
-    const result: any[] = []
+    const result: UltimateOscillatorResult[] = []
 
     // 预计算 BP 和 TR 序列（从索引 1 开始有效）
     const bp: number[] = new Array(len).fill(0)

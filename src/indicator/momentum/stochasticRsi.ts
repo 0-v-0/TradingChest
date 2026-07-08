@@ -9,6 +9,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type StochasticRsiResult = { k: number | undefined; d: number | undefined }
+
 const stochasticRsi: IndicatorTemplate = {
   name: 'StochRSI',
   shortName: 'StochRSI',
@@ -91,7 +93,7 @@ const stochasticRsi: IndicatorTemplate = {
     const dLine: (number | null)[] = new Array(len).fill(null)
 
     // K 线：对 stochRsi 做滑动平均
-    let kBuf: number[] = []
+    const kBuf: number[] = []
     let kSum = 0
     for (let i = 0; i < len; i++) {
       if (stochRsi[i] !== null) {
@@ -115,7 +117,7 @@ const stochasticRsi: IndicatorTemplate = {
     }
 
     // D 线：对 K 线做滑动平均
-    let dBuf: number[] = []
+    const dBuf: number[] = []
     for (let i = 0; i < len; i++) {
       if (kLine[i] !== null) {
         dBuf.push(kLine[i] as number)
@@ -130,11 +132,11 @@ const stochasticRsi: IndicatorTemplate = {
     }
 
     // ---- 组装输出 ----
-    const result: any[] = []
+    const result: StochasticRsiResult[] = []
     for (let i = 0; i < len; i++) {
       result.push({
-        k: kLine[i] !== null ? kLine[i] : undefined,
-        d: dLine[i] !== null ? dLine[i] : undefined
+        k: kLine[i] ?? undefined,
+        d: dLine[i] ?? undefined
       })
     }
     return result

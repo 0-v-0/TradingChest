@@ -6,6 +6,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type ZlemaResult = { zlema: number | undefined }
+
 const zlema: IndicatorTemplate = {
   name: 'ZLEMA',
   shortName: 'ZLEMA',
@@ -19,7 +21,7 @@ const zlema: IndicatorTemplate = {
     const lag = Math.floor((period - 1) / 2)
     const k = 2 / (period + 1)
 
-    const result: any[] = []
+    const result: ZlemaResult[] = []
     let prevZlema = 0
 
     for (let i = 0; i < dataList.length; i++) {

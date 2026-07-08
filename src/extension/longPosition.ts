@@ -8,7 +8,7 @@
  * 显示盈亏比文字
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import { OverlayTemplate, OverlayFigure } from 'klinecharts'
 
 const longPosition: OverlayTemplate = {
   name: 'longPosition',
@@ -32,7 +32,7 @@ const longPosition: OverlayTemplate = {
     // 使用止损点的 x 坐标作为右边界，或者入场点 x + 固定宽度
     const rightX = coordinates[1].x
 
-    const figures: any[] = []
+    const figures: OverlayFigure[] = []
 
     // 红色区域：入场到止损
     const redColor = 'rgba(239, 83, 80, 0.15)'

@@ -113,6 +113,7 @@ describe('ReplayEngine', () => {
   it('goToPosition 夹紧到有效范围', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Array.from({ length: 10 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
     engine2.start(data, 5)
 
@@ -127,6 +128,7 @@ describe('ReplayEngine', () => {
   it('stepForward 在末尾不越界', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Array.from({ length: 5 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
     engine2.start(data, 5) // position = 5 = totalBars
     const beforeCalls = cbs.onBarUpdate.mock.calls.length
@@ -139,6 +141,7 @@ describe('ReplayEngine', () => {
   it('play 重复调用无效', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Array.from({ length: 100 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
     engine2.start(data, 5)
     engine2.play()
@@ -150,6 +153,7 @@ describe('ReplayEngine', () => {
   it('dispose 在播放中停止定时器', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Array.from({ length: 100 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
     engine2.start(data, 5)
     engine2.play()

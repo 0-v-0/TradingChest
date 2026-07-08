@@ -4,6 +4,14 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type IchimokuResult = {
+  tenkanSen: number | undefined
+  kijunSen: number | undefined
+  senkouSpanA: number | undefined
+  senkouSpanB: number | undefined
+  chikouSpan: number | undefined
+}
+
 /**
  * 计算指定区间内的最高价与最低价的中间值
  */
@@ -61,10 +69,10 @@ const ichimoku: IndicatorTemplate = {
 
     // 组装结果，先行带需要前移 displacement 个周期，迟行带需要后移 displacement 个周期
     const totalLength = dataList.length + displacement
-    const result: any[] = []
+    const result: IchimokuResult[] = []
 
     for (let i = 0; i < totalLength; i++) {
-      const item: any = {}
+      const item: Partial<IchimokuResult> = {}
 
       if (i < dataList.length) {
         item.tenkanSen = tenkanArr[i]
@@ -84,7 +92,7 @@ const ichimoku: IndicatorTemplate = {
         item.chikouSpan = dataList[chikouSrcIdx].close
       }
 
-      result.push(item)
+      result.push(item as IchimokuResult)
     }
 
     return result

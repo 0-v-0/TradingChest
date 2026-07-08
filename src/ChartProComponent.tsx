@@ -16,7 +16,8 @@ import { createSignal, createEffect, onMount, Show, onCleanup, startTransition, 
 
 import {
   init, dispose, utils, Nullable, Chart, OverlayMode, Styles,
-  TooltipIconPosition, ActionType, PaneOptions, Indicator, DomPosition, FormatDateType,
+  TooltipIconPosition, ActionType, PaneOptions, Indicator, IndicatorStyle, IndicatorCreate,
+  Coordinate, DomPosition, FormatDateType,
   type Overlay
 } from 'klinecharts'
 
@@ -62,7 +63,7 @@ async function createIndicator (widget: Nullable<Chart>, indicatorName: string, 
   }
   return widget?.createIndicator({
     name: indicatorName,
-    createTooltipDataSource: ({ indicator, defaultStyles }: any) => {
+    createTooltipDataSource: ({ indicator, defaultStyles }: { indicator: Indicator<Record<string, unknown>>; defaultStyles: IndicatorStyle }) => {
       const icons = []
       if (indicator.visible) {
         icons.push(defaultStyles.tooltip.icons[1])
@@ -75,7 +76,7 @@ async function createIndicator (widget: Nullable<Chart>, indicatorName: string, 
       }
       return { icons }
     }
-  } as any, isStack, paneOptions) ?? null
+  } as unknown as IndicatorCreate<Record<string, unknown>>, isStack, paneOptions) ?? null
 }
 
 function snapshotOverlay (overlay: Overlay): OverlayLifecycleEvent['overlay'] {
@@ -92,12 +93,12 @@ function snapshotOverlay (overlay: Overlay): OverlayLifecycleEvent['overlay'] {
 }
 
 const ChartProComponent: Component<ChartProComponentProps> = props => {
-  let widgetRef: HTMLDivElement | undefined = undefined
+  const widgetRef: HTMLDivElement | undefined = undefined
   let widget: Nullable<Chart> = null
 
   let priceUnitDom: HTMLElement
 
-  const [loading, setLoading] = createSignal(false)
+  const [, setLoading] = createSignal(false)
   let fetchSeq = 0  // 单调递增的请求序号，用于丢弃过期响应
 
   const [theme, setTheme] = createSignal(props.theme)
@@ -125,7 +126,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   const [loadingVisible, setLoadingVisible] = createSignal(false)
 
   const [indicatorSettingModalParams, setIndicatorSettingModalParams] = createSignal({
-    visible: false, indicatorName: '', paneId: '', calcParams: [] as Array<any>
+    visible: false, indicatorName: '', paneId: '', calcParams: [] as number[]
   })
 
   // 绘图 overlay 选中状态（浮动属性工具栏）
@@ -168,7 +169,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         const pixel = widget.convertToPixel(
           { timestamp: points[0].timestamp, value: points[0].value },
           { paneId: 'candle_pane' }
-        ) as any
+        ) as Partial<Coordinate>
         x = (pixel?.x ?? 200) + 52
         y = (pixel?.y ?? 100) - 50
       }
@@ -348,7 +349,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     if (widget) {
       const watermarkContainer = widget.getDom('candle_pane', DomPosition.Main)
       if (watermarkContainer) {
-        let watermark = document.createElement('div')
+        const watermark = document.createElement('div')
         watermark.className = 'klinecharts-pro-watermark'
         if (utils.isString(props.watermark)) {
           const str = (props.watermark as string).replace(/(^\s*)|(\s*$)/g, '')
@@ -393,7 +394,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         if (seq !== fetchSeq) return
         widget?.applyMoreData(kLineDataList, kLineDataList.length > 0)
       }
-      get().catch(e => { props.onError?.({ type: 'load-more', message: 'loadMore failed', raw: e }) }).finally(() => { if (seq === fetchSeq) setLoading(false) })
+      void get().catch(e => { props.onError?.({ type: 'load-more', message: 'loadMore failed', raw: e }) }).finally(() => { if (seq === fetchSeq) setLoading(false) })
     })
     widget?.subscribeAction(ActionType.OnTooltipIconClick, (data) => {
       if (data.indicatorName) {
@@ -486,7 +487,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         props.onPriceUpdate?.(data.close)
       })
     }
-    get()
+    void get()
       .catch(e => { props.onError?.({ type: 'data-fetch', message: 'data fetch failed', raw: e }) })
       .finally(() => { if (seq === fetchSeq) { setLoading(false); setLoadingVisible(false) } })
     return { symbol: s, period: p }

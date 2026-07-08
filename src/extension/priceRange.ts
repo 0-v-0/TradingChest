@@ -44,8 +44,8 @@ const priceRange: OverlayTemplate = {
       const maxX = Math.max(coordinates[0].x, coordinates[1].x)
       const minY = Math.min(coordinates[0].y, coordinates[1].y)
       const maxY = Math.max(coordinates[0].y, coordinates[1].y)
-      const width = maxX - minX
-      const height = maxY - minY
+      const _width = maxX - minX
+      const _height = maxY - minY
 
       // 上涨绿色，下跌红色
       const fillColor = isUp

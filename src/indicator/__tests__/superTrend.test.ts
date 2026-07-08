@@ -17,6 +17,7 @@ function makeKlines(count: number): KLineData[] {
 
 describe('SuperTrend indicator', () => {
   const klines = makeKlines(30)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const indicator = { calcParams: [10, 3] } as any
 
   it('返回与输入等长的数组', () => {

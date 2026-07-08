@@ -11,6 +11,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type AdLineResult = { ad: number }
+
 const adLine: IndicatorTemplate = {
   name: 'AD',
   shortName: 'AD',
@@ -18,8 +20,8 @@ const adLine: IndicatorTemplate = {
   figures: [
     { key: 'ad', title: 'AD: ', type: 'line' }
   ],
-  calc: (dataList: KLineData[], _indicator) => {
-    const result: any[] = []
+  calc: (dataList: KLineData[]) => {
+    const result: AdLineResult[] = []
     let ad = 0
 
     for (let i = 0; i < dataList.length; i++) {

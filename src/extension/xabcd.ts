@@ -25,7 +25,7 @@ const xabcd: OverlayTemplate = {
       color: 'rgba(22, 119, 255, 0.15)'
     }
   },
-  createPointFigures: ({ coordinates, overlay }) => {
+  createPointFigures: ({ coordinates, overlay: _overlay }) => {
     const dashedLines: LineAttrs[] = []
     const polygons: PolygonAttrs[] = []
     const tags = ['X', 'A', 'B', 'C', 'D']

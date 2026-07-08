@@ -5,6 +5,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type BollingerBandWidthResult = { bbw: number | undefined }
+
 const bollingerBandWidth: IndicatorTemplate = {
   name: 'BBW',
   shortName: 'BBW',
@@ -16,7 +18,7 @@ const bollingerBandWidth: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
     const stddevMultiplier = params[1] as number
-    const result: any[] = []
+    const result: BollingerBandWidthResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
       if (i < period - 1) {

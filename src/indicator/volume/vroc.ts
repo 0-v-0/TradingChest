@@ -9,6 +9,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type VrocResult = { vroc: number | undefined }
+
 const vroc: IndicatorTemplate = {
   name: 'VROC',
   shortName: 'VROC',
@@ -19,7 +21,7 @@ const vroc: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: VrocResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
       if (i < period) {

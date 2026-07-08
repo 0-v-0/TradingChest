@@ -4,6 +4,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type AtrResult = { atr: number | undefined }
+
 const atr: IndicatorTemplate = {
   name: 'ATR',
   shortName: 'ATR',
@@ -14,7 +16,7 @@ const atr: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: AtrResult[] = []
     let prevAtr = 0
 
     for (let i = 0; i < dataList.length; i++) {

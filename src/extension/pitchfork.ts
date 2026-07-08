@@ -77,7 +77,7 @@ const pitchfork: OverlayTemplate = {
       x: (pivot.x + swing1.x) / 2,
       y: (pivot.y + swing1.y) / 2
     }
-    const innerUpper2 = {
+    const _innerUpper2 = {
       x: innerUpper1.x + dx,
       y: innerUpper1.y + dy
     }

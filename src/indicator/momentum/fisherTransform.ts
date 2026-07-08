@@ -11,6 +11,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type FisherTransformResult = { fisher: number | undefined; trigger: number | undefined }
+
 const fisherTransform: IndicatorTemplate = {
   name: 'FISHER',
   shortName: 'Fisher',
@@ -22,7 +24,7 @@ const fisherTransform: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: FisherTransformResult[] = []
 
     // 计算中间价序列
     const midPrices: number[] = new Array(len)

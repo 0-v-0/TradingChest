@@ -8,7 +8,7 @@
  * 显示盈亏比文字
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import { OverlayTemplate, OverlayFigure } from 'klinecharts'
 
 const shortPosition: OverlayTemplate = {
   name: 'shortPosition',
@@ -31,7 +31,7 @@ const shortPosition: OverlayTemplate = {
     const leftX = coordinates[0].x
     const rightX = coordinates[1].x
 
-    const figures: any[] = []
+    const figures: OverlayFigure[] = []
 
     // 红色区域：入场到止损（做空时止损在入场上方）
     const redColor = 'rgba(239, 83, 80, 0.15)'

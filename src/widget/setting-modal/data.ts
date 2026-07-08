@@ -16,13 +16,13 @@ import i18n from '../../i18n'
 
 export interface SettingOption {
   key: string
-  text: any
+  text: string
   component: 'select' | 'switch' | 'color'
-  dataSource?: Array<{ key: string, text: any }>
+  dataSource?: Array<{ key: string, text: string }>
 }
 
 export interface SettingGroup {
-  label: any
+  label: string
   options: SettingOption[]
 }
 

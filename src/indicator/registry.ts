@@ -51,8 +51,6 @@ export class IndicatorRegistry {
         const template = await loader()
         this._registerFn(template)
         this._registered.add(name)
-      } catch (e) {
-        throw e
       } finally {
         this._pending.delete(name)
       }

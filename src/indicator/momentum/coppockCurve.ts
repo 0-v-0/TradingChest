@@ -7,6 +7,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type CoppockCurveResult = { coppock: number | undefined }
+
 const coppockCurve: IndicatorTemplate = {
   name: 'COPPOCK',
   shortName: 'Coppock',
@@ -20,7 +22,7 @@ const coppockCurve: IndicatorTemplate = {
     const roc2Period = params[1] as number
     const wmaPeriod = params[2] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: CoppockCurveResult[] = []
 
     // 需要足够的历史数据来计算 ROC
     const maxRocPeriod = Math.max(roc1Period, roc2Period)

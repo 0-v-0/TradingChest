@@ -14,7 +14,7 @@
 
 import { render } from 'solid-js/web'
 
-import { utils, Nullable, DeepPartial, Styles, registerIndicator, YAxisType } from 'klinecharts'
+import { utils, Nullable, DeepPartial, Styles, registerIndicator, YAxisType, IndicatorCreate } from 'klinecharts'
 import { normalizeToPercent } from './compare'
 
 import ChartProComponent from './ChartProComponent'
@@ -305,7 +305,7 @@ export default class KLineChartPro implements ChartPro {
     chart.createIndicator({
       name: 'TradeVis',
       extendData: { trades, _instanceId: this._instanceId }
-    } as any, true, paneOptions ?? { id: 'candle_pane' })
+    } as IndicatorCreate<Record<string, unknown>>, true, paneOptions ?? { id: 'candle_pane' })
   }
 
   addAlert (config: AlertConfig): void {
@@ -358,8 +358,8 @@ export default class KLineChartPro implements ChartPro {
   }
 
   private _clearComparisons (): void {
-    for (const [ticker, indicatorName] of this._comparisons) {
-      try { this.getChart()?.removeIndicator('candle_pane', indicatorName) } catch (_) { /* already disposing */ }
+    for (const [_ticker, indicatorName] of this._comparisons) {
+      try { this.getChart()?.removeIndicator('candle_pane', indicatorName) } catch { /* already disposing */ }
     }
     this._comparisons.clear()
   }
@@ -456,7 +456,7 @@ export default class KLineChartPro implements ChartPro {
     this._disposed = true
     // 1. Stop replay (safe — ChartProComponent.onCleanup also handles this)
     if (this._chartApi) {
-      try { this._chartApi.stopReplay() } catch (_) { /* already disposing */ }
+      try { this._chartApi.stopReplay() } catch { /* already disposing */ }
     }
     // 2. Remove comparisons
     this._clearComparisons()

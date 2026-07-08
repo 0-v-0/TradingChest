@@ -5,6 +5,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type UlcerIndexResult = { ui: number | undefined }
+
 const ulcerIndex: IndicatorTemplate = {
   name: 'UI',
   shortName: 'UI',
@@ -15,7 +17,7 @@ const ulcerIndex: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: UlcerIndexResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
       if (i < period - 1) {

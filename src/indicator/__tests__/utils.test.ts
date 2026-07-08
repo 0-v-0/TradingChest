@@ -23,7 +23,7 @@ function expectArrayClose(actual: (number | null)[], expected: (number | null)[]
     if (expected[i] === null) {
       expect(actual[i]).toBeNull()
     } else {
-      expect(actual[i]).toBeCloseTo(expected[i] as number, 10)
+      expect(Math.abs((actual[i] as number) - (expected[i] as number))).toBeLessThanOrEqual(eps)
     }
   }
 }

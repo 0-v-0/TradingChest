@@ -12,6 +12,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type ElderRayResult = { bullPower: number | undefined; bearPower: number | undefined }
+
 const elderRay: IndicatorTemplate = {
   name: 'ELDER_RAY',
   shortName: 'Elder Ray',
@@ -23,7 +25,7 @@ const elderRay: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: ElderRayResult[] = []
 
     // 内联计算收盘价的 EMA
     const k = 2 / (period + 1)

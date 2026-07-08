@@ -10,6 +10,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type ForceIndexResult = { fi: number | undefined }
+
 const forceIndex: IndicatorTemplate = {
   name: 'FI',
   shortName: 'FI',
@@ -20,7 +22,7 @@ const forceIndex: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: any[] = []
+    const result: ForceIndexResult[] = []
 
     if (dataList.length === 0) {
       return result

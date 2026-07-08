@@ -1,6 +1,6 @@
 import { KLineData, Indicator } from 'klinecharts'
 
-type CalcFn = (dataList: KLineData[], indicator: Indicator) => any[]
+type CalcFn = (dataList: KLineData[], indicator: Indicator) => Array<Record<string, unknown>>
 
 /**
  * Wraps a full-recalculation indicator `calc` function with an incremental
@@ -32,9 +32,9 @@ type CalcFn = (dataList: KLineData[], indicator: Indicator) => any[]
 export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): CalcFn {
   let prevLen = 0
   let prevSecondLastTs = 0
-  let cached: any[] = []
+  let cached: Array<Record<string, unknown>> = []
 
-  return (dataList: KLineData[], indicator: Indicator): any[] => {
+  return (dataList: KLineData[], indicator: Indicator): Array<Record<string, unknown>> => {
     const len = dataList.length
 
     if (len === 0) {

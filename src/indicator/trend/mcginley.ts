@@ -5,6 +5,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type McginleyResult = { md: number | undefined }
+
 const mcginley: IndicatorTemplate = {
   name: 'MCGINLEY',
   shortName: 'McGinley',
@@ -16,7 +18,7 @@ const mcginley: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
 
-    const result: any[] = []
+    const result: McginleyResult[] = []
     let prevMd = 0
 
     for (let i = 0; i < dataList.length; i++) {

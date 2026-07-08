@@ -4,6 +4,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type SuperTrendResult = { up: number | undefined; down: number | undefined }
+
 const superTrend: IndicatorTemplate = {
   name: 'SUPERTREND',
   shortName: 'SuperTrend',
@@ -16,7 +18,7 @@ const superTrend: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
     const multiplier = params[1] as number
-    const result: any[] = []
+    const result: SuperTrendResult[] = []
 
     // 先计算 ATR（Wilder 平滑）
     const atrValues: number[] = []
@@ -51,7 +53,7 @@ const superTrend: IndicatorTemplate = {
     let prevLowerBand = 0
     let prevSuperTrend = 0
     // 趋势方向：1 = 上升, -1 = 下降
-    let direction = 1
+    let direction: number
 
     for (let i = 0; i < dataList.length; i++) {
       if (i < period) {

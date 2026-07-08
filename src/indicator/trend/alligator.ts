@@ -5,6 +5,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type AlligatorResult = { jaw: number | undefined; teeth: number | undefined; lips: number | undefined }
+
 const alligator: IndicatorTemplate = {
   name: 'ALLIGATOR',
   shortName: 'Alligator',
@@ -57,10 +59,10 @@ const alligator: IndicatorTemplate = {
 
     // 应用偏移后组装结果
     const totalLength = dataList.length + Math.max(jawOffset, teethOffset, lipsOffset)
-    const result: any[] = []
+    const result: AlligatorResult[] = []
 
     for (let i = 0; i < totalLength; i++) {
-      const item: any = {}
+      const item: Partial<AlligatorResult> = {}
 
       // 颚线：前移 jawOffset
       const jawSrcIdx = i - jawOffset
@@ -80,7 +82,7 @@ const alligator: IndicatorTemplate = {
         item.lips = lipsSmma[lipsSrcIdx]
       }
 
-      result.push(item)
+      result.push(item as AlligatorResult)
     }
 
     return result

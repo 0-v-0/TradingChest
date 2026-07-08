@@ -8,6 +8,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type AroonResult = { aroonUp: number | undefined; aroonDown: number | undefined; oscillator: number | undefined }
+
 const aroon: IndicatorTemplate = {
   name: 'AROON',
   shortName: 'Aroon',
@@ -20,7 +22,7 @@ const aroon: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
-    const result: any[] = []
+    const result: AroonResult[] = []
 
     for (let i = 0; i < len; i++) {
       if (i < period) {

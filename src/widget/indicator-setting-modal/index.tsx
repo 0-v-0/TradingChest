@@ -22,18 +22,20 @@ import i18n from '../../i18n'
 
 import data from './data'
 
+type IndicatorSettingConfig = { paramNameKey: string; precision?: number; min?: number; default?: number }
+
 export interface IndicatorSettingModalProps {
   locale: string
-  params: { indicatorName: string, paneId: string, calcParams: any[] }
+  params: { indicatorName: string, paneId: string, calcParams: number[] }
   onClose: () => void
-  onConfirm: (calcParams: any) => void
+  onConfirm: (calcParams: number[]) => void
 }
 
 const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
 
-  const getConfig: (name: string) => any[] = (name: string) => {
-    return (data as Record<string, any[]>)[name]
+  const getConfig: (name: string) => IndicatorSettingConfig[] = (name: string) => {
+    return (data as Record<string, IndicatorSettingConfig[]>)[name]
   }
 
   return (
@@ -46,11 +48,11 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
           children: i18n('confirm', props.locale),
           onClick: () => {
             const config = getConfig(props.params.indicatorName)
-            const params: any[] = []
-            utils.clone(calcParams()).forEach((param: any, i: number) => {
-              if (!utils.isValid(param) || param === '') {
+            const params: number[] = []
+            utils.clone(calcParams()).forEach((param: number, i: number) => {
+              if (!utils.isValid(param)) {
                 if ('default' in config[i]) {
-                  params.push(config[i]['default'])
+                  params.push(config[i]['default'] as number)
                 }
               } else {
                 params.push(param)
@@ -75,7 +77,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
                   min={d.min}
                   onChange={value => {
                     const params = utils.clone(calcParams())
-                    params[i] = value
+                    params[i] = value as number
                     setCalcParams(params)
                   }}/>
               </>

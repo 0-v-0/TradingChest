@@ -5,6 +5,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type KamaResult = { kama: number | undefined }
+
 const kama: IndicatorTemplate = {
   name: 'KAMA',
   shortName: 'KAMA',
@@ -22,7 +24,7 @@ const kama: IndicatorTemplate = {
     const fastSc = 2 / (fastPeriod + 1)
     const slowSc = 2 / (slowPeriod + 1)
 
-    const result: any[] = []
+    const result: KamaResult[] = []
     let prevKama = 0
 
     for (let i = 0; i < dataList.length; i++) {

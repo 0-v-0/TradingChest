@@ -18,12 +18,17 @@ export default tseslint.config(
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        ...globals.es2021,
+        ...globals.es2023,
       },
     },
     rules: {
       'n/no-missing-import': 'off',
       'n/no-unsupported-features/node-builtins': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+      }],
     },
   },
 )

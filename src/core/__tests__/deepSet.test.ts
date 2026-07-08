@@ -3,7 +3,7 @@ import { deepSet } from '../deepSet'
 
 describe('deepSet', () => {
   it('sets a nested property', () => {
-    const obj: any = {}
+    const obj: Record<string, unknown> = {}
     deepSet(obj, 'a.b.c', 42)
     expect(obj.a.b.c).toBe(42)
   })
@@ -15,20 +15,20 @@ describe('deepSet', () => {
   })
 
   it('sets top-level property', () => {
-    const obj: any = {}
+    const obj: Record<string, unknown> = {}
     deepSet(obj, 'x', 'hello')
     expect(obj.x).toBe('hello')
   })
 
   it('rejects __proto__ path segments', () => {
-    const obj: any = {}
+    const obj: Record<string, unknown> = {}
     deepSet(obj, '__proto__.polluted', true)
-    expect(({} as any).polluted).toBeUndefined()
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined()
   })
 
   it('rejects constructor path segments', () => {
-    const obj: any = {}
+    const obj: Record<string, unknown> = {}
     deepSet(obj, 'constructor.prototype.polluted', true)
-    expect(({} as any).polluted).toBeUndefined()
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined()
   })
 })

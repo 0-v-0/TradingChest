@@ -39,8 +39,8 @@ const Select: Component<SelectProps> = props => {
       role="combobox"
       aria-expanded={open()}
       aria-haspopup="listbox"
-      onClick={_ => { setOpen(o => !o) }}
-      onBlur={_ => { setOpen(false) }}
+      onClick={_val => { setOpen(o => !o) }}
+      onBlur={_val => { setOpen(false) }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(o => !o) }
         if (e.key === 'Escape') { setOpen(false) }
@@ -58,7 +58,7 @@ const Select: Component<SelectProps> = props => {
             {
               props.dataSource.map(data => {
                 const d = data as SelectDataSourceItem
-                const v = (d as Record<string, any>)[props.valueKey ?? 'text'] ?? data
+                const v: JSX.Element = ((d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text']) ?? (data as unknown as JSX.Element)
                 return (
                   <li
                     role="option"

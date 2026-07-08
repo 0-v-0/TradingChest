@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { saveLayout, loadLayout, deleteLayout, listLayouts, type ChartLayout } from '../index'
+import { saveLayout, loadLayout, deleteLayout, listLayouts } from '../index'
 
 const store: Record<string, string> = {}
 const localStorageMock = {
@@ -194,8 +194,6 @@ describe('persistence', () => {
       }
 
       saveLayout('first', layout1)
-      // Add a small delay to ensure different timestamps
-      const firstTimestamp = Date.now()
       saveLayout('second', layout2)
 
       const list = listLayouts()

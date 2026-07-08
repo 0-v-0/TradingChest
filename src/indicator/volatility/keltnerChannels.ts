@@ -4,6 +4,8 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type KeltnerChannelsResult = { middle: number | undefined; upper: number | undefined; lower: number | undefined }
+
 const keltnerChannels: IndicatorTemplate = {
   name: 'KC',
   shortName: 'KC',
@@ -17,7 +19,7 @@ const keltnerChannels: IndicatorTemplate = {
     const params = indicator.calcParams
     const emaPeriod = params[0] as number
     const atrMultiplier = params[1] as number
-    const result: any[] = []
+    const result: KeltnerChannelsResult[] = []
 
     // EMA 平滑系数
     const emaK = 2 / (emaPeriod + 1)
