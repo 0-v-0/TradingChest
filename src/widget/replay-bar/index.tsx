@@ -15,7 +15,7 @@
 import { Component, Show } from 'solid-js'
 import type { ReplayState, ReplaySpeed } from '../../replay/types'
 import i18n from '../../i18n'
-import './index.less'
+import './index.css'
 
 export interface ReplayControlBarProps {
   locale: string

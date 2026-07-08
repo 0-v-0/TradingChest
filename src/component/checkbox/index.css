@@ -1,6 +1,4 @@
-@import (reference) '../../base.less';
-
-.@{prefix-cls}-checkbox {
+.klinecharts-pro-checkbox {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -9,15 +7,17 @@
   color: var(--klinecharts-pro-text-color);
   fill: var(--klinecharts-pro-text-color);
   cursor: pointer;
-  .icon {
+
+  & .icon {
     width: 20px;
     height: 20px;
   }
 
-  .label {
+  & .label {
     display: inline-block;
     margin-left: 6px;
   }
+
   &.checked {
     color: var(--klinecharts-pro-primary-color);
     fill: var(--klinecharts-pro-primary-color);

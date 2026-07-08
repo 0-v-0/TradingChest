@@ -1,6 +1,4 @@
-@import (reference) '../../base.less';
-
-.@{prefix-cls}-switch {
+.klinecharts-pro-switch {
   display: flex;
   flex-direction: row;
   position: relative;
@@ -8,7 +6,8 @@
   height: 18px;
   border-radius: 9px;
   cursor: pointer;
-  .thumb {
+
+  & .thumb {
     display: inline-block;
     position: absolute;
     top: 2px;
@@ -22,13 +21,16 @@
 
   &.turn-off {
     background-color: var(--klinecharts-pro-border-color);
-    .thumb {
+
+    & .thumb {
       left: 2px;
     }
   }
+
   &.turn-on {
     background-color: var(--klinecharts-pro-primary-color);
-    .thumb {
+
+    & .thumb {
       left: 20px;
     }
   }

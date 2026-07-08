@@ -24,7 +24,7 @@ import { load } from './i18n'
 
 import { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, ChartProOptions, ChartPro } from './types'
 
-import './index.less'
+import './index.css'
 
 import tradeVisualization from './indicator/trade/tradeVisualization'
 

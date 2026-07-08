@@ -1,18 +1,17 @@
-@import (reference) '../../base.less';
-
-.@{prefix-cls}-setting-modal-group-label {
+.klinecharts-pro-setting-modal-group-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--klinecharts-pro-text-color);
   padding: 12px 0 8px;
   border-bottom: 1px solid var(--klinecharts-pro-border-color);
   margin-bottom: 12px;
+
   &:first-child {
     padding-top: 0;
   }
 }
 
-.@{prefix-cls}-setting-modal-content {
+.klinecharts-pro-setting-modal-content {
   display: grid;
   grid-template-columns: auto auto auto auto;
   grid-row-gap: 16px;

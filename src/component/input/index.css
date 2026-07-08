@@ -1,6 +1,4 @@
-@import (reference) '../../base.less';
-
-.@{prefix-cls}-input {
+.klinecharts-pro-input {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -13,24 +11,27 @@
   color: var(--klinecharts-pro-text-color);
   box-sizing: border-box;
   cursor: pointer;
+
   &[data-status="focus"] {
     border-color: var(--klinecharts-pro-primary-color);
   }
-  .prefix {
+
+  & .prefix {
     display: flex;
     white-space: nowrap;
     padding-right: 10px;
   }
-  .suffix {
+
+  & .suffix {
     display: flex;
     white-space: nowrap;
     padding-left: 10px;
   }
-  .value {
+
+  & .value {
     width: 100%;
     border: none;
     outline: none;
-    border: none;
     background: transparent;
     color: var(--klinecharts-pro-text-color);
     font-size: 14px;

@@ -1,6 +1,4 @@
-@import (reference) '../../base.less';
-
-.@{prefix-cls}-modal {
+.klinecharts-pro-modal {
   position: absolute;
   display: flex;
   flex-direction: row;
@@ -12,11 +10,13 @@
   top: 0;
   background-color: rgba(0, 0, 0, .2);
   z-index: 99;
-  .inner {
+
+  & .inner {
     background-color: var(--klinecharts-pro-popover-background-color);
     box-shadow: 0 6px 12px 0 rgba(0, 0, 0, .3);
     border-radius: 4px;
-    .title-container {
+
+    & .title-container {
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -29,21 +29,25 @@
       position: relative;
       box-sizing: border-box;
       border-bottom: solid 1px var(--klinecharts-pro-border-color);
-      .close-icon {
+
+      & .close-icon {
         width: 14px;
         height: 14px;
         cursor: pointer;
         fill: var(--klinecharts-pro-text-color);
+
         &:hover {
           fill: var(--klinecharts-pro-primary-color);
         }
       }
     }
-    .content-container {
+
+    & .content-container {
       padding: 0 26px;
       min-height: 140px;
     }
-    .button-container {
+
+    & .button-container {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;

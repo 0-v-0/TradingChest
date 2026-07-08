@@ -1,12 +1,10 @@
-@import (reference) '../../base.less';
-
-.@{prefix-cls}-color-input {
+.klinecharts-pro-color-input {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   position: relative;
 
-  input[type="color"] {
+  & input[type="color"] {
     width: 28px;
     height: 28px;
     border: 1px solid var(--klinecharts-pro-border-color);
@@ -18,6 +16,7 @@
     &::-webkit-color-swatch-wrapper {
       padding: 0;
     }
+
     &::-webkit-color-swatch {
       border: none;
       border-radius: 2px;
