@@ -1,6 +1,4 @@
-'use client';
-
-import * as React from 'react'
+import { type Component, For } from 'solid-js'
 
 export interface LiveSharpePoint {
   timestamp: string
@@ -32,7 +30,7 @@ const pathFromPoints = (points: ReadonlyArray<[number, number]>): string => (
   points.map(([x, y], index) => `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`).join(' ')
 )
 
-export function LiveSharpeChart (props: LiveSharpeChartProps): React.ReactElement {
+export const LiveSharpeChart: Component<LiveSharpeChartProps> = props => {
   // charter D-03 + L-25 — DO NOT change the default M+1 threshold to mask bad live evidence.
   const threshold = props.threshold ?? 0.7
   const height = props.height ?? DEFAULT_HEIGHT
@@ -61,94 +59,49 @@ export function LiveSharpeChart (props: LiveSharpeChartProps): React.ReactElemen
   const thresholdY = yFor(threshold)
   const latest = values.at(-1)
 
-  return React.createElement(
-    'div',
-    {
-      className: props.className,
-      'data-testid': 'live-sharpe-chart',
-      style: {
+  return (
+    <div
+      class={props.className}
+      data-testid="live-sharpe-chart"
+      style={{
         border: '1px solid #d7dde8',
-        borderRadius: 8,
+        'border-radius': '8px',
         background: '#ffffff',
-        padding: 12,
-        minHeight: height + 24
-      }
-    },
-    React.createElement(
-      'div',
-      {
-        style: {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          marginBottom: 8
+        padding: '12px',
+        'min-height': `${height + 24}px`
+      }}
+    >
+      <div style={{
+        display: 'flex',
+        'align-items': 'center',
+        'justify-content': 'space-between',
+        gap: '12px',
+        'margin-bottom': '8px'
+      }}>
+        <strong style={{ 'font-size': '14px', color: '#172033' }}>Rolling 60D Sharpe / Ratio</strong>
+        <span style={{ 'font-size': '12px', color: latest !== undefined && latest >= threshold ? '#0f766e' : '#b42318' }}>
+          {latest !== undefined ? `当前 ${formatValue(latest)} / 阈值 ${formatValue(threshold)}` : '暂无数据'}
+        </span>
+      </div>
+      <svg
+        role="img"
+        aria-label="rolling 60 day sharpe ratio chart"
+        viewBox={`0 0 ${WIDTH} ${height}`}
+        width="100%"
+        height={height}
+        preserveAspectRatio="none"
+      >
+        <rect x={PAD_X} y={PAD_Y} width={usableWidth} height={usableHeight} fill="#f8fafc" stroke="#e2e8f0" />
+        <line x1={PAD_X} x2={WIDTH - PAD_X} y1={thresholdY} y2={thresholdY} stroke="#d92d20" stroke-dasharray="5 5" stroke-width="2" />
+        <text x={WIDTH - PAD_X} y={Math.max(14, thresholdY - 8)} text-anchor="end" fill="#b42318" font-size="12">M+1 {formatValue(threshold)}</text>
+        {linePath
+          ? <path d={linePath} fill="none" stroke="#2563eb" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" />
+          : <text x={WIDTH / 2} y={height / 2} text-anchor="middle" fill="#667085" font-size="13">暂无 LIVE 观察数据</text>
         }
-      },
-      React.createElement('strong', { style: { fontSize: 14, color: '#172033' } }, 'Rolling 60D Sharpe / Ratio'),
-      React.createElement(
-        'span',
-        { style: { fontSize: 12, color: latest !== undefined && latest >= threshold ? '#0f766e' : '#b42318' } },
-        latest !== undefined ? `当前 ${formatValue(latest)} / 阈值 ${formatValue(threshold)}` : '暂无数据'
-      )
-    ),
-    React.createElement(
-      'svg',
-      {
-        role: 'img',
-        'aria-label': 'rolling 60 day sharpe ratio chart',
-        viewBox: `0 0 ${WIDTH} ${height}`,
-        width: '100%',
-        height,
-        preserveAspectRatio: 'none'
-      },
-      React.createElement('rect', {
-        x: PAD_X,
-        y: PAD_Y,
-        width: usableWidth,
-        height: usableHeight,
-        fill: '#f8fafc',
-        stroke: '#e2e8f0'
-      }),
-      React.createElement('line', {
-        x1: PAD_X,
-        x2: WIDTH - PAD_X,
-        y1: thresholdY,
-        y2: thresholdY,
-        stroke: '#d92d20',
-        strokeDasharray: '5 5',
-        strokeWidth: 2
-      }),
-      React.createElement('text', {
-        x: WIDTH - PAD_X,
-        y: Math.max(14, thresholdY - 8),
-        textAnchor: 'end',
-        fill: '#b42318',
-        fontSize: 12
-      }, `M+1 ${formatValue(threshold)}`),
-      linePath
-        ? React.createElement('path', {
-          d: linePath,
-          fill: 'none',
-          stroke: '#2563eb',
-          strokeLinecap: 'round',
-          strokeLinejoin: 'round',
-          strokeWidth: 3
-        })
-        : React.createElement('text', {
-          x: WIDTH / 2,
-          y: height / 2,
-          textAnchor: 'middle',
-          fill: '#667085',
-          fontSize: 13
-        }, '暂无 LIVE 观察数据'),
-      points.map(([x, y], index) => React.createElement('circle', {
-        key: `${props.series[index]?.timestamp ?? index}-${index}`,
-        cx: x,
-        cy: y,
-        r: 3.5,
-        fill: '#2563eb'
-      }))
-    )
+        <For each={points}>
+          {([x, y]) => <circle cx={x} cy={y} r="3.5" fill="#2563eb" />}
+        </For>
+      </svg>
+    </div>
   )
 }

@@ -1,6 +1,4 @@
-'use client';
-
-import * as React from 'react'
+import { type Component, For } from 'solid-js'
 
 export interface DrawdownPoint {
   timestamp: string
@@ -26,7 +24,7 @@ const pathFromPoints = (points: ReadonlyArray<[number, number]>): string => (
   points.map(([x, y], index) => `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`).join(' ')
 )
 
-export function DrawdownAreaChart (props: DrawdownAreaChartProps): React.ReactElement {
+export const DrawdownAreaChart: Component<DrawdownAreaChartProps> = props => {
   const height = props.height ?? DEFAULT_HEIGHT
   const usableWidth = WIDTH - PAD_X * 2
   const usableHeight = height - PAD_Y * 2
@@ -53,93 +51,49 @@ export function DrawdownAreaChart (props: DrawdownAreaChartProps): React.ReactEl
     : ''
   const latest = values.at(-1)
 
-  return React.createElement(
-    'div',
-    {
-      className: props.className,
-      'data-testid': 'drawdown-area-chart',
-      style: {
+  return (
+    <div
+      class={props.className}
+      data-testid="drawdown-area-chart"
+      style={{
         border: '1px solid #d7dde8',
-        borderRadius: 8,
+        'border-radius': '8px',
         background: '#ffffff',
-        padding: 12,
-        minHeight: height + 24
-      }
-    },
-    React.createElement(
-      'div',
-      {
-        style: {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          marginBottom: 8
+        padding: '12px',
+        'min-height': `${height + 24}px`
+      }}
+    >
+      <div style={{
+        display: 'flex',
+        'align-items': 'center',
+        'justify-content': 'space-between',
+        gap: '12px',
+        'margin-bottom': '8px'
+      }}>
+        <strong style={{ 'font-size': '14px', color: '#172033' }}>Drawdown Trajectory</strong>
+        <span style={{ 'font-size': '12px', color: '#b42318' }}>
+          {latest !== undefined ? `当前 ${(latest * 100).toFixed(2)}%` : '暂无数据'}
+        </span>
+      </div>
+      <svg
+        role="img"
+        aria-label="drawdown underwater area chart"
+        viewBox={`0 0 ${WIDTH} ${height}`}
+        width="100%"
+        height={height}
+        preserveAspectRatio="none"
+      >
+        <rect x={PAD_X} y={PAD_Y} width={usableWidth} height={usableHeight} fill="#fff7f7" stroke="#fee4e2" />
+        <line x1={PAD_X} x2={WIDTH - PAD_X} y1={zeroY} y2={zeroY} stroke="#667085" stroke-width="1" />
+        {areaPath && <path d={areaPath} fill="rgba(217, 45, 32, 0.22)" stroke="none" />}
+        {linePath
+          ? <path d={linePath} fill="none" stroke="#d92d20" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" />
+          : <text x={WIDTH / 2} y={height / 2} text-anchor="middle" fill="#667085" font-size="13">暂无 drawdown 数据</text>
         }
-      },
-      React.createElement('strong', { style: { fontSize: 14, color: '#172033' } }, 'Drawdown Trajectory'),
-      React.createElement(
-        'span',
-        { style: { fontSize: 12, color: '#b42318' } },
-        latest !== undefined ? `当前 ${(latest * 100).toFixed(2)}%` : '暂无数据'
-      )
-    ),
-    React.createElement(
-      'svg',
-      {
-        role: 'img',
-        'aria-label': 'drawdown underwater area chart',
-        viewBox: `0 0 ${WIDTH} ${height}`,
-        width: '100%',
-        height,
-        preserveAspectRatio: 'none'
-      },
-      React.createElement('rect', {
-        x: PAD_X,
-        y: PAD_Y,
-        width: usableWidth,
-        height: usableHeight,
-        fill: '#fff7f7',
-        stroke: '#fee4e2'
-      }),
-      React.createElement('line', {
-        x1: PAD_X,
-        x2: WIDTH - PAD_X,
-        y1: zeroY,
-        y2: zeroY,
-        stroke: '#667085',
-        strokeWidth: 1
-      }),
-      areaPath
-        ? React.createElement('path', {
-          d: areaPath,
-          fill: 'rgba(217, 45, 32, 0.22)',
-          stroke: 'none'
-        })
-        : null,
-      linePath
-        ? React.createElement('path', {
-          d: linePath,
-          fill: 'none',
-          stroke: '#d92d20',
-          strokeLinecap: 'round',
-          strokeLinejoin: 'round',
-          strokeWidth: 3
-        })
-        : React.createElement('text', {
-          x: WIDTH / 2,
-          y: height / 2,
-          textAnchor: 'middle',
-          fill: '#667085',
-          fontSize: 13
-        }, '暂无 drawdown 数据'),
-      points.map(([x, y], index) => React.createElement('circle', {
-        key: `${props.series[index]?.timestamp ?? index}-${index}`,
-        cx: x,
-        cy: y,
-        r: 3.5,
-        fill: '#d92d20'
-      }))
-    )
+        <For each={points}>
+          {([x, y]) => <circle cx={x} cy={y} r="3.5" fill="#d92d20" />}
+        </For>
+      </svg>
+    </div>
   )
 }
