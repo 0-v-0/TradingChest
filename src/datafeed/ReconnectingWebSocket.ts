@@ -59,7 +59,7 @@ export class ReconnectingWebSocket {
     }
   }
 
-  send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
+  send(data: BufferSource | Blob | string): void {
     if (this._ws?.readyState === WebSocket.OPEN) {
       this._ws.send(data)
     }
