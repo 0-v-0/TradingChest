@@ -358,7 +358,7 @@ export default class KLineChartPro implements ChartPro {
   }
 
   private _clearComparisons (): void {
-    for (const [_ticker, indicatorName] of this._comparisons) {
+    for (const [, indicatorName] of this._comparisons) {
       try { this.getChart()?.removeIndicator('candle_pane', indicatorName) } catch { /* already disposing */ }
     }
     this._comparisons.clear()

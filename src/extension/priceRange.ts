@@ -39,14 +39,6 @@ const priceRange: OverlayTemplate = {
       // 根据 x 坐标近似估算 K 线根数
       const bars = Math.abs(Math.round((coordinates[1].x - coordinates[0].x) / 10))
 
-      // 矩形区域的边界
-      const minX = Math.min(coordinates[0].x, coordinates[1].x)
-      const maxX = Math.max(coordinates[0].x, coordinates[1].x)
-      const minY = Math.min(coordinates[0].y, coordinates[1].y)
-      const maxY = Math.max(coordinates[0].y, coordinates[1].y)
-      const _width = maxX - minX
-      const _height = maxY - minY
-
       // 上涨绿色，下跌红色
       const fillColor = isUp
         ? 'rgba(38, 166, 154, 0.15)'

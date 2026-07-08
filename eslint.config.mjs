@@ -25,7 +25,6 @@ export default tseslint.config(
       'n/no-missing-import': 'off',
       'n/no-unsupported-features/node-builtins': 'off',
       '@typescript-eslint/no-unused-vars': ['error', {
-        varsIgnorePattern: '^_',
         argsIgnorePattern: '^_',
         caughtErrors: 'all',
       }],

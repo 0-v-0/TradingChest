@@ -73,14 +73,6 @@ const pitchfork: OverlayTemplate = {
     const lowerRay = getRayLine([lower1, lower2], bounding) as LineAttrs
 
     // 50% 内线：中线与外线之间的中间平行线
-    const innerUpper1 = {
-      x: (pivot.x + swing1.x) / 2,
-      y: (pivot.y + swing1.y) / 2
-    }
-    const _innerUpper2 = {
-      x: innerUpper1.x + dx,
-      y: innerUpper1.y + dy
-    }
     // 内上线的起点取中线起点与上外线起点的中点方向
     const innerUpperStart = {
       x: (midPoint.x + swing1.x) / 2,

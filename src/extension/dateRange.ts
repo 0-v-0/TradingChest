@@ -42,7 +42,6 @@ const dateRange: OverlayTemplate = {
       // 垂直阴影带：从图表顶部到底部
       const minX = Math.min(coordinates[0].x, coordinates[1].x)
       const maxX = Math.max(coordinates[0].x, coordinates[1].x)
-      const _width = maxX - minX
       const chartHeight = bounding.height
 
       // 显示文本
