@@ -20,7 +20,7 @@ import { deepSet } from '../../core/deepSet'
 import { Modal, Select, Switch, ColorInput } from '../../component'
 import type { SelectDataSourceItem } from '../../component'
 
-import i18n from '../../i18n'
+import t from '../../i18n'
 import { getOptions } from './data'
 import type { SettingOption } from './data'
 
@@ -57,11 +57,11 @@ const SettingModal: Component<SettingModalProps> = props => {
 
   return (
     <Modal
-      title={i18n('setting', props.locale)}
+      title={t('setting', props.locale)}
       width={560}
       buttons={[
         {
-          children: i18n('restore_default', props.locale),
+          children: t('restore_default', props.locale),
           onClick: () => {
             props.onRestoreDefault(flatOptions())
             props.onClose()
@@ -85,7 +85,7 @@ const SettingModal: Component<SettingModalProps> = props => {
                           component = (
                             <Select
                               style={{ width: '120px' }}
-                              value={i18n(value as string, props.locale)}
+                              value={t(value as string, props.locale)}
                               dataSource={option.dataSource}
                               onSelected={(data) => {
                                 const newValue = (data as SelectDataSourceItem).key

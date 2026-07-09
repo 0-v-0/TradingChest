@@ -16,7 +16,7 @@ import { Component, createSignal, createMemo } from 'solid-js'
 
 import { Modal, Select } from '../../component'
 import type { SelectDataSourceItem } from '../../component'
-import i18n from '../../i18n'
+import t from '../../i18n'
 
 import { createTimezoneSelectOptions } from './data'
 
@@ -34,11 +34,11 @@ const TimezoneModal: Component<TimezoneModalProps> = props => {
 
   return (
     <Modal
-      title={i18n('timezone', props.locale)}
+      title={t('timezone', props.locale)}
       width={320}
       buttons={[
         {
-          children: i18n('confirm', props.locale),
+          children: t('confirm', props.locale),
           onClick: () => {
             props.onConfirm(innerTimezone())
             props.onClose()

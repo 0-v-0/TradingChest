@@ -14,7 +14,7 @@
 
 import { Component, Show } from 'solid-js'
 import type { ReplayState, ReplaySpeed } from '../../replay/types'
-import i18n from '../../i18n'
+import t from '../../i18n'
 import './index.css'
 
 export interface ReplayControlBarProps {
@@ -40,7 +40,7 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
   return (
     <Show when={props.state.active}>
       <div class="klinecharts-pro-replay-bar">
-        <div class="replay-btn" onClick={props.onStepBackward} title={i18n('replay_back', props.locale)}>
+        <div class="replay-btn" onClick={props.onStepBackward} title={t('replay_back', props.locale)}>
           <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" transform="scale(-1,1) translate(-24,0)"/></svg>
         </div>
         <div class="replay-btn" onClick={() => props.state.playing ? props.onPause() : props.onPlay()}>
@@ -50,10 +50,10 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           )}
         </div>
-        <div class="replay-btn" onClick={props.onStepForward} title={i18n('replay_forward', props.locale)}>
+        <div class="replay-btn" onClick={props.onStepForward} title={t('replay_forward', props.locale)}>
           <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </div>
-        <span class="replay-speed" onClick={() => props.onSpeedChange(nextSpeed())} title={i18n('replay_speed', props.locale)}>
+        <span class="replay-speed" onClick={() => props.onSpeedChange(nextSpeed())} title={t('replay_speed', props.locale)}>
           {props.state.speed}x
         </span>
         <div class="replay-progress">
@@ -63,7 +63,7 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
           <span>{props.state.totalBars}</span>
         </div>
         <span class="replay-exit" onClick={props.onStop}>
-          {i18n('replay_exit', props.locale)}
+          {t('replay_exit', props.locale)}
         </span>
       </div>
     </Show>

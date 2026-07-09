@@ -12,20 +12,32 @@
  * limitations under the License.
  */
 
-import zhCN from './zh-CN.json'
-import enUS from './en-US.json'
-import ja from './ja.json'
-import ko from './ko.json'
+const locales: Record<string, Record<string, string>> = {}
+const loadedLanguages = new Set<string>()
 
-const locales: Record<string, Record<string, string>> = {
-  'zh-CN': zhCN,
-  'en-US': enUS,
-  'ja': ja,
-  'ko': ko
-}
-
-export function load (key: string, ls: Record<string, string>) {
-  locales[key] = ls
+export async function load(locale: string) {
+  if (loadedLanguages.has(locale)) {
+    return
+  }
+  let mod: Record<string, string>
+  switch (locale) {
+    case 'zh-CN':
+      mod = (await import('./zh-CN.json')).default
+      break
+    case 'en-US':
+      mod = (await import('./en-US.json')).default
+      break
+    case 'ja':
+      mod = (await import('./ja.json')).default
+      break
+    case 'ko':
+      mod = (await import('./ko.json')).default
+      break
+    default:
+      return
+  }
+  locales[locale] = mod
+  loadedLanguages.add(locale)
 }
 
 export default (key: string, locale: string) => {

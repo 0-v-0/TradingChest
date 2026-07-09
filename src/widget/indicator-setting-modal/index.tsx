@@ -18,7 +18,7 @@ import { utils } from 'klinecharts'
 
 import { Modal, Input } from '../../component'
 
-import i18n from '../../i18n'
+import t from '../../i18n'
 
 import data from './data'
 
@@ -45,7 +45,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
       buttons={[
         {
           type: 'confirm',
-          children: i18n('confirm', props.locale),
+          children: t('confirm', props.locale),
           onClick: () => {
             const config = getConfig(props.params.indicatorName)
             const params: number[] = []
@@ -69,7 +69,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
           getConfig(props.params.indicatorName).map((d, i) => {
             return (
               <>
-                <span >{i18n(d.paramNameKey, props.locale)}</span>
+                <span >{t(d.paramNameKey, props.locale)}</span>
                 <Input
                   style={{ width: '200px' }}
                   value={calcParams()[i] ?? ''}

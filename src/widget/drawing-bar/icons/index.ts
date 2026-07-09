@@ -71,7 +71,7 @@ import remove from './remove'
 
 import type { SelectDataSourceItem } from '../../../component'
 
-import i18n from '../../../i18n'
+import t from '../../../i18n'
 
 export const mapping = {
   horizontalStraightLine,
@@ -128,96 +128,96 @@ export const mapping = {
 
 export function createSingleLineOptions (locale: string): SelectDataSourceItem[] {
   return  [
-    { key: 'horizontalStraightLine', text: i18n('horizontal_straight_line', locale) },
-    { key: 'horizontalRayLine', text: i18n('horizontal_ray_line', locale) },
-    { key: 'horizontalSegment', text: i18n('horizontal_segment', locale) },
-    { key: 'verticalStraightLine', text: i18n('vertical_straight_line', locale) },
-    { key: 'verticalRayLine', text: i18n('vertical_ray_line', locale) },
-    { key: 'verticalSegment', text: i18n('vertical_segment', locale) },
-    { key: 'straightLine', text: i18n('straight_line', locale) },
-    { key: 'rayLine', text: i18n('ray_line', locale) },
-    { key: 'segment', text: i18n('segment', locale) },
-    { key: 'arrow', text: i18n('arrow', locale) },
-    { key: 'priceLine', text: i18n('price_line', locale) }
+    { key: 'horizontalStraightLine', text: t('horizontal_straight_line', locale) },
+    { key: 'horizontalRayLine', text: t('horizontal_ray_line', locale) },
+    { key: 'horizontalSegment', text: t('horizontal_segment', locale) },
+    { key: 'verticalStraightLine', text: t('vertical_straight_line', locale) },
+    { key: 'verticalRayLine', text: t('vertical_ray_line', locale) },
+    { key: 'verticalSegment', text: t('vertical_segment', locale) },
+    { key: 'straightLine', text: t('straight_line', locale) },
+    { key: 'rayLine', text: t('ray_line', locale) },
+    { key: 'segment', text: t('segment', locale) },
+    { key: 'arrow', text: t('arrow', locale) },
+    { key: 'priceLine', text: t('price_line', locale) }
   ]
 }
 
 export function createMoreLineOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'priceChannelLine', text: i18n('price_channel_line', locale) },
-    { key: 'parallelStraightLine', text: i18n('parallel_straight_line', locale) }
+    { key: 'priceChannelLine', text: t('price_channel_line', locale) },
+    { key: 'parallelStraightLine', text: t('parallel_straight_line', locale) }
   ]
 }
 
 export function createPolygonOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'circle', text: i18n('circle', locale) },
-    { key: 'rect', text: i18n('rect', locale) },
-    { key: 'parallelogram', text: i18n('parallelogram', locale) },
-    { key: 'triangle', text: i18n('triangle', locale) }
+    { key: 'circle', text: t('circle', locale) },
+    { key: 'rect', text: t('rect', locale) },
+    { key: 'parallelogram', text: t('parallelogram', locale) },
+    { key: 'triangle', text: t('triangle', locale) }
   ]
 }
 
 export function createFibonacciOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'fibonacciLine', text: i18n('fibonacci_line', locale) },
-    { key: 'fibonacciSegment', text: i18n('fibonacci_segment', locale) },
-    { key: 'fibonacciCircle', text: i18n('fibonacci_circle', locale) },
-    { key: 'fibonacciSpiral', text: i18n('fibonacci_spiral', locale) },
-    { key: 'fibonacciSpeedResistanceFan', text: i18n('fibonacci_speed_resistance_fan', locale) },
-    { key: 'fibonacciExtension', text: i18n('fibonacci_extension', locale) },
-    { key: 'gannBox', text: i18n('gann_box', locale) }
+    { key: 'fibonacciLine', text: t('fibonacci_line', locale) },
+    { key: 'fibonacciSegment', text: t('fibonacci_segment', locale) },
+    { key: 'fibonacciCircle', text: t('fibonacci_circle', locale) },
+    { key: 'fibonacciSpiral', text: t('fibonacci_spiral', locale) },
+    { key: 'fibonacciSpeedResistanceFan', text: t('fibonacci_speed_resistance_fan', locale) },
+    { key: 'fibonacciExtension', text: t('fibonacci_extension', locale) },
+    { key: 'gannBox', text: t('gann_box', locale) }
   ]
 }
 
 export function createWaveOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'xabcd', text: i18n('xabcd', locale) },
-    { key: 'abcd', text: i18n('abcd', locale) },
-    { key: 'threeWaves', text: i18n('three_waves', locale) },
-    { key: 'fiveWaves', text: i18n('five_waves', locale) },
-    { key: 'eightWaves', text: i18n('eight_waves', locale) },
-    { key: 'anyWaves', text: i18n('any_waves', locale) },
+    { key: 'xabcd', text: t('xabcd', locale) },
+    { key: 'abcd', text: t('abcd', locale) },
+    { key: 'threeWaves', text: t('three_waves', locale) },
+    { key: 'fiveWaves', text: t('five_waves', locale) },
+    { key: 'eightWaves', text: t('eight_waves', locale) },
+    { key: 'anyWaves', text: t('any_waves', locale) },
   ]
 }
 
 export function createMeasurementOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'priceRange', text: i18n('price_range', locale) },
-    { key: 'dateRange', text: i18n('date_range', locale) },
-    { key: 'dateAndPriceRange', text: i18n('date_and_price_range', locale) }
+    { key: 'priceRange', text: t('price_range', locale) },
+    { key: 'dateRange', text: t('date_range', locale) },
+    { key: 'dateAndPriceRange', text: t('date_and_price_range', locale) }
   ]
 }
 
 export function createChannelOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'pitchfork', text: i18n('pitchfork', locale) },
-    { key: 'schiffPitchfork', text: i18n('schiff_pitchfork', locale) },
-    { key: 'regressionTrend', text: i18n('regression_trend', locale) },
-    { key: 'regressionChannel', text: i18n('regression_channel', locale) }
+    { key: 'pitchfork', text: t('pitchfork', locale) },
+    { key: 'schiffPitchfork', text: t('schiff_pitchfork', locale) },
+    { key: 'regressionTrend', text: t('regression_trend', locale) },
+    { key: 'regressionChannel', text: t('regression_channel', locale) }
   ]
 }
 
 export function createAnnotationOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'textAnnotation', text: i18n('text_annotation', locale) },
-    { key: 'callout', text: i18n('callout', locale) },
-    { key: 'note', text: i18n('note', locale) },
-    { key: 'brush', text: i18n('brush', locale) }
+    { key: 'textAnnotation', text: t('text_annotation', locale) },
+    { key: 'callout', text: t('callout', locale) },
+    { key: 'note', text: t('note', locale) },
+    { key: 'brush', text: t('brush', locale) }
   ]
 }
 
 export function createPositionOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'longPosition', text: i18n('long_position', locale) },
-    { key: 'shortPosition', text: i18n('short_position', locale) }
+    { key: 'longPosition', text: t('long_position', locale) },
+    { key: 'shortPosition', text: t('short_position', locale) }
   ]
 }
 
 export function createMagnetOptions (locale: string): SelectDataSourceItem[] {
   return [
-    { key: 'weak_magnet', text: i18n('weak_magnet', locale) },
-    { key: 'strong_magnet', text: i18n('strong_magnet', locale) }
+    { key: 'weak_magnet', text: t('weak_magnet', locale) },
+    { key: 'strong_magnet', text: t('strong_magnet', locale) }
   ]
 }
 

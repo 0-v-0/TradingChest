@@ -16,7 +16,7 @@ import { Component } from 'solid-js'
 
 import { Modal } from '../../component'
 
-import i18n from '../../i18n'
+import t from '../../i18n'
 
 export interface ScreenshotModalProps {
   locale: string
@@ -27,12 +27,12 @@ export interface ScreenshotModalProps {
 const ScreenshotModal: Component<ScreenshotModalProps> = props => {
   return (
     <Modal
-      title={i18n('screenshot', props.locale)}
+      title={t('screenshot', props.locale)}
       width={540}
       buttons={[
         {
           type: 'confirm',
-          children: i18n('save', props.locale),
+          children: t('save', props.locale),
           onClick: () => {
             const a = document.createElement('a')
             a.download = 'screenshot'
