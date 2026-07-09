@@ -19,8 +19,8 @@ const callout: OverlayTemplate = {
         {
           type: 'line',
           attrs: {
-            coordinates: [coordinates[0], coordinates[1]]
-          }
+            coordinates: [coordinates[0], coordinates[1]],
+          },
         },
         {
           type: 'circle',
@@ -28,12 +28,12 @@ const callout: OverlayTemplate = {
           attrs: {
             x: coordinates[0].x,
             y: coordinates[0].y,
-            r: 4
+            r: 4,
           },
           styles: {
             style: 'fill',
-            color: '#1677FF'
-          }
+            color: '#1677FF',
+          },
         },
         {
           type: 'rectText',
@@ -42,7 +42,7 @@ const callout: OverlayTemplate = {
             y: coordinates[1].y,
             text: text,
             baseline: 'middle',
-            align: 'center'
+            align: 'center',
           },
           styles: {
             style: 'stroke_fill',
@@ -55,15 +55,18 @@ const callout: OverlayTemplate = {
             paddingRight: 8,
             paddingTop: 4,
             paddingBottom: 4,
-            size: 12
-          }
-        }
+            size: 12,
+          },
+        },
       ]
     }
     return []
   },
   onDrawEnd: ({ overlay }) => {
-    const input = window.prompt('输入标注文字 / Enter text:', (overlay.extendData as string) || 'Note')
+    const input = window.prompt(
+      '输入标注文字 / Enter text:',
+      (overlay.extendData as string) || 'Note',
+    )
     if (input !== null && input.trim() !== '') {
       overlay.extendData = input.trim()
     }
@@ -75,7 +78,7 @@ const callout: OverlayTemplate = {
       overlay.extendData = input.trim()
     }
     return true
-  }
+  },
 }
 
 export default callout

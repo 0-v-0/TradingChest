@@ -11,9 +11,7 @@ const kama: IndicatorTemplate = {
   name: 'KAMA',
   shortName: 'KAMA',
   calcParams: [10, 2, 30],
-  figures: [
-    { key: 'kama', title: 'KAMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'kama', title: 'KAMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -62,7 +60,7 @@ const kama: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default kama

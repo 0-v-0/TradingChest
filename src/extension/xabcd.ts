@@ -22,8 +22,8 @@ const xabcd: OverlayTemplate = {
   needDefaultYAxisFigure: true,
   styles: {
     polygon: {
-      color: 'rgba(22, 119, 255, 0.15)'
-    }
+      color: 'rgba(22, 119, 255, 0.15)',
+    },
   },
   createPointFigures: ({ coordinates }) => {
     const dashedLines: LineAttrs[] = []
@@ -32,7 +32,7 @@ const xabcd: OverlayTemplate = {
     const texts = coordinates.map((coordinate, i) => ({
       ...coordinate,
       baseline: 'bottom',
-      text: `(${tags[i]})`
+      text: `(${tags[i]})`,
     }))
     if (coordinates.length > 2) {
       dashedLines.push({ coordinates: [coordinates[0], coordinates[2]] })
@@ -48,25 +48,25 @@ const xabcd: OverlayTemplate = {
     return [
       {
         type: 'line',
-        attrs: { coordinates }
+        attrs: { coordinates },
       },
       {
         type: 'line',
         attrs: dashedLines,
-        styles: { style: 'dashed' }
+        styles: { style: 'dashed' },
       },
       {
         type: 'polygon',
         ignoreEvent: true,
-        attrs: polygons
+        attrs: polygons,
       },
       {
         type: 'text',
         ignoreEvent: true,
-        attrs: texts
-      }
+        attrs: texts,
+      },
     ]
-  }
+  },
 }
 
 export default xabcd

@@ -13,7 +13,6 @@
  */
 
 import { OverlayTemplate } from 'klinecharts'
-
 import { getDistance } from './utils'
 
 const circle: OverlayTemplate = {
@@ -24,8 +23,8 @@ const circle: OverlayTemplate = {
   needDefaultYAxisFigure: true,
   styles: {
     circle: {
-      color: 'rgba(22, 119, 255, 0.15)'
-    }
+      color: 'rgba(22, 119, 255, 0.15)',
+    },
   },
   createPointFigures: ({ coordinates }) => {
     if (coordinates.length > 1) {
@@ -34,13 +33,13 @@ const circle: OverlayTemplate = {
         type: 'circle',
         attrs: {
           ...coordinates[0],
-          r: radius
+          r: radius,
         },
-        styles: { style: 'stroke_fill' }
+        styles: { style: 'stroke_fill' },
       }
     }
     return []
-  }
+  },
 }
 
 export default circle

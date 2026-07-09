@@ -81,12 +81,15 @@ export function exportAllToCSV(chart: Nullable<Chart>, filename?: string): boole
 /**
  * 导出图表截图
  */
-export function exportScreenshot(chart: Nullable<Chart>, options?: {
-  includeOverlay?: boolean
-  format?: 'png' | 'jpeg'
-  backgroundColor?: string
-  filename?: string
-}): boolean {
+export function exportScreenshot(
+  chart: Nullable<Chart>,
+  options?: {
+    includeOverlay?: boolean
+    format?: 'png' | 'jpeg'
+    backgroundColor?: string
+    filename?: string
+  },
+): boolean {
   try {
     if (!chart) return false
 
@@ -96,7 +99,9 @@ export function exportScreenshot(chart: Nullable<Chart>, options?: {
 
     const link = document.createElement('a')
     link.href = url
-    link.download = filename ?? `chart-screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${format}`
+    link.download =
+      filename ??
+      `chart-screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${format}`
     link.click()
     return true
   } catch {

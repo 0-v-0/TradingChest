@@ -1,6 +1,6 @@
+import { KLineData } from 'klinecharts'
 import { describe, it, expect, vi } from 'vitest'
 import { ReplayEngine } from '../../replay/ReplayEngine'
-import { KLineData } from 'klinecharts'
 
 function makeData(count: number): KLineData[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -9,7 +9,7 @@ function makeData(count: number): KLineData[] {
     high: 105 + i,
     low: 95 + i,
     close: 102 + i,
-    volume: 1000 + i * 10
+    volume: 1000 + i * 10,
   })) as KLineData[]
 }
 

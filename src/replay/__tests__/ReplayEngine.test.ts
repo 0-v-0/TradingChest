@@ -1,12 +1,16 @@
+import { KLineData } from 'klinecharts'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { ReplayEngine } from '../ReplayEngine'
-import { KLineData } from 'klinecharts'
 
 function makeKlines(count: number): KLineData[] {
   return Array.from({ length: count }, (_, i) => ({
     timestamp: 1700000000000 + i * 60000,
-    open: 100 + i, high: 102 + i, low: 99 + i, close: 101 + i,
-    volume: 1000, turnover: 0
+    open: 100 + i,
+    high: 102 + i,
+    low: 99 + i,
+    close: 101 + i,
+    volume: 1000,
+    turnover: 0,
   }))
 }
 
@@ -114,7 +118,13 @@ describe('ReplayEngine', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = Array.from({ length: 10 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
+    const data = Array.from({ length: 10 }, (_, i) => ({
+      timestamp: i * 1000,
+      open: 1,
+      high: 2,
+      low: 0.5,
+      close: 1.5,
+    })) as any
     engine2.start(data, 5)
 
     engine2.goToPosition(0) // should clamp to 1
@@ -129,7 +139,13 @@ describe('ReplayEngine', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = Array.from({ length: 5 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
+    const data = Array.from({ length: 5 }, (_, i) => ({
+      timestamp: i * 1000,
+      open: 1,
+      high: 2,
+      low: 0.5,
+      close: 1.5,
+    })) as any
     engine2.start(data, 5) // position = 5 = totalBars
     const beforeCalls = cbs.onBarUpdate.mock.calls.length
     engine2.stepForward() // should be no-op
@@ -142,7 +158,13 @@ describe('ReplayEngine', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = Array.from({ length: 100 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
+    const data = Array.from({ length: 100 }, (_, i) => ({
+      timestamp: i * 1000,
+      open: 1,
+      high: 2,
+      low: 0.5,
+      close: 1.5,
+    })) as any
     engine2.start(data, 5)
     engine2.play()
     engine2.play() // second call should be no-op
@@ -154,7 +176,13 @@ describe('ReplayEngine', () => {
     const cbs = { onDataChange: vi.fn(), onBarUpdate: vi.fn(), onStateChange: vi.fn() }
     const engine2 = new ReplayEngine(cbs)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = Array.from({ length: 100 }, (_, i) => ({ timestamp: i * 1000, open: 1, high: 2, low: 0.5, close: 1.5 })) as any
+    const data = Array.from({ length: 100 }, (_, i) => ({
+      timestamp: i * 1000,
+      open: 1,
+      high: 2,
+      low: 0.5,
+      close: 1.5,
+    })) as any
     engine2.start(data, 5)
     engine2.play()
     engine2.dispose()

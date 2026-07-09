@@ -48,8 +48,9 @@ export class AlertManager {
       let triggered = false
       switch (alert.condition) {
         case 'crossing':
-          triggered = (this._prevPrice < alert.price && currentPrice >= alert.price) ||
-                      (this._prevPrice > alert.price && currentPrice <= alert.price)
+          triggered =
+            (this._prevPrice < alert.price && currentPrice >= alert.price) ||
+            (this._prevPrice > alert.price && currentPrice <= alert.price)
           break
         case 'above':
           triggered = this._prevPrice <= alert.price && currentPrice > alert.price
@@ -64,7 +65,7 @@ export class AlertManager {
         this.onTrigger?.({
           alert,
           triggerPrice: currentPrice,
-          timestamp
+          timestamp,
         })
       }
     }

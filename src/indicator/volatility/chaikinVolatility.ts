@@ -10,9 +10,7 @@ const chaikinVolatility: IndicatorTemplate = {
   name: 'CV',
   shortName: 'CV',
   calcParams: [10],
-  figures: [
-    { key: 'cv', title: 'CV: ', type: 'line' }
-  ],
+  figures: [{ key: 'cv', title: 'CV: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -69,7 +67,7 @@ const chaikinVolatility: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default chaikinVolatility

@@ -14,14 +14,14 @@ export interface ThemePreset {
 const darkTheme: ThemePreset = {
   name: 'dark',
   labelKey: 'theme_dark',
-  styles: {}
+  styles: {},
 }
 
 /** 亮色主题 */
 const lightTheme: ThemePreset = {
   name: 'light',
   labelKey: 'theme_light',
-  styles: {}
+  styles: {},
 }
 
 /** 午夜蓝主题 */
@@ -31,46 +31,48 @@ const midnightTheme: ThemePreset = {
   styles: {
     grid: {
       horizontal: { color: 'rgba(44, 62, 80, 0.5)' },
-      vertical: { color: 'rgba(44, 62, 80, 0.5)' }
+      vertical: { color: 'rgba(44, 62, 80, 0.5)' },
     },
     candle: {
       bar: {
         upColor: '#2ecc71',
         downColor: '#e74c3c',
-        noChangeColor: '#95a5a6'
+        noChangeColor: '#95a5a6',
       },
       priceMark: {
         last: {
           upColor: '#2ecc71',
           downColor: '#e74c3c',
-          noChangeColor: '#95a5a6'
-        }
-      }
+          noChangeColor: '#95a5a6',
+        },
+      },
     },
     indicator: {
-      bars: [{
-        upColor: 'rgba(46, 204, 113, 0.6)',
-        downColor: 'rgba(231, 76, 60, 0.6)',
-        noChangeColor: 'rgba(149, 165, 166, 0.6)'
-      }]
+      bars: [
+        {
+          upColor: 'rgba(46, 204, 113, 0.6)',
+          downColor: 'rgba(231, 76, 60, 0.6)',
+          noChangeColor: 'rgba(149, 165, 166, 0.6)',
+        },
+      ],
     },
     xAxis: {
-      tickText: { color: '#7f8c8d' }
+      tickText: { color: '#7f8c8d' },
     },
     yAxis: {
-      tickText: { color: '#7f8c8d' }
+      tickText: { color: '#7f8c8d' },
     },
     crosshair: {
       horizontal: {
         line: { color: '#3498db' },
-        text: { backgroundColor: '#2c3e50' }
+        text: { backgroundColor: '#2c3e50' },
       },
       vertical: {
         line: { color: '#3498db' },
-        text: { backgroundColor: '#2c3e50' }
-      }
-    }
-  }
+        text: { backgroundColor: '#2c3e50' },
+      },
+    },
+  },
 }
 
 /** 经典绿红主题（TradingView 风格） */
@@ -82,24 +84,26 @@ const classicTheme: ThemePreset = {
       bar: {
         upColor: '#089981',
         downColor: '#F23645',
-        noChangeColor: '#888888'
+        noChangeColor: '#888888',
       },
       priceMark: {
         last: {
           upColor: '#089981',
           downColor: '#F23645',
-          noChangeColor: '#888888'
-        }
-      }
+          noChangeColor: '#888888',
+        },
+      },
     },
     indicator: {
-      bars: [{
-        upColor: 'rgba(8, 153, 129, 0.6)',
-        downColor: 'rgba(242, 54, 69, 0.6)',
-        noChangeColor: 'rgba(136, 136, 136, 0.6)'
-      }]
-    }
-  }
+      bars: [
+        {
+          upColor: 'rgba(8, 153, 129, 0.6)',
+          downColor: 'rgba(242, 54, 69, 0.6)',
+          noChangeColor: 'rgba(136, 136, 136, 0.6)',
+        },
+      ],
+    },
+  },
 }
 
 /** 高对比主题 */
@@ -109,30 +113,35 @@ const highContrastTheme: ThemePreset = {
   styles: {
     grid: {
       horizontal: { color: 'rgba(255, 255, 255, 0.15)' },
-      vertical: { color: 'rgba(255, 255, 255, 0.15)' }
+      vertical: { color: 'rgba(255, 255, 255, 0.15)' },
     },
     candle: {
       bar: {
         upColor: '#00FF00',
         downColor: '#FF0000',
-        noChangeColor: '#FFFFFF'
-      }
+        noChangeColor: '#FFFFFF',
+      },
     },
     xAxis: {
-      tickText: { color: '#FFFFFF' }
+      tickText: { color: '#FFFFFF' },
     },
     yAxis: {
-      tickText: { color: '#FFFFFF' }
-    }
-  }
+      tickText: { color: '#FFFFFF' },
+    },
+  },
 }
 
+// oxfmt-ignore
 export const themePresets: ThemePreset[] = [
-  darkTheme, lightTheme, midnightTheme, classicTheme, highContrastTheme
+  darkTheme,
+  lightTheme,
+  midnightTheme,
+  classicTheme,
+  highContrastTheme,
 ]
 
 export function getThemeByName(name: string): ThemePreset | undefined {
-  return themePresets.find(t => t.name === name)
+  return themePresets.find((t) => t.name === name)
 }
 
 export default themePresets

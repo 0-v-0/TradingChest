@@ -20,7 +20,7 @@ export interface ChartLayout {
 export interface OverlaySerializedData {
   name: string
   groupId: string
-  points: Array<{ timestamp: number, value: number }>
+  points: Array<{ timestamp: number; value: number }>
   lock: boolean
   visible: boolean
   extendData?: Record<string, unknown>
@@ -33,12 +33,12 @@ const STORAGE_KEY_PREFIX = 'trading-chest-layout-'
  */
 export function saveLayout(
   key: string,
-  layout: Omit<ChartLayout, 'version' | 'timestamp'>
+  layout: Omit<ChartLayout, 'version' | 'timestamp'>,
 ): boolean {
   const data: ChartLayout = {
     version: 1,
     timestamp: Date.now(),
-    ...layout
+    ...layout,
   }
   try {
     localStorage.setItem(STORAGE_KEY_PREFIX + key, JSON.stringify(data))
@@ -73,8 +73,8 @@ export function deleteLayout(key: string): void {
 /**
  * 列出所有已保存的布局
  */
-export function listLayouts(): Array<{ key: string, timestamp: number }> {
-  const result: Array<{ key: string, timestamp: number }> = []
+export function listLayouts(): Array<{ key: string; timestamp: number }> {
+  const result: Array<{ key: string; timestamp: number }> = []
   for (let i = 0; i < localStorage.length; i++) {
     const storageKey = localStorage.key(i)
     if (storageKey?.startsWith(STORAGE_KEY_PREFIX)) {
@@ -82,9 +82,11 @@ export function listLayouts(): Array<{ key: string, timestamp: number }> {
         const data = JSON.parse(localStorage.getItem(storageKey)!) as ChartLayout
         result.push({
           key: storageKey.replace(STORAGE_KEY_PREFIX, ''),
-          timestamp: data.timestamp
+          timestamp: data.timestamp,
         })
-      } catch { /* 忽略损坏的数据 */ }
+      } catch {
+        /* 忽略损坏的数据 */
+      }
     }
   }
   return result.sort((a, b) => b.timestamp - a.timestamp)

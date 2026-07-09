@@ -69,7 +69,7 @@ describe('Alert Price Stream Integration', () => {
     expect(cb).toHaveBeenCalledTimes(1)
 
     mgr.resetAll()
-    mgr.checkPrice(95, 3000)  // crosses back
+    mgr.checkPrice(95, 3000) // crosses back
     expect(cb).toHaveBeenCalledTimes(2)
   })
 })

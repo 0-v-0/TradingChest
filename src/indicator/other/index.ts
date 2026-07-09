@@ -5,9 +5,6 @@
 import pivotPoints from './pivotPoints'
 import zigzag from './zigzag'
 
-const otherIndicators = [
-  pivotPoints,
-  zigzag
-]
+const otherIndicators = [pivotPoints, zigzag]
 
 export default otherIndicators

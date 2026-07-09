@@ -30,12 +30,12 @@ const tradeMarker: OverlayTemplate = {
             { x: x, y: y },
             { x: x - 5, y: y - 8 },
             { x: x + 5, y: y - 8 },
-          ]
+          ],
         },
         styles: {
           style: 'fill',
           color: borderColor,
-        }
+        },
       },
       // 标签背景 + 文字（可点击）
       {
@@ -60,10 +60,10 @@ const tradeMarker: OverlayTemplate = {
           paddingTop: 3,
           paddingBottom: 3,
           size: 11,
-        }
+        },
       },
     ]
-  }
+  },
 }
 
 export default tradeMarker

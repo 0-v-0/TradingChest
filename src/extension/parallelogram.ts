@@ -22,8 +22,8 @@ const parallelogram: OverlayTemplate = {
   needDefaultYAxisFigure: true,
   styles: {
     polygon: {
-      color: 'rgba(22, 119, 255, 0.15)'
-    }
+      color: 'rgba(22, 119, 255, 0.15)',
+    },
   },
   createPointFigures: ({ coordinates }) => {
     if (coordinates.length === 2) {
@@ -31,18 +31,21 @@ const parallelogram: OverlayTemplate = {
         {
           type: 'line',
           ignoreEvent: true,
-          attrs: { coordinates }
-        }
+          attrs: { coordinates },
+        },
       ]
     }
     if (coordinates.length === 3) {
-      const coordinate = { x: coordinates[0].x + (coordinates[2].x - coordinates[1].x), y: coordinates[2].y }
+      const coordinate = {
+        x: coordinates[0].x + (coordinates[2].x - coordinates[1].x),
+        y: coordinates[2].y,
+      }
       return [
         {
           type: 'polygon',
           attrs: { coordinates: [coordinates[0], coordinates[1], coordinates[2], coordinate] },
-          styles: { style: 'stroke_fill' }
-        }
+          styles: { style: 'stroke_fill' },
+        },
       ]
     }
     return []
@@ -60,7 +63,7 @@ const parallelogram: OverlayTemplate = {
       // @ts-expect-error — klinecharts internally uses 'price' on Point but it is not in the public type defs
       points[0].price = performPoint.price
     }
-  }
+  },
 }
 
 export default parallelogram

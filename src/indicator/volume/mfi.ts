@@ -19,9 +19,7 @@ const mfi: IndicatorTemplate = {
   name: 'MFI',
   shortName: 'MFI',
   calcParams: [14],
-  figures: [
-    { key: 'mfi', title: 'MFI: ', type: 'line' }
-  ],
+  figures: [{ key: 'mfi', title: 'MFI: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -67,7 +65,7 @@ const mfi: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default mfi

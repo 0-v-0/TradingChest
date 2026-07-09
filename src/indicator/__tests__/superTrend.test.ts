@@ -1,6 +1,6 @@
+import { KLineData } from 'klinecharts'
 import { describe, it, expect } from 'vitest'
 import superTrend from '../trend/superTrend'
-import { KLineData } from 'klinecharts'
 
 function makeKlines(count: number): KLineData[] {
   const base = 100
@@ -11,7 +11,7 @@ function makeKlines(count: number): KLineData[] {
     low: base + i * 0.5 - 1,
     close: base + i * 0.5 + 1,
     volume: 1000 + i * 10,
-    turnover: 0
+    turnover: 0,
   }))
 }
 

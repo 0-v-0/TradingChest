@@ -18,7 +18,7 @@ export interface SettingOption {
   key: string
   text: string
   component: 'select' | 'switch' | 'color'
-  dataSource?: Array<{ key: string, text: string }>
+  dataSource?: Array<{ key: string; text: string }>
 }
 
 export interface SettingGroup {
@@ -26,7 +26,7 @@ export interface SettingGroup {
   options: SettingOption[]
 }
 
-export function getOptions (locale: string): SettingGroup[] {
+export function getOptions(locale: string): SettingGroup[] {
   return [
     {
       label: t('group_candle', locale),
@@ -43,33 +43,33 @@ export function getOptions (locale: string): SettingGroup[] {
             { key: 'ohlc', text: t('ohlc', locale) },
             { key: 'area', text: t('area', locale) },
             { key: 'heikin_ashi', text: t('heikin_ashi', locale) },
-            { key: 'baseline', text: t('baseline', locale) }
-          ]
+            { key: 'baseline', text: t('baseline', locale) },
+          ],
         },
         {
           key: 'candle.bar.upColor',
           text: t('candle_up_color', locale),
-          component: 'color'
+          component: 'color',
         },
         {
           key: 'candle.bar.downColor',
           text: t('candle_down_color', locale),
-          component: 'color'
+          component: 'color',
         },
         {
           key: 'candle.priceMark.last.show',
           text: t('last_price_show', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'candle.priceMark.high.show',
           text: t('high_price_show', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'candle.priceMark.low.show',
           text: t('low_price_show', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'candle.tooltip.showType',
@@ -77,10 +77,10 @@ export function getOptions (locale: string): SettingGroup[] {
           component: 'select',
           dataSource: [
             { key: 'standard', text: t('tooltip_standard', locale) },
-            { key: 'rect', text: t('tooltip_rect', locale) }
-          ]
-        }
-      ]
+            { key: 'rect', text: t('tooltip_rect', locale) },
+          ],
+        },
+      ],
     },
     {
       label: t('group_axis', locale),
@@ -92,20 +92,20 @@ export function getOptions (locale: string): SettingGroup[] {
           dataSource: [
             { key: 'normal', text: t('normal', locale) },
             { key: 'percentage', text: t('percentage', locale) },
-            { key: 'log', text: t('log', locale) }
-          ]
+            { key: 'log', text: t('log', locale) },
+          ],
         },
         {
           key: 'yAxis.reverse',
           text: t('reverse_coordinate', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'indicator.lastValueMark.show',
           text: t('indicator_last_value_show', locale),
-          component: 'switch'
-        }
-      ]
+          component: 'switch',
+        },
+      ],
     },
     {
       label: t('group_grid_crosshair', locale),
@@ -113,24 +113,24 @@ export function getOptions (locale: string): SettingGroup[] {
         {
           key: 'grid.show',
           text: t('grid_show', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'crosshair.show',
           text: t('crosshair_show', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'crosshair.horizontal.show',
           text: t('crosshair_horizontal_show', locale),
-          component: 'switch'
+          component: 'switch',
         },
         {
           key: 'crosshair.vertical.show',
           text: t('crosshair_vertical_show', locale),
-          component: 'switch'
-        }
-      ]
-    }
+          component: 'switch',
+        },
+      ],
+    },
   ]
 }

@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
+import { SelectDataSourceItem } from '../../component'
 import t from '../../i18n'
 
-import { SelectDataSourceItem } from '../../component'
-
-export function translateTimezone (timezone: string, locale: string): string {
+// oxfmt-ignore
+export function translateTimezone(timezone: string, locale: string): string {
   switch (timezone) {
     case 'Etc/UTC': return t('utc', locale)
     case 'Pacific/Honolulu': return t('honolulu', locale)
@@ -40,7 +40,7 @@ export function translateTimezone (timezone: string, locale: string): string {
   return timezone
 }
 
-export function createTimezoneSelectOptions (locale: string): SelectDataSourceItem[] {
+export function createTimezoneSelectOptions(locale: string): SelectDataSourceItem[] {
   return [
     { key: 'Etc/UTC', text: t('utc', locale) },
     { key: 'Pacific/Honolulu', text: t('honolulu', locale) },
@@ -59,6 +59,6 @@ export function createTimezoneSelectOptions (locale: string): SelectDataSourceIt
     { key: 'Asia/Shanghai', text: t('shanghai', locale) },
     { key: 'Asia/Tokyo', text: t('tokyo', locale) },
     { key: 'Australia/Sydney', text: t('sydney', locale) },
-    { key: 'Pacific/Norfolk', text: t('norfolk', locale) }
+    { key: 'Pacific/Norfolk', text: t('norfolk', locale) },
   ]
 }

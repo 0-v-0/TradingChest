@@ -9,7 +9,7 @@ import { OverlayTemplate } from 'klinecharts'
 
 const brush: OverlayTemplate = {
   name: 'brush',
-  totalStep: 100,  // 最多100个点，实际通过右键结束
+  totalStep: 100, // 最多100个点，实际通过右键结束
   needDefaultPointFigure: false,
   needDefaultXAxisFigure: false,
   needDefaultYAxisFigure: false,
@@ -22,16 +22,16 @@ const brush: OverlayTemplate = {
       {
         type: 'line',
         attrs: {
-          coordinates: coordinates
+          coordinates: coordinates,
         },
         styles: {
           style: 'solid',
           size: 2,
-          color: '#FF6D00'
-        }
-      }
+          color: '#FF6D00',
+        },
+      },
     ]
-  }
+  },
 }
 
 export default brush

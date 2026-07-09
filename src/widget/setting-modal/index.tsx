@@ -12,17 +12,14 @@
  * limitations under the License.
  */
 
-import { Component, createEffect, For, createSignal } from 'solid-js'
 import { Styles, utils, DeepPartial } from 'klinecharts'
-
-import { deepSet } from '../../core/deepSet'
-
-import { Modal, Select, Switch, ColorInput } from '../../component'
+import { Component, createEffect, For, createSignal } from 'solid-js'
 import type { SelectDataSourceItem } from '../../component'
-
+import type { SettingOption } from './data'
+import { Modal, Select, Switch, ColorInput } from '../../component'
+import { deepSet } from '../../core/deepSet'
 import t from '../../i18n'
 import { getOptions } from './data'
-import type { SettingOption } from './data'
 
 export interface SettingModalProps {
   locale: string
@@ -32,7 +29,7 @@ export interface SettingModalProps {
   onRestoreDefault: (options: SelectDataSourceItem[]) => void
 }
 
-const SettingModal: Component<SettingModalProps> = props => {
+const SettingModal: Component<SettingModalProps> = (props) => {
   const [styles, setStyles] = createSignal(props.currentStyles)
   const [groups, setGroups] = createSignal(getOptions(props.locale))
 
@@ -52,7 +49,7 @@ const SettingModal: Component<SettingModalProps> = props => {
 
   // 将所有分组中的选项展开为扁平数组，用于恢复默认
   const flatOptions = () => {
-    return groups().flatMap(group => group.options)
+    return groups().flatMap((group) => group.options)
   }
 
   return (
@@ -65,71 +62,71 @@ const SettingModal: Component<SettingModalProps> = props => {
           onClick: () => {
             props.onRestoreDefault(flatOptions())
             props.onClose()
-          }
-        }
+          },
+        },
       ]}
-      onClose={props.onClose}>
+      onClose={props.onClose}
+    >
       <For each={groups()}>
-        {
-          group => (
-            <>
-              <div class="klinecharts-pro-setting-modal-group-label">{group.label}</div>
-              <div class="klinecharts-pro-setting-modal-content">
-                <For each={group.options}>
-                  {
-                    option => {
-                      let component
-                      const value = utils.formatValue(styles(), option.key)
-                      switch (option.component) {
-                        case 'select': {
-                          component = (
-                            <Select
-                              style={{ width: '120px' }}
-                              value={t(value as string, props.locale)}
-                              dataSource={option.dataSource}
-                              onSelected={(data) => {
-                                const newValue = (data as SelectDataSourceItem).key
-                                update(option, newValue)
-                              }}/>
-                          )
-                          break
-                        }
-                        case 'switch': {
-                          const open = !!value
-                          component = (
-                            <Switch
-                              open={open}
-                              onChange={() => {
-                                const newValue = !open
-                                update(option, newValue)
-                              }}/>
-                          )
-                          break
-                        }
-                        case 'color': {
-                          component = (
-                            <ColorInput
-                              value={(value as string) ?? '#000000'}
-                              onChange={(color) => {
-                                update(option, color)
-                              }}/>
-                          )
-                          break
-                        }
-                      }
-                      return (
-                        <>
-                          <span>{option.text}</span>
-                          {component}
-                        </>
+        {(group) => (
+          <>
+            <div class="klinecharts-pro-setting-modal-group-label">{group.label}</div>
+            <div class="klinecharts-pro-setting-modal-content">
+              <For each={group.options}>
+                {(option) => {
+                  let component
+                  const value = utils.formatValue(styles(), option.key)
+                  switch (option.component) {
+                    case 'select': {
+                      component = (
+                        <Select
+                          style={{ width: '120px' }}
+                          value={t(value as string, props.locale)}
+                          dataSource={option.dataSource}
+                          onSelected={(data) => {
+                            const newValue = (data as SelectDataSourceItem).key
+                            update(option, newValue)
+                          }}
+                        />
                       )
+                      break
+                    }
+                    case 'switch': {
+                      const open = !!value
+                      component = (
+                        <Switch
+                          open={open}
+                          onChange={() => {
+                            const newValue = !open
+                            update(option, newValue)
+                          }}
+                        />
+                      )
+                      break
+                    }
+                    case 'color': {
+                      component = (
+                        <ColorInput
+                          value={(value as string) ?? '#000000'}
+                          onChange={(color) => {
+                            update(option, color)
+                          }}
+                        />
+                      )
+                      break
                     }
                   }
-                </For>
-              </div>
-            </>
-          )
-        }
+                  return (
+                    <>
+                      <span>{option.text}</span>
+                      {component}
+                    </>
+                  )
+                }}
+              </For>
+            </div>
+          </>
+        )}
       </For>
     </Modal>
   )

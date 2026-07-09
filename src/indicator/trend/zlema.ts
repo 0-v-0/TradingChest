@@ -12,9 +12,7 @@ const zlema: IndicatorTemplate = {
   name: 'ZLEMA',
   shortName: 'ZLEMA',
   calcParams: [21],
-  figures: [
-    { key: 'zlema', title: 'ZLEMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'zlema', title: 'ZLEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -41,7 +39,7 @@ const zlema: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default zlema

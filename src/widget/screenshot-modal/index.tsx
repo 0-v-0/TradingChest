@@ -13,9 +13,7 @@
  */
 
 import { Component } from 'solid-js'
-
 import { Modal } from '../../component'
-
 import t from '../../i18n'
 
 export interface ScreenshotModalProps {
@@ -24,7 +22,7 @@ export interface ScreenshotModalProps {
   onClose: () => void
 }
 
-const ScreenshotModal: Component<ScreenshotModalProps> = props => {
+const ScreenshotModal: Component<ScreenshotModalProps> = (props) => {
   return (
     <Modal
       title={t('screenshot', props.locale)}
@@ -40,11 +38,12 @@ const ScreenshotModal: Component<ScreenshotModalProps> = props => {
             document.body.appendChild(a)
             a.click()
             a.remove()
-          }
-        }
+          },
+        },
       ]}
-      onClose={props.onClose}>
-      <img style="width:500px;margin-top: 20px" src={props.url}/>
+      onClose={props.onClose}
+    >
+      <img style="width:500px;margin-top: 20px" src={props.url} />
     </Modal>
   )
 }

@@ -33,7 +33,7 @@
   font-weight: bold;
   padding: 1px 4px;
   color: var(--klinecharts-pro-text-second-color);
-  box-shadow: 0 3px 3px 0 rgba(50, 50, 50, .3);
+  box-shadow: 0 3px 3px 0 rgba(50, 50, 50, 0.3);
   border: solid 1px var(--klinecharts-pro-border-color);
   background-color: var(--klinecharts-pro-background-color);
 }
@@ -60,6 +60,6 @@
   margin-left: 0;
 }
 
-.klinecharts-pro-widget[data-drawing-bar-visible="false"] {
+.klinecharts-pro-widget[data-drawing-bar-visible=false] {
   width: 100%;
 }

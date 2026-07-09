@@ -176,14 +176,15 @@ describe('calcTR', () => {
     expect(result[1]).toBeCloseTo(25, 10)
   })
 
+  // oxfmt-ignore
   it('multiple bars returns correct length', () => {
-    const high  = [10, 11, 12, 13, 14]
-    const low   = [ 8,  9, 10, 11, 12]
-    const close = [ 9, 10, 11, 12, 13]
+    const high = [10, 11, 12, 13, 14]
+    const low = [8, 9, 10, 11, 12]
+    const close = [9, 10, 11, 12, 13]
     const result = calcTR(high, low, close)
     expect(result).toHaveLength(5)
     // All values should be non-null numbers
-    result.forEach(v => expect(typeof v).toBe('number'))
+    result.forEach((v) => expect(typeof v).toBe('number'))
   })
 
   it('single bar returns [high - low]', () => {
@@ -216,7 +217,7 @@ describe('calcStdDev', () => {
 
   it('period 1 returns zero (single-element window)', () => {
     const result = calcStdDev([1, 2, 3], 1)
-    result.forEach(v => expect(v).toBeCloseTo(0, 10))
+    result.forEach((v) => expect(v).toBeCloseTo(0, 10))
   })
 
   it('period larger than data returns all nulls', () => {
@@ -375,10 +376,7 @@ describe('calcLoss', () => {
 describe('calcHighest', () => {
   it('returns rolling max correctly', () => {
     // data=[3,1,4,1,5,9,2,6], period=3
-    expectArrayClose(
-      calcHighest([3, 1, 4, 1, 5, 9, 2, 6], 3),
-      [null, null, 4, 4, 5, 9, 9, 9]
-    )
+    expectArrayClose(calcHighest([3, 1, 4, 1, 5, 9, 2, 6], 3), [null, null, 4, 4, 5, 9, 9, 9])
   })
 
   it('period 1 returns every element', () => {
@@ -406,10 +404,7 @@ describe('calcHighest', () => {
 describe('calcLowest', () => {
   it('returns rolling min correctly', () => {
     // data=[3,1,4,1,5,9,2,6], period=3
-    expectArrayClose(
-      calcLowest([3, 1, 4, 1, 5, 9, 2, 6], 3),
-      [null, null, 1, 1, 1, 1, 2, 2]
-    )
+    expectArrayClose(calcLowest([3, 1, 4, 1, 5, 9, 2, 6], 3), [null, null, 1, 1, 1, 1, 2, 2])
   })
 
   it('period 1 returns every element', () => {

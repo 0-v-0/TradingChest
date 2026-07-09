@@ -23,7 +23,7 @@ const note: OverlayTemplate = {
             y: coordinates[0].y,
             text: text,
             baseline: 'top',
-            align: 'left'
+            align: 'left',
           },
           styles: {
             style: 'stroke_fill',
@@ -36,15 +36,18 @@ const note: OverlayTemplate = {
             paddingRight: 8,
             paddingTop: 6,
             paddingBottom: 6,
-            size: 12
-          }
-        }
+            size: 12,
+          },
+        },
       ]
     }
     return []
   },
   onDrawEnd: ({ overlay }) => {
-    const input = window.prompt('输入便签内容 / Enter note:', (overlay.extendData as string) || 'Note')
+    const input = window.prompt(
+      '输入便签内容 / Enter note:',
+      (overlay.extendData as string) || 'Note',
+    )
     if (input !== null && input.trim() !== '') {
       overlay.extendData = input.trim()
     }
@@ -56,7 +59,7 @@ const note: OverlayTemplate = {
       overlay.extendData = input.trim()
     }
     return true
-  }
+  },
 }
 
 export default note

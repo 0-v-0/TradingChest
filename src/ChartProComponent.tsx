@@ -12,43 +12,68 @@
  * limitations under the License.
  */
 
-import { createSignal, createEffect, onMount, Show, onCleanup, startTransition, Component, ErrorBoundary } from 'solid-js'
-
 import {
-  init, dispose, utils, Nullable, Chart, OverlayMode, Styles,
-  TooltipIconPosition, ActionType, PaneOptions, Indicator, IndicatorStyle, IndicatorCreate,
-  Coordinate, DomPosition, FormatDateType,
-  type Overlay
+  init,
+  dispose,
+  utils,
+  Nullable,
+  Chart,
+  OverlayMode,
+  Styles,
+  TooltipIconPosition,
+  ActionType,
+  PaneOptions,
+  Indicator,
+  IndicatorStyle,
+  IndicatorCreate,
+  Coordinate,
+  DomPosition,
+  FormatDateType,
+  type Overlay,
 } from 'klinecharts'
-
-import { deepSet } from './core/deepSet'
-
-import { SelectDataSourceItem, Loading } from './component'
-
 import {
-  PeriodBar, DrawingBar, IndicatorModal, TimezoneModal, SettingModal,
-  ScreenshotModal, IndicatorSettingModal, SymbolSearchModal, OverlayPropertyBar,
-  ReplayControlBar
-} from './widget'
-import { ReplayEngine } from './replay/ReplayEngine'
+  createSignal,
+  createEffect,
+  onMount,
+  Show,
+  onCleanup,
+  startTransition,
+  Component,
+  ErrorBoundary,
+} from 'solid-js'
 import type { ReplayState, ReplaySpeed } from './replay/types'
-
-import { translateTimezone } from './widget/timezone-modal/data'
-
-import { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
-import { indicatorRegistry } from './indicator'
+import type { OverlayLifecycleEvent, OverlayLifecycleSource } from './types'
+import { SelectDataSourceItem, Loading } from './component'
 import { adjustFromTo } from './core/adjustFromTo'
 import { buildStyles } from './core/buildStyles'
-import type { OverlayLifecycleEvent, OverlayLifecycleSource } from './types'
+import { deepSet } from './core/deepSet'
+import { indicatorRegistry } from './indicator'
+import { ReplayEngine } from './replay/ReplayEngine'
+import { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
+import {
+  PeriodBar,
+  DrawingBar,
+  IndicatorModal,
+  TimezoneModal,
+  SettingModal,
+  ScreenshotModal,
+  IndicatorSettingModal,
+  SymbolSearchModal,
+  OverlayPropertyBar,
+  ReplayControlBar,
+} from './widget'
+import { translateTimezone } from './widget/timezone-modal/data'
 
-export interface ChartProComponentProps extends Required<Omit<ChartProOptions, 'container' | 'onAlertTrigger' | 'onError'>> {
+export interface ChartProComponentProps extends Required<
+  Omit<ChartProOptions, 'container' | 'onAlertTrigger' | 'onError'>
+> {
   ref: (chart: ChartPro) => void
   /** 内部回调：实时数据到达时通知外层（用于报警检测） */
   onPriceUpdate?: (price: number) => void
   /** 内部回调：品种/周期切换时通知外层（用于重置报警状态等） */
   onDataReset?: () => void
   /** 内部错误回调 */
-  onError?: (error: { type: string, message: string, raw?: unknown }) => void
+  onError?: (error: { type: string; message: string; raw?: unknown }) => void
 }
 
 interface PrevSymbolPeriod {
@@ -56,50 +81,67 @@ interface PrevSymbolPeriod {
   period: Period
 }
 
-async function createIndicator (widget: Nullable<Chart>, indicatorName: string, isStack?: boolean, paneOptions?: PaneOptions): Promise<Nullable<string>> {
+async function createIndicator(
+  widget: Nullable<Chart>,
+  indicatorName: string,
+  isStack?: boolean,
+  paneOptions?: PaneOptions,
+): Promise<Nullable<string>> {
   await indicatorRegistry.ensureRegistered(indicatorName)
   if (indicatorName === 'VOL') {
     paneOptions = { gap: { bottom: 2 }, ...paneOptions }
   }
-  return widget?.createIndicator({
-    name: indicatorName,
-    createTooltipDataSource: ({ indicator, defaultStyles }: { indicator: Indicator<Record<string, unknown>>; defaultStyles: IndicatorStyle }) => {
-      const icons = []
-      if (indicator.visible) {
-        icons.push(defaultStyles.tooltip.icons[1])
-        icons.push(defaultStyles.tooltip.icons[2])
-        icons.push(defaultStyles.tooltip.icons[3])
-      } else {
-        icons.push(defaultStyles.tooltip.icons[0])
-        icons.push(defaultStyles.tooltip.icons[2])
-        icons.push(defaultStyles.tooltip.icons[3])
-      }
-      return { icons }
-    }
-  } as unknown as IndicatorCreate<Record<string, unknown>>, isStack, paneOptions) ?? null
+  return (
+    widget?.createIndicator(
+      {
+        name: indicatorName,
+        createTooltipDataSource: ({
+          indicator,
+          defaultStyles,
+        }: {
+          indicator: Indicator<Record<string, unknown>>
+          defaultStyles: IndicatorStyle
+        }) => {
+          const icons = []
+          if (indicator.visible) {
+            icons.push(defaultStyles.tooltip.icons[1])
+            icons.push(defaultStyles.tooltip.icons[2])
+            icons.push(defaultStyles.tooltip.icons[3])
+          } else {
+            icons.push(defaultStyles.tooltip.icons[0])
+            icons.push(defaultStyles.tooltip.icons[2])
+            icons.push(defaultStyles.tooltip.icons[3])
+          }
+          return { icons }
+        },
+      } as unknown as IndicatorCreate<Record<string, unknown>>,
+      isStack,
+      paneOptions,
+    ) ?? null
+  )
 }
 
-function snapshotOverlay (overlay: Overlay): OverlayLifecycleEvent['overlay'] {
+function snapshotOverlay(overlay: Overlay): OverlayLifecycleEvent['overlay'] {
   return {
     id: overlay.id,
     groupId: overlay.groupId,
     name: overlay.name,
-    points: (overlay.points ?? []).map(point => ({ ...point })),
+    points: (overlay.points ?? []).map((point) => ({ ...point })),
     extendData: overlay.extendData,
     styles: overlay.styles,
     lock: overlay.lock,
-    visible: overlay.visible
+    visible: overlay.visible,
   }
 }
 
-const ChartProComponent: Component<ChartProComponentProps> = props => {
+const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const widgetRef: HTMLDivElement | undefined = undefined
   let widget: Nullable<Chart> = null
 
   let priceUnitDom: HTMLElement
 
   const [, setLoading] = createSignal(false)
-  let fetchSeq = 0  // 单调递增的请求序号，用于丢弃过期响应
+  let fetchSeq = 0 // 单调递增的请求序号，用于丢弃过期响应
 
   const [theme, setTheme] = createSignal(props.theme)
   const [styles, setStyles] = createSignal(props.styles)
@@ -108,11 +150,14 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   const [symbol, setSymbol] = createSignal(props.symbol)
   const [period, setPeriod] = createSignal(props.period)
   const [indicatorModalVisible, setIndicatorModalVisible] = createSignal(false)
-  const [mainIndicators, setMainIndicators] = createSignal([...(props.mainIndicators!)])
+  const [mainIndicators, setMainIndicators] = createSignal([...props.mainIndicators!])
   const [subIndicators, setSubIndicators] = createSignal({})
 
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
-  const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({ key: props.timezone, text: translateTimezone(props.timezone, props.locale) })
+  const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
+    key: props.timezone,
+    text: translateTimezone(props.timezone, props.locale),
+  })
 
   const [settingModalVisible, setSettingModalVisible] = createSignal(false)
   const [widgetDefaultStyles, setWidgetDefaultStyles] = createSignal<Styles>()
@@ -126,16 +171,29 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   const [loadingVisible, setLoadingVisible] = createSignal(false)
 
   const [indicatorSettingModalParams, setIndicatorSettingModalParams] = createSignal({
-    visible: false, indicatorName: '', paneId: '', calcParams: [] as number[]
+    visible: false,
+    indicatorName: '',
+    paneId: '',
+    calcParams: [] as number[],
   })
 
   // 绘图 overlay 选中状态（浮动属性工具栏）
   const [selectedOverlay, setSelectedOverlay] = createSignal<{
-    id: string, x: number, y: number,
-    color: string, fillColor?: string, lineWidth: number, lineStyle: string, locked: boolean
+    id: string
+    x: number
+    y: number
+    color: string
+    fillColor?: string
+    lineWidth: number
+    lineStyle: string
+    locked: boolean
   } | null>(null)
 
-  const notifyOverlay = (source: OverlayLifecycleSource, overlay: Overlay, kind: 'create' | 'update' | 'delete') => {
+  const notifyOverlay = (
+    source: OverlayLifecycleSource,
+    overlay: Overlay,
+    kind: 'create' | 'update' | 'delete',
+  ) => {
     const event = { overlay: snapshotOverlay(overlay), source }
     if (kind === 'create') {
       props.onOverlayCreate?.(event)
@@ -149,12 +207,12 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   const promptTextOverlay = (overlay: Overlay) => {
     if (overlay.name !== 'textAnnotation' && overlay.name !== 'note') return
     const fallback = overlay.name === 'note' ? 'Note' : 'Text'
-    const current = typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
-      ? overlay.extendData
-      : fallback
-    const label = overlay.name === 'note'
-      ? '输入便签内容 / Enter note:'
-      : '输入标注文字 / Enter text:'
+    const current =
+      typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
+        ? overlay.extendData
+        : fallback
+    const label =
+      overlay.name === 'note' ? '输入便签内容 / Enter note:' : '输入标注文字 / Enter text:'
     const input = window.prompt(label, current)
     if (input !== null && input.trim() !== '') {
       overlay.extendData = input.trim()
@@ -164,20 +222,30 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   const markSelectedOverlay = (overlay: Overlay) => {
     if (overlay.id) {
       const points = overlay.points ?? []
-      let x = 0, y = 0
+      let x = 0,
+        y = 0
       if (points.length > 0 && widget) {
         const pixel = widget.convertToPixel(
           { timestamp: points[0].timestamp, value: points[0].value },
-          { paneId: 'candle_pane' }
+          { paneId: 'candle_pane' },
         ) as Partial<Coordinate>
         x = (pixel?.x ?? 200) + 52
         y = (pixel?.y ?? 100) - 50
       }
       const fillOverlays = [
-        'rect', 'circle', 'triangle', 'parallelogram',
-        'gannBox', 'regressionChannel', 'xabcd',
-        'positionRange', 'longPosition', 'shortPosition',
-        'dateAndPriceRange', 'dateRange', 'priceRange',
+        'rect',
+        'circle',
+        'triangle',
+        'parallelogram',
+        'gannBox',
+        'regressionChannel',
+        'xabcd',
+        'positionRange',
+        'longPosition',
+        'shortPosition',
+        'dateAndPriceRange',
+        'dateRange',
+        'priceRange',
         'fibonacciCircle',
       ]
       const hasFill = fillOverlays.includes(overlay.name ?? '')
@@ -189,7 +257,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         fillColor: hasFill ? 'rgba(22, 119, 255, 0.15)' : undefined,
         lineWidth: 1,
         lineStyle: 'solid',
-        locked: overlay.lock ?? false
+        locked: overlay.lock ?? false,
       })
     }
   }
@@ -202,7 +270,13 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   }
 
   // 回放状态
-  const defaultReplayState: ReplayState = { active: false, playing: false, speed: 1, position: 0, totalBars: 0 }
+  const defaultReplayState: ReplayState = {
+    active: false,
+    playing: false,
+    speed: 1,
+    position: 0,
+    totalBars: 0,
+  }
   const [replayState, setReplayState] = createSignal<ReplayState>(defaultReplayState)
   let replayEngine: ReplayEngine | null = null
 
@@ -220,9 +294,15 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     props.datafeed.unsubscribe(symbol(), period())
     const pos = startPosition ?? Math.floor(dataList.length * 0.5)
     replayEngine = new ReplayEngine({
-      onDataChange: (data) => { widget?.applyNewData(data, data.length > 0) },
-      onBarUpdate: (bar) => { widget?.updateData(bar) },
-      onStateChange: (state) => { setReplayState(state) },
+      onDataChange: (data) => {
+        widget?.applyNewData(data, data.length > 0)
+      },
+      onBarUpdate: (bar) => {
+        widget?.updateData(bar)
+      },
+      onStateChange: (state) => {
+        setReplayState(state)
+      },
     })
     replayEngine.start(dataList, pos)
   }
@@ -240,15 +320,17 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
       const get = async () => {
         const [from, to] = adjustFromTo(p, new Date().getTime(), 500)
         const kLineDataList = await props.datafeed.getHistoryKLineData(s, p, from, to)
-        if (seq !== fetchSeq) return  // 品种/周期已切换，丢弃过期响应
+        if (seq !== fetchSeq) return // 品种/周期已切换，丢弃过期响应
         widget?.applyNewData(kLineDataList, kLineDataList.length > 0)
         // 恢复实时数据订阅
-        props.datafeed.subscribe(s, p, data => {
+        props.datafeed.subscribe(s, p, (data) => {
           widget?.updateData(data)
           props.onPriceUpdate?.(data.close)
         })
       }
-      get().catch(e => { props.onError?.({ type: 'replay-reload', message: 'replay data reload failed', raw: e }) })
+      get().catch((e) => {
+        props.onError?.({ type: 'replay-reload', message: 'replay data reload failed', raw: e })
+      })
     }
   }
 
@@ -256,34 +338,70 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     setTheme,
     getTheme: () => theme(),
     setStyles,
-    getStyles: () => widget?.getStyles() ?? {} as Styles,
+    getStyles: () => widget?.getStyles() ?? ({} as Styles),
     setLocale,
     getLocale: () => locale(),
-    setTimezone: (tz: string) => { setTimezone({ key: tz, text: translateTimezone(tz, locale()) }) },
+    setTimezone: (tz: string) => {
+      setTimezone({ key: tz, text: translateTimezone(tz, locale()) })
+    },
     getTimezone: () => timezone().key,
-    setSymbol: (s: SymbolInfo) => { if (!replayEngine) setSymbol(s) },
+    setSymbol: (s: SymbolInfo) => {
+      if (!replayEngine) setSymbol(s)
+    },
     getSymbol: () => symbol(),
     setPeriod: setChartPeriod,
     getPeriod: () => period(),
     getChart: () => widget,
     // 以下方法由 KLineChartPro 直接实现，不经过 _chartApi 代理
     // 如果有人绕过 KLineChartPro 直接调用组件 ref，给出明确错误
-    exportCSV: () => { throw new Error('[TradingChest] exportCSV must be called on KLineChartPro instance') },
-    exportAllCSV: () => { throw new Error('[TradingChest] exportAllCSV must be called on KLineChartPro instance') },
-    exportScreenshot: () => { throw new Error('[TradingChest] exportScreenshot must be called on KLineChartPro instance') },
-    getShortcutManager: () => { throw new Error('[TradingChest] getShortcutManager must be called on KLineChartPro instance') },
-    addAlert: () => { throw new Error('[TradingChest] addAlert must be called on KLineChartPro instance') },
-    updateAlert: () => { throw new Error('[TradingChest] updateAlert must be called on KLineChartPro instance') },
-    removeAlert: () => { throw new Error('[TradingChest] removeAlert must be called on KLineChartPro instance') },
-    getAlerts: () => { throw new Error('[TradingChest] getAlerts must be called on KLineChartPro instance') },
-    addComparison: async () => { throw new Error('[TradingChest] addComparison must be called on KLineChartPro instance') },
-    removeComparison: () => { throw new Error('[TradingChest] removeComparison must be called on KLineChartPro instance') },
-    startReplay: (pos?: number) => { startReplay(pos) },
-    stopReplay: () => { stopReplay() },
+    exportCSV: () => {
+      throw new Error('[TradingChest] exportCSV must be called on KLineChartPro instance')
+    },
+    exportAllCSV: () => {
+      throw new Error('[TradingChest] exportAllCSV must be called on KLineChartPro instance')
+    },
+    exportScreenshot: () => {
+      throw new Error('[TradingChest] exportScreenshot must be called on KLineChartPro instance')
+    },
+    getShortcutManager: () => {
+      throw new Error('[TradingChest] getShortcutManager must be called on KLineChartPro instance')
+    },
+    addAlert: () => {
+      throw new Error('[TradingChest] addAlert must be called on KLineChartPro instance')
+    },
+    updateAlert: () => {
+      throw new Error('[TradingChest] updateAlert must be called on KLineChartPro instance')
+    },
+    removeAlert: () => {
+      throw new Error('[TradingChest] removeAlert must be called on KLineChartPro instance')
+    },
+    getAlerts: () => {
+      throw new Error('[TradingChest] getAlerts must be called on KLineChartPro instance')
+    },
+    addComparison: async () => {
+      throw new Error('[TradingChest] addComparison must be called on KLineChartPro instance')
+    },
+    removeComparison: () => {
+      throw new Error('[TradingChest] removeComparison must be called on KLineChartPro instance')
+    },
+    startReplay: (pos?: number) => {
+      startReplay(pos)
+    },
+    stopReplay: () => {
+      stopReplay()
+    },
     getReplayEngine: () => replayEngine,
-    createTradeVisualization: () => { throw new Error('[TradingChest] createTradeVisualization must be called on KLineChartPro instance') },
-    feedPrice: () => { throw new Error('[TradingChest] feedPrice must be called on KLineChartPro instance') },
-    dispose: () => { throw new Error('[TradingChest] dispose must be called on KLineChartPro instance') },
+    createTradeVisualization: () => {
+      throw new Error(
+        '[TradingChest] createTradeVisualization must be called on KLineChartPro instance',
+      )
+    },
+    feedPrice: () => {
+      throw new Error('[TradingChest] feedPrice must be called on KLineChartPro instance')
+    },
+    dispose: () => {
+      throw new Error('[TradingChest] dispose must be called on KLineChartPro instance')
+    },
   })
 
   const documentResize = () => {
@@ -311,7 +429,12 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     widgetRef!.addEventListener('keydown', handleKeyDown)
     widget = init(widgetRef!, {
       customApi: {
-        formatDate: (dateTimeFormat: Intl.DateTimeFormat, timestamp, format: string, type: FormatDateType) => {
+        formatDate: (
+          dateTimeFormat: Intl.DateTimeFormat,
+          timestamp,
+          format: string,
+          type: FormatDateType,
+        ) => {
           const p = period()
           switch (p.timespan) {
             case 'minute': {
@@ -327,7 +450,8 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD HH:mm')
             }
             case 'day':
-            case 'week': return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD')
+            case 'week':
+              return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD')
             case 'month': {
               if (type === FormatDateType.XAxis) {
                 return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM')
@@ -342,8 +466,8 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
             }
           }
           return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD HH:mm')
-        }
-      }
+        },
+      },
     })
 
     if (widget) {
@@ -381,10 +505,12 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         }
       }
       setSubIndicators(subIndicatorMap)
-    })().catch(e => { props.onError?.({ type: 'indicator-init', message: 'indicator init failed', raw: e }) })
-    widget?.loadMore(timestamp => {
-      if (replayEngine) return  // 回放模式下不从 datafeed 拉取数据
-      const seq = ++fetchSeq  // 复用 fetchSeq 防止 loadMore 与主加载/品种切换竞态
+    })().catch((e) => {
+      props.onError?.({ type: 'indicator-init', message: 'indicator init failed', raw: e })
+    })
+    widget?.loadMore((timestamp) => {
+      if (replayEngine) return // 回放模式下不从 datafeed 拉取数据
+      const seq = ++fetchSeq // 复用 fetchSeq 防止 loadMore 与主加载/品种切换竞态
       setLoading(true)
       const get = async () => {
         const p = period()
@@ -394,7 +520,13 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         if (seq !== fetchSeq) return
         widget?.applyMoreData(kLineDataList, kLineDataList.length > 0)
       }
-      void get().catch(e => { props.onError?.({ type: 'load-more', message: 'loadMore failed', raw: e }) }).finally(() => { if (seq === fetchSeq) setLoading(false) })
+      void get()
+        .catch((e) => {
+          props.onError?.({ type: 'load-more', message: 'loadMore failed', raw: e })
+        })
+        .finally(() => {
+          if (seq === fetchSeq) setLoading(false)
+        })
     })
     widget?.subscribeAction(ActionType.OnTooltipIconClick, (data) => {
       if (data.indicatorName) {
@@ -408,9 +540,15 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
             break
           }
           case 'setting': {
-            const indicator = widget?.getIndicatorByPaneId(data.paneId, data.indicatorName) as Indicator
+            const indicator = widget?.getIndicatorByPaneId(
+              data.paneId,
+              data.indicatorName,
+            ) as Indicator
             setIndicatorSettingModalParams({
-              visible: true, indicatorName: data.indicatorName, paneId: data.paneId, calcParams: indicator.calcParams
+              visible: true,
+              indicatorName: data.indicatorName,
+              paneId: data.paneId,
+              calcParams: indicator.calcParams,
             })
             break
           }
@@ -434,7 +572,6 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     widget?.subscribeAction(ActionType.OnCandleBarClick, () => {
       setSelectedOverlay(null)
     })
-
   })
 
   onCleanup(() => {
@@ -473,7 +610,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     if (prev) {
       props.onDataReset?.()
     }
-    const seq = ++fetchSeq  // 捕获当前序号
+    const seq = ++fetchSeq // 捕获当前序号
     setLoading(true)
     setLoadingVisible(true)
     const get = async () => {
@@ -482,14 +619,21 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
       // 如果在等待期间又发起了新请求，丢弃当前过期响应
       if (seq !== fetchSeq) return
       widget?.applyNewData(kLineDataList, kLineDataList.length > 0)
-      props.datafeed.subscribe(s, p, data => {
+      props.datafeed.subscribe(s, p, (data) => {
         widget?.updateData(data)
         props.onPriceUpdate?.(data.close)
       })
     }
     void get()
-      .catch(e => { props.onError?.({ type: 'data-fetch', message: 'data fetch failed', raw: e }) })
-      .finally(() => { if (seq === fetchSeq) { setLoading(false); setLoadingVisible(false) } })
+      .catch((e) => {
+        props.onError?.({ type: 'data-fetch', message: 'data fetch failed', raw: e })
+      })
+      .finally(() => {
+        if (seq === fetchSeq) {
+          setLoading(false)
+          setLoadingVisible(false)
+        }
+      })
     return { symbol: s, period: p }
   })
 
@@ -518,7 +662,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               color: color,
               activeColor: color,
               backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)'
+              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
             },
             {
               id: 'invisible',
@@ -537,7 +681,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               color: color,
               activeColor: color,
               backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)'
+              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
             },
             {
               id: 'setting',
@@ -556,7 +700,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               color: color,
               activeColor: color,
               backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)'
+              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
             },
             {
               id: 'close',
@@ -575,11 +719,11 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               color: color,
               activeColor: color,
               backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)'
-            }
-          ]
-        }
-      }
+              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
+            },
+          ],
+        },
+      },
     })
   })
 
@@ -598,26 +742,35 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   })
 
   return (
-    <ErrorBoundary fallback={(err) => (
-      <div style={{ padding: '20px', color: 'red', 'font-family': 'monospace' }}>
-        [TradingChest] Render error: {err?.message ?? String(err)}
-      </div>
-    )}>
-      <i class="icon-close klinecharts-pro-load-icon"/>
+    <ErrorBoundary
+      fallback={(err) => (
+        <div style={{ padding: '20px', color: 'red', 'font-family': 'monospace' }}>
+          [TradingChest] Render error: {err?.message ?? String(err)}
+        </div>
+      )}
+    >
+      <i class="icon-close klinecharts-pro-load-icon" />
       <Show when={symbolSearchModalVisible()}>
         <SymbolSearchModal
           locale={props.locale}
           datafeed={props.datafeed}
-          onSymbolSelected={symbol => { setSymbol(symbol) }}
-          onClose={() => { setSymbolSearchModalVisible(false) }}/>
+          onSymbolSelected={(symbol) => {
+            setSymbol(symbol)
+          }}
+          onClose={() => {
+            setSymbolSearchModalVisible(false)
+          }}
+        />
       </Show>
       <Show when={indicatorModalVisible()}>
         <IndicatorModal
           locale={props.locale}
           mainIndicators={mainIndicators()}
           subIndicators={subIndicators()}
-          onClose={() => { setIndicatorModalVisible(false) }}
-          onMainIndicatorChange={async data => {
+          onClose={() => {
+            setIndicatorModalVisible(false)
+          }}
+          onMainIndicatorChange={async (data) => {
             const newMainIndicators = [...mainIndicators()]
             if (data.added) {
               await createIndicator(widget, data.name, true, { id: 'candle_pane' })
@@ -628,7 +781,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
             }
             setMainIndicators(newMainIndicators)
           }}
-          onSubIndicatorChange={async data => {
+          onSubIndicatorChange={async (data) => {
             const newSubIndicators: Record<string, string> = { ...subIndicators() }
             if (data.added) {
               const paneId = await createIndicator(widget, data.name)
@@ -642,13 +795,16 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               }
             }
             setSubIndicators(newSubIndicators)
-          }}/>
+          }}
+        />
       </Show>
       <Show when={timezoneModalVisible()}>
         <TimezoneModal
           locale={props.locale}
           timezone={timezone()}
-          onClose={() => { setTimezoneModalVisible(false) }}
+          onClose={() => {
+            setTimezoneModalVisible(false)
+          }}
           onConfirm={setTimezone}
         />
       </Show>
@@ -656,13 +812,15 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         <SettingModal
           locale={props.locale}
           currentStyles={utils.clone(widget!.getStyles())}
-          onClose={() => { setSettingModalVisible(false) }}
-          onChange={style => {
+          onClose={() => {
+            setSettingModalVisible(false)
+          }}
+          onChange={(style) => {
             widget?.setStyles(style)
           }}
           onRestoreDefault={(options: SelectDataSourceItem[]) => {
             const style = {}
-            options.forEach(option => {
+            options.forEach((option) => {
               const key = option.key
               deepSet(style, key, utils.formatValue(widgetDefaultStyles(), key))
             })
@@ -674,17 +832,29 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         <ScreenshotModal
           locale={props.locale}
           url={screenshotUrl()}
-          onClose={() => { setScreenshotUrl('') }}
+          onClose={() => {
+            setScreenshotUrl('')
+          }}
         />
       </Show>
       <Show when={indicatorSettingModalParams().visible}>
         <IndicatorSettingModal
           locale={props.locale}
           params={indicatorSettingModalParams()}
-          onClose={() => { setIndicatorSettingModalParams({ visible: false, indicatorName: '', paneId: '', calcParams: [] }) }}
-          onConfirm={(params)=> {
+          onClose={() => {
+            setIndicatorSettingModalParams({
+              visible: false,
+              indicatorName: '',
+              paneId: '',
+              calcParams: [],
+            })
+          }}
+          onConfirm={(params) => {
             const modalParams = indicatorSettingModalParams()
-            widget?.overrideIndicator({ name: modalParams.indicatorName, calcParams: params }, modalParams.paneId)
+            widget?.overrideIndicator(
+              { name: modalParams.indicatorName, calcParams: params },
+              modalParams.paneId,
+            )
           }}
         />
       </Show>
@@ -698,16 +868,30 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           try {
             await startTransition(() => setDrawingBarVisible(!drawingBarVisible()))
             widget?.resize()
-          } catch (e) { console.warn('[TradingChest] toggle drawing bar failed:', e) }
+          } catch (e) {
+            console.warn('[TradingChest] toggle drawing bar failed:', e)
+          }
         }}
-        onSymbolClick={() => { setSymbolSearchModalVisible(!symbolSearchModalVisible()) }}
+        onSymbolClick={() => {
+          setSymbolSearchModalVisible(!symbolSearchModalVisible())
+        }}
         onPeriodChange={setChartPeriod}
-        onIndicatorClick={() => { setIndicatorModalVisible((visible => !visible)) }}
-        onTimezoneClick={() => { setTimezoneModalVisible((visible => !visible)) }}
-        onSettingClick={() => { setSettingModalVisible((visible => !visible)) }}
+        onIndicatorClick={() => {
+          setIndicatorModalVisible((visible) => !visible)
+        }}
+        onTimezoneClick={() => {
+          setTimezoneModalVisible((visible) => !visible)
+        }}
+        onSettingClick={() => {
+          setSettingModalVisible((visible) => !visible)
+        }}
         onScreenshotClick={() => {
           if (widget) {
-            const url = widget.getConvertPictureUrl(true, 'jpeg', props.theme === 'dark' ? '#151517' : '#ffffff')
+            const url = widget.getConvertPictureUrl(
+              true,
+              'jpeg',
+              props.theme === 'dark' ? '#151517' : '#ffffff',
+            )
             setScreenshotUrl(url)
           }
         }}
@@ -720,15 +904,14 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           }
         }}
       />
-      <div
-        class="klinecharts-pro-content">
+      <div class="klinecharts-pro-content">
         <Show when={loadingVisible()}>
-          <Loading/>
+          <Loading />
         </Show>
         <Show when={drawingBarVisible()}>
           <DrawingBar
             locale={props.locale}
-            onDrawingItemClick={overlay => {
+            onDrawingItemClick={(overlay) => {
               widget?.createOverlay({
                 ...overlay,
                 onDrawEnd: (event) => {
@@ -752,18 +935,28 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
                   notifyOverlay('drawing-bar', event.overlay, 'delete')
                   setSelectedOverlay(null)
                   return true
-                }
+                },
               })
             }}
-            onModeChange={mode => { widget?.overrideOverlay({ mode: mode as OverlayMode }) }}
-            onLockChange={lock => { widget?.overrideOverlay({ lock }) }}
-            onVisibleChange={visible => { widget?.overrideOverlay({ visible }) }}
-            onRemoveClick={(groupId) => { widget?.removeOverlay({ groupId }) }}/>
+            onModeChange={(mode) => {
+              widget?.overrideOverlay({ mode: mode as OverlayMode })
+            }}
+            onLockChange={(lock) => {
+              widget?.overrideOverlay({ lock })
+            }}
+            onVisibleChange={(visible) => {
+              widget?.overrideOverlay({ visible })
+            }}
+            onRemoveClick={(groupId) => {
+              widget?.removeOverlay({ groupId })
+            }}
+          />
         </Show>
         <div
           ref={widgetRef}
-          class='klinecharts-pro-widget'
-          data-drawing-bar-visible={drawingBarVisible()}/>
+          class="klinecharts-pro-widget"
+          data-drawing-bar-visible={drawingBarVisible()}
+        />
         {/* 绘图 overlay 浮动属性工具栏 */}
         <OverlayPropertyBar
           locale={props.locale}
@@ -787,7 +980,10 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           onFillColorChange={(fillColor) => {
             const info = selectedOverlay()
             if (info && widget) {
-              const next = { ...info, fillColor: fillColor === 'transparent' ? 'rgba(0,0,0,0)' : fillColor }
+              const next = {
+                ...info,
+                fillColor: fillColor === 'transparent' ? 'rgba(0,0,0,0)' : fillColor,
+              }
               widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
               setSelectedOverlay(next)
               notifySelectedOverlayUpdate('property-bar', info.id)
@@ -831,13 +1027,27 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
         <ReplayControlBar
           locale={props.locale}
           state={replayState()}
-          onPlay={() => { replayEngine?.play() }}
-          onPause={() => { replayEngine?.pause() }}
-          onStepForward={() => { replayEngine?.stepForward() }}
-          onStepBackward={() => { replayEngine?.stepBackward() }}
-          onSpeedChange={(speed: ReplaySpeed) => { replayEngine?.setSpeed(speed) }}
-          onPositionChange={(pos: number) => { replayEngine?.goToPosition(pos) }}
-          onStop={() => { stopReplay() }}
+          onPlay={() => {
+            replayEngine?.play()
+          }}
+          onPause={() => {
+            replayEngine?.pause()
+          }}
+          onStepForward={() => {
+            replayEngine?.stepForward()
+          }}
+          onStepBackward={() => {
+            replayEngine?.stepBackward()
+          }}
+          onSpeedChange={(speed: ReplaySpeed) => {
+            replayEngine?.setSpeed(speed)
+          }}
+          onPositionChange={(pos: number) => {
+            replayEngine?.goToPosition(pos)
+          }}
+          onStop={() => {
+            stopReplay()
+          }}
         />
       </div>
     </ErrorBoundary>

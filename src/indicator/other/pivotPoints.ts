@@ -34,7 +34,7 @@ const pivotPoints: IndicatorTemplate = {
     { key: 'r3', title: 'R3: ', type: 'line' },
     { key: 's1', title: 'S1: ', type: 'line' },
     { key: 's2', title: 'S2: ', type: 'line' },
-    { key: 's3', title: 'S3: ', type: 'line' }
+    { key: 's3', title: 'S3: ', type: 'line' },
   ],
   calc: (dataList: KLineData[]) => {
     const result: PivotPointsResult[] = []
@@ -49,7 +49,7 @@ const pivotPoints: IndicatorTemplate = {
           r3: undefined,
           s1: undefined,
           s2: undefined,
-          s3: undefined
+          s3: undefined,
         })
         continue
       }
@@ -72,7 +72,7 @@ const pivotPoints: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default pivotPoints

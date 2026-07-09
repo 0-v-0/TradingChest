@@ -28,7 +28,7 @@ export interface SelectProps {
   onSelected?: (data: SelectDataSourceItem | string) => void
 }
 
-const Select: Component<SelectProps> = props => {
+const Select: Component<SelectProps> = (props) => {
   const [open, setOpen] = createSignal(false)
 
   return (
@@ -39,44 +39,52 @@ const Select: Component<SelectProps> = props => {
       role="combobox"
       aria-expanded={open()}
       aria-haspopup="listbox"
-      onClick={_val => { setOpen(o => !o) }}
-      onBlur={_val => { setOpen(false) }}
+      onClick={(_val) => {
+        setOpen((o) => !o)
+      }}
+      onBlur={(_val) => {
+        setOpen(false)
+      }}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(o => !o) }
-        if (e.key === 'Escape') { setOpen(false) }
-      }}>
-      <div
-        class="selector-container">
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          setOpen((o) => !o)
+        }
+        if (e.key === 'Escape') {
+          setOpen(false)
+        }
+      }}
+    >
+      <div class="selector-container">
         <span class="value">{props.value}</span>
-        <i class="arrow"/>
+        <i class="arrow" />
       </div>
-      {
-        (props.dataSource && props.dataSource.length > 0) &&
-        <div
-          class="drop-down-container">
+      {props.dataSource && props.dataSource.length > 0 && (
+        <div class="drop-down-container">
           <ul role="listbox">
-            {
-              props.dataSource.map(data => {
-                const d = data as SelectDataSourceItem
-                const v: JSX.Element = ((d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text']) ?? (data as unknown as JSX.Element)
-                return (
-                  <li
-                    role="option"
-                    onClick={e => {
-                      e.stopPropagation()
-                      if (props.value !== v) {
-                        props.onSelected?.(data)
-                      }
-                      setOpen(false)
-                    }}>
-                    {v}
-                  </li>
-                )
-              })
-            }
+            {props.dataSource.map((data) => {
+              const d = data as SelectDataSourceItem
+              const v: JSX.Element =
+                (d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text'] ??
+                (data as unknown as JSX.Element)
+              return (
+                <li
+                  role="option"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (props.value !== v) {
+                      props.onSelected?.(data)
+                    }
+                    setOpen(false)
+                  }}
+                >
+                  {v}
+                </li>
+              )
+            })}
           </ul>
         </div>
-      }
+      )}
     </div>
   )
 }

@@ -91,11 +91,7 @@ export function calcWMA(data: number[], period: number): (number | null)[] {
  * TR = max(high - low, |high - prevClose|, |low - prevClose|)
  * 第一根 K 线无前收盘价，TR = high - low
  */
-export function calcTR(
-  high: number[],
-  low: number[],
-  close: number[]
-): (number | null)[] {
+export function calcTR(high: number[], low: number[], close: number[]): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < high.length; i++) {
     if (i === 0) {

@@ -11,9 +11,7 @@ const mcginley: IndicatorTemplate = {
   name: 'MCGINLEY',
   shortName: 'McGinley',
   calcParams: [14],
-  figures: [
-    { key: 'md', title: 'MD: ', type: 'line' }
-  ],
+  figures: [{ key: 'md', title: 'MD: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -40,7 +38,7 @@ const mcginley: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default mcginley

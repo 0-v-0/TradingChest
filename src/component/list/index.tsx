@@ -13,9 +13,8 @@
  */
 
 import { ParentComponent, ParentProps, JSX, Show } from 'solid-js'
-
-import Loading from '../loading'
 import Empty from '../empty'
+import Loading from '../loading'
 
 export interface ListProps<T = unknown> extends ParentProps {
   class?: string
@@ -25,29 +24,18 @@ export interface ListProps<T = unknown> extends ParentProps {
   renderItem?: (data: T) => JSX.Element
 }
 
-const List: ParentComponent<ListProps> = props => {
+const List: ParentComponent<ListProps> = (props) => {
   return (
-    <ul
-      style={props.style}
-      class={`klinecharts-pro-list ${props.class ?? ''}`}
-      role="list">
+    <ul style={props.style} class={`klinecharts-pro-list ${props.class ?? ''}`} role="list">
       <Show when={props.loading}>
-        <Loading/>
+        <Loading />
       </Show>
       <Show when={!props.loading && !props.children && !props.dataSource?.length}>
-        <Empty/>
+        <Empty />
       </Show>
-      <Show
-        when={props.children}>
-        {props.children}
-      </Show>
-      <Show
-        when={!props.children}>
-        {
-          props.dataSource?.map(data => (
-            props.renderItem?.(data) ?? <li></li>
-          ))
-        }
+      <Show when={props.children}>{props.children}</Show>
+      <Show when={!props.children}>
+        {props.dataSource?.map((data) => props.renderItem?.(data) ?? <li></li>)}
       </Show>
     </ul>
   )

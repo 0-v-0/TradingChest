@@ -8,7 +8,11 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type PpoResult = { ppo: number | undefined; signal: number | undefined; histogram: number | undefined }
+type PpoResult = {
+  ppo: number | undefined
+  signal: number | undefined
+  histogram: number | undefined
+}
 
 const ppo: IndicatorTemplate = {
   name: 'PPO',
@@ -17,7 +21,7 @@ const ppo: IndicatorTemplate = {
   figures: [
     { key: 'ppo', title: 'PPO: ', type: 'line' },
     { key: 'signal', title: 'Signal: ', type: 'line' },
-    { key: 'histogram', title: 'Hist: ', type: 'line' }
+    { key: 'histogram', title: 'Hist: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -69,7 +73,8 @@ const ppo: IndicatorTemplate = {
     const ppoLine: (number | null)[] = new Array(len).fill(null)
     for (let i = 0; i < len; i++) {
       if (emaFast[i] !== null && emaSlow[i] !== null && emaSlow[i] !== 0) {
-        ppoLine[i] = ((emaFast[i] as number) - (emaSlow[i] as number)) / (emaSlow[i] as number) * 100
+        ppoLine[i] =
+          (((emaFast[i] as number) - (emaSlow[i] as number)) / (emaSlow[i] as number)) * 100
       }
     }
 
@@ -103,12 +108,12 @@ const ppo: IndicatorTemplate = {
       result.push({
         ppo: p !== null ? p : undefined,
         signal: s !== null ? s : undefined,
-        histogram: p !== null && s !== null ? (p as number) - (s as number) : undefined
+        histogram: p !== null && s !== null ? (p as number) - (s as number) : undefined,
       })
     }
 
     return result
-  }
+  },
 }
 
 export default ppo

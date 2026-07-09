@@ -20,9 +20,7 @@ const dpo: IndicatorTemplate = {
   name: 'DPO',
   shortName: 'DPO',
   calcParams: [20],
-  figures: [
-    { key: 'dpo', title: 'DPO: ', type: 'line' }
-  ],
+  figures: [{ key: 'dpo', title: 'DPO: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
@@ -55,7 +53,7 @@ const dpo: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default dpo

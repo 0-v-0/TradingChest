@@ -13,16 +13,21 @@ const alertLine: OverlayTemplate = {
     return [
       {
         type: 'line',
-        attrs: { coordinates: [{ x: 0, y }, { x: bounding.width, y }] },
+        attrs: {
+          coordinates: [
+            { x: 0, y },
+            { x: bounding.width, y },
+          ],
+        },
         styles: {
           color,
           size: 1,
           style: 'dashed',
-          dashedValue: [6, 4]
-        }
-      }
+          dashedValue: [6, 4],
+        },
+      },
     ]
-  }
+  },
 }
 
 export default alertLine

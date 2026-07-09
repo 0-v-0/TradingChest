@@ -10,9 +10,7 @@ const atr: IndicatorTemplate = {
   name: 'ATR',
   shortName: 'ATR',
   calcParams: [14],
-  figures: [
-    { key: 'atr', title: 'ATR: ', type: 'line' }
-  ],
+  figures: [{ key: 'atr', title: 'ATR: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -30,7 +28,7 @@ const atr: IndicatorTemplate = {
         tr = Math.max(
           kline.high - kline.low,
           Math.abs(kline.high - prevClose),
-          Math.abs(kline.low - prevClose)
+          Math.abs(kline.low - prevClose),
         )
       }
 
@@ -50,7 +48,7 @@ const atr: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default atr

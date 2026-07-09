@@ -12,26 +12,27 @@
  * limitations under the License.
  */
 
-import { Component, createSignal } from 'solid-js'
-
 import { utils } from 'klinecharts'
-
+import { Component, createSignal } from 'solid-js'
 import { Modal, Input } from '../../component'
-
 import t from '../../i18n'
-
 import data from './data'
 
-type IndicatorSettingConfig = { paramNameKey: string; precision?: number; min?: number; default?: number }
+type IndicatorSettingConfig = {
+  paramNameKey: string
+  precision?: number
+  min?: number
+  default?: number
+}
 
 export interface IndicatorSettingModalProps {
   locale: string
-  params: { indicatorName: string, paneId: string, calcParams: number[] }
+  params: { indicatorName: string; paneId: string; calcParams: number[] }
   onClose: () => void
   onConfirm: (calcParams: number[]) => void
 }
 
-const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
+const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => {
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
 
   const getConfig: (name: string) => IndicatorSettingConfig[] = (name: string) => {
@@ -60,32 +61,31 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = props => {
             })
             props.onConfirm(params)
             props.onClose()
-          }
-        }
+          },
+        },
       ]}
-      onClose={props.onClose}>
+      onClose={props.onClose}
+    >
       <div class="klinecharts-pro-indicator-setting-modal-content">
-        {
-          getConfig(props.params.indicatorName).map((d, i) => {
-            return (
-              <>
-                <span >{t(d.paramNameKey, props.locale)}</span>
-                <Input
-                  style={{ width: '200px' }}
-                  value={calcParams()[i] ?? ''}
-                  precision={d.precision}
-                  min={d.min}
-                  onChange={value => {
-                    const params = utils.clone(calcParams())
-                    params[i] = value as number
-                    setCalcParams(params)
-                  }}/>
-              </>
-            )
-          })
-        }
+        {getConfig(props.params.indicatorName).map((d, i) => {
+          return (
+            <>
+              <span>{t(d.paramNameKey, props.locale)}</span>
+              <Input
+                style={{ width: '200px' }}
+                value={calcParams()[i] ?? ''}
+                precision={d.precision}
+                min={d.min}
+                onChange={(value) => {
+                  const params = utils.clone(calcParams())
+                  params[i] = value as number
+                  setCalcParams(params)
+                }}
+              />
+            </>
+          )
+        })}
       </div>
-      
     </Modal>
   )
 }

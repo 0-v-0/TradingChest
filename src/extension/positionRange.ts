@@ -36,12 +36,12 @@ const positionRange: OverlayTemplate = {
           { x: maxX, y: minY },
           { x: maxX, y: maxY },
           { x: minX, y: maxY },
-        ]
+        ],
       },
       styles: {
         style: 'fill',
         color: overlay.styles?.polygon?.color ?? 'rgba(38, 166, 154, 0.15)',
-      }
+      },
     })
 
     // 边框
@@ -53,14 +53,14 @@ const positionRange: OverlayTemplate = {
           { x: maxX, y: minY },
           { x: maxX, y: maxY },
           { x: minX, y: maxY },
-        ]
+        ],
       },
       styles: {
         style: 'stroke',
         borderColor: overlay.styles?.polygon?.borderColor ?? 'rgba(38, 166, 154, 0.6)',
         borderSize: overlay.styles?.polygon?.borderSize ?? 1,
         borderStyle: 'dashed',
-      }
+      },
     })
 
     // 中间 PnL 标签
@@ -88,12 +88,12 @@ const positionRange: OverlayTemplate = {
           paddingTop: 3,
           paddingBottom: 3,
           size: 11,
-        }
+        },
       })
     }
 
     return figures
-  }
+  },
 }
 
 export default positionRange

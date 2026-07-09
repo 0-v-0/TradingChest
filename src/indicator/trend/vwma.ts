@@ -9,9 +9,7 @@ const vwma: IndicatorTemplate = {
   name: 'VWMA',
   shortName: 'VWMA',
   calcParams: [20],
-  figures: [
-    { key: 'vwma', title: 'VWMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'vwma', title: 'VWMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -37,7 +35,7 @@ const vwma: IndicatorTemplate = {
       }
       return { vwma: cvSum / vSum }
     })
-  }
+  },
 }
 
 export default vwma

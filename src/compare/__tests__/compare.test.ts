@@ -23,7 +23,7 @@ describe('normalizeToPercent', () => {
     const data = [
       { timestamp: 1, open: 0, high: 0, low: 0, close: 0, volume: 0 },
       { timestamp: 2, open: 1, high: 1, low: 1, close: 1, volume: 0 },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ] as any
     const result = normalizeToPercent(data)
     expect(result).toEqual([0, 0])

@@ -12,7 +12,7 @@ const linearRegression: IndicatorTemplate = {
   figures: [
     { key: 'value', title: '回归: ', type: 'line' },
     { key: 'upper', title: '上轨: ', type: 'line' },
-    { key: 'lower', title: '下轨: ', type: 'line' }
+    { key: 'lower', title: '下轨: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -59,10 +59,10 @@ const linearRegression: IndicatorTemplate = {
       return {
         value: regValue,
         upper: regValue + 2 * stdDev,
-        lower: regValue - 2 * stdDev
+        lower: regValue - 2 * stdDev,
       }
     })
-  }
+  },
 }
 
 export default linearRegression

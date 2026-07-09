@@ -48,10 +48,7 @@ export class ReconnectingWebSocket {
     this._ws.onclose = (ev) => {
       this.onclose?.(ev)
       if (!this._disposed && this._retryCount < this._maxRetries) {
-        const delay = Math.min(
-          this._baseDelay * Math.pow(2, this._retryCount),
-          this._maxDelay
-        )
+        const delay = Math.min(this._baseDelay * Math.pow(2, this._retryCount), this._maxDelay)
         this._retryCount++
         this.onreconnect?.(this._retryCount)
         this._retryTimer = setTimeout(() => this._connect(), delay)

@@ -10,9 +10,7 @@ const historicalVolatility: IndicatorTemplate = {
   name: 'HV',
   shortName: 'HV',
   calcParams: [20],
-  figures: [
-    { key: 'hv', title: 'HV: ', type: 'line' }
-  ],
+  figures: [{ key: 'hv', title: 'HV: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -66,7 +64,7 @@ const historicalVolatility: IndicatorTemplate = {
       result.push({ hv: hv })
     }
     return result
-  }
+  },
 }
 
 export default historicalVolatility

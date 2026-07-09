@@ -40,7 +40,7 @@ describe('KeyboardShortcutManager', () => {
       const handler2 = vi.fn()
       manager.registerActions({
         'action:1': handler1,
-        'action:2': handler2
+        'action:2': handler2,
       })
       manager.addBinding({ combo: 'ctrl+a', action: 'action:1', descriptionKey: 'action_1' })
       manager.addBinding({ combo: 'ctrl+b', action: 'action:2', descriptionKey: 'action_2' })
@@ -64,39 +64,48 @@ describe('KeyboardShortcutManager', () => {
       const binding = { combo: 'ctrl+t', action: 'test:action', descriptionKey: 'test' }
       manager.addBinding(binding)
       const bindings = manager.getBindings()
-      expect(bindings.some(b => b.combo === 'ctrl+t' && b.action === 'test:action')).toBe(true)
+      expect(bindings.some((b) => b.combo === 'ctrl+t' && b.action === 'test:action')).toBe(true)
     })
 
     it('同一 combo 的新绑定覆盖旧绑定', () => {
       manager.addBinding({ combo: 'ctrl+t', action: 'action:1', descriptionKey: 'action_1' })
       manager.addBinding({ combo: 'ctrl+t', action: 'action:2', descriptionKey: 'action_2' })
       const bindings = manager.getBindings()
-      const ctrlTBindings = bindings.filter(b => b.combo === 'ctrl+t')
+      const ctrlTBindings = bindings.filter((b) => b.combo === 'ctrl+t')
       expect(ctrlTBindings.length).toBe(1)
       expect(ctrlTBindings[0].action).toBe('action:2')
     })
 
     it('支持各种快捷键组合', () => {
+      // oxfmt-ignore
       const combos = ['alt+f', 'shift+ctrl+z', 'escape', 'delete', 'home', 'end', 'ctrl+plus', 'ctrl+minus']
-      combos.forEach(combo => {
+      combos.forEach((combo) => {
         manager.addBinding({ combo, action: 'test', descriptionKey: 'test' })
       })
       const bindings = manager.getBindings()
       expect(bindings.length).toBe(combos.length)
-      combos.forEach(combo => {
-        expect(bindings.some(b => b.combo === combo)).toBe(true)
+      combos.forEach((combo) => {
+        expect(bindings.some((b) => b.combo === combo)).toBe(true)
       })
     })
   })
 
   describe('removeBinding', () => {
     it('移除指定 combo 的绑定', () => {
-      manager.addBinding({ combo: 'alt+f', action: 'draw:fibonacci', descriptionKey: 'shortcut_fibonacci' })
-      manager.addBinding({ combo: 'alt+t', action: 'draw:line', descriptionKey: 'shortcut_trend_line' })
+      manager.addBinding({
+        combo: 'alt+f',
+        action: 'draw:fibonacci',
+        descriptionKey: 'shortcut_fibonacci',
+      })
+      manager.addBinding({
+        combo: 'alt+t',
+        action: 'draw:line',
+        descriptionKey: 'shortcut_trend_line',
+      })
       const countBefore = manager.getBindings().length
       manager.removeBinding('alt+f')
       expect(manager.getBindings().length).toBe(countBefore - 1)
-      expect(manager.getBindings().some(b => b.combo === 'alt+f')).toBe(false)
+      expect(manager.getBindings().some((b) => b.combo === 'alt+f')).toBe(false)
     })
 
     it('移除不存在的 combo 不抛错', () => {
@@ -196,7 +205,12 @@ describe('KeyboardShortcutManager', () => {
       document.body.appendChild(input)
       manager.bindTo(document.body)
       input.focus()
-      const event = new KeyboardEvent('keydown', { key: 't', ctrlKey: true, bubbles: true, target: input })
+      const event = new KeyboardEvent('keydown', {
+        key: 't',
+        ctrlKey: true,
+        bubbles: true,
+        target: input,
+      })
       input.dispatchEvent(event)
       expect(handler).not.toHaveBeenCalled()
       document.body.removeChild(input)
@@ -210,12 +224,17 @@ describe('KeyboardShortcutManager', () => {
       document.body.appendChild(textarea)
       manager.bindTo(document.body)
       textarea.focus()
-      const event = new KeyboardEvent('keydown', { key: 't', ctrlKey: true, bubbles: true, target: textarea })
-      textarea.dispatchEvent(event)
+      textarea.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 't',
+          ctrlKey: true,
+          bubbles: true,
+          target: textarea,
+        }),
+      )
       expect(handler).not.toHaveBeenCalled()
       document.body.removeChild(textarea)
     })
-
 
     it('快捷键匹配不到时不触发 handler', () => {
       const handler = vi.fn()
@@ -230,7 +249,11 @@ describe('KeyboardShortcutManager', () => {
     })
 
     it('快捷键对应的 action 没注册时不触发', () => {
-      manager.addBinding({ combo: 'ctrl+t', action: 'unregistered:action', descriptionKey: 'unregistered' })
+      manager.addBinding({
+        combo: 'ctrl+t',
+        action: 'unregistered:action',
+        descriptionKey: 'unregistered',
+      })
       const el = document.createElement('div')
       manager.bindTo(el)
       const event = new KeyboardEvent('keydown', { key: 't', ctrlKey: true, bubbles: true })
@@ -296,8 +319,14 @@ describe('KeyboardShortcutManager', () => {
       manager.addBinding({ combo: 'ctrl+shift+t', action: 'test:action', descriptionKey: 'test' })
       const el = document.createElement('div')
       manager.bindTo(el)
-      const event = new KeyboardEvent('keydown', { key: 't', ctrlKey: true, shiftKey: true, bubbles: true })
-      el.dispatchEvent(event)
+      el.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 't',
+          ctrlKey: true,
+          shiftKey: true,
+          bubbles: true,
+        }),
+      )
       expect(handler).toHaveBeenCalled()
     })
 
@@ -374,8 +403,16 @@ describe('KeyboardShortcutManager', () => {
       const handler2 = vi.fn()
       manager.registerAction('zoom:in', handler1)
       manager.registerAction('zoom:out', handler2)
-      manager.addBinding({ combo: 'ctrl+plus', action: 'zoom:in', descriptionKey: 'shortcut_zoom_in' })
-      manager.addBinding({ combo: 'ctrl+minus', action: 'zoom:out', descriptionKey: 'shortcut_zoom_out' })
+      manager.addBinding({
+        combo: 'ctrl+plus',
+        action: 'zoom:in',
+        descriptionKey: 'shortcut_zoom_in',
+      })
+      manager.addBinding({
+        combo: 'ctrl+minus',
+        action: 'zoom:out',
+        descriptionKey: 'shortcut_zoom_out',
+      })
       const el = document.createElement('div')
       manager.bindTo(el)
 
@@ -421,9 +458,7 @@ describe('KeyboardShortcutManager', () => {
     })
 
     it('自定义初始化时返回自定义绑定', () => {
-      const customBindings = [
-        { combo: 'custom+1', action: 'custom:1', descriptionKey: 'custom_1' }
-      ]
+      const customBindings = [{ combo: 'custom+1', action: 'custom:1', descriptionKey: 'custom_1' }]
       const mgr = new KeyboardShortcutManager(customBindings)
       expect(mgr.getBindings().length).toBe(1)
       expect(mgr.getBindings()[0].combo).toBe('custom+1')

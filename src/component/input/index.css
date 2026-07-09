@@ -12,7 +12,7 @@
   box-sizing: border-box;
   cursor: pointer;
 
-  &[data-status="focus"] {
+  &[data-status=focus] {
     border-color: var(--klinecharts-pro-primary-color);
   }
 

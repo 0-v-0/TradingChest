@@ -18,9 +18,7 @@ const twiggsMf: IndicatorTemplate = {
   name: 'TMF',
   shortName: 'TMF',
   calcParams: [21],
-  figures: [
-    { key: 'tmf', title: 'TMF: ', type: 'line' }
-  ],
+  figures: [{ key: 'tmf', title: 'TMF: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
     const len = dataList.length
@@ -43,7 +41,7 @@ const twiggsMf: IndicatorTemplate = {
         if (range === 0) {
           ad[i] = 0
         } else {
-          ad[i] = volume * (2 * kline.close - kline.low - kline.high) / range
+          ad[i] = (volume * (2 * kline.close - kline.low - kline.high)) / range
         }
       } else {
         const prevClose = dataList[i - 1].close
@@ -54,7 +52,7 @@ const twiggsMf: IndicatorTemplate = {
         if (range === 0) {
           ad[i] = 0
         } else {
-          ad[i] = volume * (2 * kline.close - trl - trh) / range
+          ad[i] = (volume * (2 * kline.close - trl - trh)) / range
         }
       }
     }
@@ -93,7 +91,7 @@ const twiggsMf: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default twiggsMf

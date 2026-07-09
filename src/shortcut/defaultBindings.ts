@@ -3,7 +3,7 @@
  * descriptionKey 对应 i18n key
  */
 export interface ShortcutBinding {
-  combo: string  // 例如 'alt+t', 'ctrl+z', 'escape'
+  combo: string // 例如 'alt+t', 'ctrl+z', 'escape'
   action: string
   descriptionKey: string
 }
@@ -11,7 +11,11 @@ export interface ShortcutBinding {
 const defaultBindings: ShortcutBinding[] = [
   // 绘图工具快捷键
   { combo: 'alt+t', action: 'draw:straightLine', descriptionKey: 'shortcut_trend_line' },
-  { combo: 'alt+h', action: 'draw:horizontalStraightLine', descriptionKey: 'shortcut_horizontal_line' },
+  {
+    combo: 'alt+h',
+    action: 'draw:horizontalStraightLine',
+    descriptionKey: 'shortcut_horizontal_line',
+  },
   { combo: 'alt+v', action: 'draw:verticalStraightLine', descriptionKey: 'shortcut_vertical_line' },
   { combo: 'alt+f', action: 'draw:fibonacciLine', descriptionKey: 'shortcut_fibonacci' },
   { combo: 'alt+r', action: 'draw:rect', descriptionKey: 'shortcut_rectangle' },
@@ -32,7 +36,7 @@ const defaultBindings: ShortcutBinding[] = [
   // 显示切换快捷键
   { combo: 'alt+c', action: 'toggle:crosshair', descriptionKey: 'shortcut_crosshair' },
   { combo: 'alt+g', action: 'toggle:grid', descriptionKey: 'shortcut_grid' },
-  { combo: 'alt+l', action: 'toggle:logScale', descriptionKey: 'shortcut_log_scale' }
+  { combo: 'alt+l', action: 'toggle:logScale', descriptionKey: 'shortcut_log_scale' },
 ]
 
 export default defaultBindings

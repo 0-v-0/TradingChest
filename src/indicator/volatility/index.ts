@@ -1,11 +1,11 @@
-import keltnerChannels from './keltnerChannels'
+import bollingerBandWidth from './bollingerBandWidth'
+import chaikinVolatility from './chaikinVolatility'
 import donchianChannels from './donchianChannels'
 import historicalVolatility from './historicalVolatility'
-import standardDeviation from './standardDeviation'
-import chaikinVolatility from './chaikinVolatility'
+import keltnerChannels from './keltnerChannels'
 import massIndex from './massIndex'
+import standardDeviation from './standardDeviation'
 import ulcerIndex from './ulcerIndex'
-import bollingerBandWidth from './bollingerBandWidth'
 
 const volatilityIndicators = [
   keltnerChannels,
@@ -15,7 +15,7 @@ const volatilityIndicators = [
   chaikinVolatility,
   massIndex,
   ulcerIndex,
-  bollingerBandWidth
+  bollingerBandWidth,
 ]
 
 export default volatilityIndicators

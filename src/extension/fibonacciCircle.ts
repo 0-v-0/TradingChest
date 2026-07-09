@@ -28,32 +28,30 @@ const fibonacciCircle: OverlayTemplate = {
       const percents = [0.236, 0.382, 0.5, 0.618, 0.786, 1]
       const circles: CircleAttrs[] = []
       const texts: TextAttrs[] = []
-      percents.forEach(percent => {
+      percents.forEach((percent) => {
         const r = radius * percent
-        circles.push(
-          { ...coordinates[0], r }
-        )
+        circles.push({ ...coordinates[0], r })
         texts.push({
           x: coordinates[0].x,
           y: coordinates[0].y + r + 6,
-          text: `${(percent * 100).toFixed(1)}%`
+          text: `${(percent * 100).toFixed(1)}%`,
         })
       })
       return [
         {
           type: 'circle',
           attrs: circles,
-          styles: { style: 'stroke' }
+          styles: { style: 'stroke' },
         },
         {
           type: 'text',
           ignoreEvent: true,
-          attrs: texts
-        }
+          attrs: texts,
+        },
       ]
     }
     return []
-  }
+  },
 }
 
 export default fibonacciCircle

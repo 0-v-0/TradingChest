@@ -13,7 +13,6 @@
  */
 
 import { OverlayTemplate, LineAttrs } from 'klinecharts'
-
 import { getRayLine } from './utils'
 
 /**
@@ -38,8 +37,8 @@ const pitchfork: OverlayTemplate = {
         {
           type: 'line',
           ignoreEvent: true,
-          attrs: { coordinates }
-        }
+          attrs: { coordinates },
+        },
       ]
     }
 
@@ -51,7 +50,7 @@ const pitchfork: OverlayTemplate = {
     // 两摆动点的中点
     const midPoint = {
       x: (swing1.x + swing2.x) / 2,
-      y: (swing1.y + swing2.y) / 2
+      y: (swing1.y + swing2.y) / 2,
     }
 
     // 中线方向向量（pivot → midPoint）
@@ -76,21 +75,21 @@ const pitchfork: OverlayTemplate = {
     // 内上线的起点取中线起点与上外线起点的中点方向
     const innerUpperStart = {
       x: (midPoint.x + swing1.x) / 2,
-      y: (midPoint.y + swing1.y) / 2
+      y: (midPoint.y + swing1.y) / 2,
     }
     const innerUpperEnd = {
       x: innerUpperStart.x + dx,
-      y: innerUpperStart.y + dy
+      y: innerUpperStart.y + dy,
     }
     const innerUpperRay = getRayLine([innerUpperStart, innerUpperEnd], bounding) as LineAttrs
 
     const innerLowerStart = {
       x: (midPoint.x + swing2.x) / 2,
-      y: (midPoint.y + swing2.y) / 2
+      y: (midPoint.y + swing2.y) / 2,
     }
     const innerLowerEnd = {
       x: innerLowerStart.x + dx,
-      y: innerLowerStart.y + dy
+      y: innerLowerStart.y + dy,
     }
     const innerLowerRay = getRayLine([innerLowerStart, innerLowerEnd], bounding) as LineAttrs
 
@@ -112,7 +111,7 @@ const pitchfork: OverlayTemplate = {
     // 连接线：pivot → swing1, pivot → swing2（辅助参考）
     const connectLines: LineAttrs[] = [
       { coordinates: [pivot, swing1] },
-      { coordinates: [pivot, swing2] }
+      { coordinates: [pivot, swing2] },
     ]
 
     // 内线（50% 线，虚线风格）
@@ -128,19 +127,19 @@ const pitchfork: OverlayTemplate = {
       {
         type: 'line',
         attrs: connectLines,
-        styles: { style: 'dashed' }
+        styles: { style: 'dashed' },
       },
       {
         type: 'line',
-        attrs: lines
+        attrs: lines,
       },
       {
         type: 'line',
         attrs: innerLines,
-        styles: { style: 'dashed' }
-      }
+        styles: { style: 'dashed' },
+      },
     ]
-  }
+  },
 }
 
 export default pitchfork

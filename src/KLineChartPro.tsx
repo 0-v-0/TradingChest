@@ -12,25 +12,32 @@
  * limitations under the License.
  */
 
+import {
+  utils,
+  Nullable,
+  DeepPartial,
+  Styles,
+  registerIndicator,
+  YAxisType,
+  IndicatorCreate,
+} from 'klinecharts'
 import { render } from 'solid-js/web'
-
-import { utils, Nullable, DeepPartial, Styles, registerIndicator, YAxisType, IndicatorCreate } from 'klinecharts'
-import { normalizeToPercent } from './compare'
-
+import type { AlertConfig } from './alert/types'
+import type { TradeRecord } from './indicator/trade/tradeVisualization'
+import { AlertManager } from './alert'
 import ChartProComponent from './ChartProComponent'
-
+import { normalizeToPercent } from './compare'
+import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
+import {
+  getTradeVisHitTargets,
+  cleanupTradeVisInstance,
+} from './indicator/trade/tradeVisualization'
+import { ReplayEngine } from './replay/ReplayEngine'
+import KeyboardShortcutManager from './shortcut'
 import { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 
-import KeyboardShortcutManager from './shortcut'
-import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
-import { AlertManager } from './alert'
-import type { AlertConfig } from './alert/types'
-import { ReplayEngine } from './replay/ReplayEngine'
-import type { TradeRecord } from './indicator/trade/tradeVisualization'
-import { getTradeVisHitTargets, cleanupTradeVisInstance } from './indicator/trade/tradeVisualization'
-
 export default class KLineChartPro implements ChartPro {
-  constructor (options: ChartProOptions) {
+  constructor(options: ChartProOptions) {
     if (utils.isString(options.container)) {
       this._container = document.getElementById(options.container as string)
       if (!this._container) {
@@ -45,7 +52,9 @@ export default class KLineChartPro implements ChartPro {
     this._solidDispose = render(
       () => (
         <ChartProComponent
-          ref={(chart: ChartPro) => { this._chartApi = chart }}
+          ref={(chart: ChartPro) => {
+            this._chartApi = chart
+          }}
           styles={options.styles ?? {}}
           watermark={options.watermark ?? ''}
           theme={options.theme ?? 'light'}
@@ -64,7 +73,7 @@ export default class KLineChartPro implements ChartPro {
               { multiplier: 1, timespan: 'day', text: 'D' },
               { multiplier: 1, timespan: 'week', text: 'W' },
               { multiplier: 1, timespan: 'month', text: 'M' },
-              { multiplier: 1, timespan: 'year', text: 'Y' }
+              { multiplier: 1, timespan: 'year', text: 'Y' },
             ]
           }
           timezone={options.timezone ?? 'Asia/Shanghai'}
@@ -76,16 +85,19 @@ export default class KLineChartPro implements ChartPro {
           onOverlayCreate={options.onOverlayCreate ?? (() => {})}
           onOverlayUpdate={options.onOverlayUpdate ?? (() => {})}
           onOverlayDelete={options.onOverlayDelete ?? (() => {})}
-          onPriceUpdate={(price: number) => { this._alertManager.checkPrice(price, Date.now()) }}
+          onPriceUpdate={(price: number) => {
+            this._alertManager.checkPrice(price, Date.now())
+          }}
           onDataReset={() => {
             this._alertManager.resetPrevPrice()
             // 品种/周期切换时清理比较指标（旧数据时间戳不再对齐）
             this._clearComparisons()
           }}
-          onError={options.onError}/>
+          onError={options.onError}
+        />
       ),
-      this._container
-    ) as unknown as (() => void)
+      this._container,
+    ) as unknown as () => void
 
     this._datafeed = options.datafeed
 
@@ -138,8 +150,12 @@ export default class KLineChartPro implements ChartPro {
     this._shortcutManager = new KeyboardShortcutManager()
     this._shortcutManager.registerActions({
       // 导航
-      'nav:scrollToEnd': () => { this.getChart()?.scrollToRealTime() },
-      'nav:scrollToStart': () => { this.getChart()?.scrollToDataIndex(0) },
+      'nav:scrollToEnd': () => {
+        this.getChart()?.scrollToRealTime()
+      },
+      'nav:scrollToStart': () => {
+        this.getChart()?.scrollToDataIndex(0)
+      },
       'nav:zoomIn': () => {
         const chart = this.getChart()
         if (chart) {
@@ -155,17 +171,37 @@ export default class KLineChartPro implements ChartPro {
         }
       },
       // 图表操作
-      'chart:screenshot': () => { this.exportScreenshot() },
-      'chart:cancelDraw': () => { this.getChart()?.removeOverlay() },
-      'chart:deleteSelected': () => { this.getChart()?.removeOverlay() },
+      'chart:screenshot': () => {
+        this.exportScreenshot()
+      },
+      'chart:cancelDraw': () => {
+        this.getChart()?.removeOverlay()
+      },
+      'chart:deleteSelected': () => {
+        this.getChart()?.removeOverlay()
+      },
       // 绘图工具
-      'draw:straightLine': () => { this.getChart()?.createOverlay('straightLine') },
-      'draw:horizontalStraightLine': () => { this.getChart()?.createOverlay('horizontalStraightLine') },
-      'draw:verticalStraightLine': () => { this.getChart()?.createOverlay('verticalStraightLine') },
-      'draw:fibonacciLine': () => { this.getChart()?.createOverlay('fibonacciLine') },
-      'draw:rect': () => { this.getChart()?.createOverlay('rect') },
-      'draw:brush': () => { this.getChart()?.createOverlay('simpleAnnotation') },
-      'draw:dateAndPriceRange': () => { this.getChart()?.createOverlay('dateAndPriceRange') },
+      'draw:straightLine': () => {
+        this.getChart()?.createOverlay('straightLine')
+      },
+      'draw:horizontalStraightLine': () => {
+        this.getChart()?.createOverlay('horizontalStraightLine')
+      },
+      'draw:verticalStraightLine': () => {
+        this.getChart()?.createOverlay('verticalStraightLine')
+      },
+      'draw:fibonacciLine': () => {
+        this.getChart()?.createOverlay('fibonacciLine')
+      },
+      'draw:rect': () => {
+        this.getChart()?.createOverlay('rect')
+      },
+      'draw:brush': () => {
+        this.getChart()?.createOverlay('simpleAnnotation')
+      },
+      'draw:dateAndPriceRange': () => {
+        this.getChart()?.createOverlay('dateAndPriceRange')
+      },
       // 显示切换
       'toggle:crosshair': () => {
         const chart = this.getChart()
@@ -214,10 +250,14 @@ export default class KLineChartPro implements ChartPro {
   /** Throws if called before Solid.js render completes or after dispose. */
   private _api(): ChartPro {
     if (this._disposed) {
-      throw new Error('[TradingChest] Instance has been disposed. Create a new instance to continue.')
+      throw new Error(
+        '[TradingChest] Instance has been disposed. Create a new instance to continue.',
+      )
     }
     if (!this._chartApi) {
-      throw new Error('[TradingChest] Chart not initialized yet. Wait for render to complete before calling API methods.')
+      throw new Error(
+        '[TradingChest] Chart not initialized yet. Wait for render to complete before calling API methods.',
+      )
     }
     return this._chartApi
   }
@@ -225,16 +265,18 @@ export default class KLineChartPro implements ChartPro {
   /** Throws if instance is disposed. For methods that don't need _chartApi. */
   private _assertNotDisposed(): void {
     if (this._disposed) {
-      throw new Error('[TradingChest] Instance has been disposed. Create a new instance to continue.')
+      throw new Error(
+        '[TradingChest] Instance has been disposed. Create a new instance to continue.',
+      )
     }
   }
 
-  setTheme (theme: string): void {
+  setTheme(theme: string): void {
     this._container?.setAttribute('data-theme', theme)
     this._api().setTheme(theme)
   }
 
-  getTheme (): string {
+  getTheme(): string {
     return this._api().getTheme()
   }
 
@@ -246,69 +288,77 @@ export default class KLineChartPro implements ChartPro {
     return this._api().getStyles()
   }
 
-  setLocale (locale: string): void {
+  setLocale(locale: string): void {
     this._api().setLocale(locale)
   }
 
-  getLocale (): string {
+  getLocale(): string {
     return this._api().getLocale()
   }
 
-  setTimezone (timezone: string): void {
+  setTimezone(timezone: string): void {
     this._api().setTimezone(timezone)
   }
 
-  getTimezone (): string {
+  getTimezone(): string {
     return this._api().getTimezone()
   }
 
-  setSymbol (symbol: SymbolInfo): void {
+  setSymbol(symbol: SymbolInfo): void {
     this._api().setSymbol(symbol)
   }
 
-  getSymbol (): SymbolInfo {
+  getSymbol(): SymbolInfo {
     return this._api().getSymbol()
   }
 
-  setPeriod (period: Period): void {
+  setPeriod(period: Period): void {
     this._api().setPeriod(period)
   }
 
-  getPeriod (): Period {
+  getPeriod(): Period {
     return this._api().getPeriod()
   }
 
-  getChart () {
+  getChart() {
     return this._api().getChart()
   }
 
-  exportCSV (filename?: string): void {
+  exportCSV(filename?: string): void {
     exportToCSV(this.getChart(), filename)
   }
 
-  exportAllCSV (filename?: string): void {
+  exportAllCSV(filename?: string): void {
     exportAllToCSV(this.getChart(), filename)
   }
 
-  exportScreenshot (options?: { format?: 'png' | 'jpeg', backgroundColor?: string, filename?: string }): void {
+  exportScreenshot(options?: {
+    format?: 'png' | 'jpeg'
+    backgroundColor?: string
+    filename?: string
+  }): void {
     exportScreenshot(this.getChart(), options)
   }
 
-  getShortcutManager (): KeyboardShortcutManager {
+  getShortcutManager(): KeyboardShortcutManager {
     return this._shortcutManager
   }
 
-  createTradeVisualization (trades: TradeRecord[], paneOptions?: Record<string, unknown>): void {
+  createTradeVisualization(trades: TradeRecord[], paneOptions?: Record<string, unknown>): void {
     this._assertNotDisposed()
     const chart = this.getChart()
     if (!chart) return
-    chart.createIndicator({
-      name: 'TradeVis',
-      extendData: { trades, _instanceId: this._instanceId }
-    } as IndicatorCreate<Record<string, unknown>>, true, paneOptions ?? { id: 'candle_pane' })
+    chart.createIndicator(
+      {
+        name: 'TradeVis',
+        extendData: { trades, _instanceId: this._instanceId },
+      } as IndicatorCreate<Record<string, unknown>>,
+      true,
+      paneOptions ?? { id: 'candle_pane' },
+    )
   }
 
-  addAlert (config: AlertConfig): void {
+  addAlert(config: AlertConfig): void {
     this._assertNotDisposed()
     this._alertManager.addAlert(config)
     const chart = this.getChart()
@@ -318,12 +368,12 @@ export default class KLineChartPro implements ChartPro {
         id: `alert_${config.id}`,
         points: [{ value: config.price }],
         styles: { line: { color: config.color ?? '#ff9800' } },
-        lock: true
+        lock: true,
       })
     }
   }
 
-  updateAlert (id: string, updates: Partial<Omit<AlertConfig, 'id'>>): boolean {
+  updateAlert(id: string, updates: Partial<Omit<AlertConfig, 'id'>>): boolean {
     this._assertNotDisposed()
     const ok = this._alertManager.updateAlert(id, updates)
     if (ok && updates.price !== undefined) {
@@ -338,7 +388,7 @@ export default class KLineChartPro implements ChartPro {
             id: `alert_${id}`,
             points: [{ value: alert.price }],
             styles: { line: { color: updates.color ?? alert.color ?? '#ff9800' } },
-            lock: true
+            lock: true,
           })
         }
       }
@@ -346,20 +396,24 @@ export default class KLineChartPro implements ChartPro {
     return ok
   }
 
-  removeAlert (id: string): void {
+  removeAlert(id: string): void {
     this._assertNotDisposed()
     this._alertManager.removeAlert(id)
     this.getChart()?.removeOverlay({ id: `alert_${id}` })
   }
 
-  getAlerts (): AlertConfig[] {
+  getAlerts(): AlertConfig[] {
     this._assertNotDisposed()
     return this._alertManager.getAlerts()
   }
 
-  private _clearComparisons (): void {
+  private _clearComparisons(): void {
     for (const [, indicatorName] of this._comparisons) {
-      try { this.getChart()?.removeIndicator('candle_pane', indicatorName) } catch { /* already disposing */ }
+      try {
+        this.getChart()?.removeIndicator('candle_pane', indicatorName)
+      } catch {
+        /* already disposing */
+      }
     }
     this._comparisons.clear()
   }
@@ -368,7 +422,7 @@ export default class KLineChartPro implements ChartPro {
    * Add comparison overlay for another symbol.
    * Known limitation: comparison data is fetched once and not updated with new ticks.
    */
-  async addComparison (symbol: SymbolInfo): Promise<void> {
+  async addComparison(symbol: SymbolInfo): Promise<void> {
     this._assertNotDisposed()
     // 防止重复添加同一品种（先移除旧的）
     if (this._comparisons.has(symbol.ticker)) {
@@ -389,8 +443,10 @@ export default class KLineChartPro implements ChartPro {
     const compPercent = normalizeToPercent(compData)
     const compMap = new Map<number, number>()
     // Sorted arrays for binary search fallback
-    const compTimestamps = compData.map(d => d.timestamp)
-    compData.forEach((d, i) => { compMap.set(d.timestamp, compPercent[i]) })
+    const compTimestamps = compData.map((d) => d.timestamp)
+    compData.forEach((d, i) => {
+      compMap.set(d.timestamp, compPercent[i])
+    })
 
     const indicatorName = `COMPARE_${symbol.ticker.replace(/[^A-Z0-9]/g, '_')}`
     registerIndicator({
@@ -398,11 +454,12 @@ export default class KLineChartPro implements ChartPro {
       shortName: symbol.shortName ?? symbol.ticker,
       figures: [{ key: 'pct', title: `${symbol.ticker}: `, type: 'line' }],
       calc: (dataList) => {
-        return dataList.map(d => {
+        return dataList.map((d) => {
           let pct = compMap.get(d.timestamp)
           if (pct === undefined) {
             // Binary search for nearest timestamp within tolerance
-            let lo = 0, hi = compTimestamps.length - 1
+            let lo = 0,
+              hi = compTimestamps.length - 1
             while (lo < hi) {
               const mid = (lo + hi) >> 1
               if (compTimestamps[mid] < d.timestamp) lo = mid + 1
@@ -410,7 +467,11 @@ export default class KLineChartPro implements ChartPro {
             }
             // Check lo and lo-1 for closest match within 60s
             for (const idx of [lo, lo - 1]) {
-              if (idx >= 0 && idx < compTimestamps.length && Math.abs(compTimestamps[idx] - d.timestamp) <= 60000) {
+              if (
+                idx >= 0 &&
+                idx < compTimestamps.length &&
+                Math.abs(compTimestamps[idx] - d.timestamp) <= 60000
+              ) {
                 pct = compMap.get(compTimestamps[idx])
                 break
               }
@@ -418,14 +479,14 @@ export default class KLineChartPro implements ChartPro {
           }
           return { pct }
         })
-      }
+      },
     })
 
     chart.createIndicator(indicatorName, true, { id: 'candle_pane' })
     this._comparisons.set(symbol.ticker, indicatorName)
   }
 
-  removeComparison (ticker: string): void {
+  removeComparison(ticker: string): void {
     this._assertNotDisposed()
     const indicatorName = this._comparisons.get(ticker)
     if (indicatorName) {
@@ -434,29 +495,33 @@ export default class KLineChartPro implements ChartPro {
     }
   }
 
-  startReplay (startPosition?: number): void {
+  startReplay(startPosition?: number): void {
     this._api().startReplay(startPosition)
   }
 
-  stopReplay (): void {
+  stopReplay(): void {
     this._api().stopReplay()
   }
 
-  getReplayEngine (): ReplayEngine | null {
+  getReplayEngine(): ReplayEngine | null {
     return this._api().getReplayEngine()
   }
 
-  feedPrice (price: number): void {
+  feedPrice(price: number): void {
     if (this._disposed) return // feedPrice 静默忽略，不抛异常
     this._alertManager.checkPrice(price, Date.now())
   }
 
-  dispose (): void {
+  dispose(): void {
     if (this._disposed) return // 幂等：重复调用安全
     this._disposed = true
     // 1. Stop replay (safe — ChartProComponent.onCleanup also handles this)
     if (this._chartApi) {
-      try { this._chartApi.stopReplay() } catch { /* already disposing */ }
+      try {
+        this._chartApi.stopReplay()
+      } catch {
+        /* already disposing */
+      }
     }
     // 2. Remove comparisons
     this._clearComparisons()

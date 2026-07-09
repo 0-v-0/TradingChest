@@ -4,7 +4,11 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type KeltnerChannelsResult = { middle: number | undefined; upper: number | undefined; lower: number | undefined }
+type KeltnerChannelsResult = {
+  middle: number | undefined
+  upper: number | undefined
+  lower: number | undefined
+}
 
 const keltnerChannels: IndicatorTemplate = {
   name: 'KC',
@@ -13,7 +17,7 @@ const keltnerChannels: IndicatorTemplate = {
   figures: [
     { key: 'middle', title: 'MID: ', type: 'line' },
     { key: 'upper', title: 'UP: ', type: 'line' },
-    { key: 'lower', title: 'LOW: ', type: 'line' }
+    { key: 'lower', title: 'LOW: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -42,7 +46,7 @@ const keltnerChannels: IndicatorTemplate = {
         tr = Math.max(
           kline.high - kline.low,
           Math.abs(kline.high - prevClose),
-          Math.abs(kline.low - prevClose)
+          Math.abs(kline.low - prevClose),
         )
       }
 
@@ -59,7 +63,7 @@ const keltnerChannels: IndicatorTemplate = {
           result.push({
             middle: emaValue,
             upper: emaValue + atrMultiplier * atrValue,
-            lower: emaValue - atrMultiplier * atrValue
+            lower: emaValue - atrMultiplier * atrValue,
           })
         } else {
           result.push({ middle: undefined, upper: undefined, lower: undefined })
@@ -72,12 +76,12 @@ const keltnerChannels: IndicatorTemplate = {
         result.push({
           middle: emaValue,
           upper: emaValue + atrMultiplier * atrValue,
-          lower: emaValue - atrMultiplier * atrValue
+          lower: emaValue - atrMultiplier * atrValue,
         })
       }
     }
     return result
-  }
+  },
 }
 
 export default keltnerChannels

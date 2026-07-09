@@ -13,7 +13,6 @@
  */
 
 import { OverlayTemplate, LineAttrs } from 'klinecharts'
-
 import { getRayLine, getDistance } from './utils'
 
 /**
@@ -30,8 +29,8 @@ const regressionChannel: OverlayTemplate = {
   needDefaultYAxisFigure: true,
   styles: {
     polygon: {
-      color: 'rgba(22, 119, 255, 0.08)'
-    }
+      color: 'rgba(22, 119, 255, 0.08)',
+    },
   },
   createPointFigures: ({ coordinates, bounding }) => {
     if (coordinates.length < 2) {
@@ -96,19 +95,19 @@ const regressionChannel: OverlayTemplate = {
         type: 'polygon',
         ignoreEvent: true,
         attrs: { coordinates: fillCoordinates },
-        styles: { style: 'fill' }
+        styles: { style: 'fill' },
       },
       {
         type: 'line',
-        attrs: centerLines
+        attrs: centerLines,
       },
       {
         type: 'line',
         attrs: channelLines,
-        styles: { style: 'dashed' }
-      }
+        styles: { style: 'dashed' },
+      },
     ]
-  }
+  },
 }
 
 export default regressionChannel

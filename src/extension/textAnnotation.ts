@@ -23,7 +23,7 @@ const textAnnotation: OverlayTemplate = {
             y: coordinates[0].y,
             text: text,
             baseline: 'middle',
-            align: 'center'
+            align: 'center',
           },
           styles: {
             style: 'stroke_fill',
@@ -36,16 +36,19 @@ const textAnnotation: OverlayTemplate = {
             paddingRight: 8,
             paddingTop: 4,
             paddingBottom: 4,
-            size: 12
-          }
-        }
+            size: 12,
+          },
+        },
       ]
     }
     return []
   },
   // 绘制完成后弹出文字输入
   onDrawEnd: ({ overlay }) => {
-    const input = window.prompt('输入标注文字 / Enter text:', (overlay.extendData as string) || 'Text')
+    const input = window.prompt(
+      '输入标注文字 / Enter text:',
+      (overlay.extendData as string) || 'Text',
+    )
     if (input !== null && input.trim() !== '') {
       overlay.extendData = input.trim()
     }
@@ -61,8 +64,8 @@ const textAnnotation: OverlayTemplate = {
     if (input !== null && input.trim() !== '') {
       overlay.extendData = input.trim()
     }
-    return true  // 阻止默认右键菜单
-  }
+    return true // 阻止默认右键菜单
+  },
 }
 
 export default textAnnotation

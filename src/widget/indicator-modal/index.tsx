@@ -13,20 +13,11 @@
  */
 
 import { Component, createSignal, createMemo, For, Show, onMount } from 'solid-js'
-
 import { Modal, List, Checkbox } from '../../component'
-
 import t from '../../i18n'
-
 import { indicatorCategories } from '../../indicator'
 
-type OnIndicatorChange = (
-  params: {
-    name: string
-    paneId: string
-    added: boolean
-  }
-) => void
+type OnIndicatorChange = (params: { name: string; paneId: string; added: boolean }) => void
 
 export interface IndicatorModalProps {
   locale: string
@@ -37,6 +28,7 @@ export interface IndicatorModalProps {
   onClose: () => void
 }
 
+// oxfmt-ignore
 // 主图指标（叠加在蜡烛图上）
 // 名称必须与 IndicatorTemplate.name 完全一致
 const MAIN_INDICATORS = [
@@ -47,6 +39,7 @@ const MAIN_INDICATORS = [
   'KC', 'DC', 'PIVOTPOINTS'
 ]
 
+// oxfmt-ignore
 // 副图指标（独立面板）
 const SUB_INDICATORS = [
   'MA', 'EMA', 'VOL', 'MACD', 'BOLL', 'KDJ',
@@ -66,19 +59,25 @@ const SUB_INDICATORS = [
 // 分类 Tab 列表
 const CATEGORY_KEYS = ['all', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
 
-const IndicatorModal: Component<IndicatorModalProps> = props => {
+const IndicatorModal: Component<IndicatorModalProps> = (props) => {
   const [searchText, setSearchText] = createSignal('')
   const [activeCategory, setActiveCategory] = createSignal<string>('all')
   let searchInputRef!: HTMLInputElement
 
-  onMount(() => { searchInputRef?.focus() })
+  onMount(() => {
+    searchInputRef?.focus()
+  })
 
   // 根据分类和搜索筛选指标
   const filteredMainIndicators = createMemo(() => {
     const search = searchText().toLowerCase()
     const cat = activeCategory()
-    return MAIN_INDICATORS.filter(name => {
-      if (search && !name.toLowerCase().includes(search) && !t(name.toLowerCase(), props.locale).toLowerCase().includes(search)) {
+    return MAIN_INDICATORS.filter((name) => {
+      if (
+        search &&
+        !name.toLowerCase().includes(search) &&
+        !t(name.toLowerCase(), props.locale).toLowerCase().includes(search)
+      ) {
         return false
       }
       if (cat === 'all') return true
@@ -90,8 +89,12 @@ const IndicatorModal: Component<IndicatorModalProps> = props => {
   const filteredSubIndicators = createMemo(() => {
     const search = searchText().toLowerCase()
     const cat = activeCategory()
-    return SUB_INDICATORS.filter(name => {
-      if (search && !name.toLowerCase().includes(search) && !t(name.toLowerCase(), props.locale).toLowerCase().includes(search)) {
+    return SUB_INDICATORS.filter((name) => {
+      if (
+        search &&
+        !name.toLowerCase().includes(search) &&
+        !t(name.toLowerCase(), props.locale).toLowerCase().includes(search)
+      ) {
         return false
       }
       if (cat === 'all') return true
@@ -109,15 +112,14 @@ const IndicatorModal: Component<IndicatorModalProps> = props => {
   }
 
   return (
-    <Modal
-      title={t('indicator', props.locale)}
-      width={480}
-      onClose={props.onClose}>
+    <Modal title={t('indicator', props.locale)} width={480} onClose={props.onClose}>
       {/* 搜索栏 */}
       <div class="klinecharts-pro-indicator-modal-search">
         <div class="klinecharts-pro-input">
           <input
-            ref={(el) => { searchInputRef = el }}
+            ref={(el) => {
+              searchInputRef = el
+            }}
             class="value"
             placeholder={t('indicator_search', props.locale)}
             value={searchText()}
@@ -131,14 +133,14 @@ const IndicatorModal: Component<IndicatorModalProps> = props => {
           {(key) => (
             <span
               class={`klinecharts-pro-indicator-modal-tab${activeCategory() === key ? ' active' : ''}`}
-              onClick={() => setActiveCategory(key)}>
+              onClick={() => setActiveCategory(key)}
+            >
               {getCategoryLabel(key)}
             </span>
           )}
         </For>
       </div>
-      <List
-        class="klinecharts-pro-indicator-modal-list">
+      <List class="klinecharts-pro-indicator-modal-list">
         <Show when={filteredMainIndicators().length > 0}>
           <li class="title">{t('main_indicator', props.locale)}</li>
         </Show>
@@ -150,8 +152,9 @@ const IndicatorModal: Component<IndicatorModalProps> = props => {
                 class="row"
                 onClick={() => {
                   props.onMainIndicatorChange({ name, paneId: 'candle_pane', added: !checked() })
-                }}>
-                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name}/>
+                }}
+              >
+                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name} />
               </li>
             )
           }}
@@ -166,9 +169,14 @@ const IndicatorModal: Component<IndicatorModalProps> = props => {
               <li
                 class="row"
                 onClick={() => {
-                  props.onSubIndicatorChange({ name, paneId: props.subIndicators[name] ?? '', added: !checked() })
-                }}>
-                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name}/>
+                  props.onSubIndicatorChange({
+                    name,
+                    paneId: props.subIndicators[name] ?? '',
+                    added: !checked(),
+                  })
+                }}
+              >
+                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name} />
               </li>
             )
           }}

@@ -17,9 +17,7 @@ const adLine: IndicatorTemplate = {
   name: 'AD',
   shortName: 'AD',
   calcParams: [],
-  figures: [
-    { key: 'ad', title: 'AD: ', type: 'line' }
-  ],
+  figures: [{ key: 'ad', title: 'AD: ', type: 'line' }],
   calc: (dataList: KLineData[]) => {
     const result: AdLineResult[] = []
     let ad = 0
@@ -30,7 +28,7 @@ const adLine: IndicatorTemplate = {
 
       if (hl !== 0) {
         // 资金流量乘数：收盘价越接近最高价，值越接近 +1；越接近最低价，值越接近 -1
-        const mfMultiplier = ((kline.close - kline.low) - (kline.high - kline.close)) / hl
+        const mfMultiplier = (kline.close - kline.low - (kline.high - kline.close)) / hl
         ad += mfMultiplier * (kline.volume ?? 0)
       }
       // 最高价等于最低价时，资金流量为 0，AD 值不变
@@ -38,7 +36,7 @@ const adLine: IndicatorTemplate = {
       result.push({ ad })
     }
     return result
-  }
+  },
 }
 
 export default adLine

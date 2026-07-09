@@ -23,12 +23,12 @@ const abcd: OverlayTemplate = {
   createPointFigures: ({ coordinates }) => {
     let acLineCoordinates: Coordinate[] = []
     let bdLineCoordinates: Coordinate[] = []
-   
+
     const tags = ['A', 'B', 'C', 'D']
     const texts = coordinates.map((coordinate, i) => ({
       ...coordinate,
       baseline: 'bottom',
-      text: `(${tags[i]})`
+      text: `(${tags[i]})`,
     }))
     if (coordinates.length > 2) {
       acLineCoordinates = [coordinates[0], coordinates[2]]
@@ -39,20 +39,20 @@ const abcd: OverlayTemplate = {
     return [
       {
         type: 'line',
-        attrs: { coordinates }
+        attrs: { coordinates },
       },
       {
         type: 'line',
         attrs: [{ coordinates: acLineCoordinates }, { coordinates: bdLineCoordinates }],
-        styles: { style: 'dashed' }
+        styles: { style: 'dashed' },
       },
       {
         type: 'text',
         ignoreEvent: true,
-        attrs: texts
-      }
+        attrs: texts,
+      },
     ]
-  }
+  },
 }
 
 export default abcd

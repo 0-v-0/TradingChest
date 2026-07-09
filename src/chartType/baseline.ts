@@ -12,17 +12,17 @@ const baseline: IndicatorTemplate = {
   calcParams: [],
   figures: [
     { key: 'close', title: 'Close: ', type: 'line' },
-    { key: 'baseline', title: 'Base: ', type: 'line' }
+    { key: 'baseline', title: 'Base: ', type: 'line' },
   ],
   calc: (dataList: KLineData[]) => {
     if (dataList.length === 0) return []
     // 默认基准价：第一根K线的收盘价
     const basePrice = dataList[0].close
-    return dataList.map(d => ({
+    return dataList.map((d) => ({
       close: d.close,
-      baseline: basePrice
+      baseline: basePrice,
     }))
-  }
+  },
 }
 
 export default baseline

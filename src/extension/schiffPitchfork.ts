@@ -13,7 +13,6 @@
  */
 
 import { OverlayTemplate, LineAttrs } from 'klinecharts'
-
 import { getRayLine } from './utils'
 
 /**
@@ -38,8 +37,8 @@ const schiffPitchfork: OverlayTemplate = {
         {
           type: 'line',
           ignoreEvent: true,
-          attrs: { coordinates }
-        }
+          attrs: { coordinates },
+        },
       ]
     }
 
@@ -50,13 +49,13 @@ const schiffPitchfork: OverlayTemplate = {
     // 希夫变体：枢轴点在 Y 方向移至原始枢轴与第二点的中点
     const pivot = {
       x: originalPivot.x,
-      y: (originalPivot.y + swing1.y) / 2
+      y: (originalPivot.y + swing1.y) / 2,
     }
 
     // 两摆动点的中点
     const midPoint = {
       x: (swing1.x + swing2.x) / 2,
-      y: (swing1.y + swing2.y) / 2
+      y: (swing1.y + swing2.y) / 2,
     }
 
     // 中线方向向量（调整后的 pivot → midPoint）
@@ -69,32 +68,32 @@ const schiffPitchfork: OverlayTemplate = {
     // 上外线：过 swing1，平行于中线
     const upperRay = getRayLine(
       [swing1, { x: swing1.x + dx, y: swing1.y + dy }],
-      bounding
+      bounding,
     ) as LineAttrs
 
     // 下外线：过 swing2，平行于中线
     const lowerRay = getRayLine(
       [swing2, { x: swing2.x + dx, y: swing2.y + dy }],
-      bounding
+      bounding,
     ) as LineAttrs
 
     // 50% 内线
     const innerUpperStart = {
       x: (midPoint.x + swing1.x) / 2,
-      y: (midPoint.y + swing1.y) / 2
+      y: (midPoint.y + swing1.y) / 2,
     }
     const innerUpperRay = getRayLine(
       [innerUpperStart, { x: innerUpperStart.x + dx, y: innerUpperStart.y + dy }],
-      bounding
+      bounding,
     ) as LineAttrs
 
     const innerLowerStart = {
       x: (midPoint.x + swing2.x) / 2,
-      y: (midPoint.y + swing2.y) / 2
+      y: (midPoint.y + swing2.y) / 2,
     }
     const innerLowerRay = getRayLine(
       [innerLowerStart, { x: innerLowerStart.x + dx, y: innerLowerStart.y + dy }],
-      bounding
+      bounding,
     ) as LineAttrs
 
     // 收集主线
@@ -112,7 +111,7 @@ const schiffPitchfork: OverlayTemplate = {
     // 连接线：原始枢轴 → 各摆动点（虚线辅助参考）
     const connectLines: LineAttrs[] = [
       { coordinates: [originalPivot, swing1] },
-      { coordinates: [originalPivot, swing2] }
+      { coordinates: [originalPivot, swing2] },
     ]
 
     // 内线（50%，虚线）
@@ -128,19 +127,19 @@ const schiffPitchfork: OverlayTemplate = {
       {
         type: 'line',
         attrs: connectLines,
-        styles: { style: 'dashed' }
+        styles: { style: 'dashed' },
       },
       {
         type: 'line',
-        attrs: mainLines
+        attrs: mainLines,
       },
       {
         type: 'line',
         attrs: innerLines,
-        styles: { style: 'dashed' }
-      }
+        styles: { style: 'dashed' },
+      },
     ]
-  }
+  },
 }
 
 export default schiffPitchfork

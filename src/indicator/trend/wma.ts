@@ -9,14 +9,12 @@ const wma: IndicatorTemplate = {
   name: 'WMA',
   shortName: 'WMA',
   calcParams: [9],
-  figures: [
-    { key: 'wma', title: 'WMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'wma', title: 'WMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
     // 权重之和 = n * (n + 1) / 2
-    const weightSum = period * (period + 1) / 2
+    const weightSum = (period * (period + 1)) / 2
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
@@ -29,7 +27,7 @@ const wma: IndicatorTemplate = {
       }
       return { wma: sum / weightSum }
     })
-  }
+  },
 }
 
 export default wma

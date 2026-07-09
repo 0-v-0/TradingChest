@@ -14,9 +14,7 @@ const t3: IndicatorTemplate = {
   name: 'T3',
   shortName: 'T3',
   calcParams: [5, 0.7],
-  figures: [
-    { key: 't3', title: 'T3: ', type: 'line' }
-  ],
+  figures: [{ key: 't3', title: 'T3: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -72,7 +70,7 @@ const t3: IndicatorTemplate = {
       }
       return { t3: c1 * e6[i] + c2 * e5[i] + c3 * e4[i] + c4 * e3[i] }
     })
-  }
+  },
 }
 
 export default t3

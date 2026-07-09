@@ -9,9 +9,7 @@ const tema: IndicatorTemplate = {
   name: 'TEMA',
   shortName: 'TEMA',
   calcParams: [21],
-  figures: [
-    { key: 'tema', title: 'TEMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'tema', title: 'TEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -44,7 +42,7 @@ const tema: IndicatorTemplate = {
       }
       return { tema: 3 * ema1[i] - 3 * ema2[i] + ema3[i] }
     })
-  }
+  },
 }
 
 export default tema

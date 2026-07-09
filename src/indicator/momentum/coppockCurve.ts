@@ -13,9 +13,7 @@ const coppockCurve: IndicatorTemplate = {
   name: 'COPPOCK',
   shortName: 'Coppock',
   calcParams: [14, 11, 10],
-  figures: [
-    { key: 'coppock', title: 'Coppock: ', type: 'line' }
-  ],
+  figures: [{ key: 'coppock', title: 'Coppock: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const roc1Period = params[0] as number
@@ -77,7 +75,7 @@ const coppockCurve: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default coppockCurve

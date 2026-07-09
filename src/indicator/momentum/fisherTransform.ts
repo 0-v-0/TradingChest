@@ -19,7 +19,7 @@ const fisherTransform: IndicatorTemplate = {
   calcParams: [9],
   figures: [
     { key: 'fisher', title: 'Fisher: ', type: 'line' },
-    { key: 'trigger', title: 'Trigger: ', type: 'line' }
+    { key: 'trigger', title: 'Trigger: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
@@ -79,7 +79,7 @@ const fisherTransform: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default fisherTransform

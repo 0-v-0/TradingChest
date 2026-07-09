@@ -15,8 +15,8 @@ const localStorageMock = {
   },
   key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
   clear: vi.fn(() => {
-    Object.keys(store).forEach(k => delete store[k])
-  })
+    Object.keys(store).forEach((k) => delete store[k])
+  }),
 }
 
 vi.stubGlobal('localStorage', localStorageMock)
@@ -36,7 +36,7 @@ describe('persistence', () => {
         mainIndicators: ['MA'],
         subIndicators: ['VOL'],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('test1', layout)
@@ -61,7 +61,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('versioned', layout)
@@ -86,13 +86,13 @@ describe('persistence', () => {
             groupId: 'group-1',
             points: [
               { timestamp: 1000, value: 100 },
-              { timestamp: 2000, value: 200 }
+              { timestamp: 2000, value: 200 },
             ],
             lock: true,
             visible: true,
-            extendData: { color: '#ff0000' }
-          }
-        ]
+            extendData: { color: '#ff0000' },
+          },
+        ],
       }
 
       saveLayout('overlay', layout)
@@ -126,7 +126,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
       store['trading-chest-layout-invalid-version'] = JSON.stringify(data)
       expect(loadLayout('invalid-version')).toBeNull()
@@ -151,7 +151,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('delme', layout)
@@ -180,7 +180,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       const layout2 = {
@@ -190,7 +190,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('first', layout1)
@@ -199,8 +199,8 @@ describe('persistence', () => {
       const list = listLayouts()
 
       expect(list).toHaveLength(2)
-      expect(list.some(item => item.key === 'first')).toBe(true)
-      expect(list.some(item => item.key === 'second')).toBe(true)
+      expect(list.some((item) => item.key === 'first')).toBe(true)
+      expect(list.some((item) => item.key === 'second')).toBe(true)
     })
 
     it('should return layouts sorted by timestamp descending (newest first)', () => {
@@ -211,7 +211,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('a', layout)
@@ -219,7 +219,7 @@ describe('persistence', () => {
       const bData = {
         version: 1,
         timestamp: Date.now() + 1000,
-        ...layout
+        ...layout,
       }
       store['trading-chest-layout-b'] = JSON.stringify(bData)
 
@@ -239,7 +239,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('valid', layout)
@@ -259,7 +259,7 @@ describe('persistence', () => {
         mainIndicators: [],
         subIndicators: [],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       saveLayout('trading', layout)
@@ -282,7 +282,7 @@ describe('persistence', () => {
         mainIndicators: ['MA'],
         subIndicators: ['VOL'],
         styles: null,
-        overlayData: []
+        overlayData: [],
       }
 
       // Create multiple layouts
@@ -298,9 +298,9 @@ describe('persistence', () => {
 
       // Verify remaining ones are intact
       const list = listLayouts()
-      expect(list.some(item => item.key === 'layout1')).toBe(true)
-      expect(list.some(item => item.key === 'layout3')).toBe(true)
-      expect(list.some(item => item.key === 'layout2')).toBe(false)
+      expect(list.some((item) => item.key === 'layout1')).toBe(true)
+      expect(list.some((item) => item.key === 'layout3')).toBe(true)
+      expect(list.some((item) => item.key === 'layout2')).toBe(false)
 
       // Verify data integrity
       const loaded1 = loadLayout('layout1')!

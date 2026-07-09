@@ -18,7 +18,7 @@ import t from '../../i18n'
 export interface OverlayPropertyBarProps {
   locale: string
   visible: boolean
-  position: { x: number, y: number }
+  position: { x: number; y: number }
   overlayId: string
   /** 描边色 */
   currentColor: string
@@ -37,6 +37,7 @@ export interface OverlayPropertyBarProps {
   onClose: () => void
 }
 
+// oxfmt-ignore
 // 预设调色板颜色（TradingView 风格 8x9 色板）
 const PALETTE_COLORS = [
   // 灰度行
@@ -58,13 +59,13 @@ const PALETTE_COLORS = [
 ]
 
 const LINE_WIDTHS = [1, 2, 3, 4]
-const LINE_STYLES: { key: string, labelKey: string }[] = [
+const LINE_STYLES: { key: string; labelKey: string }[] = [
   { key: 'solid', labelKey: 'line_style_solid' },
   { key: 'dashed', labelKey: 'line_style_dashed' },
   { key: 'dotted', labelKey: 'line_style_dotted' },
 ]
 
-const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
+const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
   const [showColorPalette, setShowColorPalette] = createSignal(false)
   const [showFillPalette, setShowFillPalette] = createSignal(false)
   const [showWidthPicker, setShowWidthPicker] = createSignal(false)
@@ -84,19 +85,32 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
         style={{
           left: `${props.position.x}px`,
           top: `${props.position.y}px`,
-        }}>
+        }}
+      >
         {/* 颜色选择 */}
-        <div class="klinecharts-pro-overlay-property-bar-item"
-          onClick={() => { const next = !showColorPalette(); closeAllPopups(); setShowColorPalette(next) }}>
-          <div class="klinecharts-pro-overlay-property-bar-color-swatch"
-            style={{ 'background-color': props.currentColor }} />
+        <div
+          class="klinecharts-pro-overlay-property-bar-item"
+          onClick={() => {
+            const next = !showColorPalette()
+            closeAllPopups()
+            setShowColorPalette(next)
+          }}
+        >
+          <div
+            class="klinecharts-pro-overlay-property-bar-color-swatch"
+            style={{ 'background-color': props.currentColor }}
+          />
           <Show when={showColorPalette()}>
             <div class="klinecharts-pro-overlay-property-bar-palette">
-              {PALETTE_COLORS.map(color => (
+              {PALETTE_COLORS.map((color) => (
                 <div
                   class={`klinecharts-pro-overlay-property-bar-palette-item${color === props.currentColor ? ' active' : ''}`}
                   style={{ 'background-color': color }}
-                  onClick={(e) => { e.stopPropagation(); props.onColorChange(color); setShowColorPalette(false) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    props.onColorChange(color)
+                    setShowColorPalette(false)
+                  }}
                 />
               ))}
             </div>
@@ -105,33 +119,52 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
 
         {/* 填充色（仅对有填充的图形显示） */}
         <Show when={props.currentFillColor != null}>
-          <div class="klinecharts-pro-overlay-property-bar-item"
-            onClick={() => { const next = !showFillPalette(); closeAllPopups(); setShowFillPalette(next) }}>
-            <div class="klinecharts-pro-overlay-property-bar-color-swatch"
+          <div
+            class="klinecharts-pro-overlay-property-bar-item"
+            onClick={() => {
+              const next = !showFillPalette()
+              closeAllPopups()
+              setShowFillPalette(next)
+            }}
+          >
+            <div
+              class="klinecharts-pro-overlay-property-bar-color-swatch"
               style={{
                 'background-color': props.currentFillColor ?? 'transparent',
-                'background-image': !props.currentFillColor || props.currentFillColor === 'transparent'
-                  ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)'
-                  : 'none',
+                'background-image':
+                  !props.currentFillColor || props.currentFillColor === 'transparent'
+                    ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)'
+                    : 'none',
                 'background-size': '6px 6px',
                 'background-position': '0 0, 3px 3px',
-              }} />
+              }}
+            />
             <Show when={showFillPalette()}>
               <div class="klinecharts-pro-overlay-property-bar-palette">
                 {/* 透明（无填充）选项 */}
                 <div
                   class={`klinecharts-pro-overlay-property-bar-palette-item${props.currentFillColor === 'transparent' ? ' active' : ''}`}
                   style={{
-                    'background-image': 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)',
-                    'background-size': '8px 8px', 'background-position': '0 0, 4px 4px',
+                    'background-image':
+                      'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)',
+                    'background-size': '8px 8px',
+                    'background-position': '0 0, 4px 4px',
                   }}
-                  onClick={(e) => { e.stopPropagation(); props.onFillColorChange?.('transparent'); setShowFillPalette(false) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    props.onFillColorChange?.('transparent')
+                    setShowFillPalette(false)
+                  }}
                 />
-                {PALETTE_COLORS.map(color => (
+                {PALETTE_COLORS.map((color) => (
                   <div
                     class={`klinecharts-pro-overlay-property-bar-palette-item${color === props.currentFillColor ? ' active' : ''}`}
                     style={{ 'background-color': color + '40' }}
-                    onClick={(e) => { e.stopPropagation(); props.onFillColorChange?.(color + '40'); setShowFillPalette(false) }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      props.onFillColorChange?.(color + '40')
+                      setShowFillPalette(false)
+                    }}
                   />
                 ))}
               </div>
@@ -142,18 +175,36 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
         <span class="klinecharts-pro-overlay-property-bar-separator" />
 
         {/* 线宽选择 */}
-        <div class="klinecharts-pro-overlay-property-bar-item"
-          onClick={() => { const next = !showWidthPicker(); closeAllPopups(); setShowWidthPicker(next) }}>
+        <div
+          class="klinecharts-pro-overlay-property-bar-item"
+          onClick={() => {
+            const next = !showWidthPicker()
+            closeAllPopups()
+            setShowWidthPicker(next)
+          }}
+        >
           <svg width="20" height="14" viewBox="0 0 20 14">
-            <line x1="2" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width={props.currentLineWidth} />
+            <line
+              x1="2"
+              y1="7"
+              x2="18"
+              y2="7"
+              stroke="currentColor"
+              stroke-width={props.currentLineWidth}
+            />
           </svg>
           <span class="klinecharts-pro-overlay-property-bar-label">{props.currentLineWidth}px</span>
           <Show when={showWidthPicker()}>
             <div class="klinecharts-pro-overlay-property-bar-dropdown">
-              {LINE_WIDTHS.map(w => (
+              {LINE_WIDTHS.map((w) => (
                 <div
                   class={`klinecharts-pro-overlay-property-bar-dropdown-item${w === props.currentLineWidth ? ' active' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); props.onLineWidthChange(w); setShowWidthPicker(false) }}>
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    props.onLineWidthChange(w)
+                    setShowWidthPicker(false)
+                  }}
+                >
                   <svg width="40" height="14" viewBox="0 0 40 14">
                     <line x1="4" y1="7" x2="36" y2="7" stroke="currentColor" stroke-width={w} />
                   </svg>
@@ -167,21 +218,54 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
         <span class="klinecharts-pro-overlay-property-bar-separator" />
 
         {/* 线型选择 */}
-        <div class="klinecharts-pro-overlay-property-bar-item"
-          onClick={() => { const next = !showStylePicker(); closeAllPopups(); setShowStylePicker(next) }}>
+        <div
+          class="klinecharts-pro-overlay-property-bar-item"
+          onClick={() => {
+            const next = !showStylePicker()
+            closeAllPopups()
+            setShowStylePicker(next)
+          }}
+        >
           <svg width="20" height="14" viewBox="0 0 20 14">
-            <line x1="2" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="2"
-              stroke-dasharray={props.currentLineStyle === 'dashed' ? '4,3' : props.currentLineStyle === 'dotted' ? '1,3' : 'none'} />
+            <line
+              x1="2"
+              y1="7"
+              x2="18"
+              y2="7"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-dasharray={
+                props.currentLineStyle === 'dashed'
+                  ? '4,3'
+                  : props.currentLineStyle === 'dotted'
+                    ? '1,3'
+                    : 'none'
+              }
+            />
           </svg>
           <Show when={showStylePicker()}>
             <div class="klinecharts-pro-overlay-property-bar-dropdown">
-              {LINE_STYLES.map(s => (
+              {LINE_STYLES.map((s) => (
                 <div
                   class={`klinecharts-pro-overlay-property-bar-dropdown-item${s.key === props.currentLineStyle ? ' active' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); props.onLineStyleChange(s.key); setShowStylePicker(false) }}>
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    props.onLineStyleChange(s.key)
+                    setShowStylePicker(false)
+                  }}
+                >
                   <svg width="40" height="14" viewBox="0 0 40 14">
-                    <line x1="4" y1="7" x2="36" y2="7" stroke="currentColor" stroke-width="2"
-                      stroke-dasharray={s.key === 'dashed' ? '6,4' : s.key === 'dotted' ? '2,4' : 'none'} />
+                    <line
+                      x1="4"
+                      y1="7"
+                      x2="36"
+                      y2="7"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-dasharray={
+                        s.key === 'dashed' ? '6,4' : s.key === 'dotted' ? '2,4' : 'none'
+                      }
+                    />
                   </svg>
                   <span>{t(s.labelKey, props.locale)}</span>
                 </div>
@@ -196,12 +280,20 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
         <div
           class={`klinecharts-pro-overlay-property-bar-item${props.locked ? ' active' : ''}`}
           onClick={() => props.onLockChange(!props.locked)}
-          title={t('lock', props.locale)}>
+          title={t('lock', props.locale)}
+        >
           <svg width="16" height="16" viewBox="0 0 16 16">
-            {props.locked
-              ? <path d="M11,7V5A3,3,0,0,0,5,5V7a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h6a2,2,0,0,0,2-2V9A2,2,0,0,0,11,7ZM6,5A2,2,0,0,1,10,5V7H6ZM12,13a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9A1,1,0,0,1,5,8h6a1,1,0,0,1,1,1Z" fill="currentColor"/>
-              : <path d="M11,7H6V5A2,2,0,0,1,10,5h1A3,3,0,0,0,5,5V7a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h6a2,2,0,0,0,2-2V9A2,2,0,0,0,11,7Zm1,6a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9A1,1,0,0,1,5,8h6a1,1,0,0,1,1,1Z" fill="currentColor"/>
-            }
+            {props.locked ? (
+              <path
+                d="M11,7V5A3,3,0,0,0,5,5V7a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h6a2,2,0,0,0,2-2V9A2,2,0,0,0,11,7ZM6,5A2,2,0,0,1,10,5V7H6ZM12,13a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9A1,1,0,0,1,5,8h6a1,1,0,0,1,1,1Z"
+                fill="currentColor"
+              />
+            ) : (
+              <path
+                d="M11,7H6V5A2,2,0,0,1,10,5h1A3,3,0,0,0,5,5V7a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h6a2,2,0,0,0,2-2V9A2,2,0,0,0,11,7Zm1,6a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9A1,1,0,0,1,5,8h6a1,1,0,0,1,1,1Z"
+                fill="currentColor"
+              />
+            )}
           </svg>
         </div>
 
@@ -209,9 +301,13 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = props => {
         <div
           class="klinecharts-pro-overlay-property-bar-item danger"
           onClick={() => props.onDelete()}
-          title={t('delete_overlay', props.locale)}>
+          title={t('delete_overlay', props.locale)}
+        >
           <svg width="16" height="16" viewBox="0 0 16 16">
-            <path d="M11,3H8.5l-.5-1h-3l-.5,1H2v1h1v9a1,1,0,0,0,1,1h7a1,1,0,0,0,1-1V4h1V3ZM11,13H4V4h7Zm-5-2V6H7v5Zm3,0V6h1v5Z" fill="currentColor"/>
+            <path
+              d="M11,3H8.5l-.5-1h-3l-.5,1H2v1h1v9a1,1,0,0,0,1,1h7a1,1,0,0,0,1-1V4h1V3ZM11,13H4V4h7Zm-5-2V6H7v5Zm3,0V6h1v5Z"
+              fill="currentColor"
+            />
           </svg>
         </div>
       </div>

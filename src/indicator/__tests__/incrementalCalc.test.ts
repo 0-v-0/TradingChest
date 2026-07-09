@@ -4,9 +4,7 @@ import { wrapWithIncrementalCalc } from '../incrementalCalc'
 
 describe('wrapWithIncrementalCalc', () => {
   it('首次调用执行完整计算', () => {
-    const fullCalc = vi.fn((dataList: any[]) =>
-      dataList.map((d: any) => ({ val: d.close * 2 }))
-    )
+    const fullCalc = vi.fn((dataList: any[]) => dataList.map((d: any) => ({ val: d.close * 2 })))
     const wrapped = wrapWithIncrementalCalc(fullCalc, 5)
 
     const data = [
@@ -58,12 +56,15 @@ describe('wrapWithIncrementalCalc', () => {
     })
     const wrapped = wrapWithIncrementalCalc(fullCalc, 3)
 
-    wrapped([
-      { timestamp: 1, close: 10 },
-      { timestamp: 2, close: 20 },
-      { timestamp: 3, close: 30 },
-      { timestamp: 4, close: 40 },
-    ] as any, {} as any)
+    wrapped(
+      [
+        { timestamp: 1, close: 10 },
+        { timestamp: 2, close: 20 },
+        { timestamp: 3, close: 30 },
+        { timestamp: 4, close: 40 },
+      ] as any,
+      {} as any,
+    )
 
     // Data shrinks (symbol change)
     wrapped([{ timestamp: 5, close: 50 }] as any, {} as any)
@@ -96,7 +97,7 @@ describe('wrapWithIncrementalCalc', () => {
       { timestamp: 2, close: 20 },
       { timestamp: 3, close: 30 },
       { timestamp: 4, close: 40 },
-      { timestamp: 5, close: 55 },  // updated
+      { timestamp: 5, close: 55 }, // updated
     ]
     const result = wrapped(data2 as any, {} as any)
 

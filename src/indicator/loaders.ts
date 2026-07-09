@@ -2,6 +2,7 @@ import { IndicatorTemplate } from 'klinecharts'
 
 type IndicatorLoader = () => Promise<IndicatorTemplate>
 
+// oxfmt-ignore
 export const indicatorLoaders: Record<string, IndicatorLoader> = {
   // Trend
   ATR:              () => import('./trend/atr').then(m => m.default),

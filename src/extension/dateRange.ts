@@ -59,19 +59,29 @@ const dateRange: OverlayTemplate = {
               { x: minX, y: 0 },
               { x: maxX, y: 0 },
               { x: maxX, y: chartHeight },
-              { x: minX, y: chartHeight }
-            ]
+              { x: minX, y: chartHeight },
+            ],
           },
-          styles: { style: 'fill', color: 'rgba(22, 119, 255, 0.1)' }
+          styles: { style: 'fill', color: 'rgba(22, 119, 255, 0.1)' },
         },
         // 左右垂直边界线
         {
           type: 'line',
           attrs: [
-            { coordinates: [{ x: coordinates[0].x, y: 0 }, { x: coordinates[0].x, y: chartHeight }] },
-            { coordinates: [{ x: coordinates[1].x, y: 0 }, { x: coordinates[1].x, y: chartHeight }] }
+            {
+              coordinates: [
+                { x: coordinates[0].x, y: 0 },
+                { x: coordinates[0].x, y: chartHeight },
+              ],
+            },
+            {
+              coordinates: [
+                { x: coordinates[1].x, y: 0 },
+                { x: coordinates[1].x, y: chartHeight },
+              ],
+            },
           ],
-          styles: { style: 'dashed', color: 'rgba(22, 119, 255, 0.5)' }
+          styles: { style: 'dashed', color: 'rgba(22, 119, 255, 0.5)' },
         },
         // 测量文本
         {
@@ -82,20 +92,20 @@ const dateRange: OverlayTemplate = {
             y: textY,
             text: displayText,
             baseline: 'bottom',
-            align: 'center'
-          }
-        }
+            align: 'center',
+          },
+        },
       ]
     }
     return []
-  }
+  },
 }
 
 /**
  * 将毫秒时间差格式化为可读文本
  * 根据跨度自动选择合适的单位
  */
-function formatDuration (ms: number): string {
+function formatDuration(ms: number): string {
   const seconds = Math.floor(ms / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)

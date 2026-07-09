@@ -1,38 +1,38 @@
-import arrow from './arrow'
-
-import circle from './circle'
-import rect from './rect'
-import parallelogram from './parallelogram'
-import triangle from './triangle'
-import fibonacciCircle from './fibonacciCircle'
-import fibonacciSegment from './fibonacciSegment'
-import fibonacciSpiral from './fibonacciSpiral'
-import fibonacciSpeedResistanceFan from './fibonacciSpeedResistanceFan'
-import fibonacciExtension from './fibonacciExtension'
-import gannBox from './gannBox'
-import threeWaves from './threeWaves'
-import fiveWaves from './fiveWaves'
-import eightWaves from './eightWaves'
-import anyWaves from './anyWaves'
-import abcd from './abcd'
-import xabcd from './xabcd'
-import priceRange from './priceRange'
-import dateRange from './dateRange'
-import dateAndPriceRange from './dateAndPriceRange'
-import pitchfork from './pitchfork'
-import schiffPitchfork from './schiffPitchfork'
-import regressionTrend from './regressionTrend'
-import regressionChannel from './regressionChannel'
-import textAnnotation from './textAnnotation'
-import callout from './callout'
-import brush from './brush'
-import longPosition from './longPosition'
-import shortPosition from './shortPosition'
-import note from './note'
-import positionRange from './positionRange'
-import tradeMarker from './tradeMarker'
 import alertLine from '../alert/AlertLine'
+import abcd from './abcd'
+import anyWaves from './anyWaves'
+import arrow from './arrow'
+import brush from './brush'
+import callout from './callout'
+import circle from './circle'
+import dateAndPriceRange from './dateAndPriceRange'
+import dateRange from './dateRange'
+import eightWaves from './eightWaves'
+import fibonacciCircle from './fibonacciCircle'
+import fibonacciExtension from './fibonacciExtension'
+import fibonacciSegment from './fibonacciSegment'
+import fibonacciSpeedResistanceFan from './fibonacciSpeedResistanceFan'
+import fibonacciSpiral from './fibonacciSpiral'
+import fiveWaves from './fiveWaves'
+import gannBox from './gannBox'
+import longPosition from './longPosition'
+import note from './note'
+import parallelogram from './parallelogram'
+import pitchfork from './pitchfork'
+import positionRange from './positionRange'
+import priceRange from './priceRange'
+import rect from './rect'
+import regressionChannel from './regressionChannel'
+import regressionTrend from './regressionTrend'
+import schiffPitchfork from './schiffPitchfork'
+import shortPosition from './shortPosition'
+import textAnnotation from './textAnnotation'
+import threeWaves from './threeWaves'
+import tradeMarker from './tradeMarker'
+import triangle from './triangle'
+import xabcd from './xabcd'
 
+// oxfmt-ignore
 const overlays = [
   arrow,
   circle, rect, triangle, parallelogram,
@@ -44,7 +44,7 @@ const overlays = [
   textAnnotation, callout, brush, longPosition, shortPosition, note,
   positionRange,
   tradeMarker,
-  alertLine
+  alertLine,
 ]
 
 export default overlays

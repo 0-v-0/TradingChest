@@ -29,15 +29,20 @@ const fibonacciExtension: OverlayTemplate = {
       const yDif = coordinates[1].y - coordinates[0].y
       const percents = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]
       const textX = coordinates[2].x > coordinates[1].x ? coordinates[1].x : coordinates[2].x
-      percents.forEach(percent => {
+      percents.forEach((percent) => {
         const y = coordinates[2].y + yDif * percent
         const price = (points[2].value! + valueDif * percent).toFixed(precision.price)
-        fbLines.push({ coordinates: [{ x: coordinates[1].x, y }, { x: coordinates[2].x, y }] })
+        fbLines.push({
+          coordinates: [
+            { x: coordinates[1].x, y },
+            { x: coordinates[2].x, y },
+          ],
+        })
         texts.push({
           x: textX,
           y,
           text: `${price} (${(percent * 100).toFixed(1)}%)`,
-          baseline: 'bottom'
+          baseline: 'bottom',
         })
       })
     }
@@ -45,19 +50,19 @@ const fibonacciExtension: OverlayTemplate = {
       {
         type: 'line',
         attrs: { coordinates },
-        styles: { style: 'dashed' }
+        styles: { style: 'dashed' },
       },
       {
         type: 'line',
-        attrs: fbLines
+        attrs: fbLines,
       },
       {
         type: 'text',
         ignoreEvent: true,
-        attrs: texts
-      }
+        attrs: texts,
+      },
     ]
-  }
+  },
 }
 
 export default fibonacciExtension

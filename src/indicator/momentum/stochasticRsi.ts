@@ -17,7 +17,7 @@ const stochasticRsi: IndicatorTemplate = {
   calcParams: [14, 14, 3, 3],
   figures: [
     { key: 'k', title: 'K: ', type: 'line' },
-    { key: 'd', title: 'D: ', type: 'line' }
+    { key: 'd', title: 'D: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -136,11 +136,11 @@ const stochasticRsi: IndicatorTemplate = {
     for (let i = 0; i < len; i++) {
       result.push({
         k: kLine[i] ?? undefined,
-        d: dLine[i] ?? undefined
+        d: dLine[i] ?? undefined,
       })
     }
     return result
-  }
+  },
 }
 
 export default stochasticRsi

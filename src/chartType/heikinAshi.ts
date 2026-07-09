@@ -22,7 +22,7 @@ const heikinAshi: IndicatorTemplate = {
     { key: 'haOpen', title: 'O: ', type: 'line' },
     { key: 'haHigh', title: 'H: ', type: 'line' },
     { key: 'haLow', title: 'L: ', type: 'line' },
-    { key: 'haClose', title: 'C: ', type: 'line' }
+    { key: 'haClose', title: 'C: ', type: 'line' },
   ],
   calc: (dataList: KLineData[]) => {
     const result: HeikinAshiResult[] = []
@@ -44,7 +44,7 @@ const heikinAshi: IndicatorTemplate = {
       prevHaClose = haClose
     }
     return result
-  }
+  },
 }
 
 export default heikinAshi

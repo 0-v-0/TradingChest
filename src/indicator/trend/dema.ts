@@ -9,9 +9,7 @@ const dema: IndicatorTemplate = {
   name: 'DEMA',
   shortName: 'DEMA',
   calcParams: [21],
-  figures: [
-    { key: 'dema', title: 'DEMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'dema', title: 'DEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -42,7 +40,7 @@ const dema: IndicatorTemplate = {
       }
       return { dema: 2 * ema1[i] - ema2[i] }
     })
-  }
+  },
 }
 
 export default dema

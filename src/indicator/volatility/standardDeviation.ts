@@ -10,9 +10,7 @@ const standardDeviation: IndicatorTemplate = {
   name: 'STDDEV',
   shortName: 'StdDev',
   calcParams: [20],
-  figures: [
-    { key: 'stddev', title: 'STDDEV: ', type: 'line' }
-  ],
+  figures: [{ key: 'stddev', title: 'STDDEV: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -43,7 +41,7 @@ const standardDeviation: IndicatorTemplate = {
       result.push({ stddev: stddev })
     }
     return result
-  }
+  },
 }
 
 export default standardDeviation

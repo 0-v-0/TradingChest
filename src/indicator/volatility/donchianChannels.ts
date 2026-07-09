@@ -4,7 +4,11 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type DonchianChannelsResult = { upper: number | undefined; lower: number | undefined; middle: number | undefined }
+type DonchianChannelsResult = {
+  upper: number | undefined
+  lower: number | undefined
+  middle: number | undefined
+}
 
 const donchianChannels: IndicatorTemplate = {
   name: 'DC',
@@ -13,7 +17,7 @@ const donchianChannels: IndicatorTemplate = {
   figures: [
     { key: 'upper', title: 'UP: ', type: 'line' },
     { key: 'lower', title: 'LOW: ', type: 'line' },
-    { key: 'middle', title: 'MID: ', type: 'line' }
+    { key: 'middle', title: 'MID: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -43,11 +47,11 @@ const donchianChannels: IndicatorTemplate = {
       result.push({
         upper: highestHigh,
         lower: lowestLow,
-        middle: middle
+        middle: middle,
       })
     }
     return result
-  }
+  },
 }
 
 export default donchianChannels

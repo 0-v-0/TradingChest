@@ -12,17 +12,18 @@
  * limitations under the License.
  */
 
-import PeriodBar from './period-bar'
 import DrawingBar from './drawing-bar'
 import IndicatorModal from './indicator-modal'
-import TimezoneModal from './timezone-modal'
-import SettingModal from './setting-modal'
-import ScreenshotModal from './screenshot-modal'
 import IndicatorSettingModal from './indicator-setting-modal'
-import SymbolSearchModal from './symbol-search-modal'
 import OverlayPropertyBar from './overlay-property-bar'
+import PeriodBar from './period-bar'
 import ReplayControlBar from './replay-bar'
+import ScreenshotModal from './screenshot-modal'
+import SettingModal from './setting-modal'
+import SymbolSearchModal from './symbol-search-modal'
+import TimezoneModal from './timezone-modal'
 
+// oxfmt-ignore
 export {
   PeriodBar, DrawingBar, IndicatorModal,
   TimezoneModal, SettingModal, ScreenshotModal,

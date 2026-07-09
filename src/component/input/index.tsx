@@ -25,10 +25,10 @@ export interface InputProps {
   placeholder?: string
   value: string | number
   disabled?: boolean
-  onChange?: (v: string | number) => void 
+  onChange?: (v: string | number) => void
 }
 
-const Input: Component<InputProps> = p => {
+const Input: Component<InputProps> = (p) => {
   const props = mergeProps({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER }, p)
   let input: HTMLInputElement
 
@@ -39,17 +39,26 @@ const Input: Component<InputProps> = p => {
       style={props.style}
       class={`klinecharts-pro-input ${props.class ?? ''}`}
       data-status={status()}
-      onClick={() => { input?.focus() }}>
+      onClick={() => {
+        input?.focus()
+      }}
+    >
       <Show when={props.prefix}>
         <span class="prefix">{props.prefix}</span>
-      </Show>  
+      </Show>
       <input
-        ref={(el) => { input = el }}
+        ref={(el) => {
+          input = el
+        }}
         class="value"
         placeholder={props.placeholder ?? ''}
         value={props.value}
-        onFocus={() => { setStatus('focus') }}
-        onBlur={() => { setStatus('normal') }}
+        onFocus={() => {
+          setStatus('focus')
+        }}
+        onBlur={() => {
+          setStatus('normal')
+        }}
         onChange={(e) => {
           const v = (e.target as HTMLInputElement).value
           if ('precision' in props) {
@@ -66,10 +75,11 @@ const Input: Component<InputProps> = p => {
           } else {
             props.onChange?.(v)
           }
-        }}/>
+        }}
+      />
       <Show when={props.suffix}>
         <span class="suffix">{props.suffix}</span>
-      </Show>  
+      </Show>
     </div>
   )
 }

@@ -13,31 +13,36 @@
  */
 
 import { registerOverlay, registerIndicator } from 'klinecharts'
-
-import overlays from './extension'
 import chartTypes from './chartType'
-
 import DefaultDatafeed from './DefaultDatafeed'
-import KLineChartPro from './KLineChartPro'
-
+import overlays from './extension'
 import { load } from './i18n'
-
-import { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, ChartProOptions, ChartPro } from './types'
-
-import './index.css'
-
 import tradeVisualization from './indicator/trade/tradeVisualization'
+import KLineChartPro from './KLineChartPro'
+import './index.css'
+import {
+  Datafeed,
+  SymbolInfo,
+  Period,
+  DatafeedSubscribeCallback,
+  ChartProOptions,
+  ChartPro,
+} from './types'
 
-overlays.forEach(o => { registerOverlay(o) })
-chartTypes.forEach(ct => { registerIndicator(ct) })
+overlays.forEach((o) => {
+  registerOverlay(o)
+})
+chartTypes.forEach((ct) => {
+  registerIndicator(ct)
+})
 registerIndicator(tradeVisualization)
 
-// 新模块导出
-import { themePresets, getThemeByName } from './theme'
 import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
+import { indicatorCategories, indicatorRegistry } from './indicator'
 import { saveLayout, loadLayout, deleteLayout, listLayouts } from './persistence'
 import KeyboardShortcutManager from './shortcut'
-import { indicatorCategories, indicatorRegistry } from './indicator'
+// 新模块导出
+import { themePresets, getThemeByName } from './theme'
 
 export {
   DefaultDatafeed,
@@ -60,12 +65,10 @@ export {
   // 指标分类
   indicatorCategories,
   // 懒加载注册表
-  indicatorRegistry
+  indicatorRegistry,
 }
 
-export type {
-  Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, ChartProOptions, ChartPro
-}
+export type { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, ChartProOptions, ChartPro }
 
 export type { ThemePreset } from './theme'
 export type { ChartLayout } from './persistence'
@@ -76,7 +79,10 @@ export type { AlertConfig, AlertEvent } from './alert/types'
 export { normalizeToPercent } from './compare'
 export { ReplayEngine } from './replay/ReplayEngine'
 export type { ReplayState, ReplaySpeed } from './replay/types'
-export { getTradeVisHitTargets, cleanupTradeVisInstance } from './indicator/trade/tradeVisualization'
+export {
+  getTradeVisHitTargets,
+  cleanupTradeVisInstance,
+} from './indicator/trade/tradeVisualization'
 export type { TradeRecord, TradeVisExtendData } from './indicator/trade/tradeVisualization'
 export type { ConnectionState } from './DefaultDatafeed'
 export { LiveSharpeChart, type LiveSharpeChartProps } from './widget/LiveSharpeChart'

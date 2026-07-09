@@ -11,9 +11,7 @@ const ulcerIndex: IndicatorTemplate = {
   name: 'UI',
   shortName: 'UI',
   calcParams: [14],
-  figures: [
-    { key: 'ui', title: 'UI: ', type: 'line' }
-  ],
+  figures: [{ key: 'ui', title: 'UI: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -48,7 +46,7 @@ const ulcerIndex: IndicatorTemplate = {
       result.push({ ui: ui })
     }
     return result
-  }
+  },
 }
 
 export default ulcerIndex

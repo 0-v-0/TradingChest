@@ -8,12 +8,12 @@
   height: 100%;
   left: 0;
   top: 0;
-  background-color: rgba(0, 0, 0, .2);
+  background-color: rgba(0, 0, 0, 0.2);
   z-index: 99;
 
   & .inner {
     background-color: var(--klinecharts-pro-popover-background-color);
-    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, .3);
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.3);
     border-radius: 4px;
 
     & .title-container {

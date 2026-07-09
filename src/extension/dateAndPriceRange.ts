@@ -46,12 +46,8 @@ const dateAndPriceRange: OverlayTemplate = {
       const durationText = formatDuration(timeDiffMs)
 
       // 上涨绿色，下跌红色
-      const fillColor = isUp
-        ? 'rgba(38, 166, 154, 0.15)'
-        : 'rgba(239, 83, 80, 0.15)'
-      const borderColor = isUp
-        ? 'rgba(38, 166, 154, 0.6)'
-        : 'rgba(239, 83, 80, 0.6)'
+      const fillColor = isUp ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)'
+      const borderColor = isUp ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'
 
       // 格式化显示文本：价格差 / 涨跌幅 / K 线数 / 时间
       const sign = priceDiff >= 0 ? '+' : ''
@@ -72,10 +68,10 @@ const dateAndPriceRange: OverlayTemplate = {
               coordinates[0],
               { x: coordinates[1].x, y: coordinates[0].y },
               coordinates[1],
-              { x: coordinates[0].x, y: coordinates[1].y }
-            ]
+              { x: coordinates[0].x, y: coordinates[1].y },
+            ],
           },
-          styles: { style: 'fill', color: fillColor }
+          styles: { style: 'fill', color: fillColor },
         },
         // 边框线
         {
@@ -84,15 +80,15 @@ const dateAndPriceRange: OverlayTemplate = {
             { coordinates: [coordinates[0], { x: coordinates[1].x, y: coordinates[0].y }] },
             { coordinates: [{ x: coordinates[1].x, y: coordinates[0].y }, coordinates[1]] },
             { coordinates: [coordinates[1], { x: coordinates[0].x, y: coordinates[1].y }] },
-            { coordinates: [{ x: coordinates[0].x, y: coordinates[1].y }, coordinates[0]] }
+            { coordinates: [{ x: coordinates[0].x, y: coordinates[1].y }, coordinates[0]] },
           ],
-          styles: { color: borderColor }
+          styles: { color: borderColor },
         },
         // 对角连线（起点到终点）
         {
           type: 'line',
           attrs: { coordinates: [coordinates[0], coordinates[1]] },
-          styles: { style: 'dashed', color: borderColor }
+          styles: { style: 'dashed', color: borderColor },
         },
         // 第一行文本：价格差和涨跌幅
         {
@@ -103,8 +99,8 @@ const dateAndPriceRange: OverlayTemplate = {
             y: textY - 10,
             text: line1,
             baseline: 'bottom',
-            align: 'center'
-          }
+            align: 'center',
+          },
         },
         // 第二行文本：K 线数和时间跨度
         {
@@ -115,20 +111,20 @@ const dateAndPriceRange: OverlayTemplate = {
             y: textY + 10,
             text: line2,
             baseline: 'top',
-            align: 'center'
-          }
-        }
+            align: 'center',
+          },
+        },
       ]
     }
     return []
-  }
+  },
 }
 
 /**
  * 将毫秒时间差格式化为可读文本
  * 根据跨度自动选择合适的单位
  */
-function formatDuration (ms: number): string {
+function formatDuration(ms: number): string {
   const seconds = Math.floor(ms / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)

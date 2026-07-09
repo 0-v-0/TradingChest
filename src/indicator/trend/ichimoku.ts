@@ -35,7 +35,7 @@ const ichimoku: IndicatorTemplate = {
     { key: 'kijunSen', title: '基准线: ', type: 'line' },
     { key: 'senkouSpanA', title: '先行带A: ', type: 'line' },
     { key: 'senkouSpanB', title: '先行带B: ', type: 'line' },
-    { key: 'chikouSpan', title: '迟行带: ', type: 'line' }
+    { key: 'chikouSpan', title: '迟行带: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -96,7 +96,7 @@ const ichimoku: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default ichimoku

@@ -26,16 +26,27 @@ export function buildStyles(s: OverlayStyleInput): any {
   const pointStyles = { color: s.color }
 
   if (!hasFill) {
-    return { line: lineStyles, point: pointStyles, arc: { color: s.color, style: lineStyleKC, dashedValue } }
+    return {
+      line: lineStyles,
+      point: pointStyles,
+      arc: { color: s.color, style: lineStyleKC, dashedValue },
+    }
   }
 
   const shapeStyles = {
-    color: fc, borderColor: s.color, borderSize: s.lineWidth,
-    borderStyle: lineStyleKC, borderDashedValue: dashedValue, style: 'stroke_fill',
+    color: fc,
+    borderColor: s.color,
+    borderSize: s.lineWidth,
+    borderStyle: lineStyleKC,
+    borderDashedValue: dashedValue,
+    style: 'stroke_fill',
   }
   return {
-    line: lineStyles, point: pointStyles,
-    polygon: shapeStyles, circle: shapeStyles, rect: { ...shapeStyles, borderRadius: 0 },
+    line: lineStyles,
+    point: pointStyles,
+    polygon: shapeStyles,
+    circle: shapeStyles,
+    rect: { ...shapeStyles, borderRadius: 0 },
     arc: { color: s.color, style: lineStyleKC, dashedValue },
   }
 }

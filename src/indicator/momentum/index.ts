@@ -1,3 +1,10 @@
+import adx from './adx'
+import aroon from './aroon'
+import coppockCurve from './coppockCurve'
+import dpo from './dpo'
+import fisherTransform from './fisherTransform'
+import kst from './kst'
+import ppo from './ppo'
 /**
  * 动量类技术指标集合
  *
@@ -14,19 +21,20 @@
  * - TMF: 特威格斯资金流
  */
 import stochasticRsi from './stochasticRsi'
-import adx from './adx'
-import aroon from './aroon'
-import ultimateOscillator from './ultimateOscillator'
-import fisherTransform from './fisherTransform'
-import coppockCurve from './coppockCurve'
-import ppo from './ppo'
-import dpo from './dpo'
-import kst from './kst'
 import twiggsMf from './twiggsMf'
+import ultimateOscillator from './ultimateOscillator'
 
 const momentumIndicators = [
-  stochasticRsi, adx, aroon, ultimateOscillator, fisherTransform,
-  coppockCurve, ppo, dpo, kst, twiggsMf
+  stochasticRsi,
+  adx,
+  aroon,
+  ultimateOscillator,
+  fisherTransform,
+  coppockCurve,
+  ppo,
+  dpo,
+  kst,
+  twiggsMf,
 ]
 
 export default momentumIndicators

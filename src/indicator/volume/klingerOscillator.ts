@@ -22,7 +22,7 @@ const klingerOscillator: IndicatorTemplate = {
   calcParams: [34, 55, 13],
   figures: [
     { key: 'kvo', title: 'KVO: ', type: 'line' },
-    { key: 'signal', title: 'Signal: ', type: 'line' }
+    { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -106,17 +106,16 @@ const klingerOscillator: IndicatorTemplate = {
       } else {
         const kvoVal = kvoValues[i]
         const signalIdx = i - slowStart
-        const signalVal = signalIdx >= 0 && signalIdx < signalEma.length
-          ? signalEma[signalIdx]
-          : null
+        const signalVal =
+          signalIdx >= 0 && signalIdx < signalEma.length ? signalEma[signalIdx] : null
         result.push({
           kvo: kvoVal,
-          signal: signalVal ?? undefined
+          signal: signalVal ?? undefined,
         })
       }
     }
     return result
-  }
+  },
 }
 
 /**

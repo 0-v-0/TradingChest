@@ -138,7 +138,9 @@ describe('exportScreenshot', () => {
 
   it('getConvertPictureUrl 异常返回 false', () => {
     const chart = {
-      getConvertPictureUrl: () => { throw new Error('canvas error') },
+      getConvertPictureUrl: () => {
+        throw new Error('canvas error')
+      },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
     expect(exportScreenshot(chart)).toBe(false)

@@ -17,9 +17,7 @@ const chaikinMoneyFlow: IndicatorTemplate = {
   name: 'CMF',
   shortName: 'CMF',
   calcParams: [20],
-  figures: [
-    { key: 'cmf', title: 'CMF: ', type: 'line' }
-  ],
+  figures: [{ key: 'cmf', title: 'CMF: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -36,7 +34,7 @@ const chaikinMoneyFlow: IndicatorTemplate = {
         mfVolumes.push(0)
       } else {
         // 资金流量乘数：衡量收盘价在当日波幅中的相对位置
-        const mfMultiplier = ((kline.close - kline.low) - (kline.high - kline.close)) / hl
+        const mfMultiplier = (kline.close - kline.low - (kline.high - kline.close)) / hl
         mfVolumes.push(mfMultiplier * (kline.volume ?? 0))
       }
     }
@@ -66,7 +64,7 @@ const chaikinMoneyFlow: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default chaikinMoneyFlow

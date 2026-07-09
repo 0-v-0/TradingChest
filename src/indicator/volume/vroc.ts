@@ -15,9 +15,7 @@ const vroc: IndicatorTemplate = {
   name: 'VROC',
   shortName: 'VROC',
   calcParams: [14],
-  figures: [
-    { key: 'vroc', title: 'VROC: ', type: 'line' }
-  ],
+  figures: [{ key: 'vroc', title: 'VROC: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -40,7 +38,7 @@ const vroc: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default vroc

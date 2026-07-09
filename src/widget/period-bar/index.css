@@ -22,7 +22,7 @@
       width: 28px;
       height: 28px;
       cursor: pointer;
-      transition: all .2s;
+      transition: all 0.2s;
 
       &.rotate {
         transform: rotate(180deg);

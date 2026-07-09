@@ -11,9 +11,7 @@ const bollingerBandWidth: IndicatorTemplate = {
   name: 'BBW',
   shortName: 'BBW',
   calcParams: [20, 2],
-  figures: [
-    { key: 'bbw', title: 'BBW: ', type: 'line' }
-  ],
+  figures: [{ key: 'bbw', title: 'BBW: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -56,7 +54,7 @@ const bollingerBandWidth: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default bollingerBandWidth

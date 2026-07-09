@@ -20,9 +20,7 @@ const zigzag: IndicatorTemplate = {
   name: 'ZIGZAG',
   shortName: 'ZigZag',
   calcParams: [5],
-  figures: [
-    { key: 'zigzag', title: 'ZigZag: ', type: 'line' }
-  ],
+  figures: [{ key: 'zigzag', title: 'ZigZag: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const deviation = (params[0] as number) / 100
@@ -135,7 +133,7 @@ const zigzag: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default zigzag

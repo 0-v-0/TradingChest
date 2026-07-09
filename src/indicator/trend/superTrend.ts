@@ -12,7 +12,7 @@ const superTrend: IndicatorTemplate = {
   calcParams: [10, 3],
   figures: [
     { key: 'up', title: 'Up: ', type: 'line' },
-    { key: 'down', title: 'Down: ', type: 'line' }
+    { key: 'down', title: 'Down: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -33,7 +33,7 @@ const superTrend: IndicatorTemplate = {
         tr = Math.max(
           kline.high - kline.low,
           Math.abs(kline.high - prevClose),
-          Math.abs(kline.low - prevClose)
+          Math.abs(kline.low - prevClose),
         )
       }
       if (i < period) {
@@ -100,7 +100,7 @@ const superTrend: IndicatorTemplate = {
 
       result.push({
         up: direction === 1 ? superTrendVal : undefined,
-        down: direction === -1 ? superTrendVal : undefined
+        down: direction === -1 ? superTrendVal : undefined,
       })
 
       prevUpperBand = upperBand
@@ -109,7 +109,7 @@ const superTrend: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default superTrend

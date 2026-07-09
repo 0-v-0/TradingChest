@@ -5,7 +5,11 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type AlligatorResult = { jaw: number | undefined; teeth: number | undefined; lips: number | undefined }
+type AlligatorResult = {
+  jaw: number | undefined
+  teeth: number | undefined
+  lips: number | undefined
+}
 
 const alligator: IndicatorTemplate = {
   name: 'ALLIGATOR',
@@ -14,7 +18,7 @@ const alligator: IndicatorTemplate = {
   figures: [
     { key: 'jaw', title: '颚线: ', type: 'line' },
     { key: 'teeth', title: '齿线: ', type: 'line' },
-    { key: 'lips', title: '唇线: ', type: 'line' }
+    { key: 'lips', title: '唇线: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -86,7 +90,7 @@ const alligator: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default alligator

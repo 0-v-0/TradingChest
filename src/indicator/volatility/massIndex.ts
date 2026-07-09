@@ -11,9 +11,7 @@ const massIndex: IndicatorTemplate = {
   name: 'MI',
   shortName: 'MI',
   calcParams: [9, 25],
-  figures: [
-    { key: 'mi', title: 'MI: ', type: 'line' }
-  ],
+  figures: [{ key: 'mi', title: 'MI: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const emaPeriod = params[0] as number
@@ -111,7 +109,7 @@ const massIndex: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default massIndex

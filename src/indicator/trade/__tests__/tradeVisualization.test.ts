@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { findClosestBar } from '../tradeVisualization'
 import type { TradeRecord } from '../tradeVisualization'
+import { findClosestBar } from '../tradeVisualization'
 import tradeVisualization from '../tradeVisualization'
 
 // Helper: make KLineData-like objects with just the fields calc needs
@@ -14,12 +14,12 @@ describe('findClosestBar (binary search)', () => {
   })
 
   it('finds exact match', () => {
-    const bars = [10, 20, 30, 40, 50].map(ts => ({ timestamp: ts }))
+    const bars = [10, 20, 30, 40, 50].map((ts) => ({ timestamp: ts }))
     expect(findClosestBar(bars, 30)).toBe(2)
   })
 
   it('finds closest when target is between bars', () => {
-    const bars = [10, 20, 30, 40, 50].map(ts => ({ timestamp: ts }))
+    const bars = [10, 20, 30, 40, 50].map((ts) => ({ timestamp: ts }))
     // 24 is closer to 20 (idx 1) than 30 (idx 2)
     expect(findClosestBar(bars, 24)).toBe(1)
     // 26 is closer to 30 (idx 2) than 20 (idx 1)
@@ -29,12 +29,12 @@ describe('findClosestBar (binary search)', () => {
   })
 
   it('handles target before all bars', () => {
-    const bars = [100, 200, 300].map(ts => ({ timestamp: ts }))
+    const bars = [100, 200, 300].map((ts) => ({ timestamp: ts }))
     expect(findClosestBar(bars, 5)).toBe(0)
   })
 
   it('handles target after all bars', () => {
-    const bars = [100, 200, 300].map(ts => ({ timestamp: ts }))
+    const bars = [100, 200, 300].map((ts) => ({ timestamp: ts }))
     expect(findClosestBar(bars, 999)).toBe(2)
   })
 
@@ -61,7 +61,16 @@ describe('findClosestBar (binary search)', () => {
 describe('tradeVisualization.calc', () => {
   const calc = tradeVisualization.calc!
 
-  function makeTrades(...entries: Array<{ entryTs: number; exitTs: number; entryPrice: number; exitPrice: number; pnl: number; direction: 'long' | 'short' }>): TradeRecord[] {
+  function makeTrades(
+    ...entries: Array<{
+      entryTs: number
+      exitTs: number
+      entryPrice: number
+      exitPrice: number
+      pnl: number
+      direction: 'long' | 'short'
+    }>
+  ): TradeRecord[] {
     return entries
   }
 
@@ -88,7 +97,12 @@ describe('tradeVisualization.calc', () => {
   it('maps a single trade to correct bars', () => {
     const bars = [makeBar(100), makeBar(200), makeBar(300), makeBar(400), makeBar(500)]
     const trades = makeTrades({
-      entryTs: 200, exitTs: 400, entryPrice: 50, exitPrice: 60, pnl: 10, direction: 'long'
+      entryTs: 200,
+      exitTs: 400,
+      entryPrice: 50,
+      exitPrice: 60,
+      pnl: 10,
+      direction: 'long',
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
@@ -119,7 +133,12 @@ describe('tradeVisualization.calc', () => {
   it('handles same-bar entry and exit', () => {
     const bars = [makeBar(100), makeBar(200), makeBar(300)]
     const trades = makeTrades({
-      entryTs: 200, exitTs: 200, entryPrice: 50, exitPrice: 55, pnl: 5, direction: 'short'
+      entryTs: 200,
+      exitTs: 200,
+      entryPrice: 50,
+      exitPrice: 55,
+      pnl: 5,
+      direction: 'short',
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
@@ -136,7 +155,7 @@ describe('tradeVisualization.calc', () => {
     const bars = [makeBar(100), makeBar(200), makeBar(300), makeBar(400)]
     const trades = makeTrades(
       { entryTs: 100, exitTs: 300, entryPrice: 50, exitPrice: 60, pnl: 10, direction: 'long' },
-      { entryTs: 200, exitTs: 400, entryPrice: 55, exitPrice: 45, pnl: -10, direction: 'short' }
+      { entryTs: 200, exitTs: 400, entryPrice: 55, exitPrice: 45, pnl: -10, direction: 'short' },
     )
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
@@ -149,7 +168,7 @@ describe('tradeVisualization.calc', () => {
   it('supports raw TradeRecord[] as extendData (backwards compat)', () => {
     const bars = [makeBar(100), makeBar(200)]
     const trades: TradeRecord[] = [
-      { entryTs: 100, exitTs: 200, entryPrice: 10, exitPrice: 20, pnl: 10, direction: 'long' }
+      { entryTs: 100, exitTs: 200, entryPrice: 10, exitPrice: 20, pnl: 10, direction: 'long' },
     ]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: trades } as any
@@ -163,13 +182,18 @@ describe('tradeVisualization.calc', () => {
     // Bars at 100, 200, 300 — trade entry at 190 should map to bar at 200
     const bars = [makeBar(100), makeBar(200), makeBar(300)]
     const trades = makeTrades({
-      entryTs: 190, exitTs: 310, entryPrice: 50, exitPrice: 60, pnl: 10, direction: 'long'
+      entryTs: 190,
+      exitTs: 310,
+      entryPrice: 50,
+      exitPrice: 60,
+      pnl: 10,
+      direction: 'long',
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
     const result = calc(bars, indicator)
 
     expect(result[1].entry).toBeDefined() // 190 → bar[1] (200)
-    expect(result[2].exit).toBeDefined()  // 310 → bar[2] (300)
+    expect(result[2].exit).toBeDefined() // 310 → bar[2] (300)
   })
 })

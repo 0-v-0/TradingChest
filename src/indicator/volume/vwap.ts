@@ -11,9 +11,7 @@ const vwap: IndicatorTemplate = {
   name: 'VWAP',
   shortName: 'VWAP',
   calcParams: [],
-  figures: [
-    { key: 'vwap', title: 'VWAP: ', type: 'line' }
-  ],
+  figures: [{ key: 'vwap', title: 'VWAP: ', type: 'line' }],
   calc: (dataList: KLineData[]) => {
     const result: VwapResult[] = []
     // 累计典型价格 * 成交量
@@ -35,7 +33,7 @@ const vwap: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default vwap

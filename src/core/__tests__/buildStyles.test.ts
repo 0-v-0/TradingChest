@@ -12,8 +12,10 @@ describe('buildStyles', () => {
 
   it('有填充时返回完整 polygon/circle/rect', () => {
     const result = buildStyles({
-      color: '#ff0000', fillColor: 'rgba(255,0,0,0.2)',
-      lineWidth: 3, lineStyle: 'solid'
+      color: '#ff0000',
+      fillColor: 'rgba(255,0,0,0.2)',
+      lineWidth: 3,
+      lineStyle: 'solid',
     })
     expect(result.polygon.color).toBe('rgba(255,0,0,0.2)')
     expect(result.polygon.borderColor).toBe('#ff0000')

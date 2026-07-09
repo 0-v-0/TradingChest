@@ -24,20 +24,20 @@ const threeWaves: OverlayTemplate = {
     const texts = coordinates.map((coordinate, i) => ({
       ...coordinate,
       text: `(${i})`,
-      baseline: 'bottom'
+      baseline: 'bottom',
     }))
     return [
       {
         type: 'line',
-        attrs: { coordinates }
+        attrs: { coordinates },
       },
       {
         type: 'text',
         ignoreEvent: true,
-        attrs: texts
-      }
+        attrs: texts,
+      },
     ]
-  }
+  },
 }
 
 export default threeWaves

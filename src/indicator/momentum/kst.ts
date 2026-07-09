@@ -22,7 +22,7 @@ const kst: IndicatorTemplate = {
   calcParams: [10, 15, 20, 30, 10, 10, 10, 15, 9],
   figures: [
     { key: 'kst', title: 'KST: ', type: 'line' },
-    { key: 'signal', title: 'Signal: ', type: 'line' }
+    { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const p = indicator.calcParams
@@ -109,12 +109,12 @@ const kst: IndicatorTemplate = {
     for (let i = 0; i < len; i++) {
       result.push({
         kst: kstLine[i] ?? undefined,
-        signal: signalLine[i] ?? undefined
+        signal: signalLine[i] ?? undefined,
       })
     }
 
     return result
-  }
+  },
 }
 
 export default kst

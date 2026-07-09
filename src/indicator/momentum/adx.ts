@@ -13,7 +13,11 @@
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type AdxResult = { adx: number | undefined; plusDi: number | undefined; minusDi: number | undefined }
+type AdxResult = {
+  adx: number | undefined
+  plusDi: number | undefined
+  minusDi: number | undefined
+}
 
 const adx: IndicatorTemplate = {
   name: 'ADX',
@@ -22,7 +26,7 @@ const adx: IndicatorTemplate = {
   figures: [
     { key: 'adx', title: 'ADX: ', type: 'line' },
     { key: 'plusDi', title: '+DI: ', type: 'line' },
-    { key: 'minusDi', title: '-DI: ', type: 'line' }
+    { key: 'minusDi', title: '-DI: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
@@ -47,11 +51,7 @@ const adx: IndicatorTemplate = {
         const low = dataList[i].low
 
         // 真实波幅
-        trRaw[i] = Math.max(
-          high - low,
-          Math.abs(high - prevClose),
-          Math.abs(low - prevClose)
-        )
+        trRaw[i] = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose))
 
         // 方向运动
         const upMove = high - prevHigh
@@ -86,10 +86,10 @@ const adx: IndicatorTemplate = {
           smoothMinusDm /= period
           smoothTr /= period
 
-          const plusDi = smoothTr !== 0 ? 100 * smoothPlusDm / smoothTr : 0
-          const minusDi = smoothTr !== 0 ? 100 * smoothMinusDm / smoothTr : 0
+          const plusDi = smoothTr !== 0 ? (100 * smoothPlusDm) / smoothTr : 0
+          const minusDi = smoothTr !== 0 ? (100 * smoothMinusDm) / smoothTr : 0
           const diSum = plusDi + minusDi
-          const dx = diSum !== 0 ? 100 * Math.abs(plusDi - minusDi) / diSum : 0
+          const dx = diSum !== 0 ? (100 * Math.abs(plusDi - minusDi)) / diSum : 0
 
           // 开始累积 DX 用于计算 ADX
           adxSmooth += dx
@@ -105,10 +105,10 @@ const adx: IndicatorTemplate = {
         smoothMinusDm = (smoothMinusDm * (period - 1) + minusDmRaw[i]) / period
         smoothTr = (smoothTr * (period - 1) + trRaw[i]) / period
 
-        const plusDi = smoothTr !== 0 ? 100 * smoothPlusDm / smoothTr : 0
-        const minusDi = smoothTr !== 0 ? 100 * smoothMinusDm / smoothTr : 0
+        const plusDi = smoothTr !== 0 ? (100 * smoothPlusDm) / smoothTr : 0
+        const minusDi = smoothTr !== 0 ? (100 * smoothMinusDm) / smoothTr : 0
         const diSum = plusDi + minusDi
-        const dx = diSum !== 0 ? 100 * Math.abs(plusDi - minusDi) / diSum : 0
+        const dx = diSum !== 0 ? (100 * Math.abs(plusDi - minusDi)) / diSum : 0
 
         adxCount++
         if (adxCount < period) {
@@ -128,7 +128,7 @@ const adx: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default adx

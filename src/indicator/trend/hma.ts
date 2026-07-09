@@ -36,16 +36,14 @@ const hma: IndicatorTemplate = {
   name: 'HMA',
   shortName: 'HMA',
   calcParams: [9],
-  figures: [
-    { key: 'hma', title: 'HMA: ', type: 'line' }
-  ],
+  figures: [{ key: 'hma', title: 'HMA: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
     const halfPeriod = Math.floor(period / 2)
     const sqrtPeriod = Math.round(Math.sqrt(period))
 
-    const closes = dataList.map(k => k.close)
+    const closes = dataList.map((k) => k.close)
 
     // WMA(n/2) 和 WMA(n)
     const wmaHalf = calcWmaArray(closes, halfPeriod)
@@ -65,9 +63,9 @@ const hma: IndicatorTemplate = {
     const hmaValues = calcWmaArray(diffSeries, sqrtPeriod)
 
     return dataList.map((_, i) => ({
-      hma: hmaValues[i]
+      hma: hmaValues[i],
     }))
-  }
+  },
 }
 
 export default hma

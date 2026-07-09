@@ -19,7 +19,7 @@ export interface ColorInputProps {
   onChange: (color: string) => void
 }
 
-const ColorInput: Component<ColorInputProps> = props => {
+const ColorInput: Component<ColorInputProps> = (props) => {
   return (
     <div class="klinecharts-pro-color-input">
       <input
@@ -27,7 +27,10 @@ const ColorInput: Component<ColorInputProps> = props => {
         value={props.value}
         onInput={(e) => props.onChange((e.target as HTMLInputElement).value)}
       />
-      <span class="klinecharts-pro-color-input-preview" style={{ 'background-color': props.value }} />
+      <span
+        class="klinecharts-pro-color-input-preview"
+        style={{ 'background-color': props.value }}
+      />
     </div>
   )
 }

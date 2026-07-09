@@ -20,7 +20,7 @@ const elderRay: IndicatorTemplate = {
   calcParams: [13],
   figures: [
     { key: 'bullPower', title: 'Bull: ', type: 'line' },
-    { key: 'bearPower', title: 'Bear: ', type: 'line' }
+    { key: 'bearPower', title: 'Bear: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -47,7 +47,7 @@ const elderRay: IndicatorTemplate = {
 
         result.push({
           bullPower: kline.high - prevEma,
-          bearPower: kline.low - prevEma
+          bearPower: kline.low - prevEma,
         })
       } else {
         // EMA 递归
@@ -55,12 +55,12 @@ const elderRay: IndicatorTemplate = {
 
         result.push({
           bullPower: kline.high - prevEma,
-          bearPower: kline.low - prevEma
+          bearPower: kline.low - prevEma,
         })
       }
     }
     return result
-  }
+  },
 }
 
 export default elderRay

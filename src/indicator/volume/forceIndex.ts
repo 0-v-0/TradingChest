@@ -16,9 +16,7 @@ const forceIndex: IndicatorTemplate = {
   name: 'FI',
   shortName: 'FI',
   calcParams: [13],
-  figures: [
-    { key: 'fi', title: 'FI: ', type: 'line' }
-  ],
+  figures: [{ key: 'fi', title: 'FI: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
@@ -63,7 +61,7 @@ const forceIndex: IndicatorTemplate = {
       }
     }
     return result
-  }
+  },
 }
 
 export default forceIndex

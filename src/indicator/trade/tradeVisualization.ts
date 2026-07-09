@@ -19,7 +19,13 @@ interface BarTradeInfo {
   // 该 K 线是出场点
   exit?: { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
   // 该 K 线所在的交易区间列表（用于画矩形）
-  ranges?: Array<{ entryPrice: number; exitPrice: number; pnl: number; isStart: boolean; isEnd: boolean }>
+  ranges?: Array<{
+    entryPrice: number
+    exitPrice: number
+    pnl: number
+    isStart: boolean
+    isEnd: boolean
+  }>
 }
 
 /** extendData shape for TradeVis indicator */
@@ -37,7 +43,9 @@ const _hitTargetsMap = new Map<string, HitTarget[]>()
 const _tradeBarIndicesMap = new Map<string, BarIndex[]>()
 
 /** Get the latest visible trade marker positions for a specific instance. */
-export function getTradeVisHitTargets(instanceId?: string): ReadonlyArray<{ x: number; y: number; trade: TradeRecord; type: string }> {
+export function getTradeVisHitTargets(
+  instanceId?: string,
+): ReadonlyArray<{ x: number; y: number; trade: TradeRecord; type: string }> {
   return _hitTargetsMap.get(instanceId ?? '_default') ?? []
 }
 
@@ -56,7 +64,8 @@ export function findClosestBar(dataList: Pick<KLineData, 'timestamp'>[], targetT
   const n = dataList.length
   if (n === 0) return -1
 
-  let lo = 0, hi = n - 1
+  let lo = 0,
+    hi = n - 1
   // Find first bar where timestamp >= targetTs
   while (lo < hi) {
     const mid = (lo + hi) >> 1
@@ -64,7 +73,10 @@ export function findClosestBar(dataList: Pick<KLineData, 'timestamp'>[], targetT
     else hi = mid
   }
   // Compare lo and lo-1 to find closest
-  if (lo > 0 && Math.abs(dataList[lo - 1].timestamp - targetTs) <= Math.abs(dataList[lo].timestamp - targetTs)) {
+  if (
+    lo > 0 &&
+    Math.abs(dataList[lo - 1].timestamp - targetTs) <= Math.abs(dataList[lo].timestamp - targetTs)
+  ) {
     return lo - 1
   }
   return lo
@@ -84,9 +96,18 @@ const tradeVisualization: IndicatorTemplate = {
       return dataList.map(() => ({}))
     }
 
-    const entryMap = new Map<number, { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }>()
-    const exitMap = new Map<number, { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }>()
-    const rangeSet = new Map<number, Array<{ entryPrice: number; exitPrice: number; pnl: number }>>()
+    const entryMap = new Map<
+      number,
+      { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
+    >()
+    const exitMap = new Map<
+      number,
+      { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
+    >()
+    const rangeSet = new Map<
+      number,
+      Array<{ entryPrice: number; exitPrice: number; pnl: number }>
+    >()
     const barIndices: Array<{ trade: TradeRecord; entryIdx: number; exitIdx: number }> = []
 
     for (const t of trades) {
@@ -95,7 +116,12 @@ const tradeVisualization: IndicatorTemplate = {
       const exitIdx = findClosestBar(dataList, t.exitTs)
 
       if (entryIdx >= 0) {
-        entryMap.set(entryIdx, { price: t.entryPrice, direction: t.direction, pnl: t.pnl, trade: t })
+        entryMap.set(entryIdx, {
+          price: t.entryPrice,
+          direction: t.direction,
+          pnl: t.pnl,
+          trade: t,
+        })
       }
       if (exitIdx >= 0) {
         exitMap.set(exitIdx, { price: t.exitPrice, direction: t.direction, pnl: t.pnl, trade: t })
@@ -120,8 +146,10 @@ const tradeVisualization: IndicatorTemplate = {
       if (entryMap.has(i)) info.entry = entryMap.get(i)!
       if (exitMap.has(i)) info.exit = exitMap.get(i)!
       if (rangeSet.has(i)) {
-        info.ranges = rangeSet.get(i)!.map(r => ({
-          ...r, isStart: entryMap.has(i), isEnd: exitMap.has(i)
+        info.ranges = rangeSet.get(i)!.map((r) => ({
+          ...r,
+          isStart: entryMap.has(i),
+          isEnd: exitMap.has(i),
         }))
       }
       return info
@@ -165,7 +193,8 @@ const tradeVisualization: IndicatorTemplate = {
     }
 
     // ── 第二遍：画入场/出场标记 + 收集可见标记像素坐标用于点击检测 ──
-    const hitTargets: Array<{ x: number; y: number; trade: TradeRecord; type: 'entry' | 'exit' }> = []
+    const hitTargets: Array<{ x: number; y: number; trade: TradeRecord; type: 'entry' | 'exit' }> =
+      []
 
     for (let i = visibleRange.from; i < visibleRange.to; i++) {
       const info = result[i]
@@ -199,10 +228,16 @@ const tradeVisualization: IndicatorTemplate = {
 
     ctx.restore()
     return false
-  }
+  },
 }
 
-function drawLabel(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string) {
+function drawLabel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  text: string,
+  color: string,
+) {
   const offset = 35
 
   ctx.strokeStyle = color

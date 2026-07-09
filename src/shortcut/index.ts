@@ -36,7 +36,7 @@ export class KeyboardShortcutManager {
    */
   addBinding(binding: ShortcutBinding): void {
     // 移除同一 combo 的旧绑定
-    this.bindings = this.bindings.filter(b => b.combo !== binding.combo)
+    this.bindings = this.bindings.filter((b) => b.combo !== binding.combo)
     this.bindings.push(binding)
   }
 
@@ -44,7 +44,7 @@ export class KeyboardShortcutManager {
    * 移除快捷键
    */
   removeBinding(combo: string): void {
-    this.bindings = this.bindings.filter(b => b.combo !== combo)
+    this.bindings = this.bindings.filter((b) => b.combo !== combo)
   }
 
   /**
@@ -66,14 +66,14 @@ export class KeyboardShortcutManager {
     const key = e.key.toLowerCase()
     // 标准化特殊键名
     const keyMap: Record<string, string> = {
-      'escape': 'escape',
-      'delete': 'delete',
-      'backspace': 'backspace',
-      'home': 'home',
-      'end': 'end',
+      escape: 'escape',
+      delete: 'delete',
+      backspace: 'backspace',
+      home: 'home',
+      end: 'end',
       '+': 'plus',
       '-': 'minus',
-      '=': 'plus'  // = 键通常和 + 在同一位置
+      '=': 'plus', // = 键通常和 + 在同一位置
     }
     const normalizedKey = keyMap[key] ?? key
 
@@ -95,12 +95,13 @@ export class KeyboardShortcutManager {
 
       // 如果焦点在 input/textarea 上，忽略快捷键
       const target = e.target as HTMLElement
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+        return
 
       const combo = this.eventToCombo(e)
       if (!combo) return
 
-      const binding = this.bindings.find(b => b.combo === combo)
+      const binding = this.bindings.find((b) => b.combo === combo)
       if (binding) {
         const handler = this.actionHandlers.get(binding.action)
         if (handler) {

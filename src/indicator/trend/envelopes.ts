@@ -12,7 +12,7 @@ const envelopes: IndicatorTemplate = {
   figures: [
     { key: 'middle', title: '中轨: ', type: 'line' },
     { key: 'upper', title: '上轨: ', type: 'line' },
-    { key: 'lower', title: '下轨: ', type: 'line' }
+    { key: 'lower', title: '下轨: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
@@ -35,10 +35,10 @@ const envelopes: IndicatorTemplate = {
       return {
         middle: sma,
         upper: sma + offset,
-        lower: sma - offset
+        lower: sma - offset,
       }
     })
-  }
+  },
 }
 
 export default envelopes

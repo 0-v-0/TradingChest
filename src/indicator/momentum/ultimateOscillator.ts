@@ -16,9 +16,7 @@ const ultimateOscillator: IndicatorTemplate = {
   name: 'UO',
   shortName: 'UO',
   calcParams: [7, 14, 28],
-  figures: [
-    { key: 'uo', title: 'UO: ', type: 'line' }
-  ],
+  figures: [{ key: 'uo', title: 'UO: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period1 = params[0] as number
@@ -83,7 +81,7 @@ const ultimateOscillator: IndicatorTemplate = {
     }
 
     return result
-  }
+  },
 }
 
 export default ultimateOscillator
