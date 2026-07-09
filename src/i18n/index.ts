@@ -15,28 +15,42 @@
 const locales: Record<string, Record<string, string>> = {}
 const loadedLanguages = new Set<string>()
 
+function parseIni(content: string): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed) continue
+    const eqIdx = trimmed.indexOf('=')
+    if (eqIdx === -1) continue
+    const key = trimmed.slice(0, eqIdx)
+    const value = trimmed.slice(eqIdx + 1)
+    result[key] = value
+  }
+  return result
+}
+
 export async function load(locale: string) {
   if (loadedLanguages.has(locale)) {
     return
   }
-  let mod: Record<string, string>
+  let content: string
   switch (locale) {
     case 'zh-CN':
-      mod = (await import('./zh-CN.json')).default
+      content = (await import('./zh-CN.ini?raw')).default
       break
     case 'en-US':
-      mod = (await import('./en-US.json')).default
+      content = (await import('./en-US.ini?raw')).default
       break
     case 'ja':
-      mod = (await import('./ja.json')).default
+      content = (await import('./ja.ini?raw')).default
       break
     case 'ko':
-      mod = (await import('./ko.json')).default
+      content = (await import('./ko.ini?raw')).default
       break
     default:
       return
   }
-  locales[locale] = mod
+  locales[locale] = parseIni(content)
   loadedLanguages.add(locale)
 }
 
