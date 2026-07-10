@@ -47,6 +47,7 @@ import { SelectDataSourceItem, Loading } from './component'
 import { adjustFromTo } from './core/adjustFromTo'
 import { buildStyles } from './core/buildStyles'
 import { deepSet } from './core/deepSet'
+import { MethodNotAllowedError } from './core/MethodNotAllowedError'
 import { indicatorRegistry } from './indicator'
 import { ReplayEngine } from './replay/ReplayEngine'
 import { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
@@ -460,34 +461,34 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     // 以下方法由 KLineChartPro 直接实现，不经过 _chartApi 代理
     // 如果有人绕过 KLineChartPro 直接调用组件 ref，给出明确错误
     exportCSV: () => {
-      throw new Error('[TradingChest] exportCSV must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('exportCSV')
     },
     exportAllCSV: () => {
-      throw new Error('[TradingChest] exportAllCSV must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('exportAllCSV')
     },
     exportScreenshot: () => {
-      throw new Error('[TradingChest] exportScreenshot must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('exportScreenshot')
     },
     getShortcutManager: () => {
-      throw new Error('[TradingChest] getShortcutManager must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('getShortcutManager')
     },
     addAlert: () => {
-      throw new Error('[TradingChest] addAlert must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('addAlert')
     },
     updateAlert: () => {
-      throw new Error('[TradingChest] updateAlert must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('updateAlert')
     },
     removeAlert: () => {
-      throw new Error('[TradingChest] removeAlert must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('removeAlert')
     },
     getAlerts: () => {
-      throw new Error('[TradingChest] getAlerts must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('getAlerts')
     },
     addComparison: async () => {
-      throw new Error('[TradingChest] addComparison must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('addComparison')
     },
     removeComparison: () => {
-      throw new Error('[TradingChest] removeComparison must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('removeComparison')
     },
     startReplay: (pos?: number) => {
       startReplay(pos)
@@ -497,15 +498,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     },
     getReplayEngine: () => replayEngine,
     createTradeVisualization: () => {
-      throw new Error(
-        '[TradingChest] createTradeVisualization must be called on KLineChartPro instance',
-      )
+      throw new MethodNotAllowedError('createTradeVisualization')
     },
     feedPrice: () => {
-      throw new Error('[TradingChest] feedPrice must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('feedPrice')
     },
     dispose: () => {
-      throw new Error('[TradingChest] dispose must be called on KLineChartPro instance')
+      throw new MethodNotAllowedError('dispose')
     },
   })
 
