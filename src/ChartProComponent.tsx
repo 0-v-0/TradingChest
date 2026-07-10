@@ -542,6 +542,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           type: FormatDateType,
         ) => {
           const formatTable: Record<string, { xAxis: string; default: string }> = {
+            ms: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
+            second: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
             minute: { xAxis: 'HH:mm', default: 'YYYY-MM-DD HH:mm' },
             hour: { xAxis: 'MM-DD HH:mm', default: 'YYYY-MM-DD HH:mm' },
             day: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
