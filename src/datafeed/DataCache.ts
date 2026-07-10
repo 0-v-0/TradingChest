@@ -1,4 +1,4 @@
-import { KLineData } from 'klinecharts'
+import type { KLineData } from 'klinecharts'
 
 /**
  * K 线数据内存缓存

@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-import { KLineData } from 'klinecharts'
+import type { KLineData } from 'klinecharts'
 import { ReconnectingWebSocket } from './datafeed/ReconnectingWebSocket'
-import { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback } from './types'
+import type { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback } from './types'
 
 export type ConnectionState = 'connected' | 'disconnected' | 'reconnecting' | 'failed'
 

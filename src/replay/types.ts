@@ -1,4 +1,4 @@
-import { KLineData } from 'klinecharts'
+import type { KLineData } from 'klinecharts'
 
 export type ReplaySpeed = 1 | 2 | 4 | 8 | 16
 

@@ -16,16 +16,16 @@ import {
   init,
   dispose,
   utils,
-  Nullable,
-  Chart,
-  OverlayMode,
-  Styles,
-  TooltipFeaturePosition,
-  PaneOptions,
-  Indicator,
-  IndicatorCreate,
-  Coordinate,
-  PeriodType,
+  type Nullable,
+  type Chart,
+  type OverlayMode,
+  type Styles,
+  type TooltipFeaturePosition,
+  type PaneOptions,
+  type Indicator,
+  type IndicatorCreate,
+  type Coordinate,
+  type PeriodType,
   type Overlay,
 } from 'klinecharts'
 import {
@@ -35,19 +35,19 @@ import {
   Show,
   onCleanup,
   startTransition,
-  Component,
   ErrorBoundary,
+  type Component,
 } from 'solid-js'
 import type { ReplayState, ReplaySpeed } from './replay/types'
 import type { OverlayLifecycleEvent, OverlayLifecycleSource } from './types'
-import { SelectDataSourceItem, Loading } from './component'
+import { Loading, type SelectDataSourceItem } from './component'
 import { adjustFromTo } from './core/adjustFromTo'
 import { buildStyles } from './core/buildStyles'
 import { deepSet } from './core/deepSet'
 import { MethodNotAllowedError } from './core/MethodNotAllowedError'
 import { indicatorRegistry } from './indicator'
 import { ReplayEngine } from './replay/ReplayEngine'
-import { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
+import type { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
 import {
   PeriodBar,
   DrawingBar,

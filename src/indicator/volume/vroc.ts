@@ -7,7 +7,7 @@
  *
  * 当 n 期前成交量为零时无法计算，返回 undefined
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type VrocResult = { vroc: number | undefined }
 

@@ -4,7 +4,7 @@
  * Qstick = SMA(close - open, period)
  * 正值表示买方主导（收盘>开盘），负值表示卖方主导
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
 const qstick: IndicatorTemplate = {

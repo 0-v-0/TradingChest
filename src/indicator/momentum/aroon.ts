@@ -6,7 +6,7 @@
  * AroonDown = ((period - 距最低价天数) / period) * 100
  * Aroon Oscillator = AroonUp - AroonDown
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AroonResult = {
   aroonUp: number | undefined

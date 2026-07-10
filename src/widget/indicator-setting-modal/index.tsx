@@ -13,7 +13,7 @@
  */
 
 import { utils } from 'klinecharts'
-import { Component, createSignal } from 'solid-js'
+import { createSignal, type Component } from 'solid-js'
 import { Modal, Input } from '../../component'
 import t from '../../i18n'
 import data from './data'

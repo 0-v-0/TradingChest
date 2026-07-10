@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-import type { Overlay } from 'klinecharts'
-import { KLineData, Styles, DeepPartial } from 'klinecharts'
+import type { Overlay, KLineData, Styles, DeepPartial } from 'klinecharts'
 import type KeyboardShortcutManager from './shortcut'
 
 export interface SymbolInfo {

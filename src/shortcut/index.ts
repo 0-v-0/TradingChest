@@ -1,4 +1,5 @@
-import defaultBindings, { ShortcutBinding } from './defaultBindings'
+import defaultBindings from './defaultBindings'
+import type { ShortcutBinding } from './defaultBindings'
 
 /**
  * 快捷键管理器

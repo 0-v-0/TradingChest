@@ -1,4 +1,4 @@
-import { IndicatorTemplate } from 'klinecharts'
+import type { IndicatorTemplate } from 'klinecharts'
 
 type IndicatorLoader = () => Promise<IndicatorTemplate>
 

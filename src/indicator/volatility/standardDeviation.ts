@@ -2,7 +2,7 @@
  * Standard Deviation - 标准差
  * 收盘价在回看窗口内的总体标准差
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type StandardDeviationResult = { stddev: number | undefined }
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Component, createSignal, createMemo, For, Show } from 'solid-js'
+import { createSignal, createMemo, For, Show, type Component } from 'solid-js'
 import { Modal, List, Checkbox, Input } from '../../component'
 import t from '../../i18n'
 import { indicatorCategories } from '../../indicator'

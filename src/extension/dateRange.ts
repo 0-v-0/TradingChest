@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import type { OverlayTemplate } from 'klinecharts'
 
 /**
  * 时间区间测量工具

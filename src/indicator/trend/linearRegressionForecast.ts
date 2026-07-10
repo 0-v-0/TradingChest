@@ -8,7 +8,7 @@
  *
  * 参数: period
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const linearRegressionForecast: IndicatorTemplate = {
   name: 'LinearRegressionForecast',

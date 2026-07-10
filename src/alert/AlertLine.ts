@@ -1,4 +1,4 @@
-import { OverlayTemplate, DeepPartial, OverlayStyle } from 'klinecharts'
+import type { OverlayTemplate, DeepPartial, OverlayStyle } from 'klinecharts'
 
 const alertLine: OverlayTemplate = {
   name: 'alertLine',

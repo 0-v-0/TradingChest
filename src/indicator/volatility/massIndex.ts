@@ -3,7 +3,7 @@
  * 通过计算 EMA(H-L) 与 EMA(EMA(H-L)) 的比值之和来检测趋势反转
  * 当指标超过 27 然后回落到 26.5 以下时，形成"反转膨胀"信号
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type MassIndexResult = { mi: number | undefined }
 

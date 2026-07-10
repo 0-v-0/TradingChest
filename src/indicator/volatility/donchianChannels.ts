@@ -2,7 +2,7 @@
  * Donchian Channels - 唐奇安通道
  * 以过去 N 周期最高价和最低价构成的价格通道
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type DonchianChannelsResult = {
   upper: number | undefined

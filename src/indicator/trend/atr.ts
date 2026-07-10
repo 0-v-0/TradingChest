@@ -2,7 +2,7 @@
  * ATR - 平均真实波幅
  * 使用 Wilder 平滑法（RMA）计算真实波幅的移动平均
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AtrResult = { atr: number | undefined }
 

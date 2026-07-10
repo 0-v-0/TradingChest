@@ -3,7 +3,7 @@
  * 在简单移动平均线上下各偏移固定百分比形成通道
  * 用于识别超买超卖区域和趋势方向
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
 const envelopes: IndicatorTemplate = {

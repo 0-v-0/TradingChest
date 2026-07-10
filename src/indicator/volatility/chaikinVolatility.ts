@@ -2,7 +2,7 @@
  * Chaikin Volatility - 蔡金波动率
  * 先计算 (High - Low) 的 EMA，再计算该 EMA 的变化率（ROC）
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ChaikinVolatilityResult = { cv: number | undefined }
 

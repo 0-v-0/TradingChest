@@ -2,7 +2,7 @@
  * 交易可视化指标
  * calc 中将交易数据映射到每根 K 线，draw 中直接用数据索引绘制
  */
-import { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
+import type { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
 
 export interface TradeRecord {
   entryTs: number

@@ -3,7 +3,7 @@
  * DEMA = 2 * EMA(close) - EMA(EMA(close))
  * 比普通 EMA 更贴近价格，滞后更小
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const dema: IndicatorTemplate = {
   name: 'DEMA',

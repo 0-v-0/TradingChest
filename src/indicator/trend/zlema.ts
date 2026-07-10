@@ -4,7 +4,7 @@
  * 其中 lag = floor((period - 1) / 2)
  * 通过补偿滞后来使 EMA 更贴近当前价格
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ZlemaResult = { zlema: number | undefined }
 

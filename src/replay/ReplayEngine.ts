@@ -1,5 +1,5 @@
-import { KLineData } from 'klinecharts'
-import { ReplayState, ReplaySpeed, ReplayCallbacks } from './types'
+import type { KLineData } from 'klinecharts'
+import type { ReplayState, ReplaySpeed, ReplayCallbacks } from './types'
 
 const BASE_INTERVAL = 1000
 

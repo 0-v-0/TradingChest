@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { KLineData } from 'klinecharts'
+import type { KLineData } from 'klinecharts'
 
 /**
  * Normalizes a K-line data series into percentage change values relative to

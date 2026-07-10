@@ -10,7 +10,7 @@
  * 牛力 > 0 表示多方控制，熊力 < 0 表示空方控制
  * EMA 权重因子 k = 2 / (n + 1)，首个有效值使用 SMA 种子
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ElderRayResult = { bullPower: number | undefined; bearPower: number | undefined }
 

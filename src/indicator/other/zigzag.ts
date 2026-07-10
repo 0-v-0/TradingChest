@@ -12,7 +12,7 @@
  *   4. 在确认的波峰/波谷处标记数值，其余位置为 undefined
  *   5. 最终将相邻标记点之间做线性插值，形成连续的折线
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ZigzagResult = { zigzag: number | undefined }
 

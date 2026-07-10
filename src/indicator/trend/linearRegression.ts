@@ -3,7 +3,7 @@
  * 使用最小二乘法拟合直线，并计算上下通道
  * 通道宽度基于标准差
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const linearRegression: IndicatorTemplate = {
   name: 'LINEARREGRESSION',

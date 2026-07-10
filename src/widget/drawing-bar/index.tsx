@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-import { OverlayCreate, OverlayMode } from 'klinecharts'
-import { Component, createMemo, createSignal, Show } from 'solid-js'
+import type { OverlayCreate, OverlayMode } from 'klinecharts'
+import { createMemo, createSignal, Show, type Component } from 'solid-js'
 import { List } from '../../component'
 import {
   createSingleLineOptions,

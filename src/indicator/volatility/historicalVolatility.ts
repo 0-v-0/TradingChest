@@ -2,7 +2,7 @@
  * Historical Volatility - 历史波动率
  * 对数收益率的年化标准差，使用 sqrt(252) 进行年化
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type HistoricalVolatilityResult = { hv: number | undefined }
 

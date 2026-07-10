@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { ParentComponent, ParentProps, JSX, Show } from 'solid-js'
+import { Show, type ParentComponent, type ParentProps, type JSX } from 'solid-js'
 import Empty from '../empty'
 import Loading from '../loading'
 

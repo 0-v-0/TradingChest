@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Period } from '../types'
+import type { Period } from '../types'
 
 /**
  * Calculates an aligned [from, to] timestamp pair for a given period and bar count.

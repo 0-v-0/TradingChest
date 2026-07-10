@@ -12,7 +12,7 @@
  *   SMA 周期: 10, 10, 10, 15
  *   信号线周期: 9
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
 type KstResult = { kst: number | undefined; signal: number | undefined }

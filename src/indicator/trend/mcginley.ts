@@ -3,7 +3,7 @@
  * MD = MD_prev + (close - MD_prev) / (N * (close / MD_prev)^4)
  * 自动调整速度以适应市场节奏，避免大部分均线的假突破问题
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type McginleyResult = { md: number | undefined }
 

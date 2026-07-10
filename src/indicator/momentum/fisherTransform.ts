@@ -9,7 +9,7 @@
  * Fisher = 0.5 * ln((1 + x) / (1 - x))，使用 EMA 平滑的 x
  * Trigger = 前一根的 Fisher 值
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type FisherTransformResult = { fisher: number | undefined; trigger: number | undefined }
 

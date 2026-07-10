@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { createSignal, Component, JSX } from 'solid-js'
+import { createSignal, type Component, type JSX } from 'solid-js'
 
 export interface SelectDataSourceItem {
   key: string

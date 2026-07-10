@@ -7,7 +7,7 @@
  *
  * 参数: depth(递归层数), period(SMA周期)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
 const MAX_LEVELS = 6

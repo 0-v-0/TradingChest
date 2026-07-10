@@ -3,7 +3,7 @@
  * TEMA = 3 * EMA - 3 * EMA(EMA) + EMA(EMA(EMA))
  * 进一步减少滞后，比 DEMA 响应更快
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const tema: IndicatorTemplate = {
   name: 'TEMA',

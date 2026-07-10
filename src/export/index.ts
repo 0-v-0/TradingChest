@@ -1,4 +1,4 @@
-import { Chart, Nullable } from 'klinecharts'
+import type { Chart, Nullable } from 'klinecharts'
 
 /**
  * 数据导出工具

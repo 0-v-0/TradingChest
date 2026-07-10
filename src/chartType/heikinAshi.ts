@@ -10,7 +10,7 @@
  *   HA High  = max(High, HA Open, HA Close)
  *   HA Low   = min(Low, HA Open, HA Close)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type HeikinAshiResult = { haOpen: number; haHigh: number; haLow: number; haClose: number }
 

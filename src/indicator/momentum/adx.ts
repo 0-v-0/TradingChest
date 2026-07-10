@@ -11,7 +11,7 @@
  *
  * 所有平滑均使用 Wilder 平滑法（RMA）
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AdxResult = {
   adx: number | undefined

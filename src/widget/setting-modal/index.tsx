@@ -12,14 +12,12 @@
  * limitations under the License.
  */
 
-import { Styles, utils, DeepPartial } from 'klinecharts'
-import { Component, createEffect, For, createSignal } from 'solid-js'
-import type { SelectDataSourceItem } from '../../component'
-import type { SettingOption } from './data'
-import { Modal, Select, Switch, ColorInput } from '../../component'
+import { utils, type Styles, type DeepPartial } from 'klinecharts'
+import { createEffect, For, createSignal, type Component } from 'solid-js'
+import { Modal, Select, Switch, ColorInput, type SelectDataSourceItem } from '../../component'
+import { getOptions, type SettingOption } from './data'
 import { deepSet } from '../../core/deepSet'
 import t from '../../i18n'
-import { getOptions } from './data'
 
 export interface SettingModalProps {
   locale: string

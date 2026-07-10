@@ -3,7 +3,7 @@
  * 由鳄鱼颚（Jaw）、牙齿（Teeth）、嘴唇（Lips）三条平滑移动均线组成
  * 各线有不同的周期和前移偏移量
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AlligatorResult = {
   jaw: number | undefined

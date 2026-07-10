@@ -20,7 +20,7 @@ import { load } from './i18n'
 import tradeVisualization from './indicator/trade/tradeVisualization'
 import KLineChartPro from './KLineChartPro'
 import './index.css'
-import {
+import type {
   Datafeed,
   SymbolInfo,
   Period,

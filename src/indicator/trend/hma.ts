@@ -3,7 +3,7 @@
  * HMA = WMA(2 * WMA(n/2) - WMA(n), sqrt(n))
  * 同时保持平滑度和减少滞后
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 /**
  * 计算 WMA 值序列

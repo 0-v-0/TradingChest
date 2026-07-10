@@ -4,7 +4,7 @@
  * 绘制完成后弹出输入框让用户编辑文字内容
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import type { OverlayTemplate } from 'klinecharts'
 
 const note: OverlayTemplate = {
   name: 'note',

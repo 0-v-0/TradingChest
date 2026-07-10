@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import type { OverlayTemplate } from 'klinecharts'
 
 /**
  * 综合测量工具（类似 TradingView 的日期和价格区间测量）

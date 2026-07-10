@@ -3,7 +3,7 @@
  * 基于交易时段内的累计典型价格乘以成交量除以累计成交量
  * 典型价格 = (最高价 + 最低价 + 收盘价) / 3
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type VwapResult = { vwap: number | undefined }
 

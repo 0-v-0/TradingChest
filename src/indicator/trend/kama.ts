@@ -3,7 +3,7 @@
  * 根据市场效率比率（ER）动态调整平滑常数
  * 趋势明显时响应快，震荡时响应慢
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KamaResult = { kama: number | undefined }
 

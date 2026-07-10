@@ -14,27 +14,27 @@
 
 import {
   utils,
-  Nullable,
-  DeepPartial,
-  Styles,
   registerIndicator,
-  IndicatorCreate,
-  KLineData,
+  type Nullable,
+  type DeepPartial,
+  type Styles,
+  type IndicatorCreate,
+  type KLineData,
 } from 'klinecharts'
 import { render } from 'solid-js/web'
 import type { AlertConfig } from './alert/types'
-import type { TradeRecord } from './indicator/trade/tradeVisualization'
 import { AlertManager } from './alert'
 import ChartProComponent from './ChartProComponent'
 import { normalizeToPercent } from './compare'
 import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
 import {
+  type TradeRecord,
   getTradeVisHitTargets,
   cleanupTradeVisInstance,
 } from './indicator/trade/tradeVisualization'
 import { ReplayEngine } from './replay/ReplayEngine'
 import KeyboardShortcutManager from './shortcut'
-import { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
+import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 
 export default class KLineChartPro implements ChartPro {
   constructor(options: ChartProOptions) {

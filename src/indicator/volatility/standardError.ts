@@ -3,7 +3,7 @@
  * 计算线性回归的标准误 SE = √(Σ(y-ŷ)² / (n-2))
  * SE 衡量价格偏离回归线的程度，值越大波动越剧烈
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const standardError: IndicatorTemplate = {
   name: 'StandardError',

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Component, Show } from 'solid-js'
+import { Show, type Component } from 'solid-js'
 import type { ReplayState, ReplaySpeed } from '../../replay/types'
 import t from '../../i18n'
 import './index.css'

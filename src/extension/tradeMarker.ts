@@ -4,7 +4,7 @@
  * 与 simpleAnnotation 不同，文字部分也可以接收点击事件
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import type { OverlayTemplate } from 'klinecharts'
 
 const tradeMarker: OverlayTemplate = {
   name: 'tradeMarker',

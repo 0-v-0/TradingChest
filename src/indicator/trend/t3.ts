@@ -8,7 +8,7 @@
  * 2. T3 = c1*e6 + c2*e5 + c3*e4 + c4*e3
  *    其中系数由 volume factor (vf) 决定
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const t3: IndicatorTemplate = {
   name: 'T3',

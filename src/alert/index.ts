@@ -1,4 +1,4 @@
-import { AlertConfig, AlertEvent } from './types'
+import type { AlertConfig, AlertEvent } from './types'
 
 export type { AlertConfig, AlertEvent } from './types'
 

@@ -10,7 +10,7 @@
  *
  * 参数: period, K(导数增益系数)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcEMA } from '../utils'
 
 type EhlersLeadingResult = {

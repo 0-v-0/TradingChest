@@ -7,7 +7,7 @@
  * D = SMA(K, dSmooth)
  * 输出范围 0-1（部分平台显示为 0-100，此处使用 0-1）
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type StochasticRsiResult = { k: number | undefined; d: number | undefined }
 

@@ -2,7 +2,7 @@
  * Keltner Channels - 肯特纳通道
  * 以 EMA 为中轨，ATR 乘以倍数为上下轨的波动率通道指标
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KeltnerChannelsResult = {
   middle: number | undefined

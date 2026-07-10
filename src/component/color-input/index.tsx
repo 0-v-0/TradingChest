@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Component } from 'solid-js'
+import type { Component } from 'solid-js'
 
 export interface ColorInputProps {
   value: string

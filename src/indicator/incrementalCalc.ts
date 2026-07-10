@@ -1,4 +1,4 @@
-import { KLineData, Indicator } from 'klinecharts'
+import type { KLineData, Indicator } from 'klinecharts'
 
 type CalcFn = (dataList: KLineData[], indicator: Indicator) => Array<Record<string, unknown>>
 

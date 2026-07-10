@@ -1,4 +1,4 @@
-import { OverlayTemplate, OverlayFigure } from 'klinecharts'
+import type { OverlayTemplate, OverlayFigure } from 'klinecharts'
 
 type PositionSide = 'long' | 'short'
 

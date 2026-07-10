@@ -10,7 +10,7 @@
  *
  * 参数: P(lookback), X(ATR multiplier), Q(RMA period)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcTR, calcRMA, calcHighest, calcLowest } from '../utils'
 
 type ChandeKrollStopResult = {

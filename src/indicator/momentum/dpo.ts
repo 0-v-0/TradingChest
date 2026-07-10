@@ -12,7 +12,7 @@
  * 标准实现：DPO[i] = close[i] - SMA_at(i - floor(period/2) - 1)
  * 其中 SMA_at(j) = 以 j 为终点的 period 周期 SMA
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type DpoResult = { dpo: number | undefined }
 

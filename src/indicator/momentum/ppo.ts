@@ -6,7 +6,7 @@
  * Signal = EMA(PPO, signalPeriod)
  * Histogram = PPO - Signal
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type PpoResult = {
   ppo: number | undefined

@@ -3,7 +3,7 @@
  * %R = (HighestHigh - Close) / (HighestHigh - LowestLow) × (-100)
  * 范围 [-100, 0]，超买区 < -20，超卖区 > -80
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcHighest, calcLowest } from '../utils'
 
 const williamsR: IndicatorTemplate = {

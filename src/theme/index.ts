@@ -1,4 +1,4 @@
-import { DeepPartial, Styles } from 'klinecharts'
+import type { DeepPartial, Styles } from 'klinecharts'
 
 /**
  * 预设主题配置

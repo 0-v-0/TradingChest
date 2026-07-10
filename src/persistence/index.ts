@@ -1,4 +1,4 @@
-import { Styles, DeepPartial } from 'klinecharts'
+import type { Styles, DeepPartial } from 'klinecharts'
 
 /**
  * 图表布局持久化

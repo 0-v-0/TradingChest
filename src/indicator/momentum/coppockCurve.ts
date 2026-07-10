@@ -5,7 +5,7 @@
  * Coppock = WMA(ROC(close, roc1Period) + ROC(close, roc2Period), wmaPeriod)
  * 其中 ROC(x, n) = (x / x[n周期前] - 1) * 100
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type CoppockCurveResult = { coppock: number | undefined }
 

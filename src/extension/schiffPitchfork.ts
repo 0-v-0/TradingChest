@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { OverlayTemplate, LineAttrs } from 'klinecharts'
+import type { OverlayTemplate, LineAttrs } from 'klinecharts'
 import { getRayLine } from './utils'
 
 /**

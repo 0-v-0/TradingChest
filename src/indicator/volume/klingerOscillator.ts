@@ -12,7 +12,7 @@
  * 5. KVO = EMA(VF, 快线周期) - EMA(VF, 慢线周期)
  * 6. 信号线 = EMA(KVO, 信号周期)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KlingerOscillatorResult = { kvo: number | undefined; signal: number | undefined }
 

@@ -9,7 +9,7 @@
  *
  * 当最高价等于最低价时（无波动），资金流量乘数设为 0
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AdLineResult = { ad: number }
 

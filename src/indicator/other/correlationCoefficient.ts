@@ -4,7 +4,7 @@
  * x = close, y = volume（默认），衡量价格与成交量的相关性
  * 输出范围 [-1, 1]
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const correlationCoefficient: IndicatorTemplate = {
   name: 'CorrelationCoefficient',

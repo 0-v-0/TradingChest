@@ -2,7 +2,7 @@
  * SuperTrend - 超级趋势指标
  * 基于 ATR 波段的趋势方向判断指标
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type SuperTrendResult = { up: number | undefined; down: number | undefined }
 

@@ -10,7 +10,7 @@
  *   当 TRH == TRL 时，AD = 0（无价格波动）
  * TMF = Wilder_SMA(AD, period) / Wilder_SMA(volume, period)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type TwiggsMfResult = { tmf: number | undefined }
 

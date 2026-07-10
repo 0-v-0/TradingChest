@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { TradeRecord } from '../tradeVisualization'
-import { findClosestBar } from '../tradeVisualization'
+import { type TradeRecord, findClosestBar } from '../tradeVisualization'
 import tradeVisualization from '../tradeVisualization'
 
 // Helper: make KLineData-like objects with just the fields calc needs

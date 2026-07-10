@@ -4,7 +4,7 @@
  * 专为程序化创建设计（非用户绘图），totalStep 设为 0 表示无需用户交互
  */
 
-import { OverlayTemplate, OverlayFigure } from 'klinecharts'
+import type { OverlayTemplate, OverlayFigure } from 'klinecharts'
 
 const positionRange: OverlayTemplate = {
   name: 'positionRange',

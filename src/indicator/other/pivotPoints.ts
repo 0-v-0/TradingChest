@@ -27,7 +27,7 @@
  *     S2 = C - 1.1 * (H - L) / 6
  *     S3 = C - 1.1 * (H - L) / 4
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const pivotPoints: IndicatorTemplate = {
   name: 'PIVOTPOINTS',

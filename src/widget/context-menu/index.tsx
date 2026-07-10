@@ -1,4 +1,4 @@
-import { Component, Show, onCleanup, onMount } from 'solid-js'
+import { Show, onCleanup, onMount, type Component } from 'solid-js'
 
 export interface MenuItem {
   label: string

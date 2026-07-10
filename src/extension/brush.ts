@@ -5,7 +5,7 @@
  * 因此使用多点线段实现近似效果
  */
 
-import { OverlayTemplate } from 'klinecharts'
+import type { OverlayTemplate } from 'klinecharts'
 
 const brush: OverlayTemplate = {
   name: 'brush',

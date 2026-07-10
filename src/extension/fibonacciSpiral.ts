@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { OverlayTemplate, utils } from 'klinecharts'
+import { utils, type OverlayTemplate } from 'klinecharts'
 import { getDistance, getRotateCoordinate, getRayLine } from './utils'
 
 const fibonacciSpiral: OverlayTemplate = {

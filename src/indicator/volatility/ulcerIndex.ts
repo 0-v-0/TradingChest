@@ -3,7 +3,7 @@
  * 衡量价格从最高点回撤的深度和持续时间，反映下行风险
  * UI = sqrt(sum(pctDrawdown^2) / n)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type UlcerIndexResult = { ui: number | undefined }
 

@@ -19,7 +19,8 @@ import Input from './input'
 import List from './list'
 import Loading from './loading'
 import Modal from './modal'
-import Select, { SelectDataSourceItem } from './select'
+import Select from './select'
+import type { SelectDataSourceItem } from './select'
 import Switch from './switch'
 
 export { Button, Checkbox, ColorInput, List, Modal, Select, Input, Loading, Switch }

@@ -11,7 +11,7 @@
  * 5. 资金流量比率 = 正资金流量 / 负资金流量
  * 6. MFI = 100 - 100 / (1 + 资金流量比率)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type MfiResult = { mfi: number | undefined }
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { ParentComponent, ParentProps, JSX } from 'solid-js'
+import type { ParentComponent, ParentProps, JSX } from 'solid-js'
 
 export type ButtonType = 'confirm' | 'cancel'
 

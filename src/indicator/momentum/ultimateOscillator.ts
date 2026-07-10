@@ -8,7 +8,7 @@
  * 其中 avgN = sum(BP, N) / sum(TR, N)
  * 输出范围 0-100
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type UltimateOscillatorResult = { uo: number | undefined }
 

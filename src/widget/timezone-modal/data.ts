@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { SelectDataSourceItem } from '../../component'
+import type { SelectDataSourceItem } from '../../component'
 import t from '../../i18n'
 
 // oxfmt-ignore

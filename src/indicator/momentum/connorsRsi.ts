@@ -9,7 +9,7 @@
  *
  * 参数: rsiPeriod, streakRsiPeriod, rankPeriod
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcRMA } from '../utils'
 
 type ConnorsRsiResult = {

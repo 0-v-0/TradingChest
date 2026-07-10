@@ -12,9 +12,8 @@
  * limitations under the License.
  */
 
-import { Component, createSignal, createMemo } from 'solid-js'
-import type { SelectDataSourceItem } from '../../component'
-import { Modal, Select } from '../../component'
+import { createSignal, createMemo, type Component } from 'solid-js'
+import { Modal, Select, type SelectDataSourceItem } from '../../component'
 import t from '../../i18n'
 import { createTimezoneSelectOptions } from './data'
 

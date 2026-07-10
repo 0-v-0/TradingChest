@@ -3,7 +3,7 @@
  * VO = EMA(volume, fastPeriod) - EMA(volume, slowPeriod)
  * 正值表示短期成交量均值高于长期，成交量放大
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcEMA } from '../utils'
 
 const volumeOscillator: IndicatorTemplate = {

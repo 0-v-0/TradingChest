@@ -2,7 +2,7 @@
  * Ichimoku Cloud - 一目均衡图
  * 包含转换线、基准线、先行带A/B、迟行带五条线
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type IchimokuResult = {
   tenkanSen: number | undefined

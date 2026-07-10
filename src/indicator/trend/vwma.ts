@@ -3,7 +3,7 @@
  * VWMA = SMA(close * volume, n) / SMA(volume, n)
  * 在成交量较大的价格区域赋予更多权重
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const vwma: IndicatorTemplate = {
   name: 'VWMA',

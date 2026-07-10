@@ -1,4 +1,4 @@
-import { Component, For, Show } from 'solid-js'
+import { For, Show, type Component } from 'solid-js'
 import t from '../../i18n'
 
 export interface DataWindowRow {

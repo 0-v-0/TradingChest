@@ -8,7 +8,7 @@
  *
  * EMA 权重因子 k = 2 / (n + 1)，首个有效值使用 SMA 种子
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ForceIndexResult = { fi: number | undefined }
 

@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-import { Component, Show, createSignal, onMount, onCleanup } from 'solid-js'
+import { Show, createSignal, onMount, onCleanup, type Component } from 'solid-js'
 import t from '../../i18n'
-import { SymbolInfo, Period } from '../../types'
+import type { SymbolInfo, Period } from '../../types'
 
 export interface PeriodBarProps {
   locale: string

@@ -4,7 +4,7 @@
  * 以第一根K线的收盘价作为基准线，将收盘价走势与基准线对比显示。
  * 高于基准线的区域和低于基准线的区域可通过不同颜色区分多空态势。
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const baseline: IndicatorTemplate = {
   name: 'Baseline',

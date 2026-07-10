@@ -3,7 +3,7 @@
  * 对近期数据赋予更高权重：权重 = 1, 2, 3, ..., n
  * WMA = Σ(close_i * weight_i) / Σ(weight_i)
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 const wma: IndicatorTemplate = {
   name: 'WMA',

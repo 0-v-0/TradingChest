@@ -3,7 +3,7 @@
  * 衡量布林带上下轨之间的距离相对于中轨的百分比
  * BBW = (上轨 - 下轨) / 中轨 * 100
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type BollingerBandWidthResult = { bbw: number | undefined }
 

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { JSX, Component, mergeProps, Show, createSignal } from 'solid-js'
+import { mergeProps, Show, createSignal, type JSX, type Component } from 'solid-js'
 
 export interface InputProps {
   class?: string
