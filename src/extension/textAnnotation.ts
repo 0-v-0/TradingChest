@@ -59,12 +59,8 @@ const textAnnotation: OverlayTemplate = {
     // 右键或特殊操作才编辑，普通点击不处理
     return false
   },
-  onRightClick: ({ overlay }) => {
-    const input = window.prompt('编辑标注文字 / Edit text:', (overlay.extendData as string) || '')
-    if (input !== null && input.trim() !== '') {
-      overlay.extendData = input.trim()
-    }
-    return true // 阻止默认右键菜单
+  onRightClick: () => {
+    return false // Let ChartProComponent handle context menu
   },
 }
 

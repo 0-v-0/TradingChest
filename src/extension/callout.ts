@@ -72,12 +72,8 @@ const callout: OverlayTemplate = {
     }
     return true
   },
-  onRightClick: ({ overlay }) => {
-    const input = window.prompt('编辑标注文字 / Edit text:', (overlay.extendData as string) || '')
-    if (input !== null && input.trim() !== '') {
-      overlay.extendData = input.trim()
-    }
-    return true
+  onRightClick: () => {
+    return false // Let ChartProComponent handle context menu
   },
 }
 

@@ -60,8 +60,13 @@ import {
   IndicatorSettingModal,
   SymbolSearchModal,
   OverlayPropertyBar,
+  ContextMenu,
+  DataWindow,
   ReplayControlBar,
 } from './widget'
+import type { MenuItem } from './widget/context-menu'
+import type { DataWindowRow } from './widget/data-window'
+import t from './i18n'
 import { translateTimezone } from './widget/timezone-modal/data'
 
 export interface ChartProComponentProps extends Required<
@@ -189,6 +194,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [screenshotUrl, setScreenshotUrl] = createSignal('')
 
   const [drawingBarVisible, setDrawingBarVisible] = createSignal(props.drawingBarVisible)
+  const [drawingMode, setDrawingMode] = createSignal(false)
+  const [dataWindowVisible, setDataWindowVisible] = createSignal(false)
+  const [dataWindowData, setDataWindowData] = createSignal<DataWindowRow[]>([])
 
   const [symbolSearchModalVisible, setSymbolSearchModalVisible] = createSignal(false)
 
@@ -211,6 +219,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     lineWidth: number
     lineStyle: string
     locked: boolean
+  } | null>(null)
+
+  // 右键上下文菜单状态
+  const [contextMenu, setContextMenu] = createSignal<{
+    x: number
+    y: number
+    items: MenuItem[]
   } | null>(null)
 
   const notifyOverlay = (
@@ -291,6 +306,72 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (overlay) {
       notifyOverlay(source, overlay, 'update')
     }
+  }
+
+  const handleOverlayRightClick = (overlay: Overlay, x: number, y: number) => {
+    const textOverlays = ['textAnnotation', 'callout', 'note']
+    const items: MenuItem[] = []
+
+    if (textOverlays.includes(overlay.name ?? '')) {
+      items.push({
+        label: t('menu_edit', locale()),
+        onClick: () => {
+          const label =
+            overlay.name === 'note'
+              ? t('menu_edit', locale())
+              : t('menu_edit', locale())
+          const current =
+            typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
+              ? overlay.extendData
+              : overlay.name === 'note'
+                ? 'Note'
+                : 'Text'
+          const input = window.prompt(label, current)
+          if (input !== null && input.trim() !== '' && overlay.id) {
+            widget?.overrideOverlay({ id: overlay.id, extendData: input.trim() })
+          }
+        },
+      })
+    }
+
+    items.push(
+      {
+        label: t(overlay.lock ? 'menu_unlock' : 'menu_lock', locale()),
+        onClick: () => {
+          if (overlay.id) {
+            widget?.overrideOverlay({ id: overlay.id, lock: !overlay.lock })
+          }
+        },
+      },
+      {
+        label: t('menu_copy', locale()),
+        onClick: () => {
+          if (overlay.id) {
+            const o = widget?.getOverlayById(overlay.id)
+            if (o) {
+              widget?.createOverlay({
+                name: o.name,
+                points: o.points,
+                extendData: o.extendData,
+                lock: false,
+              })
+            }
+          }
+        },
+      },
+      {
+        label: t('menu_delete', locale()),
+        danger: true,
+        onClick: () => {
+          if (overlay.id) {
+            widget?.removeOverlay({ id: overlay.id })
+            setSelectedOverlay(null)
+          }
+        },
+      },
+    )
+
+    setContextMenu({ x, y, items })
   }
 
   // 回放状态
@@ -444,6 +525,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     }
     if (e.key === 'Escape') {
       setSelectedOverlay(null)
+      setDrawingMode(false)
     }
   }
 
@@ -593,6 +675,41 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     // 点击蜡烛区域时清除 overlay 选中状态
     widget?.subscribeAction(ActionType.OnCandleBarClick, () => {
       setSelectedOverlay(null)
+    })
+    // 十字光标变化时更新数据窗口
+    widget?.subscribeAction(ActionType.OnCrosshairChange, (data) => {
+      if (!data || !data.kLineData || !data.kLineData.data) {
+        setDataWindowData([])
+        return
+      }
+      const d = data.kLineData.data as Record<string, unknown>
+      const rows: DataWindowRow[] = []
+      const addRow = (label: string, val: unknown, color?: string) => {
+        rows.push({ label, value: val != null ? String(val) : '--', color })
+      }
+      addRow('O', d.open)
+      addRow('H', d.high)
+      addRow('L', d.low)
+      addRow('C', d.close)
+      if (d.volume != null) addRow('V', d.volume)
+      // Extract indicator values from panes
+      if (widget) {
+        const mainIndicators = widget.getIndicatorByPaneId('candle_pane')
+        if (mainIndicators) {
+          for (const ind of Object.values(mainIndicators)) {
+            const vals = (ind as Record<string, unknown>)?.data as Record<string, unknown>[] | undefined
+            if (vals && vals.length > 0) {
+              const last = vals[vals.length - 1]
+              for (const [k, v] of Object.entries(last)) {
+                if (k !== 'timestamp' && k !== 'dataIndex') {
+                  addRow(`${ind.name}.${k}`, v)
+                }
+              }
+            }
+          }
+        }
+      }
+      setDataWindowData(rows)
     })
   })
 
@@ -842,6 +959,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             startReplay()
           }
         }}
+        dataWindowActive={dataWindowVisible()}
+        onDataWindowClick={() => {
+          setDataWindowVisible((v) => !v)
+          setTimeout(() => widget?.resize(), 0)
+        }}
       />
       <div class="klinecharts-pro-content">
         <Show when={loadingVisible()}>
@@ -851,9 +973,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           <DrawingBar
             locale={props.locale}
             onDrawingItemClick={(overlay) => {
+              setDrawingMode(true)
               widget?.createOverlay({
                 ...overlay,
                 onDrawEnd: (event) => {
+                  setDrawingMode(false)
                   promptTextOverlay(event.overlay)
                   notifyOverlay('drawing-bar', event.overlay, 'create')
                   return true
@@ -871,8 +995,16 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
                   return true
                 },
                 onRemoved: (event) => {
+                  setDrawingMode(false)
                   notifyOverlay('drawing-bar', event.overlay, 'delete')
                   setSelectedOverlay(null)
+                  return true
+                },
+                onRightClick: (event) => {
+                  const rect = widgetRef?.getBoundingClientRect()
+                  const x = (event.x ?? 0) + (rect?.left ?? 0)
+                  const y = (event.y ?? 0) + (rect?.top ?? 0)
+                  handleOverlayRightClick(event.overlay, x, y)
                   return true
                 },
               })
@@ -896,7 +1028,15 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             widgetRef = el
           }}
           class="klinecharts-pro-widget"
+          classList={{ 'klinecharts-pro-drawing': drawingMode() }}
           data-drawing-bar-visible={drawingBarVisible()}
+          data-data-window-visible={dataWindowVisible()}
+        />
+        <DataWindow
+          locale={props.locale}
+          visible={dataWindowVisible()}
+          onToggle={() => setDataWindowVisible(false)}
+          data={dataWindowData()}
         />
         {/* 绘图 overlay 浮动属性工具栏 */}
         <OverlayPropertyBar
@@ -991,6 +1131,16 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           }}
         />
       </div>
+      <Show when={contextMenu()}>
+        {(cm) => (
+          <ContextMenu
+            x={cm().x}
+            y={cm().y}
+            items={cm().items}
+            onClose={() => setContextMenu(null)}
+          />
+        )}
+      </Show>
     </ErrorBoundary>
   )
 }

@@ -70,6 +70,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
   const [showFillPalette, setShowFillPalette] = createSignal(false)
   const [showWidthPicker, setShowWidthPicker] = createSignal(false)
   const [showStylePicker, setShowStylePicker] = createSignal(false)
+  const [deleting, setDeleting] = createSignal(false)
 
   const closeAllPopups = () => {
     setShowColorPalette(false)
@@ -299,8 +300,12 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
 
         {/* 删除 */}
         <div
-          class="klinecharts-pro-overlay-property-bar-item danger"
-          onClick={() => props.onDelete()}
+          class={`klinecharts-pro-overlay-property-bar-item danger${deleting() ? ' deleting' : ''}`}
+          onClick={() => {
+            if (deleting()) return
+            setDeleting(true)
+            setTimeout(() => props.onDelete(), 150)
+          }}
           title={t('delete_overlay', props.locale)}
         >
           <svg width="16" height="16" viewBox="0 0 16 16">

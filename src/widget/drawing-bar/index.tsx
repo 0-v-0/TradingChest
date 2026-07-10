@@ -13,7 +13,7 @@
  */
 
 import { OverlayCreate, OverlayMode } from 'klinecharts'
-import { Component, createMemo, createSignal } from 'solid-js'
+import { Component, createMemo, createSignal, Show } from 'solid-js'
 import { List } from '../../component'
 import {
   createSingleLineOptions,
@@ -28,6 +28,13 @@ import {
   createMagnetOptions,
   Icon,
 } from './icons'
+import {
+  getFavoriteTools,
+  addFavoriteTool,
+  removeFavoriteTool,
+  isFavoriteTool,
+} from '../../core/favorites'
+import t from '../../i18n'
 
 export interface DrawingBarProps {
   locale: string
@@ -59,6 +66,12 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
   const [visible, setVisible] = createSignal(true)
 
   const [popoverKey, setPopoverKey] = createSignal('')
+  const [favVersion, setFavVersion] = createSignal(0)
+
+  const favoriteTools = createMemo(() => {
+    favVersion()
+    return getFavoriteTools()
+  })
 
   const overlays = createMemo(() => {
     return [
@@ -118,6 +131,37 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
 
   return (
     <div class="klinecharts-pro-drawing-bar">
+      <Show when={favoriteTools().length > 0}>
+        <div class="favorites-group">
+          {favoriteTools().map((toolName) => (
+            <div
+              class="item"
+              title={toolName}
+              onContextMenu={(e) => {
+                e.preventDefault()
+                removeFavoriteTool(toolName)
+                setFavVersion((v) => v + 1)
+              }}
+            >
+              <span
+                style="width:32px;height:32px"
+                onClick={() => {
+                  props.onDrawingItemClick({
+                    groupId: GROUP_ID,
+                    name: toolName,
+                    visible: visible(),
+                    lock: lock(),
+                    mode: mode() as OverlayMode,
+                  })
+                }}
+              >
+                <Icon name={toolName} />
+              </span>
+            </div>
+          ))}
+        </div>
+        <span class="split-line" />
+      </Show>
       {overlays().map((item) => {
         const currentLabel = () => String(item.list.find((d) => d.key === item.icon)?.text ?? '')
         return (
@@ -127,6 +171,16 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
             tabIndex={0}
             onBlur={() => {
               setPopoverKey('')
+            }}
+            onContextMenu={(e) => {
+              e.preventDefault()
+              favVersion()
+              if (isFavoriteTool(item.icon)) {
+                removeFavoriteTool(item.icon)
+              } else {
+                addFavoriteTool(item.icon)
+              }
+              setFavVersion((v) => v + 1)
             }}
           >
             <span

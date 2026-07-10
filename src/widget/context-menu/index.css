@@ -1,0 +1,46 @@
+.klinecharts-pro-context-menu {
+  position: fixed;
+  z-index: 300;
+  min-width: 140px;
+  padding: 4px 0;
+  background-color: var(--klinecharts-pro-popover-background-color);
+  border: 1px solid var(--klinecharts-pro-border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.klinecharts-pro-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--klinecharts-pro-text-color);
+  transition: background-color 0.1s;
+
+  &:hover {
+    background-color: var(--klinecharts-pro-hover-background-color);
+  }
+
+  &.danger {
+    color: #ef5350;
+
+    &:hover {
+      background-color: rgba(239, 83, 80, 0.1);
+    }
+  }
+
+  &.disabled {
+    color: var(--klinecharts-pro-text-second-color);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.klinecharts-pro-context-menu-item-icon {
+  display: flex;
+  width: 16px;
+  align-items: center;
+  justify-content: center;
+}

@@ -70,10 +70,26 @@
 
   & .row {
     font-size: 13px;
+    display: flex;
+    align-items: center;
 
     &:hover .checkbox {
       fill: var(--klinecharts-pro-primary-color);
       color: var(--klinecharts-pro-primary-color);
     }
+  }
+}
+
+.klinecharts-pro-indicator-modal-star {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 2px 4px;
+  cursor: pointer;
+  color: var(--klinecharts-pro-text-second-color);
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--klinecharts-pro-primary-color);
   }
 }

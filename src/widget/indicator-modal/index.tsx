@@ -12,10 +12,16 @@
  * limitations under the License.
  */
 
-import { Component, createSignal, createMemo, For, Show, onMount } from 'solid-js'
-import { Modal, List, Checkbox } from '../../component'
+import { Component, createSignal, createMemo, For, Show } from 'solid-js'
+import { Modal, List, Checkbox, Input } from '../../component'
 import t from '../../i18n'
 import { indicatorCategories } from '../../indicator'
+import {
+  getFavoriteIndicators,
+  addFavoriteIndicator,
+  removeFavoriteIndicator,
+  isFavoriteIndicator,
+} from '../../core/favorites'
 
 type OnIndicatorChange = (params: { name: string; paneId: string; added: boolean }) => void
 
@@ -57,19 +63,28 @@ const SUB_INDICATORS = [
 ]
 
 // 分类 Tab 列表
-const CATEGORY_KEYS = ['all', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
+const CATEGORY_KEYS = ['all', 'favorites', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
 
 const IndicatorModal: Component<IndicatorModalProps> = (props) => {
   const [searchText, setSearchText] = createSignal('')
   const [activeCategory, setActiveCategory] = createSignal<string>('all')
-  let searchInputRef!: HTMLInputElement
+  const [favVersion, setFavVersion] = createSignal(0)
 
-  onMount(() => {
-    searchInputRef?.focus()
-  })
+  const searchIcon = (
+    <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="8.5" cy="8.5" r="5.5" />
+      <line x1="13" y1="13" x2="17" y2="17" />
+    </svg>
+  )
+  const clearIcon = (
+    <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+      <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm4.3 12.3a.5.5 0 01-.7.7L10 10.7l-3.6 3.3a.5.5 0 01-.7-.7L9.3 10 5.7 6.7a.5.5 0 01.7-.7L10 9.3l3.6-3.3a.5.5 0 01.7.7L10.7 10l3.6 3.3z" />
+    </svg>
+  )
 
   // 根据分类和搜索筛选指标
   const filteredMainIndicators = createMemo(() => {
+    favVersion() // depend on fav toggles
     const search = searchText().toLowerCase()
     const cat = activeCategory()
     return MAIN_INDICATORS.filter((name) => {
@@ -81,12 +96,14 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         return false
       }
       if (cat === 'all') return true
+      if (cat === 'favorites') return isFavoriteIndicator(name)
       const category = indicatorCategories[cat]
       return category?.names.includes(name) ?? false
     })
   })
 
   const filteredSubIndicators = createMemo(() => {
+    favVersion() // depend on fav toggles
     const search = searchText().toLowerCase()
     const cat = activeCategory()
     return SUB_INDICATORS.filter((name) => {
@@ -98,34 +115,67 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         return false
       }
       if (cat === 'all') return true
+      if (cat === 'favorites') return isFavoriteIndicator(name)
       const category = indicatorCategories[cat]
       return category?.names.includes(name) ?? false
     })
   })
 
   const getCategoryLabel = (key: string): string => {
-    if (key === 'all') {
-      return t('all_categories', props.locale)
-    }
+    if (key === 'all') return t('all_categories', props.locale)
+    if (key === 'favorites') return t('indicator_favorites', props.locale)
     const cat = indicatorCategories[key]
     return cat ? t(cat.labelKey, props.locale) : key
+  }
+
+  const toggleFavorite = (name: string, e: MouseEvent) => {
+    e.stopPropagation()
+    if (isFavoriteIndicator(name)) {
+      removeFavoriteIndicator(name)
+    } else {
+      addFavoriteIndicator(name)
+    }
+    setFavVersion((v) => v + 1)
+  }
+
+  const StarIcon = ({ name }: { name: string }) => {
+    favVersion()
+    const fav = isFavoriteIndicator(name)
+    return (
+      <span
+        class="klinecharts-pro-indicator-modal-star"
+        onClick={(e) => toggleFavorite(name, e)}
+      >
+        <svg viewBox="0 0 20 20" width="14" height="14" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+          <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.49L10 14.27 5.06 16.7 6 11.21l-4-3.9 5.53-.8z" />
+        </svg>
+      </span>
+    )
   }
 
   return (
     <Modal title={t('indicator', props.locale)} width={480} onClose={props.onClose}>
       {/* 搜索栏 */}
       <div class="klinecharts-pro-indicator-modal-search">
-        <div class="klinecharts-pro-input">
-          <input
-            ref={(el) => {
-              searchInputRef = el
-            }}
-            class="value"
-            placeholder={t('indicator_search', props.locale)}
-            value={searchText()}
-            onInput={(e) => setSearchText((e.target as HTMLInputElement).value)}
-          />
-        </div>
+        <Input
+          prefix={searchIcon}
+          suffix={
+            <Show when={searchText().length > 0}>
+              <span
+                style={{ cursor: 'pointer', display: 'flex' }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSearchText('')
+                }}
+              >
+                {clearIcon}
+              </span>
+            </Show>
+          }
+          placeholder={t('indicator_search', props.locale)}
+          value={searchText()}
+          onChange={(v) => setSearchText(v as string)}
+        />
       </div>
       {/* 分类 Tab */}
       <div class="klinecharts-pro-indicator-modal-tabs">
@@ -155,6 +205,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
                 }}
               >
                 <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name} />
+                <StarIcon name={name} />
               </li>
             )
           }}
@@ -177,6 +228,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
                 }}
               >
                 <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name} />
+                <StarIcon name={name} />
               </li>
             )
           }}

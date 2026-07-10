@@ -40,6 +40,16 @@
     color: #ef5350;
     fill: #ef5350;
   }
+
+  &.deleting {
+    animation: overlay-delete-flash 150ms ease-out;
+  }
+}
+
+@keyframes overlay-delete-flash {
+  0% { background-color: transparent; }
+  50% { background-color: rgba(239, 83, 80, 0.2); }
+  100% { background-color: transparent; }
 }
 
 .klinecharts-pro-overlay-property-bar-color-swatch {

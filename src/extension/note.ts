@@ -53,12 +53,8 @@ const note: OverlayTemplate = {
     }
     return true
   },
-  onRightClick: ({ overlay }) => {
-    const input = window.prompt('编辑便签内容 / Edit note:', (overlay.extendData as string) || '')
-    if (input !== null && input.trim() !== '') {
-      overlay.extendData = input.trim()
-    }
-    return true
+  onRightClick: () => {
+    return false // Let ChartProComponent handle context menu
   },
 }
 

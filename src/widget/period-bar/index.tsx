@@ -23,6 +23,7 @@ export interface PeriodBarProps {
   period: Period
   periods: Period[]
   replayActive?: boolean
+  dataWindowActive?: boolean
   onMenuClick: () => void
   onSymbolClick: () => void
   onPeriodChange: (period: Period) => void
@@ -31,6 +32,7 @@ export interface PeriodBarProps {
   onSettingClick: () => void
   onScreenshotClick: () => void
   onReplayClick?: () => void
+  onDataWindowClick?: () => void
 }
 
 const PeriodBar: Component<PeriodBarProps> = (props) => {
@@ -97,6 +99,15 @@ const PeriodBar: Component<PeriodBarProps> = (props) => {
           <path d="M15.692486288146974,15.050496970825195L15.692486288146974,12.676760970825196C15.692486288146974,12.297972970825196,15.399058288146973,11.982316970825195,15.046945288146972,11.982316970825195C14.694833288146972,11.982316970825195,14.401406288146973,12.297972970825196,14.401406288146973,12.676760970825196L14.401406288146973,15.340896970825195C14.401406288146973,15.530296970825194,14.471829288146973,15.694436970825196,14.589200288146973,15.833326970825196L15.751176288146972,17.095956970825195C15.868546288146973,17.222216970825194,16.032866288146973,17.297976970825196,16.208916288146973,17.297976970825196C16.384976288146973,17.297976970825196,16.537556288146973,17.222216970825194,16.666666288146974,17.095956970825195C16.78403628814697,16.969686970825194,16.854456288146974,16.792916970825196,16.854456288146974,16.603526970825193C16.854456288146974,16.414136970825197,16.78403628814697,16.237366970825196,16.666666288146974,16.111106970825197L15.692486288146974,15.050496970825195Z" />
         </svg>
         <span>{t('timezone', props.locale)}</span>
+      </div>
+      <div
+        class={`item tools ${props.dataWindowActive ? 'selected' : ''}`}
+        onClick={() => props.onDataWindowClick?.()}
+      >
+        <svg viewBox="0 0 20 20">
+          <path d="M2,0h16c1.1,0,2,0.9,2,2v16c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2V2C0,0.9,0.9,0,2,0z M2,1C1.4,1,1,1.4,1,2v16c0,0.6,0.4,1,1,1h16c0.6,0,1-0.4,1-1V2c0-0.6-0.4-1-1-1H2z M4,5h4v1H4V5z M4,8h4v1H4V8z M4,11h4v1H4V11z M4,14h4v1H4V14z M10,5h6v1h-6V5z M10,8h6v1h-6V8z M10,11h6v1h-6V11z M10,14h6v1h-6V14z" />
+        </svg>
+        <span>{t('data_window', props.locale)}</span>
       </div>
       <div class="item tools" onClick={props.onSettingClick}>
         <svg viewBox="0 0 20 20">

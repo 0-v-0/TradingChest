@@ -63,3 +63,11 @@
 .klinecharts-pro-widget[data-drawing-bar-visible=false] {
   width: 100%;
 }
+
+.klinecharts-pro-widget[data-data-window-visible=true] {
+  width: calc(var(--klinecharts-pro-widget-width) - 200px);
+}
+
+.klinecharts-pro-widget[data-drawing-bar-visible=false][data-data-window-visible=true] {
+  width: calc(100% - 200px);
+}

@@ -28,3 +28,7 @@
     --klinecharts-pro-text-secondary: #929aa5;
   }
 }
+
+.klinecharts-pro-drawing {
+  cursor: crosshair;
+}

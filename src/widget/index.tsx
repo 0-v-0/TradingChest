@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 
+import ContextMenu from './context-menu'
+import DataWindow from './data-window'
 import DrawingBar from './drawing-bar'
 import IndicatorModal from './indicator-modal'
 import IndicatorSettingModal from './indicator-setting-modal'
@@ -25,7 +27,7 @@ import TimezoneModal from './timezone-modal'
 
 // oxfmt-ignore
 export {
-  PeriodBar, DrawingBar, IndicatorModal,
+  ContextMenu, DataWindow, PeriodBar, DrawingBar, IndicatorModal,
   TimezoneModal, SettingModal, ScreenshotModal,
   IndicatorSettingModal, SymbolSearchModal,
   OverlayPropertyBar, ReplayControlBar
