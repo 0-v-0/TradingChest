@@ -15,6 +15,7 @@ export default defineConfig({
           if (chunkInfo.name === 'style.css') {
             return 'trading-chest.css'
           }
+          return '[name][extname]'
         },
         globals: {
           klinecharts: 'klinecharts'
