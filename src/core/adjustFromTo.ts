@@ -71,6 +71,8 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
       from = Date.UTC(fromDate.getUTCFullYear(), 0, 1)
       break
     }
+    default:
+      break
   }
   return [from, to]
 }

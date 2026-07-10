@@ -36,7 +36,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => 
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
 
   const getConfig: (name: string) => IndicatorSettingConfig[] = (name: string) => {
-    return (data as Record<string, IndicatorSettingConfig[]>)[name]
+    return (data as Record<string, IndicatorSettingConfig[]>)[name] ?? []
   }
 
   return (

@@ -67,11 +67,11 @@ const coppockCurve: IndicatorTemplate = {
         weighted += (rocSum[idx] as number) * (j + 1)
       }
 
-      if (!valid) {
-        result.push({ coppock: undefined })
-      } else {
-        result.push({ coppock: weighted / weightSum })
+      let coppock = undefined
+      if (valid) {
+        coppock = weighted / weightSum
       }
+      result.push({ coppock })
     }
 
     return result

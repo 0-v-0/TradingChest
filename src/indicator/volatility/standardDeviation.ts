@@ -17,28 +17,24 @@ const standardDeviation: IndicatorTemplate = {
     const result: StandardDeviationResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < period - 1) {
-        // 数据不足一个完整周期
-        result.push({ stddev: undefined })
-        continue
-      }
+      let stddev = undefined
+      if (i >= period - 1) {
+        // 计算窗口内收盘价的均值
+        let sum = 0
+        for (let j = i - period + 1; j <= i; j++) {
+          sum += dataList[j].close
+        }
+        const mean = sum / period
 
-      // 计算窗口内收盘价的均值
-      let sum = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        sum += dataList[j].close
+        // 计算总体方差（除以 n）
+        let varianceSum = 0
+        for (let j = i - period + 1; j <= i; j++) {
+          const diff = dataList[j].close - mean
+          varianceSum += diff * diff
+        }
+        stddev = Math.sqrt(varianceSum / period)
       }
-      const mean = sum / period
-
-      // 计算总体方差（除以 n）
-      let varianceSum = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        const diff = dataList[j].close - mean
-        varianceSum += diff * diff
-      }
-      const stddev = Math.sqrt(varianceSum / period)
-
-      result.push({ stddev: stddev })
+      result.push({ stddev })
     }
     return result
   },

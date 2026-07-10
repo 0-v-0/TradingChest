@@ -2,7 +2,7 @@
  * 交易可视化指标
  * calc 中将交易数据映射到每根 K 线，draw 中直接用数据索引绘制
  */
-import { IndicatorTemplate, KLineData } from 'klinecharts'
+import { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
 
 export interface TradeRecord {
   entryTs: number
@@ -87,7 +87,7 @@ const tradeVisualization: IndicatorTemplate = {
   shortName: 'Trades',
   calcParams: [],
   figures: [],
-  calc: (dataList: KLineData[], indicator) => {
+  calc: (dataList: KLineData[], indicator: Indicator<BarTradeInfo>) => {
     const ext = indicator.extendData as TradeVisExtendData | TradeRecord[] | undefined
     const trades = Array.isArray(ext) ? ext : ext?.trades
     const instanceId = (!Array.isArray(ext) && ext?._instanceId) || '_default'
@@ -155,7 +155,7 @@ const tradeVisualization: IndicatorTemplate = {
       return info
     })
   },
-  draw: ({ ctx, indicator, bounding, xAxis, yAxis, visibleRange }) => {
+  draw: ({ ctx, indicator, bounding, xAxis, yAxis, visibleRange }: { ctx: CanvasRenderingContext2D; indicator: Indicator<BarTradeInfo>; bounding: { width: number; height: number }; xAxis: { convertToPixel: (i: number) => number }; yAxis: { convertToPixel: (v: number) => number }; visibleRange: { from: number; to: number } }) => {
     const result = indicator.result as BarTradeInfo[]
     if (!result || result.length === 0) return false
 

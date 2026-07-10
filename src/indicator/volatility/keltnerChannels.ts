@@ -50,6 +50,10 @@ const keltnerChannels: IndicatorTemplate = {
         )
       }
 
+      let middle = undefined
+      let upper = undefined
+      let lower = undefined
+
       if (i < emaPeriod) {
         // 累积阶段：收集前 emaPeriod 个数据
         emaCumSum += kline.close
@@ -60,25 +64,20 @@ const keltnerChannels: IndicatorTemplate = {
           emaValue = emaCumSum / emaPeriod
           // 首个 ATR 值为 TR 的简单平均
           atrValue = atrCumSum / emaPeriod
-          result.push({
-            middle: emaValue,
-            upper: emaValue + atrMultiplier * atrValue,
-            lower: emaValue - atrMultiplier * atrValue,
-          })
-        } else {
-          result.push({ middle: undefined, upper: undefined, lower: undefined })
+          middle = emaValue
+          upper = emaValue + atrMultiplier * atrValue
+          lower = emaValue - atrMultiplier * atrValue
         }
       } else {
         // EMA 递推
         emaValue = kline.close * emaK + emaValue * (1 - emaK)
         // ATR Wilder 平滑
         atrValue = (atrValue * (emaPeriod - 1) + tr) / emaPeriod
-        result.push({
-          middle: emaValue,
-          upper: emaValue + atrMultiplier * atrValue,
-          lower: emaValue - atrMultiplier * atrValue,
-        })
+        middle = emaValue
+        upper = emaValue + atrMultiplier * atrValue
+        lower = emaValue - atrMultiplier * atrValue
       }
+      result.push({ middle, upper, lower })
     }
     return result
   },

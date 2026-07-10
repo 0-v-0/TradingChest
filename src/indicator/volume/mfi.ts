@@ -37,32 +37,25 @@ const mfi: IndicatorTemplate = {
     }
 
     for (let i = 0; i < dataList.length; i++) {
+      let mfi = undefined
       // 需要至少 period + 1 根 K 线（因为需要比较典型价格方向）
-      if (i < period) {
-        result.push({ mfi: undefined })
-        continue
-      }
+      if (i >= period) {
+        // 计算窗口内的正负资金流量
+        let positiveFlow = 0
+        let negativeFlow = 0
 
-      // 计算窗口内的正负资金流量
-      let positiveFlow = 0
-      let negativeFlow = 0
-
-      for (let j = i - period + 1; j <= i; j++) {
-        if (typicalPrices[j] > typicalPrices[j - 1]) {
-          positiveFlow += rawMoneyFlows[j]
-        } else if (typicalPrices[j] < typicalPrices[j - 1]) {
-          negativeFlow += rawMoneyFlows[j]
+        for (let j = i - period + 1; j <= i; j++) {
+          if (typicalPrices[j] > typicalPrices[j - 1]) {
+            positiveFlow += rawMoneyFlows[j]
+          } else if (typicalPrices[j] < typicalPrices[j - 1]) {
+            negativeFlow += rawMoneyFlows[j]
+          }
+          // 典型价格不变时不计入任何一方
         }
-        // 典型价格不变时不计入任何一方
-      }
 
-      if (negativeFlow === 0) {
-        // 无负资金流量，MFI 为 100
-        result.push({ mfi: 100 })
-      } else {
-        const moneyFlowRatio = positiveFlow / negativeFlow
-        result.push({ mfi: 100 - 100 / (1 + moneyFlowRatio) })
+        mfi = negativeFlow === 0 ? 100 : 100 - 100 / (1 + positiveFlow / negativeFlow)
       }
+      result.push({ mfi })
     }
     return result
   },

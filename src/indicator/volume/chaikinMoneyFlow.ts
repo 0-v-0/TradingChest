@@ -53,15 +53,12 @@ const chaikinMoneyFlow: IndicatorTemplate = {
         sumVol -= dataList[i - period].volume ?? 0
       }
 
-      if (i < period - 1) {
-        // 数据不足一个完整周期
-        result.push({ cmf: undefined })
-      } else if (sumVol === 0) {
-        // 窗口内总成交量为零
-        result.push({ cmf: 0 })
-      } else {
-        result.push({ cmf: sumMfv / sumVol })
+      let cmf = undefined
+      if (i >= period - 1) {
+        // 窗口内总成交量为零时 CMF 为 0，否则为比值
+        cmf = sumVol === 0 ? 0 : sumMfv / sumVol
       }
+      result.push({ cmf })
     }
     return result
   },

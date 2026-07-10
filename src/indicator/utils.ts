@@ -16,16 +16,15 @@ export function calcSMA(data: number[], period: number): (number | null)[] {
   let windowSum = 0
   for (let i = 0; i < data.length; i++) {
     windowSum += data[i]
-    if (i < period - 1) {
-      // 数据不足一个完整周期
-      result.push(null)
-    } else {
+    let val: number | null = null
+    if (i >= period - 1) {
       if (i >= period) {
         // 滑出窗口最旧的一个值
         windowSum -= data[i - period]
       }
-      result.push(windowSum / period)
+      val = windowSum / period
     }
+    result.push(val)
   }
   return result
 }
@@ -41,22 +40,21 @@ export function calcEMA(data: number[], period: number): (number | null)[] {
   let prevEma: number | null = null
 
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      // 数据不足，尚未产生第一个 EMA
-      result.push(null)
-    } else if (i === period - 1) {
+    let val: number | null = null
+    if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为 EMA 种子值
       let sum = 0
       for (let j = 0; j < period; j++) {
         sum += data[j]
       }
       prevEma = sum / period
-      result.push(prevEma)
-    } else {
+      val = prevEma
+    } else if (i >= period) {
       // EMA = 前值 + k * (当前值 - 前值)
       prevEma = data[i] * k + prevEma! * (1 - k)
-      result.push(prevEma)
+      val = prevEma
     }
+    result.push(val)
   }
   return result
 }
@@ -72,16 +70,16 @@ export function calcWMA(data: number[], period: number): (number | null)[] {
   const weightSum = (period * (period + 1)) / 2
 
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(null)
-    } else {
+    let val: number | null = null
+    if (i >= period - 1) {
       let weighted = 0
       for (let j = 0; j < period; j++) {
         // 窗口内第 j 个元素的权重为 j + 1（越新权重越大）
         weighted += data[i - period + 1 + j] * (j + 1)
       }
-      result.push(weighted / weightSum)
+      val = weighted / weightSum
     }
+    result.push(val)
   }
   return result
 }
@@ -94,16 +92,18 @@ export function calcWMA(data: number[], period: number): (number | null)[] {
 export function calcTR(high: number[], low: number[], close: number[]): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < high.length; i++) {
+    let val: number
     if (i === 0) {
       // 第一根 K 线没有前一根收盘价，直接用 high - low
-      result.push(high[i] - low[i])
+      val = high[i] - low[i]
     } else {
       const prevClose = close[i - 1]
       const hl = high[i] - low[i]
       const hc = Math.abs(high[i] - prevClose)
       const lc = Math.abs(low[i] - prevClose)
-      result.push(Math.max(hl, hc, lc))
+      val = Math.max(hl, hc, lc)
     }
+    result.push(val)
   }
   return result
 }
@@ -115,9 +115,8 @@ export function calcTR(high: number[], low: number[], close: number[]): (number 
 export function calcStdDev(data: number[], period: number): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(null)
-    } else {
+    let val: number | null = null
+    if (i >= period - 1) {
       // 先求区间均值
       let sum = 0
       for (let j = i - period + 1; j <= i; j++) {
@@ -130,8 +129,9 @@ export function calcStdDev(data: number[], period: number): (number | null)[] {
         const diff = data[j] - mean
         varianceSum += diff * diff
       }
-      result.push(Math.sqrt(varianceSum / period))
+      val = Math.sqrt(varianceSum / period)
     }
+    result.push(val)
   }
   return result
 }
@@ -143,17 +143,17 @@ export function calcStdDev(data: number[], period: number): (number | null)[] {
 export function calcHighest(data: number[], period: number): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(null)
-    } else {
+    let val: number | null = null
+    if (i >= period - 1) {
       let max = -Infinity
       for (let j = i - period + 1; j <= i; j++) {
         if (data[j] > max) {
           max = data[j]
         }
       }
-      result.push(max)
+      val = max
     }
+    result.push(val)
   }
   return result
 }
@@ -165,17 +165,17 @@ export function calcHighest(data: number[], period: number): (number | null)[] {
 export function calcLowest(data: number[], period: number): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(null)
-    } else {
+    let val: number | null = null
+    if (i >= period - 1) {
       let min = Infinity
       for (let j = i - period + 1; j <= i; j++) {
         if (data[j] < min) {
           min = data[j]
         }
       }
-      result.push(min)
+      val = min
     }
+    result.push(val)
   }
   return result
 }
@@ -191,21 +191,21 @@ export function calcRMA(data: number[], period: number): (number | null)[] {
   let prevRma: number | null = null
 
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(null)
-    } else if (i === period - 1) {
+    let val: number | null = null
+    if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为种子
       let sum = 0
       for (let j = 0; j < period; j++) {
         sum += data[j]
       }
       prevRma = sum / period
-      result.push(prevRma)
-    } else {
+      val = prevRma
+    } else if (i >= period) {
       // Wilder 递归公式
       prevRma = (prevRma! * (period - 1) + data[i]) / period
-      result.push(prevRma)
+      val = prevRma
     }
+    result.push(val)
   }
   return result
 }
@@ -220,14 +220,14 @@ export function calcSum(data: number[], period: number): (number | null)[] {
 
   for (let i = 0; i < data.length; i++) {
     windowSum += data[i]
-    if (i < period - 1) {
-      result.push(null)
-    } else {
+    let val: number | null = null
+    if (i >= period - 1) {
       if (i >= period) {
         windowSum -= data[i - period]
       }
-      result.push(windowSum)
+      val = windowSum
     }
+    result.push(val)
   }
   return result
 }
@@ -240,11 +240,7 @@ export function calcSum(data: number[], period: number): (number | null)[] {
 export function calcChange(data: number[]): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < data.length; i++) {
-    if (i === 0) {
-      result.push(null)
-    } else {
-      result.push(data[i] - data[i - 1])
-    }
+    result.push(i === 0 ? null : data[i] - data[i - 1])
   }
   return result
 }
@@ -257,12 +253,7 @@ export function calcChange(data: number[]): (number | null)[] {
 export function calcGain(data: number[]): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < data.length; i++) {
-    if (i === 0) {
-      result.push(null)
-    } else {
-      const diff = data[i] - data[i - 1]
-      result.push(diff > 0 ? diff : 0)
-    }
+    result.push(i === 0 ? null : Math.max(data[i] - data[i - 1], 0))
   }
   return result
 }
@@ -275,12 +266,7 @@ export function calcGain(data: number[]): (number | null)[] {
 export function calcLoss(data: number[]): (number | null)[] {
   const result: (number | null)[] = []
   for (let i = 0; i < data.length; i++) {
-    if (i === 0) {
-      result.push(null)
-    } else {
-      const diff = data[i] - data[i - 1]
-      result.push(diff < 0 ? Math.abs(diff) : 0)
-    }
+    result.push(i === 0 ? null : Math.max(-(data[i] - data[i - 1]), 0))
   }
   return result
 }

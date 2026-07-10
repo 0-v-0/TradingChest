@@ -18,32 +18,28 @@ const ulcerIndex: IndicatorTemplate = {
     const result: UlcerIndexResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < period - 1) {
-        // 数据不足一个完整周期
-        result.push({ ui: undefined })
-        continue
-      }
-
-      // 在回看窗口内找到最高收盘价
-      let highestClose = -Infinity
-      for (let j = i - period + 1; j <= i; j++) {
-        if (dataList[j].close > highestClose) {
-          highestClose = dataList[j].close
+      let ui = undefined
+      if (i >= period - 1) {
+        // 在回看窗口内找到最高收盘价
+        let highestClose = -Infinity
+        for (let j = i - period + 1; j <= i; j++) {
+          if (dataList[j].close > highestClose) {
+            highestClose = dataList[j].close
+          }
         }
+
+        // 计算百分比回撤的平方和
+        let sumSquared = 0
+        for (let j = i - period + 1; j <= i; j++) {
+          // 百分比回撤 = (close - highestClose) / highestClose * 100
+          const pctDrawdown = ((dataList[j].close - highestClose) / highestClose) * 100
+          sumSquared += pctDrawdown * pctDrawdown
+        }
+
+        // 溃疡指数 = sqrt(平均平方回撤)
+        ui = Math.sqrt(sumSquared / period)
       }
-
-      // 计算百分比回撤的平方和
-      let sumSquared = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        // 百分比回撤 = (close - highestClose) / highestClose * 100
-        const pctDrawdown = ((dataList[j].close - highestClose) / highestClose) * 100
-        sumSquared += pctDrawdown * pctDrawdown
-      }
-
-      // 溃疡指数 = sqrt(平均平方回撤)
-      const ui = Math.sqrt(sumSquared / period)
-
-      result.push({ ui: ui })
+      result.push({ ui })
     }
     return result
   },

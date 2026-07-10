@@ -22,20 +22,16 @@ const vroc: IndicatorTemplate = {
     const result: VrocResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < period) {
-        // 数据不足 n 期，无法计算变化率
-        result.push({ vroc: undefined })
-      } else {
+      let vroc = undefined
+      if (i >= period) {
         const prevVol = dataList[i - period].volume ?? 0
         const curVol = dataList[i].volume ?? 0
-
-        if (prevVol === 0) {
-          // n 期前成交量为零，除法无意义
-          result.push({ vroc: undefined })
-        } else {
-          result.push({ vroc: ((curVol - prevVol) / prevVol) * 100 })
+        // n 期前成交量为零时除法无意义
+        if (prevVol !== 0) {
+          vroc = ((curVol - prevVol) / prevVol) * 100
         }
       }
+      result.push({ vroc })
     }
     return result
   },

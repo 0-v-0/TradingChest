@@ -51,19 +51,14 @@ const chaikinVolatility: IndicatorTemplate = {
       // EMA 从 index = period - 1 开始有效
       // ROC 需要 period 前的 EMA 也有效，即 i - period >= period - 1
       // 即 i >= 2 * period - 1
-      if (i < 2 * period - 1) {
-        result.push({ cv: undefined })
-      } else {
+      let cv = undefined
+      if (i >= 2 * period - 1) {
         const currentEma = hlEma[i]
         const prevEma = hlEma[i - period]
         // 防止除零
-        if (prevEma === 0) {
-          result.push({ cv: 0 })
-        } else {
-          const cv = ((currentEma - prevEma) / prevEma) * 100
-          result.push({ cv: cv })
-        }
+        cv = prevEma === 0 ? 0 : ((currentEma - prevEma) / prevEma) * 100
       }
+      result.push({ cv })
     }
 
     return result

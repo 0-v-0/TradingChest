@@ -26,37 +26,36 @@ const kama: IndicatorTemplate = {
     let prevKama = 0
 
     for (let i = 0; i < dataList.length; i++) {
+      let kama = undefined
       if (i < period) {
         // 数据不足，KAMA 初始值取第 period 根 K 线的收盘价
         if (i === period - 1) {
           prevKama = dataList[i].close
-          result.push({ kama: prevKama })
-        } else {
-          result.push({ kama: undefined })
+          kama = prevKama
         }
-        continue
+      } else {
+        const close = dataList[i].close
+
+        // 方向：|close - close[period 之前]|
+        const direction = Math.abs(close - dataList[i - period].close)
+
+        // 波动：period 个周期内相邻收盘价绝对差之和
+        let volatility = 0
+        for (let j = i - period + 1; j <= i; j++) {
+          volatility += Math.abs(dataList[j].close - dataList[j - 1].close)
+        }
+
+        // 效率比率
+        const er = volatility !== 0 ? direction / volatility : 0
+
+        // 自适应平滑常数
+        const sc = Math.pow(er * (fastSc - slowSc) + slowSc, 2)
+
+        // KAMA = 前值 + sc * (close - 前值)
+        prevKama = prevKama + sc * (close - prevKama)
+        kama = prevKama
       }
-
-      const close = dataList[i].close
-
-      // 方向：|close - close[period 之前]|
-      const direction = Math.abs(close - dataList[i - period].close)
-
-      // 波动：period 个周期内相邻收盘价绝对差之和
-      let volatility = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        volatility += Math.abs(dataList[j].close - dataList[j - 1].close)
-      }
-
-      // 效率比率
-      const er = volatility !== 0 ? direction / volatility : 0
-
-      // 自适应平滑常数
-      const sc = Math.pow(er * (fastSc - slowSc) + slowSc, 2)
-
-      // KAMA = 前值 + sc * (close - 前值)
-      prevKama = prevKama + sc * (close - prevKama)
-      result.push({ kama: prevKama })
+      result.push({ kama })
     }
 
     return result

@@ -130,7 +130,7 @@ export interface ChartPro {
     filename?: string
   }): void
   /** 获取快捷键管理器 */
-  getShortcutManager(): KeyboardShortcutManager | null
+  getShortcutManager(): KeyboardShortcutManager
   /** 添加报警线 */
   addAlert(config: import('./alert/types').AlertConfig): void
   /** 更新报警配置（保留触发状态） */

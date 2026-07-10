@@ -35,11 +35,11 @@ export interface CheckboxProps {
 }
 
 const Checkbox: Component<CheckboxProps> = (props) => {
-  const [innerChecked, setInnderChecked] = createSignal(props.checked ?? false)
+  const [innerChecked, setInnerChecked] = createSignal(props.checked ?? false)
 
   createEffect(() => {
     if ('checked' in props) {
-      setInnderChecked(props.checked as boolean)
+      setInnerChecked(props.checked as boolean)
     }
   })
 
@@ -53,14 +53,14 @@ const Checkbox: Component<CheckboxProps> = (props) => {
       onClick={(_e) => {
         const ck = !innerChecked()
         void props.onChange?.(ck)
-        setInnderChecked(ck)
+        setInnerChecked(ck)
       }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           const ck = !innerChecked()
           void props.onChange?.(ck)
-          setInnderChecked(ck)
+          setInnerChecked(ck)
         }
       }}
     >

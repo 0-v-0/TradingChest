@@ -62,32 +62,23 @@ const twiggsMf: IndicatorTemplate = {
     let smoothVol = 0
 
     for (let i = 0; i < len; i++) {
+      let tmf = undefined
       if (i < period - 1) {
         // 累积阶段
         smoothAd += ad[i]
         smoothVol += vol[i]
-        result.push({ tmf: undefined })
       } else if (i === period - 1) {
         // 首个平滑值 = 累积和的 SMA
         smoothAd = (smoothAd + ad[i]) / period
         smoothVol = (smoothVol + vol[i]) / period
-
-        if (smoothVol === 0) {
-          result.push({ tmf: 0 })
-        } else {
-          result.push({ tmf: smoothAd / smoothVol })
-        }
+        tmf = smoothVol === 0 ? 0 : smoothAd / smoothVol
       } else {
         // Wilder 递归平滑
         smoothAd = (smoothAd * (period - 1) + ad[i]) / period
         smoothVol = (smoothVol * (period - 1) + vol[i]) / period
-
-        if (smoothVol === 0) {
-          result.push({ tmf: 0 })
-        } else {
-          result.push({ tmf: smoothAd / smoothVol })
-        }
+        tmf = smoothVol === 0 ? 0 : smoothAd / smoothVol
       }
+      result.push({ tmf })
     }
 
     return result

@@ -56,56 +56,55 @@ const superTrend: IndicatorTemplate = {
     let direction: number
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < period) {
-        result.push({ up: undefined, down: undefined })
-        continue
-      }
+      let up = undefined
+      let down = undefined
 
-      const kline = dataList[i]
-      const atrVal = atrValues[i]
-      const hl2 = (kline.high + kline.low) / 2
+      if (i >= period) {
+        const kline = dataList[i]
+        const atrVal = atrValues[i]
+        const hl2 = (kline.high + kline.low) / 2
 
-      // 基础上下轨
-      let upperBand = hl2 + multiplier * atrVal
-      let lowerBand = hl2 - multiplier * atrVal
+        // 基础上下轨
+        let upperBand = hl2 + multiplier * atrVal
+        let lowerBand = hl2 - multiplier * atrVal
 
-      // 与前值比较，确保波段不会反向收缩
-      if (i > period) {
-        if (lowerBand > prevLowerBand || dataList[i - 1].close < prevLowerBand) {
-          // 保持
-        } else {
-          lowerBand = prevLowerBand
+        // 与前值比较，确保波段不会反向收缩
+        if (i > period) {
+          if (lowerBand > prevLowerBand || dataList[i - 1].close < prevLowerBand) {
+            // 保持
+          } else {
+            lowerBand = prevLowerBand
+          }
+          if (upperBand < prevUpperBand || dataList[i - 1].close > prevUpperBand) {
+            // 保持
+          } else {
+            upperBand = prevUpperBand
+          }
         }
-        if (upperBand < prevUpperBand || dataList[i - 1].close > prevUpperBand) {
-          // 保持
+
+        // 判断趋势方向
+        if (i === period) {
+          direction = kline.close <= upperBand ? 1 : -1
         } else {
-          upperBand = prevUpperBand
+          if (prevSuperTrend === prevUpperBand) {
+            // 之前在下降趋势
+            direction = kline.close > upperBand ? 1 : -1
+          } else {
+            // 之前在上升趋势
+            direction = kline.close < lowerBand ? -1 : 1
+          }
         }
+
+        const superTrendVal = direction === 1 ? lowerBand : upperBand
+
+        up = direction === 1 ? superTrendVal : undefined
+        down = direction === -1 ? superTrendVal : undefined
+
+        prevUpperBand = upperBand
+        prevLowerBand = lowerBand
+        prevSuperTrend = superTrendVal
       }
-
-      // 判断趋势方向
-      if (i === period) {
-        direction = kline.close <= upperBand ? 1 : -1
-      } else {
-        if (prevSuperTrend === prevUpperBand) {
-          // 之前在下降趋势
-          direction = kline.close > upperBand ? 1 : -1
-        } else {
-          // 之前在上升趋势
-          direction = kline.close < lowerBand ? -1 : 1
-        }
-      }
-
-      const superTrendVal = direction === 1 ? lowerBand : upperBand
-
-      result.push({
-        up: direction === 1 ? superTrendVal : undefined,
-        down: direction === -1 ? superTrendVal : undefined,
-      })
-
-      prevUpperBand = upperBand
-      prevLowerBand = lowerBand
-      prevSuperTrend = superTrendVal
+      result.push({ up, down })
     }
 
     return result

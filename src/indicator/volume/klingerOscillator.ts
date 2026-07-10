@@ -101,18 +101,16 @@ const klingerOscillator: IndicatorTemplate = {
     const signalEma = calcEmaArray(validKvo, signalPeriod)
 
     for (let i = 0; i < dataList.length; i++) {
-      if (fastEma[i] === null || slowEma[i] === null) {
-        result.push({ kvo: undefined, signal: undefined })
-      } else {
-        const kvoVal = kvoValues[i]
+      let kvo = undefined
+      let signal = undefined
+      if (fastEma[i] !== null && slowEma[i] !== null) {
+        kvo = kvoValues[i]
         const signalIdx = i - slowStart
         const signalVal =
           signalIdx >= 0 && signalIdx < signalEma.length ? signalEma[signalIdx] : null
-        result.push({
-          kvo: kvoVal,
-          signal: signalVal ?? undefined,
-        })
+        signal = signalVal ?? undefined
       }
+      result.push({ kvo, signal })
     }
     return result
   },
@@ -129,20 +127,20 @@ function calcEmaArray(data: number[], period: number): (number | null)[] {
   let prevEma: number | null = null
 
   for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(null)
-    } else if (i === period - 1) {
+    let val: number | null = null
+    if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为 EMA 种子值
       let sum = 0
       for (let j = 0; j < period; j++) {
         sum += data[j]
       }
       prevEma = sum / period
-      result.push(prevEma)
-    } else {
+      val = prevEma
+    } else if (i >= period) {
       prevEma = data[i] * k + prevEma! * (1 - k)
-      result.push(prevEma)
+      val = prevEma
     }
+    result.push(val)
   }
   return result
 }

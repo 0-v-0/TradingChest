@@ -79,7 +79,9 @@ export function listLayouts(): Array<{ key: string; timestamp: number }> {
     const storageKey = localStorage.key(i)
     if (storageKey?.startsWith(STORAGE_KEY_PREFIX)) {
       try {
-        const data = JSON.parse(localStorage.getItem(storageKey)!) as ChartLayout
+        const raw = localStorage.getItem(storageKey)
+        if (!raw) continue
+        const data = JSON.parse(raw) as ChartLayout
         result.push({
           key: storageKey.replace(STORAGE_KEY_PREFIX, ''),
           timestamp: data.timestamp,

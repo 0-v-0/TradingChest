@@ -45,11 +45,11 @@ const dpo: IndicatorTemplate = {
     // DPO[i] = close[i] - SMA[i - shift]
     for (let i = 0; i < len; i++) {
       const smaIdx = i - shift
-      if (smaIdx < 0 || sma[smaIdx] === null) {
-        result.push({ dpo: undefined })
-      } else {
-        result.push({ dpo: dataList[i].close - (sma[smaIdx] as number) })
+      let dpo = undefined
+      if (smaIdx >= 0 && sma[smaIdx] !== null) {
+        dpo = dataList[i].close - (sma[smaIdx] as number)
       }
+      result.push({ dpo })
     }
 
     return result

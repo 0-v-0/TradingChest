@@ -14,7 +14,7 @@
 
 import { VoidComponent } from 'solid-js'
 
-const Loding: VoidComponent = () => {
+const Loading: VoidComponent = () => {
   return (
     <div class="klinecharts-pro-loading">
       <i class="circle1" />
@@ -24,4 +24,4 @@ const Loding: VoidComponent = () => {
   )
 }
 
-export default Loding
+export default Loading

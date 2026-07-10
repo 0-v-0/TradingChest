@@ -29,13 +29,8 @@ const zlema: IndicatorTemplate = {
       // 修正后的价格 = close + (close - close[lag])
       const adjusted = close + (close - lagClose)
 
-      if (i === 0) {
-        prevZlema = adjusted
-        result.push({ zlema: i >= period - 1 ? prevZlema : undefined })
-      } else {
-        prevZlema = adjusted * k + prevZlema * (1 - k)
-        result.push({ zlema: i >= period - 1 ? prevZlema : undefined })
-      }
+      prevZlema = i === 0 ? adjusted : adjusted * k + prevZlema * (1 - k)
+      result.push({ zlema: i >= period - 1 ? prevZlema : undefined })
     }
 
     return result

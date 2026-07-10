@@ -81,6 +81,31 @@ interface PrevSymbolPeriod {
   period: Period
 }
 
+function tooltipIcons(theme: string) {
+  const color = theme === 'dark' ? '#929AA5' : '#76808F'
+  const base = {
+    position: TooltipIconPosition.Middle,
+    marginTop: 7,
+    marginBottom: 0,
+    paddingLeft: 0,
+    paddingTop: 0,
+    paddingRight: 0,
+    paddingBottom: 0,
+    fontFamily: 'icomoon',
+    size: 14,
+    color,
+    activeColor: color,
+    backgroundColor: 'transparent',
+    activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
+  }
+  return [
+    { ...base, id: 'visible', marginLeft: 8, marginRight: 0, icon: '\ue903' },
+    { ...base, id: 'invisible', marginLeft: 8, marginRight: 0, icon: '\ue901' },
+    { ...base, id: 'setting', marginLeft: 6, marginRight: 0, icon: '\ue902' },
+    { ...base, id: 'close', marginLeft: 6, marginRight: 0, icon: '\ue900' },
+  ]
+}
+
 async function createIndicator(
   widget: Nullable<Chart>,
   indicatorName: string,
@@ -135,12 +160,11 @@ function snapshotOverlay(overlay: Overlay): OverlayLifecycleEvent['overlay'] {
 }
 
 const ChartProComponent: Component<ChartProComponentProps> = (props) => {
-  const widgetRef: HTMLDivElement | undefined = undefined
+  let widgetRef: HTMLDivElement | undefined
   let widget: Nullable<Chart> = null
 
   let priceUnitDom: HTMLElement
 
-  const [, setLoading] = createSignal(false)
   let fetchSeq = 0 // 单调递增的请求序号，用于丢弃过期响应
 
   const [theme, setTheme] = createSignal(props.theme)
@@ -511,7 +535,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     widget?.loadMore((timestamp) => {
       if (replayEngine) return // 回放模式下不从 datafeed 拉取数据
       const seq = ++fetchSeq // 复用 fetchSeq 防止 loadMore 与主加载/品种切换竞态
-      setLoading(true)
       const get = async () => {
         const p = period()
         const [to] = adjustFromTo(p, timestamp!, 1)
@@ -523,9 +546,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       void get()
         .catch((e) => {
           props.onError?.({ type: 'load-more', message: 'loadMore failed', raw: e })
-        })
-        .finally(() => {
-          if (seq === fetchSeq) setLoading(false)
         })
     })
     widget?.subscribeAction(ActionType.OnTooltipIconClick, (data) => {
@@ -611,7 +631,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       props.onDataReset?.()
     }
     const seq = ++fetchSeq // 捕获当前序号
-    setLoading(true)
     setLoadingVisible(true)
     const get = async () => {
       const [from, to] = adjustFromTo(p, new Date().getTime(), 500)
@@ -630,7 +649,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       })
       .finally(() => {
         if (seq === fetchSeq) {
-          setLoading(false)
           setLoadingVisible(false)
         }
       })
@@ -639,92 +657,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   createEffect(() => {
     const t = theme()
+    // Two calls are required: setStyles(string) applies a theme preset,
+    // setStyles(object) merges partial overrides. The API does not support
+    // combining both in a single call.
     widget?.setStyles(t)
-    const color = t === 'dark' ? '#929AA5' : '#76808F'
-    widget?.setStyles({
-      indicator: {
-        tooltip: {
-          icons: [
-            {
-              id: 'visible',
-              position: TooltipIconPosition.Middle,
-              marginLeft: 8,
-              marginTop: 7,
-              marginRight: 0,
-              marginBottom: 0,
-              paddingLeft: 0,
-              paddingTop: 0,
-              paddingRight: 0,
-              paddingBottom: 0,
-              icon: '\ue903',
-              fontFamily: 'icomoon',
-              size: 14,
-              color: color,
-              activeColor: color,
-              backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
-            },
-            {
-              id: 'invisible',
-              position: TooltipIconPosition.Middle,
-              marginLeft: 8,
-              marginTop: 7,
-              marginRight: 0,
-              marginBottom: 0,
-              paddingLeft: 0,
-              paddingTop: 0,
-              paddingRight: 0,
-              paddingBottom: 0,
-              icon: '\ue901',
-              fontFamily: 'icomoon',
-              size: 14,
-              color: color,
-              activeColor: color,
-              backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
-            },
-            {
-              id: 'setting',
-              position: TooltipIconPosition.Middle,
-              marginLeft: 6,
-              marginTop: 7,
-              marginBottom: 0,
-              marginRight: 0,
-              paddingLeft: 0,
-              paddingTop: 0,
-              paddingRight: 0,
-              paddingBottom: 0,
-              icon: '\ue902',
-              fontFamily: 'icomoon',
-              size: 14,
-              color: color,
-              activeColor: color,
-              backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
-            },
-            {
-              id: 'close',
-              position: TooltipIconPosition.Middle,
-              marginLeft: 6,
-              marginTop: 7,
-              marginRight: 0,
-              marginBottom: 0,
-              paddingLeft: 0,
-              paddingTop: 0,
-              paddingRight: 0,
-              paddingBottom: 0,
-              icon: '\ue900',
-              fontFamily: 'icomoon',
-              size: 14,
-              color: color,
-              activeColor: color,
-              backgroundColor: 'transparent',
-              activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
-            },
-          ],
-        },
-      },
-    })
+    widget?.setStyles({ indicator: { tooltip: { icons: tooltipIcons(t) } } })
   })
 
   createEffect(() => {
@@ -822,7 +759,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             const style = {}
             options.forEach((option) => {
               const key = option.key
-              deepSet(style, key, utils.formatValue(widgetDefaultStyles(), key))
+              deepSet(style, key, utils.formatValue(widgetDefaultStyles() ?? {}, key))
             })
             widget?.setStyles(style)
           }}
@@ -953,7 +890,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           />
         </Show>
         <div
-          ref={widgetRef}
+          ref={(el) => {
+            widgetRef = el
+          }}
           class="klinecharts-pro-widget"
           data-drawing-bar-visible={drawingBarVisible()}
         />

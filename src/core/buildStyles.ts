@@ -15,8 +15,7 @@ export interface OverlayStyleInput {
   lineStyle: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function buildStyles(s: OverlayStyleInput): any {
+export function buildStyles(s: OverlayStyleInput): Record<string, unknown> {
   const lineStyleKC = s.lineStyle === 'dashed' || s.lineStyle === 'dotted' ? 'dashed' : 'solid'
   const dashedValue = s.lineStyle === 'dashed' ? [6, 4] : s.lineStyle === 'dotted' ? [1, 3] : [0]
   const fc = s.fillColor ?? 'rgba(0,0,0,0)'

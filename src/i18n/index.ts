@@ -33,24 +33,24 @@ export async function load(locale: string) {
   if (loadedLanguages.has(locale)) {
     return
   }
-  let content: string
+  let content: { default: string }
   switch (locale) {
     case 'zh-CN':
-      content = (await import('./zh-CN.ini?raw')).default
+      content = await import('./zh-CN.ini?raw')
       break
     case 'en-US':
-      content = (await import('./en-US.ini?raw')).default
+      content = await import('./en-US.ini?raw')
       break
     case 'ja':
-      content = (await import('./ja.ini?raw')).default
+      content = await import('./ja.ini?raw')
       break
     case 'ko':
-      content = (await import('./ko.ini?raw')).default
+      content = await import('./ko.ini?raw')
       break
     default:
       return
   }
-  locales[locale] = parseIni(content)
+  locales[locale] = parseIni(content.default)
   loadedLanguages.add(locale)
 }
 

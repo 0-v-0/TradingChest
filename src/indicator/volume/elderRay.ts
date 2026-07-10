@@ -33,10 +33,11 @@ const elderRay: IndicatorTemplate = {
 
     for (let i = 0; i < dataList.length; i++) {
       const kline = dataList[i]
+      let bullPower = undefined
+      let bearPower = undefined
 
       if (i < period - 1) {
         // 数据不足，尚未产生第一个 EMA
-        result.push({ bullPower: undefined, bearPower: undefined })
       } else if (i === period - 1) {
         // 用前 period 个收盘价的 SMA 作为 EMA 种子
         let sum = 0
@@ -44,20 +45,15 @@ const elderRay: IndicatorTemplate = {
           sum += dataList[j].close
         }
         prevEma = sum / period
-
-        result.push({
-          bullPower: kline.high - prevEma,
-          bearPower: kline.low - prevEma,
-        })
+        bullPower = kline.high - prevEma
+        bearPower = kline.low - prevEma
       } else {
         // EMA 递归
         prevEma = kline.close * k + prevEma! * (1 - k)
-
-        result.push({
-          bullPower: kline.high - prevEma,
-          bearPower: kline.low - prevEma,
-        })
+        bullPower = kline.high - prevEma
+        bearPower = kline.low - prevEma
       }
+      result.push({ bullPower, bearPower })
     }
     return result
   },

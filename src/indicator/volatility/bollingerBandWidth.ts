@@ -46,12 +46,8 @@ const bollingerBandWidth: IndicatorTemplate = {
 
       // 布林带宽度 = (上轨 - 下轨) / 中轨 * 100
       // 防止中轨为零的极端情况
-      if (sma === 0) {
-        result.push({ bbw: 0 })
-      } else {
-        const bbw = ((upper - lower) / sma) * 100
-        result.push({ bbw: bbw })
-      }
+      const bbw = sma === 0 ? 0 : ((upper - lower) / sma) * 100
+      result.push({ bbw })
     }
     return result
   },

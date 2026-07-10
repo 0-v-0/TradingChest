@@ -146,7 +146,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         </Show>
         <For each={filteredMainIndicators()}>
           {(name) => {
-            const checked = () => props.mainIndicators.includes(name)
+            const checked = createMemo(() => props.mainIndicators.includes(name))
             return (
               <li
                 class="row"
@@ -164,7 +164,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         </Show>
         <For each={filteredSubIndicators()}>
           {(name) => {
-            const checked = () => name in props.subIndicators
+            const checked = createMemo(() => name in props.subIndicators)
             return (
               <li
                 class="row"

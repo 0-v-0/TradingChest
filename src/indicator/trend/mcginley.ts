@@ -22,19 +22,18 @@ const mcginley: IndicatorTemplate = {
     for (let i = 0; i < dataList.length; i++) {
       const close = dataList[i].close
 
+      let md = undefined
       if (i === 0) {
         // 初始值使用第一根 K 线的收盘价
         prevMd = close
-        result.push({ md: undefined })
-      } else if (i < period - 1) {
-        // 数据不足，继续迭代但不输出
-        prevMd = prevMd + (close - prevMd) / (period * Math.pow(close / prevMd, 4))
-        result.push({ md: undefined })
       } else {
         // MD = MD_prev + (close - MD_prev) / (N * (close / MD_prev)^4)
         prevMd = prevMd + (close - prevMd) / (period * Math.pow(close / prevMd, 4))
-        result.push({ md: prevMd })
+        if (i >= period - 1) {
+          md = prevMd
+        }
       }
+      result.push({ md })
     }
 
     return result

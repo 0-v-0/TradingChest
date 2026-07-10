@@ -36,46 +36,46 @@ const fisherTransform: IndicatorTemplate = {
     let prevFisher = 0 // 前一根的 Fisher 值（即当前 trigger）
 
     for (let i = 0; i < len; i++) {
-      if (i < period - 1) {
-        result.push({ fisher: undefined, trigger: undefined })
-        continue
+      let fisher = undefined
+      let trigger = undefined
+
+      if (i >= period - 1) {
+        // 查找窗口内的最高和最低中间价
+        let highest = -Infinity
+        let lowest = Infinity
+        for (let j = i - period + 1; j <= i; j++) {
+          if (midPrices[j] > highest) highest = midPrices[j]
+          if (midPrices[j] < lowest) lowest = midPrices[j]
+        }
+
+        // 归一化到 [-1, 1]
+        let norm: number
+        if (highest === lowest) {
+          norm = 0
+        } else {
+          norm = 2 * (midPrices[i] - lowest) / (highest - lowest) - 1
+        }
+
+        // 钳制到 (-0.999, 0.999) 防止 ln 溢出
+        norm = Math.max(-0.999, Math.min(0.999, norm))
+
+        // EMA 平滑归一化值（系数 0.5）
+        norm = 0.5 * norm + 0.5 * prevNorm
+
+        // 再次钳制（平滑后仍可能接近边界）
+        norm = Math.max(-0.999, Math.min(0.999, norm))
+
+        // Fisher 变换
+        fisher = 0.5 * Math.log((1 + norm) / (1 - norm))
+
+        // trigger 是前一根的 fisher 值
+        trigger = i === period - 1 ? undefined : prevFisher
+
+        prevNorm = norm
+        prevFisher = fisher
       }
-
-      // 查找窗口内的最高和最低中间价
-      let highest = -Infinity
-      let lowest = Infinity
-      for (let j = i - period + 1; j <= i; j++) {
-        if (midPrices[j] > highest) highest = midPrices[j]
-        if (midPrices[j] < lowest) lowest = midPrices[j]
-      }
-
-      // 归一化到 [-1, 1]
-      let norm: number
-      if (highest === lowest) {
-        norm = 0
-      } else {
-        norm = 2 * (midPrices[i] - lowest) / (highest - lowest) - 1
-      }
-
-      // 钳制到 (-0.999, 0.999) 防止 ln 溢出
-      norm = Math.max(-0.999, Math.min(0.999, norm))
-
-      // EMA 平滑归一化值（系数 0.5）
-      norm = 0.5 * norm + 0.5 * prevNorm
-
-      // 再次钳制（平滑后仍可能接近边界）
-      norm = Math.max(-0.999, Math.min(0.999, norm))
-
-      // Fisher 变换
-      const fisher = 0.5 * Math.log((1 + norm) / (1 - norm))
-
-      // trigger 是前一根的 fisher 值
-      const trigger = i === period - 1 ? undefined : prevFisher
 
       result.push({ fisher, trigger })
-
-      prevNorm = norm
-      prevFisher = fisher
     }
 
     return result

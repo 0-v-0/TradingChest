@@ -7,11 +7,11 @@ beforeEach(async () => {
 })
 
 describe('translate', () => {
-  it('returns the correct English translation for a known key', async () => {
+  it('returns the correct English translation for a known key', () => {
     expect(translate('indicator', 'en-US')).toBe('Indicator')
   })
 
-  it('returns the correct Chinese translation for a known key', async () => {
+  it('returns the correct Chinese translation for a known key', () => {
     // zh-CN locale must exist and have a value for 'indicator'
     const result = translate('indicator', 'zh-CN')
     // The result must be a non-empty string and not the raw key
@@ -19,24 +19,24 @@ describe('translate', () => {
     expect(result.length).toBeGreaterThan(0)
   })
 
-  it('returns the key itself when the key is missing from the locale', async () => {
+  it('returns the key itself when the key is missing from the locale', () => {
     expect(translate('__nonexistent_key__', 'en-US')).toBe('__nonexistent_key__')
   })
 
-  it('returns the key itself when the locale does not exist', async () => {
+  it('returns the key itself when the locale does not exist', () => {
     expect(translate('indicator', 'fr-FR')).toBe('indicator')
   })
 
-  it('returns the key itself for both unknown locale and unknown key', async () => {
+  it('returns the key itself for both unknown locale and unknown key', () => {
     expect(translate('__unknown__', 'xx-XX')).toBe('__unknown__')
   })
 
-  it('returns correct translation for multi-word keys', async () => {
+  it('returns correct translation for multi-word keys', () => {
     expect(translate('main_indicator', 'en-US')).toBe('Main Indicator')
     expect(translate('sub_indicator', 'en-US')).toBe('Sub Indicator')
   })
 
-  it('returns correct translation for timezone keys', async () => {
+  it('returns correct translation for timezone keys', () => {
     expect(translate('shanghai', 'en-US')).toBe('(UTC+8) Shanghai')
     expect(translate('tokyo', 'en-US')).toBe('(UTC+9) Tokyo')
   })

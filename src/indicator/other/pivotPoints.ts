@@ -40,35 +40,31 @@ const pivotPoints: IndicatorTemplate = {
     const result: PivotPointsResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i === 0) {
-        // 第一根 K 线无前一根数据，无法计算
-        result.push({
-          pivot: undefined,
-          r1: undefined,
-          r2: undefined,
-          r3: undefined,
-          s1: undefined,
-          s2: undefined,
-          s3: undefined,
-        })
-        continue
+      let pivot = undefined
+      let r1 = undefined
+      let r2 = undefined
+      let r3 = undefined
+      let s1 = undefined
+      let s2 = undefined
+      let s3 = undefined
+
+      if (i > 0) {
+        // 使用前一根 K 线的 H / L / C
+        const prev = dataList[i - 1]
+        const h = prev.high
+        const l = prev.low
+        const c = prev.close
+
+        pivot = (h + l + c) / 3
+        r1 = 2 * pivot - l
+        s1 = 2 * pivot - h
+        r2 = pivot + (h - l)
+        s2 = pivot - (h - l)
+        r3 = h + 2 * (pivot - l)
+        s3 = l - 2 * (h - pivot)
       }
 
-      // 使用前一根 K 线的 H / L / C
-      const prev = dataList[i - 1]
-      const h = prev.high
-      const l = prev.low
-      const c = prev.close
-
-      const p = (h + l + c) / 3
-      const r1 = 2 * p - l
-      const s1 = 2 * p - h
-      const r2 = p + (h - l)
-      const s2 = p - (h - l)
-      const r3 = h + 2 * (p - l)
-      const s3 = l - 2 * (h - p)
-
-      result.push({ pivot: p, r1, r2, r3, s1, s2, s3 })
+      result.push({ pivot, r1, r2, r3, s1, s2, s3 })
     }
 
     return result

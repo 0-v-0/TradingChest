@@ -1,10 +1,13 @@
-/// <reference types="vite/client" />
-
 import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig({
   plugins: [solidPlugin()],
+  server: {
+    fs: {
+      strict: false
+    }
+  },
   build: {
     cssTarget: 'chrome61',
     sourcemap: false,
@@ -33,6 +36,16 @@ export default defineConfig({
           return 'trading-chest.umd.js'
         }
       }
+    }
+  },
+  test: {
+    // Default to 'node' for pure-logic tests.
+    // Use `// @vitest-environment jsdom` per-file for component tests.
+    environment: 'node',
+    include: ['src/**/__tests__/**/*.test.ts'],
+    coverage: {
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/__tests__/**', 'src/index.ts', 'src/**/*.d.ts']
     }
   }
 })

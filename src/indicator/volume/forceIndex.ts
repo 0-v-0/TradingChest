@@ -43,22 +43,21 @@ const forceIndex: IndicatorTemplate = {
     let prevEma: number | null = null
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < period - 1) {
-        // 数据不足一个完整周期
-        result.push({ fi: undefined })
-      } else if (i === period - 1) {
+      let fi = undefined
+      if (i === period - 1) {
         // 用前 period 个原始力度的 SMA 作为 EMA 种子
         let sum = 0
         for (let j = 0; j < period; j++) {
           sum += rawForce[j]
         }
         prevEma = sum / period
-        result.push({ fi: prevEma })
-      } else {
+        fi = prevEma
+      } else if (i >= period) {
         // EMA 递归
         prevEma = rawForce[i] * k + prevEma! * (1 - k)
-        result.push({ fi: prevEma })
+        fi = prevEma
       }
+      result.push({ fi })
     }
     return result
   },

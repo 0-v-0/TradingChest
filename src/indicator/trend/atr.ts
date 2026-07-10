@@ -32,20 +32,20 @@ const atr: IndicatorTemplate = {
         )
       }
 
+      let atr = undefined
       if (i < period) {
         // 累积阶段：收集前 period 个 TR 用于首次平均
         prevAtr += tr
         if (i === period - 1) {
           prevAtr = prevAtr / period
-          result.push({ atr: prevAtr })
-        } else {
-          result.push({ atr: undefined })
+          atr = prevAtr
         }
       } else {
         // Wilder 平滑：RMA = (prevATR * (period - 1) + TR) / period
         prevAtr = (prevAtr * (period - 1) + tr) / period
-        result.push({ atr: prevAtr })
+        atr = prevAtr
       }
+      result.push({ atr })
     }
     return result
   },

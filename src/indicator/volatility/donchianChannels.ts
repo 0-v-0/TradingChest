@@ -25,30 +25,28 @@ const donchianChannels: IndicatorTemplate = {
     const result: DonchianChannelsResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < period - 1) {
-        // 数据不足，无法计算完整周期
-        result.push({ upper: undefined, lower: undefined, middle: undefined })
-        continue
-      }
+      let upper = undefined
+      let lower = undefined
+      let middle = undefined
 
-      // 在回看窗口内查找最高价和最低价
-      let highestHigh = -Infinity
-      let lowestLow = Infinity
-      for (let j = i - period + 1; j <= i; j++) {
-        if (dataList[j].high > highestHigh) {
-          highestHigh = dataList[j].high
+      if (i >= period - 1) {
+        // 在回看窗口内查找最高价和最低价
+        let highestHigh = -Infinity
+        let lowestLow = Infinity
+        for (let j = i - period + 1; j <= i; j++) {
+          if (dataList[j].high > highestHigh) {
+            highestHigh = dataList[j].high
+          }
+          if (dataList[j].low < lowestLow) {
+            lowestLow = dataList[j].low
+          }
         }
-        if (dataList[j].low < lowestLow) {
-          lowestLow = dataList[j].low
-        }
-      }
 
-      const middle = (highestHigh + lowestLow) / 2
-      result.push({
-        upper: highestHigh,
-        lower: lowestLow,
-        middle: middle,
-      })
+        upper = highestHigh
+        lower = lowestLow
+        middle = (highestHigh + lowestLow) / 2
+      }
+      result.push({ upper, lower, middle })
     }
     return result
   },

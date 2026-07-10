@@ -97,15 +97,15 @@ const massIndex: IndicatorTemplate = {
     const miStartIdx = ratioStartIdx + sumPeriod - 1
 
     for (let i = 0; i < dataList.length; i++) {
-      if (i < miStartIdx) {
-        result.push({ mi: undefined })
-      } else {
+      let mi = undefined
+      if (i >= miStartIdx) {
         let sum = 0
         for (let j = i - sumPeriod + 1; j <= i; j++) {
           sum += ratios[j]
         }
-        result.push({ mi: sum })
+        mi = sum
       }
+      result.push({ mi })
     }
 
     return result

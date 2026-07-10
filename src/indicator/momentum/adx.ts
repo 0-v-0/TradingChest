@@ -74,6 +74,10 @@ const adx: IndicatorTemplate = {
     let adxCount = 0
 
     for (let i = 0; i < len; i++) {
+      let adx = undefined
+      let plusDi = undefined
+      let minusDi = undefined
+
       if (i < period) {
         // 累积阶段
         smoothPlusDm += plusDmRaw[i]
@@ -86,18 +90,14 @@ const adx: IndicatorTemplate = {
           smoothMinusDm /= period
           smoothTr /= period
 
-          const plusDi = smoothTr !== 0 ? (100 * smoothPlusDm) / smoothTr : 0
-          const minusDi = smoothTr !== 0 ? (100 * smoothMinusDm) / smoothTr : 0
+          plusDi = smoothTr !== 0 ? (100 * smoothPlusDm) / smoothTr : 0
+          minusDi = smoothTr !== 0 ? (100 * smoothMinusDm) / smoothTr : 0
           const diSum = plusDi + minusDi
           const dx = diSum !== 0 ? (100 * Math.abs(plusDi - minusDi)) / diSum : 0
 
           // 开始累积 DX 用于计算 ADX
           adxSmooth += dx
           adxCount = 1
-
-          result.push({ adx: undefined, plusDi, minusDi })
-        } else {
-          result.push({ adx: undefined, plusDi: undefined, minusDi: undefined })
         }
       } else {
         // Wilder 递归平滑
@@ -105,8 +105,8 @@ const adx: IndicatorTemplate = {
         smoothMinusDm = (smoothMinusDm * (period - 1) + minusDmRaw[i]) / period
         smoothTr = (smoothTr * (period - 1) + trRaw[i]) / period
 
-        const plusDi = smoothTr !== 0 ? (100 * smoothPlusDm) / smoothTr : 0
-        const minusDi = smoothTr !== 0 ? (100 * smoothMinusDm) / smoothTr : 0
+        plusDi = smoothTr !== 0 ? (100 * smoothPlusDm) / smoothTr : 0
+        minusDi = smoothTr !== 0 ? (100 * smoothMinusDm) / smoothTr : 0
         const diSum = plusDi + minusDi
         const dx = diSum !== 0 ? (100 * Math.abs(plusDi - minusDi)) / diSum : 0
 
@@ -114,17 +114,17 @@ const adx: IndicatorTemplate = {
         if (adxCount < period) {
           // 累积 DX 值
           adxSmooth += dx
-          result.push({ adx: undefined, plusDi, minusDi })
         } else if (adxCount === period) {
           // 首个 ADX = DX 累积期的 SMA
           adxSmooth = (adxSmooth + dx) / period
-          result.push({ adx: adxSmooth, plusDi, minusDi })
+          adx = adxSmooth
         } else {
           // ADX 的 Wilder 平滑
           adxSmooth = (adxSmooth * (period - 1) + dx) / period
-          result.push({ adx: adxSmooth, plusDi, minusDi })
+          adx = adxSmooth
         }
       }
+      result.push({ adx, plusDi, minusDi })
     }
 
     return result

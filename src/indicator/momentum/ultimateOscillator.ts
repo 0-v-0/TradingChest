@@ -50,33 +50,27 @@ const ultimateOscillator: IndicatorTemplate = {
     }
 
     for (let i = 0; i < len; i++) {
+      let uo = undefined
       // 需要至少 maxPeriod 个有效数据点（从索引 1 开始）
-      if (i < maxPeriod) {
-        result.push({ uo: undefined })
-        continue
+      if (i >= maxPeriod) {
+        // 区间 [i - periodN + 1, i] 的和
+        const bpSum1 = bpCum[i + 1] - bpCum[i - period1 + 1]
+        const trSum1 = trCum[i + 1] - trCum[i - period1 + 1]
+        const bpSum2 = bpCum[i + 1] - bpCum[i - period2 + 1]
+        const trSum2 = trCum[i + 1] - trCum[i - period2 + 1]
+        const bpSum3 = bpCum[i + 1] - bpCum[i - period3 + 1]
+        const trSum3 = trCum[i + 1] - trCum[i - period3 + 1]
+
+        // 防除零
+        if (trSum1 !== 0 && trSum2 !== 0 && trSum3 !== 0) {
+          const avg1 = bpSum1 / trSum1
+          const avg2 = bpSum2 / trSum2
+          const avg3 = bpSum3 / trSum3
+
+          // 加权平均：短周期权重 4，中周期权重 2，长周期权重 1
+          uo = 100 * (4 * avg1 + 2 * avg2 + avg3) / 7
+        }
       }
-
-      // 区间 [i - periodN + 1, i] 的和
-      const bpSum1 = bpCum[i + 1] - bpCum[i - period1 + 1]
-      const trSum1 = trCum[i + 1] - trCum[i - period1 + 1]
-      const bpSum2 = bpCum[i + 1] - bpCum[i - period2 + 1]
-      const trSum2 = trCum[i + 1] - trCum[i - period2 + 1]
-      const bpSum3 = bpCum[i + 1] - bpCum[i - period3 + 1]
-      const trSum3 = trCum[i + 1] - trCum[i - period3 + 1]
-
-      // 防除零
-      if (trSum1 === 0 || trSum2 === 0 || trSum3 === 0) {
-        result.push({ uo: undefined })
-        continue
-      }
-
-      const avg1 = bpSum1 / trSum1
-      const avg2 = bpSum2 / trSum2
-      const avg3 = bpSum3 / trSum3
-
-      // 加权平均：短周期权重 4，中周期权重 2，长周期权重 1
-      const uo = 100 * (4 * avg1 + 2 * avg2 + avg3) / 7
-
       result.push({ uo })
     }
 

@@ -37,8 +37,8 @@ export const LiveSharpeChart: Component<LiveSharpeChartProps> = (props) => {
   const usableWidth = WIDTH - PAD_X * 2
   const usableHeight = height - PAD_Y * 2
   const values = props.series.map((point) => point.ratio ?? point.live_sharpe).filter(finite)
-  const minValue = Math.min(threshold, ...values, 0)
-  const maxValue = Math.max(threshold, ...values, 1)
+  const minValue = values.reduce((min, v) => Math.min(min, v), Math.min(threshold, 0))
+  const maxValue = values.reduce((max, v) => Math.max(max, v), Math.max(threshold, 1))
   const range = Math.max(maxValue - minValue, 0.01)
   const yFor = (value: number) => PAD_Y + ((maxValue - value) / range) * usableHeight
   const xFor = (index: number) => {
