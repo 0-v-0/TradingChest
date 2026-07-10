@@ -29,6 +29,11 @@ const Modal: ParentComponent<ModalProps> = (props) => {
       role="dialog"
       aria-modal="true"
       aria-label={typeof props.title === 'string' ? props.title : undefined}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          props.onClose?.()
+        }
+      }}
     >
       <div style={{ width: `${props.width ?? 400}px` }} class="inner">
         <div class="title-container">
