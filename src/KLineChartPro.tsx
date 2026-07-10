@@ -18,7 +18,6 @@ import {
   DeepPartial,
   Styles,
   registerIndicator,
-  YAxisType,
   IndicatorCreate,
   KLineData,
 } from 'klinecharts'
@@ -219,11 +218,7 @@ export default class KLineChartPro implements ChartPro {
         chart.setStyles({ grid: { show: !show } })
       },
       'toggle:logScale': () => {
-        const chart = this.getChart()
-        if (!chart) return
-        const s = chart.getStyles()
-        const yAxisType = s.yAxis?.type === YAxisType.Log ? YAxisType.Normal : YAxisType.Log
-        chart.setStyles({ yAxis: { type: yAxisType } })
+        // v10 removed yAxis.type from styles; log scale toggle is no longer available via setStyles
       },
     })
     this._shortcutManager.bindTo(this._container!)
@@ -353,9 +348,8 @@ export default class KLineChartPro implements ChartPro {
       {
         name: 'TradeVis',
         extendData: { trades, _instanceId: this._instanceId },
-      } as IndicatorCreate<Record<string, unknown>>,
-      true,
-      paneOptions ?? { id: 'candle_pane' },
+      } as unknown as IndicatorCreate,
+      { isStack: true, pane: paneOptions ?? { id: 'candle_pane' } },
     )
   }
 
@@ -411,7 +405,7 @@ export default class KLineChartPro implements ChartPro {
   private _clearComparisons(): void {
     for (const [, indicatorName] of this._comparisons) {
       try {
-        this.getChart()?.removeIndicator('candle_pane', indicatorName)
+        this.getChart()?.removeIndicator({ paneId: 'candle_pane', name: indicatorName })
       } catch {
         /* already disposing */
       }
@@ -483,7 +477,7 @@ export default class KLineChartPro implements ChartPro {
       },
     })
 
-    chart.createIndicator(indicatorName, true, { id: 'candle_pane' })
+    chart.createIndicator(indicatorName, { isStack: true, pane: { id: 'candle_pane' } })
     this._comparisons.set(symbol.ticker, indicatorName)
   }
 
@@ -491,7 +485,7 @@ export default class KLineChartPro implements ChartPro {
     this._assertNotDisposed()
     const indicatorName = this._comparisons.get(ticker)
     if (indicatorName) {
-      this.getChart()?.removeIndicator('candle_pane', indicatorName)
+      this.getChart()?.removeIndicator({ paneId: 'candle_pane', name: indicatorName })
       this._comparisons.delete(ticker)
     }
   }

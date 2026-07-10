@@ -25,7 +25,8 @@ const priceRange: OverlayTemplate = {
   needDefaultPointFigure: true,
   needDefaultXAxisFigure: true,
   needDefaultYAxisFigure: true,
-  createPointFigures: ({ coordinates, overlay, precision }) => {
+  createPointFigures: ({ coordinates, overlay, chart }) => {
+    const precision = chart.getSymbol()?.pricePrecision ?? 2
     if (coordinates.length > 1) {
       const points = overlay.points
       const price1 = points[0].value!
@@ -45,7 +46,7 @@ const priceRange: OverlayTemplate = {
 
       // 格式化显示文本
       const sign = priceDiff >= 0 ? '+' : ''
-      const displayText = `${sign}${priceDiff.toFixed(precision.price)}  (${sign}${percentChange.toFixed(2)}%)  ${bars} 根`
+      const displayText = `${sign}${priceDiff.toFixed(precision)}  (${sign}${percentChange.toFixed(2)}%)  ${bars} 根`
 
       // 文本位置：矩形中间
       const textX = (coordinates[0].x + coordinates[1].x) / 2

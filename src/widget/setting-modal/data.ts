@@ -86,16 +86,6 @@ export function getOptions(locale: string): SettingGroup[] {
       label: t('group_axis', locale),
       options: [
         {
-          key: 'yAxis.type',
-          text: t('price_axis_type', locale),
-          component: 'select',
-          dataSource: [
-            { key: 'normal', text: t('normal', locale) },
-            { key: 'percentage', text: t('percentage', locale) },
-            { key: 'log', text: t('log', locale) },
-          ],
-        },
-        {
           key: 'yAxis.reverse',
           text: t('reverse_coordinate', locale),
           component: 'switch',

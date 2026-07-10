@@ -26,7 +26,6 @@
   ],
   "author": "EvoTrader",
   "license": "Apache-2.0",
-  "private": false,
   "scripts": {
     "build-core": "tsc && vite build",
     "build-dts": "dts-bundle-generator --no-banner true --umd-module-name klinechartspro --external-imports solid-js klinecharts -o dist/index.d.ts src/index.ts",
@@ -62,6 +61,6 @@
     "solid-js": "^1.9.14"
   },
   "peerDependencies": {
-    "klinecharts": ">=9.0.0"
+    "klinecharts": "10.0.0-beta3"
   }
 }

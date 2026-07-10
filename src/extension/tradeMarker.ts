@@ -18,8 +18,9 @@ const tradeMarker: OverlayTemplate = {
     const x = coordinates[0].x
     const y = coordinates[0].y
     const text = (overlay.extendData as string) || ''
-    const color = overlay.styles?.rectText?.backgroundColor ?? '#1677FF'
-    const borderColor = overlay.styles?.rectText?.borderColor ?? color
+    const styles = overlay.styles as Record<string, Record<string, string>> | undefined
+    const color = styles?.rectText?.backgroundColor ?? '#1677FF'
+    const borderColor = styles?.rectText?.borderColor ?? color
 
     return [
       // 小三角指示器（指向数据点）

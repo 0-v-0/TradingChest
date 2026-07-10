@@ -82,7 +82,7 @@ export function findClosestBar(dataList: Pick<KLineData, 'timestamp'>[], targetT
   return lo
 }
 
-const tradeVisualization: IndicatorTemplate = {
+const tradeVisualization: IndicatorTemplate<BarTradeInfo> = {
   name: 'TradeVis',
   shortName: 'Trades',
   calcParams: [],
@@ -155,7 +155,8 @@ const tradeVisualization: IndicatorTemplate = {
       return info
     })
   },
-  draw: ({ ctx, indicator, bounding, xAxis, yAxis, visibleRange }: { ctx: CanvasRenderingContext2D; indicator: Indicator<BarTradeInfo>; bounding: { width: number; height: number }; xAxis: { convertToPixel: (i: number) => number }; yAxis: { convertToPixel: (v: number) => number }; visibleRange: { from: number; to: number } }) => {
+  draw: ({ ctx, indicator, bounding, xAxis, yAxis, chart }) => {
+    const visibleRange = chart.getVisibleRange()
     const result = indicator.result as BarTradeInfo[]
     if (!result || result.length === 0) return false
 

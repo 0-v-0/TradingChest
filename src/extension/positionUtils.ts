@@ -5,7 +5,8 @@ type PositionSide = 'long' | 'short'
 function createPositionFigures(
   side: PositionSide,
 ): NonNullable<OverlayTemplate['createPointFigures']> {
-  return ({ coordinates, overlay, precision }) => {
+  return ({ coordinates, overlay, chart }) => {
+    const precision = chart.getSymbol()?.pricePrecision ?? 2
     if (coordinates.length < 2) {
       return []
     }
@@ -68,7 +69,7 @@ function createPositionFigures(
       attrs: {
         x: rightX,
         y: (entryY + stopLossY) / 2,
-        text: `SL: ${stopLossPrice.toFixed(precision.price)} (-${riskAmount.toFixed(precision.price)})`,
+        text: `SL: ${stopLossPrice.toFixed(precision)} (-${riskAmount.toFixed(precision)})`,
         baseline: 'middle',
         align: 'left',
       },
@@ -122,7 +123,7 @@ function createPositionFigures(
         attrs: {
           x: rightX,
           y: (entryY + takeProfitY) / 2,
-          text: `TP: ${takeProfitPrice.toFixed(precision.price)} (+${rewardAmount.toFixed(precision.price)})`,
+          text: `TP: ${takeProfitPrice.toFixed(precision)} (+${rewardAmount.toFixed(precision)})`,
           baseline: 'middle',
           align: 'left',
         },
