@@ -27,7 +27,7 @@ const fisherTransform: IndicatorTemplate = {
     const result: FisherTransformResult[] = []
 
     // 计算中间价序列
-    const midPrices: number[] = new Array(len)
+    const midPrices: number[] = Array(len)
     for (let i = 0; i < len; i++) {
       midPrices[i] = (dataList[i].high + dataList[i].low) / 2
     }

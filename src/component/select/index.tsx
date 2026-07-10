@@ -63,10 +63,13 @@ const Select: Component<SelectProps> = (props) => {
         <div class="drop-down-container">
           <ul role="listbox">
             {props.dataSource.map((data) => {
-              const d = data as SelectDataSourceItem
+              const d: SelectDataSourceItem =
+                typeof data === 'string'
+                  ? { key: data, text: data }
+                  : data as SelectDataSourceItem
               const v: JSX.Element =
                 (d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text'] ??
-                (data as unknown as JSX.Element)
+                d.text
               return (
                 <li
                   role="option"

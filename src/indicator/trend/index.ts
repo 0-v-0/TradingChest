@@ -1,8 +1,8 @@
-import alligator from './alligator'
 /**
  * 趋势类指标集合
  * 包含 ATR、SuperTrend、Ichimoku、Alligator 等 15 个趋势指标
  */
+import alligator from './alligator'
 import atr from './atr'
 import dema from './dema'
 import envelopes from './envelopes'

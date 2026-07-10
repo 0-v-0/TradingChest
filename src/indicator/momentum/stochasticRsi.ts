@@ -28,7 +28,7 @@ const stochasticRsi: IndicatorTemplate = {
     const len = dataList.length
 
     // ---- 第一步：计算 RSI（Wilder 平滑法） ----
-    const rsi: (number | null)[] = new Array(len).fill(null)
+    const rsi: (number | null)[] = Array(len).fill(null)
     let avgGain = 0
     let avgLoss = 0
 
@@ -63,7 +63,7 @@ const stochasticRsi: IndicatorTemplate = {
     }
 
     // ---- 第二步：在 RSI 序列上计算随机指标 ----
-    const stochRsi: (number | null)[] = new Array(len).fill(null)
+    const stochRsi: (number | null)[] = Array(len).fill(null)
     for (let i = 0; i < len; i++) {
       if (rsi[i] === null) continue
       // 回溯 stochPeriod 个有效 RSI 值
@@ -89,8 +89,8 @@ const stochasticRsi: IndicatorTemplate = {
 
     // ---- 第三步：K = SMA(StochRSI, kSmooth)，D = SMA(K, dSmooth) ----
     // 对有效值序列做 SMA
-    const kLine: (number | null)[] = new Array(len).fill(null)
-    const dLine: (number | null)[] = new Array(len).fill(null)
+    const kLine: (number | null)[] = Array(len).fill(null)
+    const dLine: (number | null)[] = Array(len).fill(null)
 
     // K 线：对 stochRsi 做滑动平均
     const kBuf: number[] = []

@@ -36,7 +36,7 @@ const kst: IndicatorTemplate = {
     // ---- 计算四条 ROC 序列 ----
     const rocs: (number | null)[][] = []
     for (let r = 0; r < 4; r++) {
-      const roc: (number | null)[] = new Array(len).fill(null)
+      const roc: (number | null)[] = Array(len).fill(null)
       const rocP = rocPeriods[r]
       for (let i = rocP; i < len; i++) {
         const prev = dataList[i - rocP].close
@@ -61,7 +61,7 @@ const kst: IndicatorTemplate = {
         }
       }
       const smaResult = calcSMA(validValues, smaPeriods[r])
-      const smoothed: (number | null)[] = new Array(len).fill(null)
+      const smoothed: (number | null)[] = Array(len).fill(null)
       for (let j = 0; j < validIndices.length; j++) {
         if (smaResult[j] !== null) {
           smoothed[validIndices[j]] = smaResult[j]
@@ -71,7 +71,7 @@ const kst: IndicatorTemplate = {
     }
 
     // ---- 计算 KST = 加权求和 ----
-    const kstLine: (number | null)[] = new Array(len).fill(null)
+    const kstLine: (number | null)[] = Array(len).fill(null)
     for (let i = 0; i < len; i++) {
       let allValid = true
       let val = 0
@@ -97,7 +97,7 @@ const kst: IndicatorTemplate = {
       }
     }
     const signalSmaResult = calcSMA(kstValidValues, signalPeriod)
-    const signalLine: (number | null)[] = new Array(len).fill(null)
+    const signalLine: (number | null)[] = Array(len).fill(null)
     for (let j = 0; j < kstValidIndices.length; j++) {
       if (signalSmaResult[j] !== null) {
         signalLine[kstValidIndices[j]] = signalSmaResult[j]

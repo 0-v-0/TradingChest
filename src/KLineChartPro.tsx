@@ -20,6 +20,7 @@ import {
   registerIndicator,
   YAxisType,
   IndicatorCreate,
+  KLineData,
 } from 'klinecharts'
 import { render } from 'solid-js/web'
 import type { AlertConfig } from './alert/types'
@@ -97,7 +98,7 @@ export default class KLineChartPro implements ChartPro {
         />
       ),
       this._container,
-    ) as unknown as () => void
+    ) as () => void
 
     this._datafeed = options.datafeed
 
@@ -453,8 +454,8 @@ export default class KLineChartPro implements ChartPro {
       name: indicatorName,
       shortName: symbol.shortName ?? symbol.ticker,
       figures: [{ key: 'pct', title: `${symbol.ticker}: `, type: 'line' }],
-      calc: (dataList) => {
-        return dataList.map((d) => {
+      calc: (dataList: KLineData[]) => {
+        return dataList.map((d: KLineData) => {
           let pct = compMap.get(d.timestamp)
           if (pct === undefined) {
             // Binary search for nearest timestamp within tolerance

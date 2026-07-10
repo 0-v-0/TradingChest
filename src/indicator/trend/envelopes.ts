@@ -4,6 +4,7 @@
  * 用于识别超买超卖区域和趋势方向
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcSMA } from '../utils'
 
 const envelopes: IndicatorTemplate = {
   name: 'ENVELOPES',
@@ -19,17 +20,14 @@ const envelopes: IndicatorTemplate = {
     const period = params[0] as number
     const percentage = params[1] as number
 
+    const closes = dataList.map((d) => d.close)
+    const smaValues = calcSMA(closes, period)
+
     return dataList.map((_, i) => {
-      if (i < period - 1) {
+      const sma = smaValues[i]
+      if (sma === null) {
         return { middle: undefined, upper: undefined, lower: undefined }
       }
-
-      // 计算 SMA
-      let sum = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        sum += dataList[j].close
-      }
-      const sma = sum / period
       const offset = sma * percentage / 100
 
       return {

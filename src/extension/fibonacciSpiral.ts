@@ -64,29 +64,10 @@ const fibonacciSpiral: OverlayTemplate = {
       let y = coordinates[0].y - startRadius
       for (let i = 2; i < 9; i++) {
         const r = arcs[i - 2].r + arcs[i - 1].r
-        let startAngle = 0
-        switch (i % 4) {
-          case 0: {
-            startAngle = offsetAngle
-            x -= arcs[i - 2].r
-            break
-          }
-          case 1: {
-            startAngle = offsetAngle + Math.PI / 2
-            y -= arcs[i - 2].r
-            break
-          }
-          case 2: {
-            startAngle = offsetAngle + Math.PI
-            x += arcs[i - 2].r
-            break
-          }
-          case 3: {
-            startAngle = offsetAngle + (Math.PI / 2) * 3
-            y += arcs[i - 2].r
-            break
-          }
-        }
+        const index = i % 4
+        const startAngle = offsetAngle + (Math.PI / 2) * index
+        x += (index - 1) % 2 * arcs[i - 2].r
+        y += index % 2 * (index - 2) * arcs[i - 2].r
         const endAngle = startAngle + Math.PI / 2
         const rotateCoordinate = getRotateCoordinate({ x, y }, coordinates[0], offsetAngle)
         arcs.push({

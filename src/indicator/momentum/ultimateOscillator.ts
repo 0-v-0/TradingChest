@@ -27,8 +27,8 @@ const ultimateOscillator: IndicatorTemplate = {
     const result: UltimateOscillatorResult[] = []
 
     // 预计算 BP 和 TR 序列（从索引 1 开始有效）
-    const bp: number[] = new Array(len).fill(0)
-    const tr: number[] = new Array(len).fill(0)
+    const bp: number[] = Array(len).fill(0)
+    const tr: number[] = Array(len).fill(0)
 
     for (let i = 1; i < len; i++) {
       const prevClose = dataList[i - 1].close
@@ -42,8 +42,8 @@ const ultimateOscillator: IndicatorTemplate = {
 
     // 滚动求和用于三个周期
     // 使用累积和数组，方便区间求和
-    const bpCum: number[] = new Array(len + 1).fill(0)
-    const trCum: number[] = new Array(len + 1).fill(0)
+    const bpCum: number[] = Array(len + 1).fill(0)
+    const trCum: number[] = Array(len + 1).fill(0)
     for (let i = 0; i < len; i++) {
       bpCum[i + 1] = bpCum[i] + bp[i]
       trCum[i + 1] = trCum[i] + tr[i]

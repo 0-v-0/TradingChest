@@ -30,7 +30,7 @@ const dpo: IndicatorTemplate = {
     const shift = Math.floor(period / 2) + 1
 
     // 先计算完整的 SMA 序列
-    const sma: (number | null)[] = new Array(len).fill(null)
+    const sma: (number | null)[] = Array(len).fill(null)
     let windowSum = 0
     for (let i = 0; i < len; i++) {
       windowSum += dataList[i].close

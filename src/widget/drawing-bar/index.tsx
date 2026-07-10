@@ -34,7 +34,6 @@ import {
   removeFavoriteTool,
   isFavoriteTool,
 } from '../../core/favorites'
-import t from '../../i18n'
 
 export interface DrawingBarProps {
   locale: string

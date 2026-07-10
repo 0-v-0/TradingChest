@@ -51,8 +51,11 @@ export default class DefaultDatafeed implements Datafeed {
   async searchSymbols(search?: string): Promise<SymbolInfo[]> {
     try {
       const response = await fetch(
-        `https://api.polygon.io/v3/reference/tickers?apiKey=${this._apiKey}&active=true&search=${encodeURIComponent(search ?? '')}`,
-        { signal: AbortSignal.timeout(this._fetchTimeout) },
+        `https://api.polygon.io/v3/reference/tickers?active=true&search=${encodeURIComponent(search ?? '')}`,
+        {
+          headers: { Authorization: `Bearer ${this._apiKey}` },
+          signal: AbortSignal.timeout(this._fetchTimeout),
+        },
       )
       if (!response.ok) {
         console.warn(`searchSymbols failed: ${response.status} ${response.statusText}`)
@@ -83,8 +86,11 @@ export default class DefaultDatafeed implements Datafeed {
   ): Promise<KLineData[]> {
     try {
       const response = await fetch(
-        `https://api.polygon.io/v2/aggs/ticker/${encodeURIComponent(symbol.ticker)}/range/${period.multiplier}/${period.timespan}/${from}/${to}?apiKey=${this._apiKey}`,
-        { signal: AbortSignal.timeout(this._fetchTimeout) },
+        `https://api.polygon.io/v2/aggs/ticker/${encodeURIComponent(symbol.ticker)}/range/${period.multiplier}/${period.timespan}/${from}/${to}`,
+        {
+          headers: { Authorization: `Bearer ${this._apiKey}` },
+          signal: AbortSignal.timeout(this._fetchTimeout),
+        },
       )
       if (!response.ok) {
         console.warn(`getHistoryKLineData failed: ${response.status} ${response.statusText}`)

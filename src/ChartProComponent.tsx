@@ -541,37 +541,19 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           format: string,
           type: FormatDateType,
         ) => {
-          const p = period()
-          switch (p.timespan) {
-            case 'minute': {
-              if (type === FormatDateType.XAxis) {
-                return utils.formatDate(dateTimeFormat, timestamp, 'HH:mm')
-              }
-              return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD HH:mm')
-            }
-            case 'hour': {
-              if (type === FormatDateType.XAxis) {
-                return utils.formatDate(dateTimeFormat, timestamp, 'MM-DD HH:mm')
-              }
-              return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD HH:mm')
-            }
-            case 'day':
-            case 'week':
-              return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD')
-            case 'month': {
-              if (type === FormatDateType.XAxis) {
-                return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM')
-              }
-              return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD')
-            }
-            case 'year': {
-              if (type === FormatDateType.XAxis) {
-                return utils.formatDate(dateTimeFormat, timestamp, 'YYYY')
-              }
-              return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD')
-            }
+          const formatTable: Record<string, { xAxis: string; default: string }> = {
+            minute: { xAxis: 'HH:mm', default: 'YYYY-MM-DD HH:mm' },
+            hour: { xAxis: 'MM-DD HH:mm', default: 'YYYY-MM-DD HH:mm' },
+            day: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
+            week: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
+            month: { xAxis: 'YYYY-MM', default: 'YYYY-MM-DD' },
+            year: { xAxis: 'YYYY', default: 'YYYY-MM-DD' },
           }
-          return utils.formatDate(dateTimeFormat, timestamp, 'YYYY-MM-DD HH:mm')
+          const formatInfo = formatTable[period().timespan]
+          return utils.formatDate(dateTimeFormat, timestamp,
+            type === FormatDateType.XAxis ? formatInfo?.xAxis ?? 'YYYY-MM-DD HH:mm' :
+              formatInfo?.default ?? 'YYYY-MM-DD HH:mm'
+          )
         },
       },
     })
@@ -635,15 +617,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     widget?.subscribeAction(ActionType.OnTooltipIconClick, (data) => {
       if (data.indicatorName) {
         switch (data.iconId) {
-          case 'visible': {
+          case 'visible':
             widget?.overrideIndicator({ name: data.indicatorName, visible: true }, data.paneId)
             break
-          }
-          case 'invisible': {
+          case 'invisible':
             widget?.overrideIndicator({ name: data.indicatorName, visible: false }, data.paneId)
             break
-          }
-          case 'setting': {
+          case 'setting':
             const indicator = widget?.getIndicatorByPaneId(
               data.paneId,
               data.indicatorName,
@@ -655,8 +635,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               calcParams: indicator.calcParams,
             })
             break
-          }
-          case 'close': {
+          case 'close':
             if (data.paneId === 'candle_pane') {
               const newMainIndicators = [...mainIndicators()]
               widget?.removeIndicator('candle_pane', data.indicatorName)
@@ -668,7 +647,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               delete newIndicators[data.indicatorName]
               setSubIndicators(newIndicators)
             }
-          }
+            break
         }
       }
     })

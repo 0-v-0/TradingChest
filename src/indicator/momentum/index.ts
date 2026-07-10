@@ -1,10 +1,3 @@
-import adx from './adx'
-import aroon from './aroon'
-import coppockCurve from './coppockCurve'
-import dpo from './dpo'
-import fisherTransform from './fisherTransform'
-import kst from './kst'
-import ppo from './ppo'
 /**
  * 动量类技术指标集合
  *
@@ -20,6 +13,13 @@ import ppo from './ppo'
  * - KST: 确然指标
  * - TMF: 特威格斯资金流
  */
+import adx from './adx'
+import aroon from './aroon'
+import coppockCurve from './coppockCurve'
+import dpo from './dpo'
+import fisherTransform from './fisherTransform'
+import kst from './kst'
+import ppo from './ppo'
 import stochasticRsi from './stochasticRsi'
 import twiggsMf from './twiggsMf'
 import ultimateOscillator from './ultimateOscillator'

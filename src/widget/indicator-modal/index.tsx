@@ -17,7 +17,6 @@ import { Modal, List, Checkbox, Input } from '../../component'
 import t from '../../i18n'
 import { indicatorCategories } from '../../indicator'
 import {
-  getFavoriteIndicators,
   addFavoriteIndicator,
   removeFavoriteIndicator,
   isFavoriteIndicator,

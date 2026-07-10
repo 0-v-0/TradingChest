@@ -32,12 +32,16 @@ const ScreenshotModal: Component<ScreenshotModalProps> = (props) => {
           type: 'confirm',
           children: t('save', props.locale),
           onClick: () => {
-            const a = document.createElement('a')
-            a.download = 'screenshot'
-            a.href = props.url
-            document.body.appendChild(a)
-            a.click()
-            a.remove()
+            try {
+              const a = document.createElement('a')
+              a.download = 'screenshot'
+              a.href = props.url
+              document.body.appendChild(a)
+              a.click()
+              a.remove()
+            } catch {
+              console.warn('Screenshot download failed')
+            }
           },
         },
       ]}

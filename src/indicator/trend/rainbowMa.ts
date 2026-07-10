@@ -42,7 +42,7 @@ const rainbowMa: IndicatorTemplate = {
 
     // 填充不足 depth 的层
     while (levels.length < MAX_LEVELS) {
-      levels.push(new Array(dataList.length).fill(null))
+      levels.push(Array(dataList.length).fill(null))
     }
 
     return dataList.map((_, i) => ({

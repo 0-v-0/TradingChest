@@ -4,6 +4,35 @@ import { Chart, Nullable } from 'klinecharts'
  * 数据导出工具
  */
 
+interface CsvRow {
+  timestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume?: number
+}
+
+function generateCsv(rows: CsvRow[]): string {
+  const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
+  const lines = [headers.join(',')]
+  for (const d of rows) {
+    const date = new Date(d.timestamp).toISOString()
+    lines.push([date, d.open, d.high, d.low, d.close, d.volume ?? 0].join(','))
+  }
+  return lines.join('\n')
+}
+
+function downloadCsv(csv: string, filename: string): void {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 /**
  * 导出可见区间数据为 CSV
  */
@@ -19,25 +48,15 @@ export function exportToCSV(chart: Nullable<Chart>, filename?: string): boolean 
     const startIdx = Math.max(0, visibleRange.from)
     const endIdx = Math.min(dataList.length - 1, visibleRange.to)
 
-    const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
-    const rows = [headers.join(',')]
-
+    const rows: CsvRow[] = []
     for (let i = startIdx; i <= endIdx; i++) {
-      const d = dataList[i]
-      const date = new Date(d.timestamp).toISOString()
-      rows.push([date, d.open, d.high, d.low, d.close, d.volume ?? 0].join(','))
+      rows.push(dataList[i])
     }
 
-    const csvContent = rows.join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename ?? `chart-data-${new Date().toISOString().slice(0, 10)}.csv`
-    link.click()
-
-    URL.revokeObjectURL(url)
+    downloadCsv(
+      generateCsv(rows),
+      filename ?? `chart-data-${new Date().toISOString().slice(0, 10)}.csv`,
+    )
     return true
   } catch {
     return false
@@ -54,24 +73,10 @@ export function exportAllToCSV(chart: Nullable<Chart>, filename?: string): boole
     const dataList = chart.getDataList()
     if (!dataList || dataList.length === 0) return false
 
-    const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
-    const rows = [headers.join(',')]
-
-    for (const d of dataList) {
-      const date = new Date(d.timestamp).toISOString()
-      rows.push([date, d.open, d.high, d.low, d.close, d.volume ?? 0].join(','))
-    }
-
-    const csvContent = rows.join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename ?? `chart-data-full-${new Date().toISOString().slice(0, 10)}.csv`
-    link.click()
-
-    URL.revokeObjectURL(url)
+    downloadCsv(
+      generateCsv(dataList),
+      filename ?? `chart-data-full-${new Date().toISOString().slice(0, 10)}.csv`,
+    )
     return true
   } catch {
     return false

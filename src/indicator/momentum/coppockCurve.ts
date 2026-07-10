@@ -26,7 +26,7 @@ const coppockCurve: IndicatorTemplate = {
     const maxRocPeriod = Math.max(roc1Period, roc2Period)
 
     // 计算两条 ROC 之和
-    const rocSum: (number | null)[] = new Array(len).fill(null)
+    const rocSum: (number | null)[] = Array(len).fill(null)
     for (let i = 0; i < len; i++) {
       if (i < maxRocPeriod) {
         continue

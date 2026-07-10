@@ -32,7 +32,7 @@ const ppo: IndicatorTemplate = {
     const result: PpoResult[] = []
 
     // ---- 计算快速 EMA ----
-    const emaFast: (number | null)[] = new Array(len).fill(null)
+    const emaFast: (number | null)[] = Array(len).fill(null)
     const kFast = 2 / (fastPeriod + 1)
     let prevEmaFast: number | null = null
     for (let i = 0; i < len; i++) {
@@ -51,7 +51,7 @@ const ppo: IndicatorTemplate = {
     }
 
     // ---- 计算慢速 EMA ----
-    const emaSlow: (number | null)[] = new Array(len).fill(null)
+    const emaSlow: (number | null)[] = Array(len).fill(null)
     const kSlow = 2 / (slowPeriod + 1)
     let prevEmaSlow: number | null = null
     for (let i = 0; i < len; i++) {
@@ -70,7 +70,7 @@ const ppo: IndicatorTemplate = {
     }
 
     // ---- 计算 PPO 序列 ----
-    const ppoLine: (number | null)[] = new Array(len).fill(null)
+    const ppoLine: (number | null)[] = Array(len).fill(null)
     for (let i = 0; i < len; i++) {
       if (emaFast[i] !== null && emaSlow[i] !== null && emaSlow[i] !== 0) {
         ppoLine[i] =
@@ -79,7 +79,7 @@ const ppo: IndicatorTemplate = {
     }
 
     // ---- 计算 Signal 线（对 PPO 做 EMA） ----
-    const signalLine: (number | null)[] = new Array(len).fill(null)
+    const signalLine: (number | null)[] = Array(len).fill(null)
     const kSignal = 2 / (signalPeriod + 1)
     let prevSignal: number | null = null
     let signalSeedCount = 0

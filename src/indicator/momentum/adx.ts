@@ -36,9 +36,9 @@ const adx: IndicatorTemplate = {
     if (len === 0) return result
 
     // 原始 +DM、-DM、TR 序列
-    const plusDmRaw: number[] = new Array(len).fill(0)
-    const minusDmRaw: number[] = new Array(len).fill(0)
-    const trRaw: number[] = new Array(len).fill(0)
+    const plusDmRaw: number[] = Array(len).fill(0)
+    const minusDmRaw: number[] = Array(len).fill(0)
+    const trRaw: number[] = Array(len).fill(0)
 
     for (let i = 0; i < len; i++) {
       if (i === 0) {

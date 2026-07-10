@@ -46,15 +46,12 @@ export class IndicatorRegistry {
       return
     }
 
-    const promise = (async () => {
-      try {
-        const template = await loader()
-        this._registerFn(template)
-        this._registered.add(name)
-      } finally {
-        this._pending.delete(name)
-      }
-    })()
+    const promise = loader().then((template) => {
+      this._registerFn(template)
+      this._registered.add(name)
+    }).finally(() => {
+      this._pending.delete(name)
+    })
 
     this._pending.set(name, promise)
     return promise

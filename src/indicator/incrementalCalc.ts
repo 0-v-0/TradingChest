@@ -51,7 +51,6 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
     //  4. The second-to-last timestamp from the previous call still sits at
     //     the same index in the new list — proving earlier data is unchanged.
     const isIncremental =
-      prevLen > 0 &&
       len >= prevLen &&
       len - prevLen <= 1 &&
       len >= 2 &&

@@ -29,16 +29,14 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
   let to = toTimestamp
   let from = to
   switch (period.timespan) {
-    case 'minute': {
+    case 'minute':
       to = to - (to % (60 * 1000))
       from = to - count * period.multiplier * 60 * 1000
       break
-    }
-    case 'hour': {
+    case 'hour':
       to = to - (to % (60 * 60 * 1000))
       from = to - count * period.multiplier * 60 * 60 * 1000
       break
-    }
     case 'day': {
       const d = new Date(to)
       to = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
@@ -71,8 +69,6 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
       from = Date.UTC(fromDate.getUTCFullYear(), 0, 1)
       break
     }
-    default:
-      break
   }
   return [from, to]
 }
