@@ -20,6 +20,10 @@ export const indicatorLoaders: Record<string, IndicatorLoader> = {
   LINEARREGRESSION: () => import('./trend/linearRegression').then(m => m.default),
   ENVELOPES:        () => import('./trend/envelopes').then(m => m.default),
   T3:               () => import('./trend/t3').then(m => m.default),
+  ChanDeKrollStop:          () => import('./trend/chandeKrollStop').then(m => m.default),
+  Qstick:                   () => import('./trend/qstick').then(m => m.default),
+  RainbowMA:                () => import('./trend/rainbowMa').then(m => m.default),
+  LinearRegressionForecast: () => import('./trend/linearRegressionForecast').then(m => m.default),
   // Volatility
   KC:     () => import('./volatility/keltnerChannels').then(m => m.default),
   DC:     () => import('./volatility/donchianChannels').then(m => m.default),
@@ -29,6 +33,7 @@ export const indicatorLoaders: Record<string, IndicatorLoader> = {
   MI:     () => import('./volatility/massIndex').then(m => m.default),
   UI:     () => import('./volatility/ulcerIndex').then(m => m.default),
   BBW:    () => import('./volatility/bollingerBandWidth').then(m => m.default),
+  StandardError: () => import('./volatility/standardError').then(m => m.default),
   // Volume
   VWAP:      () => import('./volume/vwap').then(m => m.default),
   MFI:       () => import('./volume/mfi').then(m => m.default),
@@ -37,7 +42,8 @@ export const indicatorLoaders: Record<string, IndicatorLoader> = {
   VROC:      () => import('./volume/vroc').then(m => m.default),
   KVO:       () => import('./volume/klingerOscillator').then(m => m.default),
   FI:        () => import('./volume/forceIndex').then(m => m.default),
-  ELDER_RAY: () => import('./volume/elderRay').then(m => m.default),
+  ELDER_RAY:        () => import('./volume/elderRay').then(m => m.default),
+  VolumeOscillator: () => import('./volume/volumeOscillator').then(m => m.default),
   // Momentum
   StochRSI: () => import('./momentum/stochasticRsi').then(m => m.default),
   ADX:      () => import('./momentum/adx').then(m => m.default),
@@ -49,7 +55,11 @@ export const indicatorLoaders: Record<string, IndicatorLoader> = {
   DPO:      () => import('./momentum/dpo').then(m => m.default),
   KST:      () => import('./momentum/kst').then(m => m.default),
   TMF:      () => import('./momentum/twiggsMf').then(m => m.default),
+  ConnorsRSI:           () => import('./momentum/connorsRsi').then(m => m.default),
+  EhlersLeading:        () => import('./momentum/ehlersLeadingIndicator').then(m => m.default),
+  WilliamsR:            () => import('./momentum/williamsR').then(m => m.default),
   // Other
-  PIVOTPOINTS: () => import('./other/pivotPoints').then(m => m.default),
-  ZIGZAG:      () => import('./other/zigzag').then(m => m.default),
+  PIVOTPOINTS:            () => import('./other/pivotPoints').then(m => m.default),
+  ZIGZAG:                 () => import('./other/zigzag').then(m => m.default),
+  CorrelationCoefficient: () => import('./other/correlationCoefficient').then(m => m.default),
 }

@@ -132,4 +132,44 @@ export default {
     { paramNameKey: 'WR4', precision: 0, min: 1, styleKey: 'lines[3].color' },
     { paramNameKey: 'WR5', precision: 0, min: 1, styleKey: 'lines[4].color' },
   ],
+  ChanDeKrollStop: [
+    { paramNameKey: 'params_1', precision: 0, min: 1, default: 10 },
+    { paramNameKey: 'params_2', precision: 2, min: 0.1, default: 2 },
+    { paramNameKey: 'params_3', precision: 0, min: 1, default: 9 },
+  ],
+  Qstick: [
+    { paramNameKey: 'period', precision: 0, min: 1, default: 14 },
+  ],
+  RainbowMA: [
+    { paramNameKey: 'params_1', precision: 0, min: 1, max: 6, default: 2 },
+    { paramNameKey: 'params_2', precision: 0, min: 1, default: 10 },
+  ],
+  LinearRegressionForecast: [
+    { paramNameKey: 'period', precision: 0, min: 2, default: 14 },
+  ],
+  StandardError: [
+    { paramNameKey: 'period', precision: 0, min: 3, default: 14 },
+  ],
+  CorrelationCoefficient: [
+    { paramNameKey: 'period', precision: 0, min: 2, default: 14 },
+  ],
+  ConnorsRSI: [
+    { paramNameKey: 'params_1', precision: 0, min: 1, default: 3 },
+    { paramNameKey: 'params_2', precision: 0, min: 1, default: 2 },
+    { paramNameKey: 'params_3', precision: 0, min: 1, default: 100 },
+  ],
+  EhlersLeading: [
+    { paramNameKey: 'params_1', precision: 0, min: 2, default: 10 },
+    { paramNameKey: 'params_2', precision: 2, min: 0, default: 1.0 },
+  ],
+  WilliamsR: [
+    { paramNameKey: 'period', precision: 0, min: 1, default: 14 },
+  ],
+  VolumeOscillator: [
+    { paramNameKey: 'params_1', precision: 0, min: 1, default: 14 },
+    { paramNameKey: 'params_2', precision: 0, min: 2, default: 28 },
+  ],
+  PIVOTPOINTS: [
+    { paramNameKey: 'pivot_type', precision: 0, min: 0, max: 2, default: 0 },
+  ],
 }
