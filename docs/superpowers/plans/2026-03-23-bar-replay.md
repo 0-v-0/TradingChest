@@ -1,6 +1,6 @@
 # K 线回放 (Bar Replay) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 实现 K 线回放功能，让交易员可以选择历史时间点，逐根 K 线前进/后退/自动播放，用于策略复盘和训练
 
@@ -41,7 +41,7 @@
 - Create: `src/replay/__tests__/ReplayEngine.test.ts`
 - Create: `src/replay/ReplayEngine.ts`
 
-- [ ] **Step 1: 创建类型定义**
+- [x] **Step 1: 创建类型定义**
 
 ```typescript
 // src/replay/types.ts
@@ -72,7 +72,7 @@ export interface ReplayCallbacks {
 }
 ```
 
-- [ ] **Step 2: 编写测试**
+- [x] **Step 2: 编写测试**
 
 ```typescript
 // src/replay/__tests__/ReplayEngine.test.ts
@@ -221,12 +221,12 @@ describe('ReplayEngine', () => {
 })
 ```
 
-- [ ] **Step 3: 运行测试确认失败**
+- [x] **Step 3: 运行测试确认失败**
 
 Run: `npx vitest run src/replay/__tests__/ReplayEngine.test.ts`
 Expected: FAIL — module not found
 
-- [ ] **Step 4: 实现 ReplayEngine**
+- [x] **Step 4: 实现 ReplayEngine**
 
 ```typescript
 // src/replay/ReplayEngine.ts
@@ -356,12 +356,12 @@ export class ReplayEngine {
 }
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run: `npx vitest run src/replay/__tests__/ReplayEngine.test.ts`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/replay/
@@ -377,7 +377,7 @@ git commit -m "feat: add ReplayEngine for bar-by-bar chart replay"
 - Create: `src/widget/replay-bar/index.less`
 - Modify: `src/widget/index.tsx` (add export)
 
-- [ ] **Step 1: 创建样式文件**
+- [x] **Step 1: 创建样式文件**
 
 ```less
 // src/widget/replay-bar/index.less
@@ -440,7 +440,7 @@ git commit -m "feat: add ReplayEngine for bar-by-bar chart replay"
 }
 ```
 
-- [ ] **Step 2: 创建组件**
+- [x] **Step 2: 创建组件**
 
 ```typescript
 // src/widget/replay-bar/index.tsx
@@ -524,19 +524,19 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
 export default ReplayControlBar
 ```
 
-- [ ] **Step 3: 在 widget/index.tsx 添加导出**
+- [x] **Step 3: 在 widget/index.tsx 添加导出**
 
 在 `src/widget/index.tsx` 中添加:
 ```typescript
 export { default as ReplayControlBar } from './replay-bar'
 ```
 
-- [ ] **Step 4: 运行构建**
+- [x] **Step 4: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/widget/replay-bar/ src/widget/index.tsx
@@ -551,7 +551,7 @@ git commit -m "feat: add ReplayControlBar UI component"
 - Modify: `src/i18n/zh-CN.ts`
 - Modify: `src/i18n/en-US.ts`
 
-- [ ] **Step 1: 读取两个 i18n 文件，添加回放相关翻译**
+- [x] **Step 1: 读取两个 i18n 文件，添加回放相关翻译**
 
 zh-CN 添加:
 ```typescript
@@ -573,12 +573,12 @@ replay_exit: 'Exit Replay',
 replay_start: 'Start Replay',
 ```
 
-- [ ] **Step 2: 运行构建**
+- [x] **Step 2: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/
@@ -595,7 +595,7 @@ git commit -m "feat: add bar replay i18n translations"
 - Modify: `src/ChartProComponent.tsx`
 - Modify: `src/index.ts`
 
-- [ ] **Step 1: 扩展 ChartPro 接口**
+- [x] **Step 1: 扩展 ChartPro 接口**
 
 在 `src/types.ts` 的 `ChartPro` 接口添加:
 ```typescript
@@ -607,7 +607,7 @@ stopReplay(): void
 getReplayEngine(): import('./replay/ReplayEngine').ReplayEngine | null
 ```
 
-- [ ] **Step 2: 在 KLineChartPro 中实现**
+- [x] **Step 2: 在 KLineChartPro 中实现**
 
 读取当前 `src/KLineChartPro.tsx`。添加:
 
@@ -667,24 +667,24 @@ stopReplay: () => {},
 getReplayEngine: () => null,
 ```
 
-- [ ] **Step 3: 在 index.ts 导出**
+- [x] **Step 3: 在 index.ts 导出**
 
 ```typescript
 export { ReplayEngine } from './replay/ReplayEngine'
 export type { ReplayState, ReplaySpeed } from './replay/types'
 ```
 
-- [ ] **Step 4: 运行构建**
+- [x] **Step 4: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 5: 运行全部测试**
+- [x] **Step 5: 运行全部测试**
 
 Run: `npx vitest run`
 Expected: 全部 PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/types.ts src/KLineChartPro.tsx src/ChartProComponent.tsx src/index.ts
@@ -695,17 +695,17 @@ git commit -m "feat: integrate ReplayEngine into ChartPro API"
 
 ## Task 5: 全量验证
 
-- [ ] **Step 1: 运行完整测试**
+- [x] **Step 1: 运行完整测试**
 
 Run: `npx vitest run`
 Expected: All PASS
 
-- [ ] **Step 2: 运行完整构建**
+- [x] **Step 2: 运行完整构建**
 
 Run: `npm run build`
 Expected: 构建成功
 
-- [ ] **Step 3: Commit (if needed)**
+- [x] **Step 3: Commit (if needed)**
 
 ```bash
 git add -A

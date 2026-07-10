@@ -19,7 +19,7 @@
 - Modify: `src/widget/setting-modal/index.tsx` — replace lodash import
 - Modify: `package.json` — remove lodash dependency
 
-- [ ] **Step 1: Write deepSet test**
+- [x] **Step 1: Write deepSet test**
 
 Create `src/core/__tests__/deepSet.test.ts`:
 ```typescript
@@ -65,11 +65,11 @@ describe('deepSet', () => {
 })
 ```
 
-- [ ] **Step 2: Run test — expect FAIL**
+- [x] **Step 2: Run test — expect FAIL**
 
 Run: `npx vitest run src/core/__tests__/deepSet.test.ts`
 
-- [ ] **Step 3: Implement deepSet**
+- [x] **Step 3: Implement deepSet**
 
 Create `src/core/deepSet.ts`:
 ```typescript
@@ -96,11 +96,11 @@ export function deepSet(obj: Record<string, any>, path: string, value: unknown):
 }
 ```
 
-- [ ] **Step 4: Run test — expect PASS**
+- [x] **Step 4: Run test — expect PASS**
 
 Run: `npx vitest run src/core/__tests__/deepSet.test.ts`
 
-- [ ] **Step 5: Replace lodash in ChartProComponent.tsx**
+- [x] **Step 5: Replace lodash in ChartProComponent.tsx**
 
 Replace imports:
 ```typescript
@@ -117,22 +117,22 @@ Replace all `lodashClone(` with `structuredClone(`.
 
 NOTE: First verify `structuredClone` compatibility — `widget!.getStyles()` returns a plain data object (colors, numbers, strings). No functions or class instances. Safe for structuredClone.
 
-- [ ] **Step 6: Replace lodash in setting-modal/index.tsx**
+- [x] **Step 6: Replace lodash in setting-modal/index.tsx**
 
 Replace `import lodashSet from 'lodash/set'` with `import { deepSet } from '../../core/deepSet'`.
 Replace all `lodashSet(` with `deepSet(`.
 
-- [ ] **Step 7: Remove lodash from package.json**
+- [x] **Step 7: Remove lodash from package.json**
 
 Remove `"lodash": "^4.17.21"` from `dependencies`.
 Remove `"@types/lodash": "^4.14.191"` from `devDependencies`.
 Run `npm install` to update lock file.
 
-- [ ] **Step 8: Verify**
+- [x] **Step 8: Verify**
 
 Run: `npx vitest run && npx tsc --noEmit && npx vite build`
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/core/deepSet.ts src/core/__tests__/deepSet.test.ts src/ChartProComponent.tsx src/widget/setting-modal/index.tsx package.json package-lock.json
@@ -152,13 +152,13 @@ deepSet rejects __proto__/constructor/prototype for safety."
 - Modify: `src/datafeed/DataCache.ts` — add LRU eviction
 - Create: `src/datafeed/__tests__/DataCache.test.ts`
 
-- [ ] **Step 1: Delete undoRedo.ts**
+- [x] **Step 1: Delete undoRedo.ts**
 
 ```bash
 rm src/shortcut/undoRedo.ts
 ```
 
-- [ ] **Step 2: Remove dead shortcut bindings**
+- [x] **Step 2: Remove dead shortcut bindings**
 
 In `src/shortcut/defaultBindings.ts`, remove these two entries:
 ```typescript
@@ -166,7 +166,7 @@ In `src/shortcut/defaultBindings.ts`, remove these two entries:
   { combo: 'ctrl+shift+z', action: 'chart:redo', description_zh: '重做', description_en: 'Redo' },
 ```
 
-- [ ] **Step 3: Write DataCache LRU test**
+- [x] **Step 3: Write DataCache LRU test**
 
 Create `src/datafeed/__tests__/DataCache.test.ts`:
 ```typescript
@@ -217,7 +217,7 @@ describe('DataCache', () => {
 })
 ```
 
-- [ ] **Step 4: Add LRU to DataCache**
+- [x] **Step 4: Add LRU to DataCache**
 
 Modify `src/datafeed/DataCache.ts`:
 ```typescript
@@ -287,11 +287,11 @@ export class DataCache {
 }
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `npx vitest run && npx tsc --noEmit`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
@@ -308,7 +308,7 @@ DataCache: add maxEntries (default 30) with LRU eviction via Map ordering."
 **Files:**
 - Modify: `src/ChartProComponent.tsx:332-435`
 
-- [ ] **Step 1: Merge theme effect's two setStyles into one**
+- [x] **Step 1: Merge theme effect's two setStyles into one** — extracted `tooltipIcons()` helper; two `setStyles` calls remain required (KLineChart API does not support combining theme string + partial object in one call), but effect is now much cleaner
 
 Replace the theme `createEffect` (lines 332-420) with a single `setStyles` call:
 
@@ -385,11 +385,11 @@ After the widget init block, add:
 
 (Note: by now `lodashClone` has been replaced with `structuredClone` in Task 1.)
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 Run: `npx vitest run && npx tsc --noEmit`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/ChartProComponent.tsx
@@ -408,14 +408,14 @@ Clone once at init instead of on every style change."
 - Modify: `src/KLineChartPro.tsx` — comparison tolerance (M2, M3, M4)
 - Modify: `src/indicator/incrementalCalc.ts` — in-place mutation (M10)
 
-- [ ] **Step 1: URL encoding**
+- [x] **Step 1: URL encoding**
 
 In `src/DefaultDatafeed.ts`:
 - Line with `search=${search ?? ''}` → `search=${encodeURIComponent(search ?? '')}`
 - Line with `ticker/${symbol.ticker}/range` → `ticker/${encodeURIComponent(symbol.ticker)}/range`
 - Add JSDoc to the class: `/** Demo datafeed for Polygon.io. Production should proxy API calls through a backend. */`
 
-- [ ] **Step 2: Comparison tolerance**
+- [x] **Step 2: Comparison tolerance**
 
 In `src/KLineChartPro.tsx`, in `addComparison`, replace:
 ```typescript
@@ -457,7 +457,7 @@ Also add JSDoc comment above `addComparison`:
    */
 ```
 
-- [ ] **Step 3: incrementalCalc optimization**
+- [x] **Step 3: incrementalCalc optimization**
 
 In `src/indicator/incrementalCalc.ts`, replace line 76:
 ```typescript
@@ -469,11 +469,11 @@ with:
     cached.push(...tailResult)
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npx vitest run && npx tsc --noEmit`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/DefaultDatafeed.ts src/KLineChartPro.tsx src/indicator/incrementalCalc.ts
@@ -491,7 +491,7 @@ git commit -m "fix: URL encoding, comparison tolerance, incrementalCalc optimiza
 **Files:**
 - Multiple files in `src/extension/`, `src/i18n/`, `src/widget/`, `src/component/`
 
-- [ ] **Step 1: Audit all @ts-expect-error locations**
+- [x] **Step 1: Audit all @ts-expect-error locations**
 
 Run `grep -rn '@ts-expect-error' src/` to find all 29 locations. For each:
 - If it's accessing a klinecharts internal property not in the type definitions → keep (document why)
@@ -504,18 +504,18 @@ Common patterns to fix:
 - `src/component/select/index.tsx`, `src/component/input/index.tsx` — fix event handler types
 - `src/extension/*.ts` — many access `coordinate.dataIndex` or `precision` which are valid klinecharts properties but not in the TS defs. For these, create a type augmentation file or use `(x as any).prop` instead of @ts-expect-error
 
-- [ ] **Step 2: Fix what's fixable, leave the rest with explanatory comments**
+- [x] **Step 2: Fix what's fixable, leave the rest with explanatory comments**
 
 For each remaining @ts-expect-error that can't be removed, change the comment to explain why:
 ```typescript
 // @ts-expect-error klinecharts OverlayFigure.attrs missing 'coordinates' in type defs
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `npx vitest run && npx tsc --noEmit`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A
@@ -529,19 +529,19 @@ that are caused by klinecharts type definition gaps."
 
 ### Task 6: Final Verification + Build
 
-- [ ] **Step 1: Run full test suite**
+- [x] **Step 1: Run full test suite**
 
 Run: `npx vitest run`
 
-- [ ] **Step 2: Type check**
+- [x] **Step 2: Type check**
 
 Run: `npx tsc --noEmit`
 
-- [ ] **Step 3: Build + compare bundle size**
+- [x] **Step 3: Build + compare bundle size**
 
 Run: `npx vite build`
 Expected: Bundle size should decrease (lodash removed).
 
-- [ ] **Step 4: Verify exports**
+- [x] **Step 4: Verify exports**
 
 Run: `grep -n 'export' src/index.ts`

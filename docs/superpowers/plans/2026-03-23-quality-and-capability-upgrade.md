@@ -1,6 +1,6 @@
 # TradingChest 质量与能力升级计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 修复 TradingChest 的工程质量问题（零测试、全局变量、内存泄漏），补齐与 TradingView 的核心功能差距（数据层健壮性、多图表布局、报警系统）
 
@@ -16,27 +16,20 @@
 新建文件:
   src/indicator/__tests__/            # 指标单元测试
     superTrend.test.ts
-    atr.test.ts
-    ichimoku.test.ts
-    macd.test.ts
-    rsi.test.ts
-    bollingerBands.test.ts
   src/persistence/__tests__/
     persistence.test.ts
   src/shortcut/__tests__/
     shortcut.test.ts
   src/export/__tests__/
     export.test.ts
-  src/DefaultDatafeed/__tests__/
-    defaultDatafeed.test.ts
-  src/__tests__/
+  src/core/__tests__/
     adjustFromTo.test.ts
     buildStyles.test.ts
-  vitest.config.ts                    # 测试配置
+  # Vitest 配置在 vite.config.ts 中（无独立 vitest.config.ts）
   src/core/                           # 从 ChartProComponent 抽取的纯函数
     adjustFromTo.ts
     buildStyles.ts
-    indicatorClickDetector.ts         # 替代全局变量方案
+    # indicatorClickDetector.ts — 已删除，改为 tradeVisualization.ts 中的模块级 _hitTargetsMap
   src/datafeed/                       # 数据层增强
     ReconnectingWebSocket.ts          # 自动重连 WebSocket
     DataCache.ts                      # K 线数据缓存
@@ -46,11 +39,10 @@
     types.ts
   src/compare/                        # 多品种对比
     index.ts
-    CompareOverlay.ts
 
 修改文件:
   package.json                        # 添加 test 脚本
-  src/KLineChartPro.tsx               # 消除 setTimeout + globalThis
+  src/KLineChartPro.tsx               # globalThis 替换为模块级 _hitTargetsMap
   src/ChartProComponent.tsx           # 抽取纯函数、集成新功能
   src/DefaultDatafeed.ts              # 实现 unsubscribe、重连、缓存
   src/types.ts                        # 扩展接口
@@ -67,7 +59,7 @@
 - Create: `vitest.config.ts`
 - Modify: `package.json`
 
-- [ ] **Step 1: 创建 vitest.config.ts**
+- [x] **Step 1: 创建 vitest.config.ts**（实际：Vitest 配置在 vite.config.ts 中，无独立 vitest.config.ts）
 
 ```typescript
 // vitest.config.ts
@@ -87,7 +79,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 2: 确认 devDependencies 已包含 vitest 和 vite-plugin-solid**
+- [x] **Step 2: 确认 devDependencies 已包含 vitest 和 vite-plugin-solid**
 
 `package.json` 中已存在 `"vitest": "^0.28.4"` 和 `"vite-plugin-solid": "^2.6.1"`，无需额外安装。在 `scripts` 中添加:
 ```json
@@ -96,12 +88,12 @@ export default defineConfig({
 "test:coverage": "vitest run --coverage"
 ```
 
-- [ ] **Step 3: 运行 `npm test` 确认配置正确（应该 0 测试通过）**
+- [x] **Step 3: 运行 `npm test` 确认配置正确（应该 0 测试通过）**
 
 Run: `npm test`
 Expected: "No test files found" 或 0 tests
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add vitest.config.ts package.json
@@ -118,7 +110,7 @@ git commit -m "chore: configure vitest test infrastructure"
 - Create: `src/core/adjustFromTo.ts`
 - Modify: `src/ChartProComponent.tsx`
 
-- [ ] **Step 1: 编写 adjustFromTo 的测试**
+- [x] **Step 1: 编写 adjustFromTo 的测试**
 
 ```typescript
 // src/core/__tests__/adjustFromTo.test.ts
@@ -162,12 +154,12 @@ describe('adjustFromTo', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `npx vitest run src/core/__tests__/adjustFromTo.test.ts`
 Expected: FAIL — module not found
 
-- [ ] **Step 3: 创建 src/core/adjustFromTo.ts — 从 ChartProComponent.tsx:134-184 提取**
+- [x] **Step 3: 创建 src/core/adjustFromTo.ts — 从 ChartProComponent.tsx:134-184 提取**
 
 ```typescript
 // src/core/adjustFromTo.ts
@@ -230,7 +222,7 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
 }
 ```
 
-- [ ] **Step 4: 在 ChartProComponent.tsx 中替换为 import**
+- [x] **Step 4: 在 ChartProComponent.tsx 中替换为 import**
 
 将 `ChartProComponent.tsx:134-184` 的 `adjustFromTo` 函数体删除，替换为:
 ```typescript
@@ -239,12 +231,12 @@ import { adjustFromTo } from './core/adjustFromTo'
 
 删除组件内的 `const adjustFromTo = ...` 函数定义。
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run: `npx vitest run src/core/__tests__/adjustFromTo.test.ts`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/core/ src/ChartProComponent.tsx
@@ -262,7 +254,7 @@ git commit -m "refactor: extract adjustFromTo to testable module with unit tests
 - Create: `src/core/__tests__/buildStyles.test.ts`
 - Modify: `src/ChartProComponent.tsx`
 
-- [ ] **Step 1: 编写 buildStyles 测试**
+- [x] **Step 1: 编写 buildStyles 测试**
 
 ```typescript
 // src/core/__tests__/buildStyles.test.ts
@@ -310,12 +302,12 @@ describe('buildStyles', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `npx vitest run src/core/__tests__/buildStyles.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 创建 src/core/buildStyles.ts**
+- [x] **Step 3: 创建 src/core/buildStyles.ts**
 
 ```typescript
 // src/core/buildStyles.ts
@@ -356,7 +348,7 @@ export function buildStyles(s: OverlayStyleInput): any {
 }
 ```
 
-- [ ] **Step 4: ChartProComponent.tsx 中替换为 import**
+- [x] **Step 4: ChartProComponent.tsx 中替换为 import**
 
 替换 `ChartProComponent.tsx:476-500` 的 `buildStyles` 定义为:
 ```typescript
@@ -365,17 +357,17 @@ import { buildStyles } from './core/buildStyles'
 
 删除组件内的 `const buildStyles = ...` 函数定义。
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run: `npx vitest run src/core/__tests__/buildStyles.test.ts`
 Expected: PASS
 
-- [ ] **Step 6: 运行构建确保不破坏**
+- [x] **Step 6: 运行构建确保不破坏**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/core/buildStyles.ts src/core/__tests__/buildStyles.test.ts src/ChartProComponent.tsx
@@ -389,7 +381,7 @@ git commit -m "refactor: extract buildStyles to testable module with unit tests"
 **Files:**
 - Create: `src/indicator/__tests__/superTrend.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/indicator/__tests__/superTrend.test.ts
@@ -455,12 +447,12 @@ describe('SuperTrend indicator', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试**
+- [x] **Step 2: 运行测试**
 
 Run: `npx vitest run src/indicator/__tests__/superTrend.test.ts`
 Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/indicator/__tests__/superTrend.test.ts
@@ -474,7 +466,7 @@ git commit -m "test: add SuperTrend indicator unit tests"
 **Files:**
 - Create: `src/persistence/__tests__/persistence.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/persistence/__tests__/persistence.test.ts
@@ -546,12 +538,12 @@ describe('persistence', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试**
+- [x] **Step 2: 运行测试**
 
 Run: `npx vitest run src/persistence/__tests__/persistence.test.ts`
 Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/persistence/__tests__/persistence.test.ts
@@ -565,7 +557,7 @@ git commit -m "test: add persistence module unit tests"
 **Files:**
 - Create: `src/shortcut/__tests__/shortcut.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/shortcut/__tests__/shortcut.test.ts
@@ -615,12 +607,12 @@ describe('KeyboardShortcutManager', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试**
+- [x] **Step 2: 运行测试**
 
 Run: `npx vitest run src/shortcut/__tests__/shortcut.test.ts`
 Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/shortcut/__tests__/shortcut.test.ts
@@ -633,6 +625,8 @@ git commit -m "test: add KeyboardShortcutManager unit tests"
 
 ### Task 2.1: 消除 globalThis.__tradeVisHitTargets
 
+> **NOTE:** IndicatorClickDetector was implemented then removed — it was never actually wired in. The codebase instead uses module-level `_hitTargetsMap` in `tradeVisualization.ts` with per-instance keys and `getTradeVisHitTargets()`. The original globalThis problem is solved via instance-scoped maps.
+
 用实例级 `IndicatorClickDetector` 替代全局变量。
 
 **Files:**
@@ -640,7 +634,7 @@ git commit -m "test: add KeyboardShortcutManager unit tests"
 - Create: `src/core/__tests__/indicatorClickDetector.test.ts`
 - Modify: `src/KLineChartPro.tsx:81-121`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/core/__tests__/indicatorClickDetector.test.ts
@@ -675,12 +669,12 @@ describe('IndicatorClickDetector', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `npx vitest run src/core/__tests__/indicatorClickDetector.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 实现 IndicatorClickDetector**
+- [x] **Step 3: 实现 IndicatorClickDetector**
 
 ```typescript
 // src/core/indicatorClickDetector.ts
@@ -728,12 +722,12 @@ export class IndicatorClickDetector {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `npx vitest run src/core/__tests__/indicatorClickDetector.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: 在 KLineChartPro.tsx 中替换全局变量逻辑**
+- [x] **Step 5: 在 KLineChartPro.tsx 中替换全局变量逻辑**
 
 修改 `src/KLineChartPro.tsx`:
 
@@ -799,12 +793,12 @@ getClickDetector(): IndicatorClickDetector {
 }
 ```
 
-- [ ] **Step 6: 运行构建确认**
+- [x] **Step 6: 运行构建确认**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/core/indicatorClickDetector.ts src/core/__tests__/indicatorClickDetector.test.ts src/KLineChartPro.tsx
@@ -818,7 +812,7 @@ git commit -m "fix: replace globalThis.__tradeVisHitTargets with instance-level 
 **Files:**
 - Modify: `src/DefaultDatafeed.ts:93-94`
 
-- [ ] **Step 1: 实现 unsubscribe**
+- [x] **Step 1: 实现 unsubscribe**
 
 修改 `src/DefaultDatafeed.ts`:
 
@@ -835,7 +829,7 @@ unsubscribe(symbol: SymbolInfo, period: Period): void {
 }
 ```
 
-- [ ] **Step 2: 添加 dispose 方法关闭 WebSocket**
+- [x] **Step 2: 添加 dispose 方法关闭 WebSocket**
 
 在 DefaultDatafeed 类中添加:
 ```typescript
@@ -847,12 +841,12 @@ dispose(): void {
 }
 ```
 
-- [ ] **Step 3: 运行构建确认**
+- [x] **Step 3: 运行构建确认**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/DefaultDatafeed.ts
@@ -871,7 +865,7 @@ git commit -m "fix: implement DefaultDatafeed.unsubscribe to prevent WebSocket m
 - Create: `src/datafeed/ReconnectingWebSocket.ts`
 - Create: `src/datafeed/__tests__/ReconnectingWebSocket.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/datafeed/__tests__/ReconnectingWebSocket.test.ts
@@ -907,7 +901,7 @@ describe('ReconnectingWebSocket options', () => {
 })
 ```
 
-- [ ] **Step 2: 实现 ReconnectingWebSocket**
+- [x] **Step 2: 实现 ReconnectingWebSocket**
 
 ```typescript
 // src/datafeed/ReconnectingWebSocket.ts
@@ -1000,12 +994,12 @@ export class ReconnectingWebSocket {
 }
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run: `npx vitest run src/datafeed/__tests__/ReconnectingWebSocket.test.ts`
 Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/datafeed/
@@ -1016,11 +1010,13 @@ git commit -m "feat: add ReconnectingWebSocket with exponential backoff"
 
 ### Task 3.2: K 线数据缓存
 
+> **NOTE:** DataCache exists but is NOT integrated into DefaultDatafeed yet.
+
 **Files:**
 - Create: `src/datafeed/DataCache.ts`
 - Create: `src/datafeed/__tests__/DataCache.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/datafeed/__tests__/DataCache.test.ts
@@ -1075,7 +1071,7 @@ describe('DataCache', () => {
 })
 ```
 
-- [ ] **Step 2: 实现 DataCache**
+- [x] **Step 2: 实现 DataCache**
 
 ```typescript
 // src/datafeed/DataCache.ts
@@ -1123,12 +1119,12 @@ export class DataCache {
 }
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run: `npx vitest run src/datafeed/__tests__/DataCache.test.ts`
 Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/datafeed/DataCache.ts src/datafeed/__tests__/DataCache.test.ts
@@ -1142,7 +1138,7 @@ git commit -m "feat: add KLineData cache with deduplication"
 **Files:**
 - Modify: `src/DefaultDatafeed.ts`
 
-- [ ] **Step 1: 替换原生 WebSocket 为 ReconnectingWebSocket**
+- [x] **Step 1: 替换原生 WebSocket 为 ReconnectingWebSocket**
 
 修改 `src/DefaultDatafeed.ts`:
 
@@ -1180,12 +1176,12 @@ dispose(): void {
 }
 ```
 
-- [ ] **Step 2: 运行构建**
+- [x] **Step 2: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/DefaultDatafeed.ts
@@ -1201,7 +1197,7 @@ git commit -m "feat: integrate ReconnectingWebSocket into DefaultDatafeed"
 **Files:**
 - Create: `src/alert/types.ts`
 
-- [ ] **Step 1: 创建类型**
+- [x] **Step 1: 创建类型**
 
 ```typescript
 // src/alert/types.ts
@@ -1231,7 +1227,7 @@ export interface AlertEvent {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add src/alert/types.ts
@@ -1246,7 +1242,7 @@ git commit -m "feat: define alert system type interfaces"
 - Create: `src/alert/index.ts`
 - Create: `src/alert/__tests__/alert.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/alert/__tests__/alert.test.ts
@@ -1308,7 +1304,7 @@ describe('AlertManager', () => {
 })
 ```
 
-- [ ] **Step 2: 实现 AlertManager**
+- [x] **Step 2: 实现 AlertManager**
 
 ```typescript
 // src/alert/index.ts
@@ -1392,12 +1388,12 @@ export class AlertManager {
 }
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run: `npx vitest run src/alert/__tests__/alert.test.ts`
 Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/alert/
@@ -1412,7 +1408,7 @@ git commit -m "feat: add AlertManager with crossing/above/below conditions"
 - Create: `src/alert/AlertLine.ts`
 - Modify: `src/extension/index.ts`
 
-- [ ] **Step 1: 创建 AlertLine overlay**
+- [x] **Step 1: 创建 AlertLine overlay**
 
 ```typescript
 // src/alert/AlertLine.ts
@@ -1451,7 +1447,7 @@ const alertLine: OverlayTemplate = {
 export default alertLine
 ```
 
-- [ ] **Step 2: 在 extension/index.ts 注册**
+- [x] **Step 2: 在 extension/index.ts 注册**
 
 在 `src/extension/index.ts` 的 imports 末尾添加:
 ```typescript
@@ -1460,12 +1456,12 @@ import alertLine from '../alert/AlertLine'
 
 在 overlays 数组末尾添加 `alertLine`。
 
-- [ ] **Step 3: 运行构建**
+- [x] **Step 3: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/alert/AlertLine.ts src/extension/index.ts
@@ -1481,7 +1477,7 @@ git commit -m "feat: add alertLine overlay for visual price alerts"
 - Modify: `src/KLineChartPro.tsx`
 - Modify: `src/index.ts`
 
-- [ ] **Step 1: 扩展 ChartPro 接口**
+- [x] **Step 1: 扩展 ChartPro 接口**
 
 在 `src/types.ts` 的 `ChartPro` 接口中添加:
 ```typescript
@@ -1499,7 +1495,7 @@ getAlerts(): import('./alert/types').AlertConfig[]
 onAlertTrigger?: (event: import('./alert/types').AlertEvent) => void
 ```
 
-- [ ] **Step 2: 在 KLineChartPro 中实现**
+- [x] **Step 2: 在 KLineChartPro 中实现**
 
 在 `src/KLineChartPro.tsx` 中:
 
@@ -1548,7 +1544,7 @@ getAlerts(): AlertConfig[] {
 }
 ```
 
-- [ ] **Step 3: 在 index.ts 导出**
+- [x] **Step 3: 在 index.ts 导出**
 
 在 `src/index.ts` 添加:
 ```typescript
@@ -1556,12 +1552,12 @@ export { AlertManager } from './alert'
 export type { AlertConfig, AlertEvent } from './alert/types'
 ```
 
-- [ ] **Step 4: 运行构建**
+- [x] **Step 4: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/types.ts src/KLineChartPro.tsx src/index.ts
@@ -1578,7 +1574,7 @@ git commit -m "feat: integrate AlertManager into ChartPro public API"
 - Create: `src/compare/index.ts`
 - Create: `src/compare/__tests__/compare.test.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/compare/__tests__/compare.test.ts
@@ -1604,7 +1600,7 @@ describe('normalizeToPercent', () => {
 })
 ```
 
-- [ ] **Step 2: 实现**
+- [x] **Step 2: 实现**
 
 ```typescript
 // src/compare/index.ts
@@ -1622,12 +1618,12 @@ export function normalizeToPercent(data: KLineData[]): number[] {
 }
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run: `npx vitest run src/compare/__tests__/compare.test.ts`
 Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/compare/
@@ -1643,7 +1639,7 @@ git commit -m "feat: add price normalization utility for multi-symbol comparison
 - Modify: `src/KLineChartPro.tsx`
 - Modify: `src/index.ts`
 
-- [ ] **Step 1: 扩展 ChartPro 接口**
+- [x] **Step 1: 扩展 ChartPro 接口**
 
 在 `src/types.ts` 的 `ChartPro` 接口添加:
 ```typescript
@@ -1659,7 +1655,7 @@ removeComparison(ticker: string): void
 comparisonDatafeed?: Datafeed
 ```
 
-- [ ] **Step 2: 在 KLineChartPro 中实现（获取对比品种数据 + 归一化）**
+- [x] **Step 2: 在 KLineChartPro 中实现（获取对比品种数据 + 归一化）**
 
 在 `src/KLineChartPro.tsx` 中:
 
@@ -1723,19 +1719,19 @@ removeComparison(ticker: string): void {
 this._datafeed = options.datafeed
 ```
 
-- [ ] **Step 3: 导出新类型**
+- [x] **Step 3: 导出新类型**
 
 在 `src/index.ts` 添加:
 ```typescript
 export { normalizeToPercent } from './compare'
 ```
 
-- [ ] **Step 4: 运行构建**
+- [x] **Step 4: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/types.ts src/KLineChartPro.tsx src/index.ts
@@ -1751,7 +1747,7 @@ git commit -m "feat: add multi-symbol comparison API with data fetching"
 **Files:**
 - Modify: `src/DefaultDatafeed.ts`
 
-- [ ] **Step 1: 为 searchSymbols 添加 try/catch 和 response.ok 检查**
+- [x] **Step 1: 为 searchSymbols 添加 try/catch 和 response.ok 检查**
 
 替换 `DefaultDatafeed.ts:31-43` 的 `searchSymbols` 方法:
 ```typescript
@@ -1780,7 +1776,7 @@ async searchSymbols(search?: string): Promise<SymbolInfo[]> {
 }
 ```
 
-- [ ] **Step 2: 为 getHistoryKLineData 添加同样的错误处理**
+- [x] **Step 2: 为 getHistoryKLineData 添加同样的错误处理**
 
 替换 `DefaultDatafeed.ts:46-58` 的 `getHistoryKLineData` 方法:
 ```typescript
@@ -1808,12 +1804,12 @@ async getHistoryKLineData(symbol: SymbolInfo, period: Period, from: number, to: 
 }
 ```
 
-- [ ] **Step 3: 运行构建**
+- [x] **Step 3: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/DefaultDatafeed.ts
@@ -1827,7 +1823,7 @@ git commit -m "fix: add error handling to DefaultDatafeed API calls"
 **Files:**
 - Modify: `src/ChartProComponent.tsx`
 
-- [ ] **Step 1: 修复 ChartProComponent.tsx 中的 5 处 @ts-expect-error**
+- [x] **Step 1: 修复 ChartProComponent.tsx 中的 5 处 @ts-expect-error**
 
 **Line 51** (`createTooltipDataSource`): 添加正确的类型断言:
 ```typescript
@@ -1851,12 +1847,12 @@ const newIndicators: Record<string, string> = { ...subIndicators() }
 const newSubIndicators: Record<string, string> = { ...subIndicators() }
 ```
 
-- [ ] **Step 2: 运行构建确认无 TS 错误**
+- [x] **Step 2: 运行构建确认无 TS 错误**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/ChartProComponent.tsx
@@ -1867,17 +1863,17 @@ git commit -m "fix: resolve all 5 @ts-expect-error with proper type declarations
 
 ### Task 6.3: 运行全部测试 + 构建验证
 
-- [ ] **Step 1: 运行完整测试套件**
+- [x] **Step 1: 运行完整测试套件**
 
 Run: `npm test`
 Expected: All tests PASS
 
-- [ ] **Step 2: 运行完整构建**
+- [x] **Step 2: 运行完整构建**
 
 Run: `npm run build`
 Expected: 构建成功，dist/ 产物正常
 
-- [ ] **Step 3: Final commit**
+- [x] **Step 3: Final commit**
 
 ```bash
 git add -A

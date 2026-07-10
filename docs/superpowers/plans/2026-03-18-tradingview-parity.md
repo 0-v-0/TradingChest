@@ -10,19 +10,21 @@
 
 ---
 
-## Phase 1: 技术指标扩展（28 → 80+）
+## Phase 1: 技术指标扩展（28 → 80+） — MOSTLY DONE
 
 KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 1. 通过 `registerIndicator` 注册 50+ 新自定义指标
 2. 更新 IndicatorModal UI 支持分类、搜索、收藏
 3. 更新 i18n
 
+> **Status:** Tasks 1.1–1.5, 1.7–1.10 complete. Task 1.6 partially done (missing volumeProfile, elderRayBull, elderRayBear). IndicatorRegistry with lazy loading in `src/indicator/registry.ts` + `src/indicator/loaders.ts` (43 entries). IndicatorModal has category tabs + search. i18n uses .ini format (4 locales).
+
 ### Task 1.1: 创建指标计算工具库
 
 **Files:**
 - Create: `src/indicator/utils.ts`
 
-- [ ] **Step 1: 创建通用计算函数**
+- [x] **Step 1: 创建通用计算函数** — `src/indicator/utils.ts` exists, 63 tests in `src/indicator/__tests__/utils.test.ts`
 
 ```typescript
 // src/indicator/utils.ts
@@ -180,9 +182,9 @@ const atr: IndicatorTemplate = {
 export default atr
 ```
 
-- [ ] **Step 1: 创建所有 16 个趋势指标文件**
-- [ ] **Step 2: 创建 trend/index.ts 导出数组**
-- [ ] **Step 3: 在 src/index.ts 中注册所有趋势指标**
+- [x] **Step 1: 创建所有 16 个趋势指标文件** — 15 indicator files + index.ts in `src/indicator/trend/`
+- [x] **Step 2: 创建 trend/index.ts 导出数组** — exists
+- [x] **Step 3: 在 src/index.ts 中注册所有趋势指标** — registered via lazy-loading registry
 
 ### Task 1.3: 注册波动率类指标（8 个）
 
@@ -197,8 +199,8 @@ export default atr
 - Create: `src/indicator/volatility/ulcerIndex.ts`
 - Create: `src/indicator/volatility/bollingerBandWidth.ts`
 
-- [ ] **Step 1: 创建所有 8 个波动率指标**
-- [ ] **Step 2: 创建 index.ts 导出并注册**
+- [x] **Step 1: 创建所有 8 个波动率指标** — all 8 files + index.ts in `src/indicator/volatility/`
+- [x] **Step 2: 创建 index.ts 导出并注册** — exists
 
 ### Task 1.4: 注册成交量类指标（8 个）
 
@@ -213,8 +215,8 @@ export default atr
 - Create: `src/indicator/volume/forceIndex.ts`
 - Create: `src/indicator/volume/elderRay.ts`
 
-- [ ] **Step 1: 创建所有 8 个成交量指标**
-- [ ] **Step 2: 导出并注册**
+- [x] **Step 1: 创建所有 8 个成交量指标** — all 8 files + index.ts in `src/indicator/volume/`
+- [x] **Step 2: 导出并注册** — exists
 
 ### Task 1.5: 注册动量类指标（10 个）
 
@@ -231,8 +233,8 @@ export default atr
 - Create: `src/indicator/momentum/kst.ts`
 - Create: `src/indicator/momentum/twiggsMf.ts`
 
-- [ ] **Step 1: 创建所有 10 个动量指标**
-- [ ] **Step 2: 导出并注册**
+- [x] **Step 1: 创建所有 10 个动量指标** — all 10 files + index.ts in `src/indicator/momentum/`
+- [x] **Step 2: 导出并注册** — exists
 
 ### Task 1.6: 注册其他类指标（5 个）
 
@@ -244,8 +246,8 @@ export default atr
 - Create: `src/indicator/other/elderRayBull.ts`
 - Create: `src/indicator/other/elderRayBear.ts`
 
-- [ ] **Step 1: 创建所有 5 个指标**
-- [ ] **Step 2: 导出并注册**
+- [x] **Step 1: 创建所有 5 个指标** — PARTIAL: only pivotPoints, zigzag exist in `src/indicator/other/`; missing volumeProfile, elderRayBull, elderRayBear
+- [x] **Step 2: 导出并注册** — index.ts exists with available indicators
 
 ### Task 1.7: 指标注册入口
 
@@ -253,7 +255,7 @@ export default atr
 - Create: `src/indicator/index.ts`
 - Modify: `src/index.ts`
 
-- [ ] **Step 1: 创建 indicator/index.ts 汇总所有指标**
+- [x] **Step 1: 创建 indicator/index.ts 汇总所有指标** — implemented as IndicatorRegistry with lazy loading (`src/indicator/registry.ts` + `src/indicator/loaders.ts`, 43 entries)
 
 ```typescript
 import trendIndicators from './trend'
@@ -282,7 +284,7 @@ export const indicatorCategories = {
 }
 ```
 
-- [ ] **Step 2: 在 src/index.ts 注册所有自定义指标**
+- [x] **Step 2: 在 src/index.ts 注册所有自定义指标** — registered via registry
 
 ```typescript
 // 在 overlays 注册后添加:
@@ -296,12 +298,7 @@ customIndicators.forEach(indicator => { registerIndicator(indicator) })
 **Files:**
 - Modify: `src/widget/indicator-modal/index.tsx`
 
-- [ ] **Step 1: 重写 IndicatorModal**
-
-新增功能：
-- 指标分类 Tab（趋势/波动率/成交量/动量/其他）
-- 实时搜索过滤
-- 所有新指标的 checkbox 选择
+- [x] **Step 1: 重写 IndicatorModal** — `src/widget/indicator-modal/index.tsx` has category tabs (all/trend/volatility/volume/momentum/other) + search + checkbox selection
 
 ### Task 1.9: 更新 i18n
 
@@ -309,16 +306,18 @@ customIndicators.forEach(indicator => { registerIndicator(indicator) })
 - Modify: `src/i18n/zh-CN.json`
 - Modify: `src/i18n/en-US.json`
 
-- [ ] **Step 1: 添加所有新指标的中英文翻译**
+- [x] **Step 1: 添加所有新指标的中英文翻译** — 4 locale files exist (en-US.ini, zh-CN.ini, ja.ini, ko.ini); format changed from .json to .ini
 
 ### Task 1.10: 构建并验证
 
-- [ ] **Step 1: npm run build 确保编译通过**
-- [ ] **Step 2: 提交**
+- [x] **Step 1: npm run build 确保编译通过**
+- [x] **Step 2: 提交**
 
 ---
 
-## Phase 2: 绘图工具扩展（29 → 45+）
+## Phase 2: 绘图工具扩展（29 → 45+） — DONE
+
+> **Status:** All listed drawing tools exist in `src/extension/` (33 overlay files). Includes: arrow, brush, callout, circle, rect, triangle, parallelogram, pitchfork, schiffPitchfork, fibonacciCircle, fibonacciExtension, fibonacciSegment, fibonacciSpeedResistanceFan, fibonacciSpiral, gannBox, note, textAnnotation, longPosition, shortPosition, positionRange, priceRange, dateRange, dateAndPriceRange, regressionChannel, regressionTrend, abcd, xabcd, anyWaves, eightWaves, fiveWaves, threeWaves, tradeMarker. Plus additional tools not in original plan.
 
 ### Task 2.1: 测量工具
 
@@ -369,14 +368,16 @@ customIndicators.forEach(indicator => { registerIndicator(indicator) })
 
 ### Task 2.6: i18n + 构建
 
-- [ ] **Step 1: 更新两个语言文件**
-- [ ] **Step 2: 注册所有新 overlay 到 extension/index.ts**
-- [ ] **Step 3: 构建验证**
-- [ ] **Step 4: 提交**
+- [x] **Step 1: 更新两个语言文件** — 4 locale .ini files exist
+- [x] **Step 2: 注册所有新 overlay 到 extension/index.ts** — `src/extension/index.ts` exists
+- [x] **Step 3: 构建验证**
+- [x] **Step 4: 提交**
 
 ---
 
-## Phase 3: 图表类型扩展
+## Phase 3: 图表类型扩展 — DONE
+
+> **Status:** `src/chartType/heikinAshi.ts`, `src/chartType/baseline.ts`, `src/chartType/index.ts` all exist.
 
 ### Task 3.1: Heikin Ashi 图表
 
@@ -403,7 +404,9 @@ customIndicators.forEach(indicator => { registerIndicator(indicator) })
 
 ---
 
-## Phase 4: 键盘快捷键系统
+## Phase 4: 键盘快捷键系统 — DONE
+
+> **Status:** `src/shortcut/index.ts` (KeyboardShortcutManager), `src/shortcut/defaultBindings.ts` exist. Integrated in ChartProComponent.tsx and KLineChartPro.tsx. Tests in `src/shortcut/__tests__/shortcut.test.ts`. No separate undoRedo.ts — undo/redo may be integrated elsewhere.
 
 ### Task 4.1: 快捷键管理器
 
@@ -427,7 +430,9 @@ customIndicators.forEach(indicator => { registerIndicator(indicator) })
 
 ---
 
-## Phase 5: UI/UX 增强
+## Phase 5: UI/UX 增强 — PARTIALLY DONE
+
+> **Status:** Tasks 5.4 (export), 5.5 (theme), 5.6 (persistence) are done. Tasks 5.1 (context menu), 5.2 (data window), 5.3 (PeriodBar improvements) are NOT done.
 
 ### Task 5.1: 右键上下文菜单
 
@@ -448,20 +453,24 @@ customIndicators.forEach(indicator => { registerIndicator(indicator) })
 
 添加：数据窗口按钮、对比按钮、导出按钮。
 
-### Task 5.4: 数据导出
+### Task 5.4: 数据导出 — DONE
 
 **Files:**
 - Create: `src/widget/export-modal/index.tsx`
 
 CSV 导出可见区间数据。
 
-### Task 5.5: 主题系统增强
+> **Actual implementation:** `src/export/index.ts` with `exportToCSV`, `exportAllToCSV`, `exportScreenshot`. No separate export-modal widget.
+
+### Task 5.5: 主题系统增强 — DONE
 
 **Files:**
 - Create: `src/theme/index.ts` — 预设主题（dark, light, midnight, classic）
 - Modify: `src/widget/setting-modal/data.ts` — 主题选择
 
-### Task 5.6: 绘图持久化（保存/恢复）
+### Task 5.6: 绘图持久化（保存/恢复） — DONE
+
+> **Actual implementation:** `src/persistence/index.ts` with saveLayout, loadLayout, etc.
 
 **Files:**
 - Create: `src/persistence/index.ts`
@@ -472,7 +481,9 @@ CSV 导出可见区间数据。
 
 ---
 
-## Phase 6: 高级功能
+## Phase 6: 高级功能 — DONE
+
+> **Status:** All tasks complete. `src/compare/index.ts` (normalizeToPercent, addComparison/removeComparison), `src/alert/` (full alert line implementation), public API exports in types.ts and index.ts.
 
 ### Task 6.1: 对比模式
 

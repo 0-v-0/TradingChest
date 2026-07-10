@@ -1,6 +1,6 @@
 # 指标懒加载 + 增量计算 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 将 43 个自定义指标从全量启动注册改为按需懒加载，并为实时更新添加增量计算缓存，减少初始化开销和运行时 CPU 占用
 
@@ -35,7 +35,7 @@
 - Create: `src/indicator/__tests__/registry.test.ts`
 - Create: `src/indicator/registry.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/indicator/__tests__/registry.test.ts
@@ -100,12 +100,12 @@ describe('IndicatorRegistry', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `npx vitest run src/indicator/__tests__/registry.test.ts`
 Expected: FAIL — module not found
 
-- [ ] **Step 3: 实现 IndicatorRegistry**
+- [x] **Step 3: 实现 IndicatorRegistry**
 
 ```typescript
 // src/indicator/registry.ts
@@ -178,12 +178,12 @@ export class IndicatorRegistry {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `npx vitest run src/indicator/__tests__/registry.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/indicator/registry.ts src/indicator/__tests__/registry.test.ts
@@ -197,7 +197,7 @@ git commit -m "feat: add IndicatorRegistry for lazy-loading indicator management
 **Files:**
 - Create: `src/indicator/loaders.ts`
 
-- [ ] **Step 1: 创建 loaders 文件**
+- [x] **Step 1: 创建 loaders 文件**
 
 每个自定义指标对应一个动态 `import()` 函数。klinecharts 内置指标（MA, EMA, SMA, BOLL, SAR, BBI, VOL, MACD, KDJ, RSI, BIAS, BRAR, CCI, DMI, CR, PSY, DMA, TRIX, OBV, VR, WR, MTM, EMV, ROC, PVT, AO）不需要 loader。
 
@@ -268,12 +268,12 @@ export const indicatorLoaders: Record<string, IndicatorLoader> = {
 }
 ```
 
-- [ ] **Step 2: 运行构建确认 import 路径正确**
+- [x] **Step 2: 运行构建确认 import 路径正确**
 
 Run: `npm run build-core`
 Expected: 构建成功（Vite 会为每个动态 import 创建 chunk）
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/indicator/loaders.ts
@@ -288,7 +288,7 @@ git commit -m "feat: add dynamic import loaders for all 43 custom indicators"
 - Create: `src/indicator/__tests__/incrementalCalc.test.ts`
 - Create: `src/indicator/incrementalCalc.ts`
 
-- [ ] **Step 1: 编写测试**
+- [x] **Step 1: 编写测试**
 
 ```typescript
 // src/indicator/__tests__/incrementalCalc.test.ts
@@ -381,12 +381,12 @@ describe('wrapWithIncrementalCalc', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `npx vitest run src/indicator/__tests__/incrementalCalc.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 实现增量计算包装器**
+- [x] **Step 3: 实现增量计算包装器**
 
 ```typescript
 // src/indicator/incrementalCalc.ts
@@ -467,12 +467,12 @@ export function wrapWithIncrementalCalc(
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `npx vitest run src/indicator/__tests__/incrementalCalc.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/indicator/incrementalCalc.ts src/indicator/__tests__/incrementalCalc.test.ts
@@ -487,7 +487,7 @@ git commit -m "feat: add incremental calculation wrapper for indicator performan
 - Modify: `src/index.ts:32-35`
 - Modify: `src/indicator/index.ts`
 
-- [ ] **Step 1: 修改 `src/indicator/index.ts`**
+- [x] **Step 1: 修改 `src/indicator/index.ts`**
 
 移除 `customIndicators` 默认导出，改为导出 registry 和 loaders：
 
@@ -536,7 +536,7 @@ export const indicatorCategories: Record<string, { names: string[], label_zh: st
 }
 ```
 
-- [ ] **Step 2: 修改 `src/index.ts`**
+- [x] **Step 2: 修改 `src/index.ts`**
 
 移除全量指标注册，保留 overlay 和 chartType 注册（它们数量少且启动必需）：
 
@@ -560,12 +560,12 @@ registerIndicator(tradeVisualization)
 export { indicatorRegistry } from './indicator'
 ```
 
-- [ ] **Step 3: 运行构建**
+- [x] **Step 3: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/index.ts src/indicator/index.ts
@@ -579,7 +579,7 @@ git commit -m "refactor: remove eager indicator registration, export lazy regist
 **Files:**
 - Modify: `src/ChartProComponent.tsx`
 
-- [ ] **Step 1: 修改 createIndicator 函数为 async**
+- [x] **Step 1: 修改 createIndicator 函数为 async**
 
 在 `ChartProComponent.tsx` 中:
 
@@ -638,17 +638,17 @@ onMainIndicatorChange={async data => {
 
 在 `onSubIndicatorChange` 回调中同理。
 
-- [ ] **Step 2: 运行构建**
+- [x] **Step 2: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 3: 运行全部测试**
+- [x] **Step 3: 运行全部测试**
 
 Run: `npx vitest run`
 Expected: 全部 PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/ChartProComponent.tsx
@@ -662,7 +662,7 @@ git commit -m "refactor: make createIndicator async for lazy-loading support"
 **Files:**
 - Modify: `src/widget/indicator-modal/index.tsx:169-170`
 
-- [ ] **Step 1: 修复类型**
+- [x] **Step 1: 修复类型**
 
 在 `src/widget/indicator-modal/index.tsx` 中:
 
@@ -680,12 +680,12 @@ export interface IndicatorModalProps {
 
 然后删除 line 169 的 `// @ts-expect-error` 注释。
 
-- [ ] **Step 2: 运行构建**
+- [x] **Step 2: 运行构建**
 
 Run: `npm run build-core`
 Expected: 构建成功
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/widget/indicator-modal/index.tsx
@@ -696,22 +696,22 @@ git commit -m "fix: type IndicatorModalProps.subIndicators as Record<string, str
 
 ## Task 7: 全量验证
 
-- [ ] **Step 1: 运行完整测试**
+- [x] **Step 1: 运行完整测试**
 
 Run: `npx vitest run`
 Expected: All PASS
 
-- [ ] **Step 2: 运行完整构建**
+- [x] **Step 2: 运行完整构建**
 
 Run: `npm run build`
 Expected: 构建成功
 
-- [ ] **Step 3: 验证 bundle 中指标代码被分割**
+- [x] **Step 3: 验证 bundle 中指标代码被分割**
 
 Run: `ls -la dist/`
 Expected: 主 bundle 大小应比之前（344KB ES）减少，或出现额外 chunk 文件
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A
