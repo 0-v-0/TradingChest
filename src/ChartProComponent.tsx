@@ -515,7 +515,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     }
 
     // Capture default styles once for "restore defaults" in settings modal
-    setWidgetDefaultStyles(structuredClone(widget!.getStyles()))
+    if (widget) {
+      setWidgetDefaultStyles(structuredClone(widget.getStyles()))
+    }
 
     ;(async () => {
       for (const indicator of mainIndicators()) {

@@ -52,14 +52,14 @@ const Checkbox: Component<CheckboxProps> = (props) => {
       tabIndex={0}
       onClick={(_e) => {
         const ck = !innerChecked()
-        void props.onChange?.(ck)
+        props.onChange?.(ck)
         setInnerChecked(ck)
       }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           const ck = !innerChecked()
-          void props.onChange?.(ck)
+          props.onChange?.(ck)
           setInnerChecked(ck)
         }
       }}

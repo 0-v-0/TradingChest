@@ -13,6 +13,7 @@
  *   信号线周期: 9
  */
 import { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcSMA } from '../utils'
 
 type KstResult = { kst: number | undefined; signal: number | undefined }
 
@@ -31,7 +32,6 @@ const kst: IndicatorTemplate = {
     const signalPeriod = p[8] as number
     const weights = [1, 2, 3, 4]
     const len = dataList.length
-    const result: KstResult[] = []
 
     // ---- 计算四条 ROC 序列 ----
     const rocs: (number | null)[][] = []
@@ -47,28 +47,26 @@ const kst: IndicatorTemplate = {
       rocs.push(roc)
     }
 
-    // ---- 对每条 ROC 做 SMA 平滑 ----
+    // ---- 对每条 ROC 做 SMA 平滑（复用 calcSMA 滑动窗口，O(n)） ----
+    // calcSMA 要求连续 number[] 输入，需将有效 ROC 值提取后传入，结果映射回原索引
     const smoothedRocs: (number | null)[][] = []
     for (let r = 0; r < 4; r++) {
-      const smoothed: (number | null)[] = new Array(len).fill(null)
-      const smaP = smaPeriods[r]
-
-      // 使用有效值索引缓冲区
+      const roc = rocs[r]
+      const validValues: number[] = []
       const validIndices: number[] = []
       for (let i = 0; i < len; i++) {
-        if (rocs[r][i] !== null) {
+        if (roc[i] !== null) {
+          validValues.push(roc[i] as number)
           validIndices.push(i)
-          if (validIndices.length >= smaP) {
-            // 精确计算避免浮点漂移
-            let s = 0
-            for (let w = validIndices.length - smaP; w < validIndices.length; w++) {
-              s += rocs[r][validIndices[w]] as number
-            }
-            smoothed[i] = s / smaP
-          }
         }
       }
-
+      const smaResult = calcSMA(validValues, smaPeriods[r])
+      const smoothed: (number | null)[] = new Array(len).fill(null)
+      for (let j = 0; j < validIndices.length; j++) {
+        if (smaResult[j] !== null) {
+          smoothed[validIndices[j]] = smaResult[j]
+        }
+      }
       smoothedRocs.push(smoothed)
     }
 
@@ -90,22 +88,24 @@ const kst: IndicatorTemplate = {
     }
 
     // ---- 计算 Signal = SMA(KST, signalPeriod) ----
-    const signalLine: (number | null)[] = new Array(len).fill(null)
+    const kstValidValues: number[] = []
     const kstValidIndices: number[] = []
     for (let i = 0; i < len; i++) {
       if (kstLine[i] !== null) {
+        kstValidValues.push(kstLine[i] as number)
         kstValidIndices.push(i)
-        if (kstValidIndices.length >= signalPeriod) {
-          let s = 0
-          for (let w = kstValidIndices.length - signalPeriod; w < kstValidIndices.length; w++) {
-            s += kstLine[kstValidIndices[w]] as number
-          }
-          signalLine[i] = s / signalPeriod
-        }
+      }
+    }
+    const signalSmaResult = calcSMA(kstValidValues, signalPeriod)
+    const signalLine: (number | null)[] = new Array(len).fill(null)
+    for (let j = 0; j < kstValidIndices.length; j++) {
+      if (signalSmaResult[j] !== null) {
+        signalLine[kstValidIndices[j]] = signalSmaResult[j]
       }
     }
 
     // ---- 组装输出 ----
+    const result: KstResult[] = []
     for (let i = 0; i < len; i++) {
       result.push({
         kst: kstLine[i] ?? undefined,

@@ -77,7 +77,7 @@ export default {
   MACD: [
     { paramNameKey: 'params_1', precision: 0, min: 1, default: 12 },
     { paramNameKey: 'params_2', precision: 0, min: 1, default: 26 },
-    { paramNameKey: 'params_2', precision: 0, min: 1, default: 9 },
+    { paramNameKey: 'params_3', precision: 0, min: 1, default: 9 },
   ],
   OBV: [{ paramNameKey: 'params_1', precision: 0, min: 1, default: 30 }],
   PVT: [],
