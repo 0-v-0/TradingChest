@@ -398,7 +398,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (dataList.length === 0) return
     // 暂停实时数据订阅，防止实时数据污染回放时间线
     props.datafeed.unsubscribe(symbol(), period())
-    const pos = startPosition ?? Math.floor(dataList.length * 0.5)
+    const pos = startPosition ?? dataList.length >>> 1
     replayEngine = new ReplayEngine({
       onDataChange: (data) => {
         widget?.applyNewData(data, data.length > 0)
@@ -444,7 +444,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     setTheme,
     getTheme: () => theme(),
     setStyles,
-    getStyles: () => widget?.getStyles() ?? ({} as Styles),
+    getStyles: () => widget?.getStyles() ?? {} as Styles,
     setLocale,
     getLocale: () => locale(),
     setTimezone: (tz: string) => {
