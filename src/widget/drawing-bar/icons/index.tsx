@@ -403,6 +403,13 @@ export const mapping = {
       <line x1="11" y1="5" x2="11" y2="17" stroke="currentColor" stroke-width="1" />
     </svg>
   ),
+  disjointAngle: (cls?: string) => (
+    <svg class={`icon-overlay ${cls ?? ''}`} viewBox="0 0 22 22">
+      <line x1="4" y1="16" x2="11" y2="6" stroke="currentColor" stroke-width="1.5" />
+      <line x1="11" y1="6" x2="18" y2="14" stroke="currentColor" stroke-width="1.5" />
+      <path d="M9,10 Q11,6 14,10" fill="none" stroke="currentColor" stroke-width="1" />
+    </svg>
+  ),
   textAnnotation: (cls?: string) => (
     <svg class={`icon-overlay ${cls ?? ''}`} viewBox="0 0 22 22">
       <path d="M6,6 L16,6 M11,6 L11,17" fill="none" stroke="currentColor" stroke-width="2" />
@@ -495,6 +502,20 @@ export const mapping = {
       <line x1="7" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1" />
       <line x1="7" y1="11" x2="15" y2="11" stroke="currentColor" stroke-width="1" />
       <line x1="7" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="1" />
+    </svg>
+  ),
+  flatTopBottom: (cls?: string) => (
+    <svg class={`icon-overlay ${cls ?? ''}`} viewBox="0 0 22 22">
+      <line x1="4" y1="8" x2="18" y2="8" stroke="currentColor" stroke-width="1.5" />
+      <text x="11" y="5" font-size="5" text-anchor="middle" fill="currentColor">Top</text>
+    </svg>
+  ),
+  forecast: (cls?: string) => (
+    <svg class={`icon-overlay ${cls ?? ''}`} viewBox="0 0 22 22">
+      <line x1="4" y1="14" x2="11" y2="10" stroke="currentColor" stroke-width="1.5" />
+      <line x1="11" y1="10" x2="18" y2="6" stroke="currentColor" stroke-width="1" stroke-dasharray="3,2" />
+      <line x1="11" y1="6" x2="18" y2="2" stroke="currentColor" stroke-width="1" stroke-dasharray="3,2" opacity="0.5" />
+      <line x1="11" y1="14" x2="18" y2="10" stroke="currentColor" stroke-width="1" stroke-dasharray="3,2" opacity="0.5" />
     </svg>
   ),
   weak_magnet: (cls?: string) => (
@@ -608,6 +629,7 @@ export function createMoreLineOptions(locale: string): SelectDataSourceItem[] {
   return [
     { key: 'priceChannelLine', text: t('price_channel_line', locale) },
     { key: 'parallelStraightLine', text: t('parallel_straight_line', locale) },
+    { key: 'flatTopBottom', text: t('flat_top_bottom', locale) },
   ]
 }
 
@@ -648,6 +670,8 @@ export function createMeasurementOptions(locale: string): SelectDataSourceItem[]
     { key: 'priceRange', text: t('price_range', locale) },
     { key: 'dateRange', text: t('date_range', locale) },
     { key: 'dateAndPriceRange', text: t('date_and_price_range', locale) },
+    { key: 'disjointAngle', text: t('disjoint_angle', locale) },
+    { key: 'forecast', text: t('forecast', locale) },
   ]
 }
 

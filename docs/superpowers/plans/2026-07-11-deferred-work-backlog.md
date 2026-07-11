@@ -264,9 +264,9 @@
 
 **预估:** 每个 0.5–1 天
 
-- [ ] **Task C.1a:** Flat Top/Bottom overlay
-- [ ] **Task C.1b:** Disjoint Angle overlay
-- [ ] **Task C.1c:** Forecast overlay
+- [x] **Task C.1a:** Flat Top/Bottom overlay
+- [x] **Task C.1b:** Disjoint Angle overlay
+- [x] **Task C.1c:** Forecast overlay
 
 ---
 
@@ -401,7 +401,7 @@ gantt
 - [x] 数据窗口显示所有 pane 指标值
 - [x] 主题可可视化编辑并导入/导出 JSON
 - [ ] Volume Profile 指标可用
-- [ ] 3 个缺失绘图工具补齐
+- [x] 3 个缺失绘图工具补齐（Flat Top/Bottom, Disjoint Angle, Forecast）
 - [ ] 多图表布局基础能力（或明确标记为平台层外包）
 
 ---

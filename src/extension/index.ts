@@ -6,6 +6,7 @@ import brush from './brush'
 import callout from './callout'
 import circle from './circle'
 import dateAndPriceRange from './dateAndPriceRange'
+import disjointAngle from './disjointAngle'
 import dateRange from './dateRange'
 import eightWaves from './eightWaves'
 import fibonacciCircle from './fibonacciCircle'
@@ -14,6 +15,8 @@ import fibonacciSegment from './fibonacciSegment'
 import fibonacciSpeedResistanceFan from './fibonacciSpeedResistanceFan'
 import fibonacciSpiral from './fibonacciSpiral'
 import fiveWaves from './fiveWaves'
+import flatTopBottom from './flatTopBottom'
+import forecast from './forecast'
 import gannBox from './gannBox'
 import longPosition from './longPosition'
 import note from './note'
@@ -39,12 +42,14 @@ const overlays = [
   fibonacciCircle, fibonacciSegment, fibonacciSpiral,
   fibonacciSpeedResistanceFan, fibonacciExtension, gannBox,
   threeWaves, fiveWaves, eightWaves, anyWaves, abcd, xabcd,
-  priceRange, dateRange, dateAndPriceRange,
+  priceRange, dateRange, dateAndPriceRange, disjointAngle,
   pitchfork, schiffPitchfork, regressionTrend, regressionChannel,
   textAnnotation, callout, brush, longPosition, shortPosition, note,
   positionRange,
   tradeMarker,
   alertLine,
+  flatTopBottom,
+  forecast,
 ]
 
 export default overlays
