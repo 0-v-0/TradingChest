@@ -340,6 +340,19 @@ describe('KeyboardShortcutManager', () => {
       el.dispatchEvent(event)
       expect(handler).toHaveBeenCalled()
     })
+
+    it('修饰键单独按下不触发', () => {
+      const handler = vi.fn()
+      manager.registerAction('test:action', handler)
+      manager.addBinding({ combo: 'ctrl+t', action: 'test:action', descriptionKey: 'test' })
+      const el = document.createElement('div')
+      manager.bindTo(el)
+      const keys = ['Control', 'Shift', 'Alt', 'Meta']
+      for (const key of keys) {
+        el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
+      }
+      expect(handler).not.toHaveBeenCalled()
+    })
   })
 
   describe('特殊键处理', () => {

@@ -70,14 +70,10 @@ const superTrend: IndicatorTemplate = {
 
         // 与前值比较，确保波段不会反向收缩
         if (i > period) {
-          if (lowerBand > prevLowerBand || dataList[i - 1].close < prevLowerBand) {
-            // 保持
-          } else {
+          if (lowerBand <= prevLowerBand && dataList[i - 1].close >= prevLowerBand) {
             lowerBand = prevLowerBand
           }
-          if (upperBand < prevUpperBand || dataList[i - 1].close > prevUpperBand) {
-            // 保持
-          } else {
+          if (upperBand >= prevUpperBand && dataList[i - 1].close <= prevUpperBand) {
             upperBand = prevUpperBand
           }
         }

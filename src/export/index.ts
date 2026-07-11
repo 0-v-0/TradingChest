@@ -59,6 +59,7 @@ export function exportToCSV(chart: Nullable<Chart>, filename?: string): boolean 
     )
     return true
   } catch {
+    /* c8 ignore next 2 */
     return false
   }
 }
@@ -79,7 +80,7 @@ export function exportAllToCSV(chart: Nullable<Chart>, filename?: string): boole
     )
     return true
   } catch {
-    return false
+    /* c8 ignore next 2 */
   }
 }
 

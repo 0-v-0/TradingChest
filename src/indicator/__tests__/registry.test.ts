@@ -75,4 +75,20 @@ describe('IndicatorRegistry', () => {
     expect(registry.isRegistered('MA')).toBe(true)
     expect(registerFn).not.toHaveBeenCalled()
   })
+
+  it('setLoaders 批量注册 loader', async () => {
+    const registerFn = vi.fn()
+    registry.setRegisterFn(registerFn)
+    registry.setLoaders({
+      ATR: vi.fn().mockResolvedValue({ name: 'ATR', calc: () => [] }),
+      RSI: vi.fn().mockResolvedValue({ name: 'RSI', calc: () => [] }),
+    })
+
+    await registry.ensureRegistered('ATR')
+    await registry.ensureRegistered('RSI')
+
+    expect(registry.isRegistered('ATR')).toBe(true)
+    expect(registry.isRegistered('RSI')).toBe(true)
+    expect(registerFn).toHaveBeenCalledTimes(2)
+  })
 })

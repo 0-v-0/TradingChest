@@ -48,6 +48,11 @@ describe('load', () => {
     expect(translate('indicator', 'ko')).toBe('지표')
   })
 
+  it('loads ja locale', async () => {
+    await load('ja')
+    expect(translate('indicator', 'ja')).toBe('指標')
+  })
+
   it('does not reload an already loaded locale', async () => {
     await load('en-US')
     await load('en-US')

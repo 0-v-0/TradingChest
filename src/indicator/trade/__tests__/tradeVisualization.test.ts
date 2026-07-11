@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { type TradeRecord, findClosestBar } from '../tradeVisualization'
+import {
+  type TradeRecord,
+  findClosestBar,
+  getTradeVisHitTargets,
+  cleanupTradeVisInstance,
+} from '../tradeVisualization'
 import tradeVisualization from '../tradeVisualization'
 
 // Helper: make KLineData-like objects with just the fields calc needs
@@ -194,5 +199,19 @@ describe('tradeVisualization.calc', () => {
 
     expect(result[1].entry).toBeDefined() // 190 → bar[1] (200)
     expect(result[2].exit).toBeDefined() // 310 → bar[2] (300)
+  })
+})
+
+describe('getTradeVisHitTargets and cleanupTradeVisInstance', () => {
+  it('returns empty array for uninitialized instance', () => {
+    expect(getTradeVisHitTargets('nonexistent')).toEqual([])
+  })
+
+  it('returns empty array for default instance', () => {
+    expect(getTradeVisHitTargets()).toEqual([])
+  })
+
+  it('cleanup does not throw for uninitialized instance', () => {
+    expect(() => cleanupTradeVisInstance('nonexistent')).not.toThrow()
   })
 })

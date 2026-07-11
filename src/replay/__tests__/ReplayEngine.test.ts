@@ -84,6 +84,17 @@ describe('ReplayEngine', () => {
     expect(onBarUpdate.mock.calls.length).toBe(4)
   })
 
+  it('setSpeed while playing restarts timer', () => {
+    engine.start(makeKlines(100), 50)
+    engine.play()
+    vi.advanceTimersByTime(1000)
+    const countBefore = onBarUpdate.mock.calls.length
+    engine.setSpeed(4)
+    vi.advanceTimersByTime(1000)
+    // With 4x speed, 1000ms / 250ms = 4 bars
+    expect(onBarUpdate.mock.calls.length).toBe(countBefore + 4)
+  })
+
   it('到达末尾自动暂停', () => {
     engine.start(makeKlines(5), 3)
     onBarUpdate.mockClear()

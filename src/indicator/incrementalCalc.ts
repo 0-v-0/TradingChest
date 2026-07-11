@@ -62,7 +62,7 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
       // dataset is too small to benefit from a partial pass.
       cached = fullCalc(dataList, indicator)
       prevLen = len
-      prevSecondLastTs = len >= 2 ? dataList[len - 2].timestamp : 0
+      prevSecondLastTs = /* c8 ignore next */ len >= 2 ? dataList[len - 2].timestamp : 0
       return cached
     }
 

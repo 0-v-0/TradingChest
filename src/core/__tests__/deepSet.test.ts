@@ -31,4 +31,11 @@ describe('deepSet', () => {
     deepSet(obj, 'constructor.prototype.polluted', true)
     expect(({} as Record<string, unknown>).polluted).toBeUndefined()
   })
+
+  it('rejects prototype as last key', () => {
+    const obj: Record<string, unknown> = {}
+    deepSet(obj, 'a.prototype', 'value')
+    expect(obj.a).toEqual({})
+    expect((obj.a as Record<string, unknown>).prototype).toBeUndefined()
+  })
 })

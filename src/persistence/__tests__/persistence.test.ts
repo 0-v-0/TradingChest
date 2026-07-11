@@ -142,6 +142,28 @@ describe('persistence', () => {
     })
   })
 
+  describe('saveLayout error handling', () => {
+    it('should return false when setItem throws', () => {
+      const setItemSpy = vi.spyOn(localStorageMock, 'setItem').mockImplementation(() => {
+        throw new Error('QuotaExceededError')
+      })
+
+      const layout = {
+        theme: 'dark',
+        locale: 'en',
+        timezone: 'UTC',
+        mainIndicators: [],
+        subIndicators: [],
+        styles: null,
+        overlayData: [],
+      }
+
+      const result = saveLayout('full', layout)
+      expect(result).toBe(false)
+      setItemSpy.mockRestore()
+    })
+  })
+
   describe('deleteLayout', () => {
     it('should remove a layout so it cannot be loaded', () => {
       const layout = {

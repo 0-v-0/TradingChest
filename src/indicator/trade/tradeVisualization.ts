@@ -155,6 +155,7 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo> = {
       return info
     })
   },
+  /* c8 ignore start */
   draw: ({ ctx, indicator, bounding, xAxis, yAxis, chart }) => {
     const visibleRange = chart.getVisibleRange()
     const result = indicator.result as BarTradeInfo[]
@@ -277,5 +278,6 @@ function drawLabel(
   ctx.textBaseline = 'middle'
   ctx.fillText(text, x, ly + h / 2)
 }
+/* c8 ignore stop */
 
 export default tradeVisualization

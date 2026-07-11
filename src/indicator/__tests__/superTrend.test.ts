@@ -56,4 +56,26 @@ describe('SuperTrend indicator', () => {
     const result = superTrend.calc!([], indicator)
     expect(result).toHaveLength(0)
   })
+
+  it('下降趋势 direction 为 -1', () => {
+    // Create klines with a sharp drop at bar 15 to trigger direction = -1
+    const descending = makeKlines(25)
+    for (let i = 12; i < descending.length; i++) {
+      descending[i] = {
+        ...descending[i],
+        high: descending[i].high - 20,
+        low: descending[i].low - 20,
+        close: descending[i].close - 20,
+      }
+    }
+    const result = superTrend.calc!(descending, indicator)
+    // After the drop, some bars should have down values
+    const hasDown = result.some((r) => r.down !== undefined)
+    expect(hasDown).toBe(true)
+    for (let i = 12; i < result.length; i++) {
+      if (result[i].down !== undefined) {
+        expect(result[i].down).toBeGreaterThan(descending[i].low)
+      }
+    }
+  })
 })

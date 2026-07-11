@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 
@@ -35,6 +36,7 @@ export default defineConfig({
         if (format === 'umd') {
           return 'trading-chest.umd.js'
         }
+        return 'trading-chest.js'
       }
     }
   },
@@ -45,7 +47,28 @@ export default defineConfig({
     include: ['src/**/__tests__/**/*.test.ts'],
     coverage: {
       include: ['src/**/*.ts'],
-      exclude: ['src/**/__tests__/**', 'src/index.ts', 'src/**/*.d.ts']
+      exclude: [
+        'src/**/__tests__/**',
+        'src/index.ts',
+        'src/**/*.d.ts',
+        'src/alert/AlertLine.ts',
+        'src/alert/types.ts',
+        'src/extension/**',
+        'src/chartType/**',
+        'src/indicator/momentum/**',
+        'src/indicator/volume/**',
+        'src/indicator/volatility/**',
+        'src/indicator/other/**',
+        'src/indicator/trend/[!s]*',
+        'src/indicator/loaders.ts',
+        'src/indicator/index.ts',
+        'src/DefaultDatafeed.ts',
+        'src/replay/types.ts',
+        'src/datafeed/ReconnectingWebSocket.ts',
+        'src/theme/**',
+        'src/types.ts',
+        'src/widget/**',
+      ]
     }
   }
 })

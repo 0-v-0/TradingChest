@@ -2,6 +2,22 @@ import { describe, it, expect } from 'vitest'
 import { adjustFromTo } from '../adjustFromTo'
 
 describe('adjustFromTo', () => {
+  it('ms 周期', () => {
+    const period = { multiplier: 100, timespan: 'ms', text: '100ms' }
+    const to = 1705312407123
+    const [from, alignedTo] = adjustFromTo(period, to, 50)
+    expect(alignedTo % 1000).toBe(0)
+    expect(alignedTo - from).toBe(50 * 100)
+  })
+
+  it('second 周期', () => {
+    const period = { multiplier: 30, timespan: 'second', text: '30s' }
+    const to = 1705312407123
+    const [from, alignedTo] = adjustFromTo(period, to, 10)
+    expect(alignedTo % 1000).toBe(0)
+    expect(alignedTo - from).toBe(10 * 30 * 1000)
+  })
+
   it('minute 周期对齐到分钟边界', () => {
     const period = { multiplier: 5, timespan: 'minute', text: '5m' }
     const to = 1705312407000 // 2024-01-15 10:03:27 UTC
