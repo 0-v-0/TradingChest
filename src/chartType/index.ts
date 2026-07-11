@@ -5,6 +5,10 @@
 import baseline from './baseline'
 import heikinAshi from './heikinAshi'
 import renko from './renko'
+import kagi from './kagi'
+import pointAndFigure from './pointAndFigure'
+import lineBreak from './lineBreak'
+import rangeBars from './rangeBars'
 
-const chartTypes = [heikinAshi, baseline, renko]
+const chartTypes = [heikinAshi, baseline, renko, kagi, pointAndFigure, lineBreak, rangeBars]
 export default chartTypes

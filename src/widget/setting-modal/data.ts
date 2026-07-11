@@ -44,6 +44,11 @@ export function getOptions(locale: string): SettingGroup[] {
             { key: 'area', text: t('area', locale) },
             { key: 'heikin_ashi', text: t('heikin_ashi', locale) },
             { key: 'baseline', text: t('baseline', locale) },
+            { key: 'Renko', text: t('renko', locale) },
+            { key: 'Kagi', text: t('kagi', locale) },
+            { key: 'PointAndFigure', text: t('point_and_figure', locale) },
+            { key: 'LineBreak', text: t('line_break', locale) },
+            { key: 'RangeBars', text: t('range_bars', locale) },
           ],
         },
         {

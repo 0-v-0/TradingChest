@@ -136,11 +136,11 @@
 **预估:** 每个 0.5–1 天，合计 3–5 天
 
 - [x] **Task B.1a:** Renko 图表类型 + 测试
-- [ ] **Task B.1b:** Kagi 图表类型 + 测试
-- [ ] **Task B.1c:** Point & Figure 图表类型 + 测试
-- [ ] **Task B.1d:** Line Break 图表类型 + 测试
-- [ ] **Task B.1e:** Range Bars 图表类型 + 测试
-- [ ] **Task B.1f:** setting-modal UI 暴露 + i18n + 构建验证
+- [x] **Task B.1b:** Kagi 图表类型 + 测试
+- [x] **Task B.1c:** Point & Figure 图表类型 + 测试
+- [x] **Task B.1d:** Line Break 图表类型 + 测试
+- [x] **Task B.1e:** Range Bars 图表类型 + 测试
+- [x] **Task B.1f:** setting-modal UI 暴露 + i18n + 构建验证
 
 ---
 
@@ -396,7 +396,7 @@ gantt
 
 - [ ] Ctrl+Z / Ctrl+Shift+Z 撤销/重做可用
 - [ ] DefaultDatafeed 历史数据请求有区间缓存
-- [ ] 12+ 图表类型（含 Renko/Kagi/P&F/Line Break/Range Bars/Hollow Candles）
+- [x] 12+ 图表类型（含 Renko/Kagi/P&F/Line Break/Range Bars/Hollow Candles）
 - [ ] Session Breaks 分隔线可配置
 - [ ] 数据窗口显示所有 pane 指标值
 - [ ] 主题可可视化编辑并导入/导出 JSON
