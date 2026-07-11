@@ -59,6 +59,7 @@ import {
   ScreenshotModal,
   IndicatorSettingModal,
   SymbolSearchModal,
+  ThemeEditor,
   OverlayPropertyBar,
   ContextMenu,
   DataWindow,
@@ -191,6 +192,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [widgetDefaultStyles, setWidgetDefaultStyles] = createSignal<Styles>()
 
   const [screenshotUrl, setScreenshotUrl] = createSignal('')
+
+  const [themeEditorVisible, setThemeEditorVisible] = createSignal(false)
 
   const [drawingBarVisible, setDrawingBarVisible] = createSignal(props.drawingBarVisible)
   const [drawingMode, setDrawingMode] = createSignal(false)
@@ -734,17 +737,27 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       addRow('L', d.low)
       addRow('C', d.close)
       if (d.volume != null) addRow('V', d.volume)
-      // Extract indicator values from panes
+      // Extract indicator values from all panes (main + sub)
       if (widget) {
-        const indicators = widget.getIndicators({ paneId: 'candle_pane' })
-        if (indicators) {
-          for (const ind of indicators) {
-            const vals = ind.result as Record<string, unknown>[] | undefined
-            if (vals && vals.length > 0) {
-              const last = vals[vals.length - 1]
-              for (const [k, v] of Object.entries(last)) {
-                if (k !== 'timestamp' && k !== 'dataIndex') {
-                  addRow(`${ind.name}.${k}`, v)
+        const allIndicators = widget.getIndicators()
+        if (allIndicators && allIndicators.length > 0) {
+          const paneGroups: Record<string, import('klinecharts').Indicator[]> = {}
+          for (const ind of allIndicators) {
+            if (!paneGroups[ind.paneId]) paneGroups[ind.paneId] = []
+            paneGroups[ind.paneId].push(ind)
+          }
+          for (const [paneId, indicators] of Object.entries(paneGroups)) {
+            if (paneId !== 'candle_pane') {
+              rows.push({ label: `[${paneId}]`, value: '', color: '#888' })
+            }
+            for (const ind of indicators) {
+              const vals = ind.result as Record<string, unknown>[] | undefined
+              if (vals && vals.length > 0) {
+                const last = vals[vals.length - 1]
+                for (const [k, v] of Object.entries(last)) {
+                  if (k !== 'timestamp' && k !== 'dataIndex') {
+                    addRow(`${ind.name}.${k}`, v)
+                  }
                 }
               }
             }
@@ -925,6 +938,14 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           }}
         />
       </Show>
+      <Show when={themeEditorVisible()}>
+        <ThemeEditor
+          locale={props.locale}
+          currentStyles={widget!.getStyles()}
+          onClose={() => setThemeEditorVisible(false)}
+          onApply={(style) => widget?.setStyles(style)}
+        />
+      </Show>
       <Show when={indicatorSettingModalParams().visible}>
         <IndicatorSettingModal
           locale={props.locale}
@@ -982,6 +1003,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             setScreenshotUrl(url)
           }
         }}
+        onThemeClick={() => setThemeEditorVisible((v) => !v)}
         replayActive={replayState().active}
         onReplayClick={() => {
           if (replayState().active) {

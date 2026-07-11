@@ -158,9 +158,9 @@
 
 **预估:** 0.5 天
 
-- [ ] **Step 1:** 确认 `candle_stroke` 渲染正常
-- [ ] **Step 2:** 添加到 setting-modal 选项列表
-- [ ] **Step 3:** i18n + 构建验证
+- [x] **Step 1:** 确认 `candle_stroke` 渲染正常
+- [x] **Step 2:** 添加到 setting-modal 选项列表
+- [x] **Step 3:** i18n + 构建验证
 
 ---
 
@@ -206,10 +206,10 @@
 
 **预估:** 1 天
 
-- [ ] **Step 1:** 调研 klinecharts pane 遍历 API
-- [ ] **Step 2:** 扩展 dataWindowData 信号结构
-- [ ] **Step 3:** 更新 DataWindow UI 分组渲染
-- [ ] **Step 4:** 测试 + 构建
+- [x] **Step 1:** 调研 klinecharts pane 遍历 API
+- [x] **Step 2:** 扩展 dataWindowData 信号结构（遍历所有 pane，分组显示）
+- [x] **Step 3:** 更新 DataWindow UI 分组渲染
+- [x] **Step 4:** 测试 + 构建
 
 ---
 
@@ -232,11 +232,11 @@
 
 **预估:** 2–3 天
 
-- [ ] **Step 1:** 定义 ThemeSchema JSON 格式 + 测试
-- [ ] **Step 2:** 实现 exportTheme / importTheme
-- [ ] **Step 3:** 创建 ThemeEditor 组件
-- [ ] **Step 4:** 集成到 setting-modal + i18n
-- [ ] **Step 5:** 全量测试 + 构建
+- [x] **Step 1:** 定义 ThemeSchema JSON 格式 + 测试（5 tests）
+- [x] **Step 2:** 实现 exportTheme / importTheme
+- [x] **Step 3:** 创建 ThemeEditor 组件 + 工具栏按钮
+- [x] **Step 4:** 集成到 ChartProComponent + i18n（4 语言）
+- [x] **Step 5:** 全量测试 + 构建
 
 ---
 
@@ -394,12 +394,12 @@ gantt
 
 本 backlog 全部完成后，TradingChest 应达到：
 
-- [ ] Ctrl+Z / Ctrl+Shift+Z 撤销/重做可用
+- [x] Ctrl+Z / Ctrl+Shift+Z 撤销/重做可用
 - [ ] DefaultDatafeed 历史数据请求有区间缓存
 - [x] 12+ 图表类型（含 Renko/Kagi/P&F/Line Break/Range Bars/Hollow Candles）
 - [ ] Session Breaks 分隔线可配置
-- [ ] 数据窗口显示所有 pane 指标值
-- [ ] 主题可可视化编辑并导入/导出 JSON
+- [x] 数据窗口显示所有 pane 指标值
+- [x] 主题可可视化编辑并导入/导出 JSON
 - [ ] Volume Profile 指标可用
 - [ ] 3 个缺失绘图工具补齐
 - [ ] 多图表布局基础能力（或明确标记为平台层外包）

@@ -23,12 +23,13 @@ import ReplayControlBar from './replay-bar'
 import ScreenshotModal from './screenshot-modal'
 import SettingModal from './setting-modal'
 import SymbolSearchModal from './symbol-search-modal'
+import ThemeEditor from './theme-editor'
 import TimezoneModal from './timezone-modal'
 
 // oxfmt-ignore
 export {
   ContextMenu, DataWindow, PeriodBar, DrawingBar, IndicatorModal,
   TimezoneModal, SettingModal, ScreenshotModal,
-  IndicatorSettingModal, SymbolSearchModal,
+  IndicatorSettingModal, SymbolSearchModal, ThemeEditor,
   OverlayPropertyBar, ReplayControlBar
 }
