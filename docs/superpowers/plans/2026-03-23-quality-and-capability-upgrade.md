@@ -4,7 +4,7 @@
 
 **Goal:** 修复 TradingChest 的工程质量问题（零测试、全局变量、内存泄漏），补齐与 TradingView 的核心功能差距（数据层健壮性、多图表布局、报警系统）
 
-**Architecture:** 分 6 个阶段递进 — 先夯实基础（测试 + bug fix），再加固数据层（重连 + 缓存），然后补齐核心功能（报警 + 多品种对比 + 多图表布局）。每个阶段独立可交付。
+**Architecture:** 分 6 个阶段递进 — 先夯实基础（测试 + bug fix），再加固数据层（WebSocket 重连），然后补齐核心功能（报警 + 多品种对比 + 多图表布局）。每个阶段独立可交付。
 
 **Tech Stack:** KLineChart 9.x, Solid.js 1.6, TypeScript, Vitest, Vite
 
@@ -32,7 +32,6 @@
     # indicatorClickDetector.ts — 已删除，改为 tradeVisualization.ts 中的模块级 _hitTargetsMap
   src/datafeed/                       # 数据层增强
     ReconnectingWebSocket.ts          # 自动重连 WebSocket
-    DataCache.ts                      # K 线数据缓存
   src/alert/                          # 报警系统
     index.ts
     AlertLine.ts                      # overlay 实现
@@ -44,7 +43,7 @@
   package.json                        # 添加 test 脚本
   src/KLineChartPro.tsx               # globalThis 替换为模块级 _hitTargetsMap
   src/ChartProComponent.tsx           # 抽取纯函数、集成新功能
-  src/DefaultDatafeed.ts              # 实现 unsubscribe、重连、缓存
+  src/DefaultDatafeed.ts              # 实现 unsubscribe、重连
   src/types.ts                        # 扩展接口
   src/index.ts                        # 导出新模块
 
@@ -347,33 +346,11 @@ git commit -m "feat: add ReconnectingWebSocket with exponential backoff"
 
 ---
 
-### Task 3.2: K 线数据缓存
+### Task 3.2: K 线数据缓存 — 已取消
 
-> **NOTE:** DataCache exists but is NOT integrated into DefaultDatafeed yet.
+> **NOTE (2026-07-11):** `DataCache` 曾实现但从未集成到 `DefaultDatafeed`，对运行时零贡献。已作为 dead code 删除（`src/datafeed/DataCache.ts`、`src/datafeed/__tests__/DataCache.test.ts`）。klinecharts 内部已维护 `dataList`，且 `getHistoryKLineData` 为区间查询，现有缓存设计不匹配；若未来需要 datafeed 层缓存，应按 `from/to` 区间重新设计。
 
-**Files:**
-- Create: `src/datafeed/DataCache.ts`
-- Create: `src/datafeed/__tests__/DataCache.test.ts`
-
-- [x] **Step 1: 编写测试**
-
-> 实现代码：[`src/datafeed/__tests__/DataCache.test.ts`](src/datafeed/__tests__/DataCache.test.ts) (1-70 行)
-
-- [x] **Step 2: 实现 DataCache**
-
-> 实现代码：[`src/datafeed/DataCache.ts`](src/datafeed/DataCache.ts) (1-62 行)
-
-- [x] **Step 3: 运行测试**
-
-Run: `npx vitest run src/datafeed/__tests__/DataCache.test.ts`
-Expected: PASS
-
-- [x] **Step 4: Commit**
-
-
-git add src/datafeed/DataCache.ts src/datafeed/__tests__/DataCache.test.ts
-git commit -m "feat: add KLineData cache with deduplication"
-
+- [x] ~~Step 1–4: 实现 DataCache~~（已回滚删除）
 
 ---
 

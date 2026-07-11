@@ -1,6 +1,6 @@
 # TradingChest Deep Audit Fix — Design Spec
 
-**Date**: 2026-03-23 | **Last updated**: 2026-07-10
+**Date**: 2026-03-23 | **Last updated**: 2026-07-11
 **Scope**: Full fix of 25 audit findings + test coverage gaps
 **Strategy**: 3 sequential feature branches by severity dimension
 
@@ -98,7 +98,7 @@
 
 ### 2.3 Dead Code Cleanup (M1) ✅
 
-- ✅ **DataCache**: LRU eviction implemented (maxEntries default 30, based on Map insertion order)
+- ❌ ~~**DataCache**~~: 曾实现 LRU 淘汰，但从未集成到 `DefaultDatafeed`；2026-07-11 作为 dead code 删除（`src/datafeed/DataCache.ts` + 测试）
 - ✅ **UndoRedoManager**: Deleted (`src/shortcut/undoRedo.ts` removed)
 - ✅ Dead shortcut bindings (`chart:undo` / `chart:redo`) removed from `defaultBindings.ts`
 
@@ -141,7 +141,7 @@
 
 **Scope**: Zero-coverage modules + weak coverage edge cases + integration tests
 **Goal**: Bring all critical code paths under test.
-**Status**: 已在 2026-03-25 完成主要测试文件, 17 个测试文件现已存在
+**Status**: 已在 2026-03-25 完成主要测试文件, 16 个单元测试文件 + 2 个集成测试文件现已存在
 
 ### 3.1 New Test Files — Zero Coverage Core Modules ✅
 
@@ -149,7 +149,7 @@
 |-----------|--------|--------|
 | `indicator/utils/__tests__/utils.test.ts` | 12 math functions | ✅ 存在 |
 | `datafeed/__tests__/ReconnectingWebSocket.test.ts` | 重写后测试实际类 | ✅ 存在 |
-| `datafeed/__tests__/DataCache.test.ts` | LRU get/set/append/delete/clear + eviction | ✅ 存在 |
+| ~~`datafeed/__tests__/DataCache.test.ts`~~ | ~~LRU cache~~ | ❌ 已删除 (DataCache 未集成且已删) |
 | ~~`shortcut/__tests__/undoRedo.test.ts`~~ | ~~UndoRedoManager~~ | ❌ 已删除 (UndoRedoManager 已删) |
 | `export/__tests__/export.test.ts` | exportToCSV, exportScreenshot | ✅ 存在 |
 
@@ -186,7 +186,7 @@
 
 ---
 
-## Current Test Inventory (17 files)
+## Current Test Inventory (16 unit + 2 integration)
 
 | File | Target |
 |------|--------|
@@ -195,7 +195,6 @@
 | `core/__tests__/adjustFromTo.test.ts` | Date range calc |
 | `core/__tests__/buildStyles.test.ts` | Style builder |
 | `core/__tests__/deepSet.test.ts` | Deep object setter |
-| `datafeed/__tests__/DataCache.test.ts` | LRU cache |
 | `datafeed/__tests__/ReconnectingWebSocket.test.ts` | WebSocket reconnection |
 | `export/__tests__/export.test.ts` | CSV/screenshot export |
 | `i18n/__tests__/i18n.test.ts` | i18n loading |
@@ -207,6 +206,8 @@
 | `persistence/__tests__/persistence.test.ts` | Layout save/load |
 | `shortcut/__tests__/shortcut.test.ts` | Keyboard shortcuts |
 | `replay/__tests__/ReplayEngine.test.ts` | Replay engine |
+| `__tests__/integration/replay-data-flow.test.ts` | ReplayEngine data flow |
+| `__tests__/integration/alert-price-stream.test.ts` | Tick stream through checkPrice |
 
 ---
 
@@ -215,11 +216,12 @@
 以下问题在审计修复后仍存在或新发现:
 
 1. **UndoRedoManager 重建**: 已删除但功能需求仍在, 需基于 Command Pattern 重新设计
-2. **图表类型不足**: Renko/Kagi/P&F/Line Break 未实现
-3. **指标数量**: 80 (53 自定义 + 27 内置) ✅ 已达标（详见 [2026-07-10-indicator-expansion-design.md](./2026-07-10-indicator-expansion-design.md)）
-4. **Session Breaks**: 盘前盘后分隔线未实现
-5. **主题编辑器**: 无可视化编辑界面
-6. **指标/工具收藏**: ✅ 已实现（详见 [2026-07-10-ux-enhancement-design.md](./2026-07-10-ux-enhancement-design.md)）
+2. **Datafeed 层缓存**: `DataCache` 已删除（未集成、设计不匹配 `from/to` 区间查询）；若需减少 API 调用，应按区间缓存重新设计
+3. **图表类型不足**: Renko/Kagi/P&F/Line Break 未实现
+4. **指标数量**: 80 (53 自定义 + 27 内置) ✅ 已达标（详见 [2026-07-10-indicator-expansion-design.md](./2026-07-10-indicator-expansion-design.md)）
+5. **Session Breaks**: 盘前盘后分隔线未实现
+6. **主题编辑器**: 无可视化编辑界面
+7. **指标/工具收藏**: ✅ 已实现（详见 [2026-07-10-ux-enhancement-design.md](./2026-07-10-ux-enhancement-design.md)）
 
 ## Out of Scope
 

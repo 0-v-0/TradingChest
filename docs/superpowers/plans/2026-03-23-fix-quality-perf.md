@@ -79,8 +79,6 @@ deepSet rejects __proto__/constructor/prototype for safety."
 **Files:**
 - Delete: `src/shortcut/undoRedo.ts`
 - Modify: `src/shortcut/defaultBindings.ts` — remove chart:undo/redo bindings
-- Modify: `src/datafeed/DataCache.ts` — add LRU eviction
-- Create: `src/datafeed/__tests__/DataCache.test.ts`
 
 - [x] **Step 1: Delete undoRedo.ts**
 
@@ -91,27 +89,18 @@ rm src/shortcut/undoRedo.ts
 In `src/shortcut/defaultBindings.ts`, remove these two entries:
 > 实现代码：[`src/shortcut/defaultBindings.ts`](src/shortcut/defaultBindings.ts)
 
-- [x] **Step 3: Write DataCache LRU test**
-
-Create `src/datafeed/__tests__/DataCache.test.ts`:
-> 实现代码：[`src/datafeed/__tests__/DataCache.test.ts`](src/datafeed/__tests__/DataCache.test.ts) (1-70 行)
-
-- [x] **Step 4: Add LRU to DataCache**
-
-Modify `src/datafeed/DataCache.ts`:
-> 实现代码：[`src/datafeed/DataCache.ts`](src/datafeed/DataCache.ts) (1-62 行)
-
-- [x] **Step 5: Verify**
+- [x] **Step 3: Verify**
 
 Run: `npx vitest run && npx tsc --noEmit`
 
-- [x] **Step 6: Commit**
+- [x] **Step 4: Commit**
 
 git add -A
-git commit -m "refactor: delete UndoRedoManager, add LRU to DataCache
+git commit -m "refactor: delete UndoRedoManager
 
-Delete dead code: undoRedo.ts + chart:undo/redo shortcut bindings.
-DataCache: add maxEntries (default 30) with LRU eviction via Map ordering."
+Delete dead code: undoRedo.ts + chart:undo/redo shortcut bindings."
+
+> **NOTE (2026-07-11):** 本任务曾包含为 `DataCache` 添加 LRU 淘汰（Step 3–4，已随 `DataCache` 一并删除）。`DataCache` 从未集成到 `DefaultDatafeed`，属于 dead code，见 `2026-03-23-quality-and-capability-upgrade.md` Task 3.2。
 
 ---
 
