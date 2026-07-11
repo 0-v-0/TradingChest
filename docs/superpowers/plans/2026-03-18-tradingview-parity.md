@@ -26,113 +26,7 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 - [x] **Step 1: 创建通用计算函数** — `src/indicator/utils.ts` exists, 63 tests in `src/indicator/__tests__/utils.test.ts`
 
-```typescript
-// src/indicator/utils.ts
-// 指标计算通用工具函数
-
-/**
- * 简单移动平均
- */
-export function calcSMA(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) { result.push(null); continue }
-    let sum = 0
-    for (let j = 0; j < period; j++) sum += data[i - j]
-    result.push(sum / period)
-  }
-  return result
-}
-
-/**
- * 指数移动平均
- */
-export function calcEMA(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
-  const k = 2 / (period + 1)
-  for (let i = 0; i < data.length; i++) {
-    if (i === 0) { result.push(data[0]); continue }
-    const prev = result[i - 1] ?? data[i]
-    result.push(data[i] * k + prev * (1 - k))
-  }
-  return result
-}
-
-/**
- * 真实波幅 (True Range)
- */
-export function calcTR(high: number[], low: number[], close: number[]): number[] {
-  const result: number[] = []
-  for (let i = 0; i < high.length; i++) {
-    if (i === 0) { result.push(high[0] - low[0]); continue }
-    const hl = high[i] - low[i]
-    const hc = Math.abs(high[i] - close[i - 1])
-    const lc = Math.abs(low[i] - close[i - 1])
-    result.push(Math.max(hl, hc, lc))
-  }
-  return result
-}
-
-/**
- * 标准差
- */
-export function calcStdDev(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) { result.push(null); continue }
-    let sum = 0
-    for (let j = 0; j < period; j++) sum += data[i - j]
-    const mean = sum / period
-    let variance = 0
-    for (let j = 0; j < period; j++) variance += (data[i - j] - mean) ** 2
-    result.push(Math.sqrt(variance / period))
-  }
-  return result
-}
-
-/**
- * 最高值
- */
-export function calcHighest(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) { result.push(null); continue }
-    let max = -Infinity
-    for (let j = 0; j < period; j++) max = Math.max(max, data[i - j])
-    result.push(max)
-  }
-  return result
-}
-
-/**
- * 最低值
- */
-export function calcLowest(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) { result.push(null); continue }
-    let min = Infinity
-    for (let j = 0; j < period; j++) min = Math.min(min, data[i - j])
-    result.push(min)
-  }
-  return result
-}
-
-/**
- * 加权移动平均
- */
-export function calcWMA(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
-  const divisor = period * (period + 1) / 2
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) { result.push(null); continue }
-    let sum = 0
-    for (let j = 0; j < period; j++) sum += data[i - j] * (period - j)
-    result.push(sum / divisor)
-  }
-  return result
-}
-```
+> 实现代码：[`src/indicator/utils.ts`](src/indicator/utils.ts) (1-256 行)
 
 ### Task 1.2: 注册趋势类指标（15 个）
 
@@ -156,31 +50,7 @@ export function calcWMA(data: number[], period: number): (number | null)[] {
 
 每个指标文件遵循 klinecharts IndicatorTemplate 模式：
 
-```typescript
-// 示例: src/indicator/trend/atr.ts
-import { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcTR, calcSMA } from '../utils'
-
-const atr: IndicatorTemplate = {
-  name: 'ATR',
-  shortName: 'ATR',
-  calcParams: [14],
-  figures: [
-    { key: 'atr', title: 'ATR: ', type: 'line' }
-  ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const highs = dataList.map(d => d.high)
-    const lows = dataList.map(d => d.low)
-    const closes = dataList.map(d => d.close)
-    const tr = calcTR(highs, lows, closes)
-    const atrValues = calcSMA(tr, period)
-    return dataList.map((_, i) => ({ atr: atrValues[i] }))
-  }
-}
-export default atr
-```
+> 实现代码：[`src/indicator/trend/atr.ts`](src/indicator/trend/atr.ts) (1-49 行)
 
 - [x] **Step 1: 创建所有 16 个趋势指标文件** — 15 indicator files + index.ts in `src/indicator/trend/`
 - [x] **Step 2: 创建 trend/index.ts 导出数组** — exists
@@ -257,41 +127,11 @@ export default atr
 
 - [x] **Step 1: 创建 indicator/index.ts 汇总所有指标** — implemented as IndicatorRegistry with lazy loading (`src/indicator/registry.ts` + `src/indicator/loaders.ts`, 43 entries)
 
-```typescript
-import trendIndicators from './trend'
-import volatilityIndicators from './volatility'
-import volumeIndicators from './volume'
-import momentumIndicators from './momentum'
-import otherIndicators from './other'
-
-const indicators = [
-  ...trendIndicators,
-  ...volatilityIndicators,
-  ...volumeIndicators,
-  ...momentumIndicators,
-  ...otherIndicators
-]
-
-export default indicators
-
-// 指标分类映射（用于 UI）
-export const indicatorCategories = {
-  trend: ['ATR', 'SuperTrend', 'Ichimoku', 'Alligator', 'DEMA', 'TEMA', 'WMA', 'HMA', 'KAMA', 'VWMA', 'ZLEMA', 'McGinley', 'LinReg', 'Envelopes', 'T3'],
-  volatility: ['KeltnerChannels', 'DonchianChannels', 'HV', 'StdDev', 'ChaikinVol', 'MassIndex', 'UlcerIndex', 'BBW'],
-  volume: ['VWAP', 'MFI', 'CMF', 'ADLine', 'VROC', 'Klinger', 'ForceIndex', 'ElderRay'],
-  momentum: ['StochRSI', 'ADX', 'Aroon', 'UltOsc', 'Fisher', 'Coppock', 'PPO', 'DPO', 'KST', 'TwiggsMF'],
-  other: ['PivotPoints', 'ZigZag', 'VolumeProfile', 'ElderRayBull', 'ElderRayBear']
-}
-```
+> 实现代码：[`src/indicator/index.ts`](src/indicator/index.ts) (1-102 行) — 实际采用 lazy-loading 模式，见 [`src/indicator/registry.ts`](src/indicator/registry.ts) (1-47 行) 和 [`src/indicator/loaders.ts`](src/indicator/loaders.ts) (1-64 行)
 
 - [x] **Step 2: 在 src/index.ts 注册所有自定义指标** — registered via registry
 
-```typescript
-// 在 overlays 注册后添加:
-import customIndicators from './indicator'
-import { registerIndicator } from 'klinecharts'
-customIndicators.forEach(indicator => { registerIndicator(indicator) })
-```
+> 实现代码：[`src/index.ts`](src/index.ts) (1-81 行) — 指标通过 lazy-loading registry 自动注册
 
 ### Task 1.8: 更新 IndicatorModal 支持分类和搜索
 

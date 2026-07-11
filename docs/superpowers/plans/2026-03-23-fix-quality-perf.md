@@ -22,48 +22,7 @@
 - [x] **Step 1: Write deepSet test**
 
 Create `src/core/__tests__/deepSet.test.ts`:
-```typescript
-import { describe, it, expect } from 'vitest'
-import { deepSet } from '../deepSet'
-
-describe('deepSet', () => {
-  it('sets a nested property', () => {
-    const obj: any = {}
-    deepSet(obj, 'a.b.c', 42)
-    expect(obj.a.b.c).toBe(42)
-  })
-
-  it('overwrites existing value', () => {
-    const obj = { a: { b: 1 } }
-    deepSet(obj, 'a.b', 2)
-    expect(obj.a.b).toBe(2)
-  })
-
-  it('sets top-level property', () => {
-    const obj: any = {}
-    deepSet(obj, 'x', 'hello')
-    expect(obj.x).toBe('hello')
-  })
-
-  it('handles array-like path', () => {
-    const obj: any = {}
-    deepSet(obj, 'a.0.b', 'val')
-    expect(obj.a['0'].b).toBe('val')
-  })
-
-  it('rejects __proto__ path segments', () => {
-    const obj: any = {}
-    deepSet(obj, '__proto__.polluted', true)
-    expect(({} as any).polluted).toBeUndefined()
-  })
-
-  it('rejects constructor path segments', () => {
-    const obj: any = {}
-    deepSet(obj, 'constructor.prototype.polluted', true)
-    expect(({} as any).polluted).toBeUndefined()
-  })
-})
-```
+> 实现代码：[`src/core/__tests__/deepSet.test.ts`](src/core/__tests__/deepSet.test.ts) (1-29 行)
 
 - [x] **Step 2: Run test — expect FAIL**
 
@@ -72,29 +31,7 @@ Run: `npx vitest run src/core/__tests__/deepSet.test.ts`
 - [x] **Step 3: Implement deepSet**
 
 Create `src/core/deepSet.ts`:
-```typescript
-const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
-
-/**
- * Set a deeply nested property on an object using a dot-separated path.
- * Rejects __proto__/constructor/prototype segments to prevent prototype pollution.
- */
-export function deepSet(obj: Record<string, any>, path: string, value: unknown): void {
-  const keys = path.split('.')
-  let current = obj
-  for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i]
-    if (UNSAFE_KEYS.has(key)) return
-    if (current[key] === undefined || current[key] === null || typeof current[key] !== 'object') {
-      current[key] = {}
-    }
-    current = current[key]
-  }
-  const lastKey = keys[keys.length - 1]
-  if (UNSAFE_KEYS.has(lastKey)) return
-  current[lastKey] = value
-}
-```
+> 实现代码：[`src/core/deepSet.ts`](src/core/deepSet.ts) (1-20 行)
 
 - [x] **Step 4: Run test — expect PASS**
 
@@ -103,14 +40,9 @@ Run: `npx vitest run src/core/__tests__/deepSet.test.ts`
 - [x] **Step 5: Replace lodash in ChartProComponent.tsx**
 
 Replace imports:
-```typescript
-import lodashSet from 'lodash/set'
-import lodashClone from 'lodash/cloneDeep'
-```
+> 实现代码：[`src/ChartProComponent.tsx`](src/ChartProComponent.tsx) (1-1089 行)
 with:
-```typescript
-import { deepSet } from './core/deepSet'
-```
+> 实现代码：[`src/ChartProComponent.tsx`](src/ChartProComponent.tsx) (1-1089 行)
 
 Replace all `lodashSet(` with `deepSet(`.
 Replace all `lodashClone(` with `structuredClone(`.
@@ -134,13 +66,11 @@ Run: `npx vitest run && npx tsc --noEmit && npx vite build`
 
 - [x] **Step 9: Commit**
 
-```bash
 git add src/core/deepSet.ts src/core/__tests__/deepSet.test.ts src/ChartProComponent.tsx src/widget/setting-modal/index.tsx package.json package-lock.json
 git commit -m "refactor: replace lodash with native deepSet + structuredClone
 
 Remove lodash dependency (~70KB gzip savings).
 deepSet rejects __proto__/constructor/prototype for safety."
-```
 
 ---
 
@@ -154,138 +84,22 @@ deepSet rejects __proto__/constructor/prototype for safety."
 
 - [x] **Step 1: Delete undoRedo.ts**
 
-```bash
 rm src/shortcut/undoRedo.ts
-```
 
 - [x] **Step 2: Remove dead shortcut bindings**
 
 In `src/shortcut/defaultBindings.ts`, remove these two entries:
-```typescript
-  { combo: 'ctrl+z', action: 'chart:undo', description_zh: '撤销', description_en: 'Undo' },
-  { combo: 'ctrl+shift+z', action: 'chart:redo', description_zh: '重做', description_en: 'Redo' },
-```
+> 实现代码：[`src/shortcut/defaultBindings.ts`](src/shortcut/defaultBindings.ts)
 
 - [x] **Step 3: Write DataCache LRU test**
 
 Create `src/datafeed/__tests__/DataCache.test.ts`:
-```typescript
-import { describe, it, expect } from 'vitest'
-import { DataCache } from '../DataCache'
-
-describe('DataCache', () => {
-  it('get returns null for missing key', () => {
-    const cache = new DataCache()
-    expect(cache.get('BTC', '1m')).toBeNull()
-  })
-
-  it('set and get round-trip', () => {
-    const cache = new DataCache()
-    const data = [{ timestamp: 1000, open: 1, high: 2, low: 0.5, close: 1.5 }] as any
-    cache.set('BTC', '1m', data)
-    expect(cache.get('BTC', '1m')).toEqual(data)
-  })
-
-  it('append deduplicates by timestamp', () => {
-    const cache = new DataCache()
-    cache.set('BTC', '1m', [{ timestamp: 1000, open: 1, high: 2, low: 0.5, close: 1.5 }] as any)
-    cache.append('BTC', '1m', [{ timestamp: 1000, open: 2, high: 3, low: 1, close: 2.5 }] as any)
-    const result = cache.get('BTC', '1m')!
-    expect(result.length).toBe(1)
-    expect(result[0].open).toBe(2) // newer overwrites
-  })
-
-  it('LRU evicts oldest entry when maxEntries exceeded', () => {
-    const cache = new DataCache(2) // max 2 entries
-    cache.set('A', '1m', [{ timestamp: 1 }] as any)
-    cache.set('B', '1m', [{ timestamp: 2 }] as any)
-    cache.set('C', '1m', [{ timestamp: 3 }] as any) // should evict A
-    expect(cache.get('A', '1m')).toBeNull()
-    expect(cache.get('B', '1m')).not.toBeNull()
-    expect(cache.get('C', '1m')).not.toBeNull()
-  })
-
-  it('get refreshes LRU order', () => {
-    const cache = new DataCache(2)
-    cache.set('A', '1m', [{ timestamp: 1 }] as any)
-    cache.set('B', '1m', [{ timestamp: 2 }] as any)
-    cache.get('A', '1m') // refresh A
-    cache.set('C', '1m', [{ timestamp: 3 }] as any) // should evict B (oldest unused)
-    expect(cache.get('A', '1m')).not.toBeNull()
-    expect(cache.get('B', '1m')).toBeNull()
-  })
-})
-```
+> 实现代码：[`src/datafeed/__tests__/DataCache.test.ts`](src/datafeed/__tests__/DataCache.test.ts) (1-70 行)
 
 - [x] **Step 4: Add LRU to DataCache**
 
 Modify `src/datafeed/DataCache.ts`:
-```typescript
-import { KLineData } from 'klinecharts'
-
-export class DataCache {
-  private _store = new Map<string, KLineData[]>()
-  private _maxEntries: number
-
-  constructor(maxEntries: number = 30) {
-    this._maxEntries = maxEntries
-  }
-
-  private _key(symbol: string, period: string): string {
-    return `${symbol}:${period}`
-  }
-
-  private _touch(key: string): void {
-    const val = this._store.get(key)
-    if (val !== undefined) {
-      this._store.delete(key)
-      this._store.set(key, val)
-    }
-  }
-
-  private _evict(): void {
-    while (this._store.size > this._maxEntries) {
-      const oldest = this._store.keys().next().value
-      if (oldest !== undefined) this._store.delete(oldest)
-    }
-  }
-
-  get(symbol: string, period: string): KLineData[] | null {
-    const key = this._key(symbol, period)
-    const val = this._store.get(key)
-    if (val === undefined) return null
-    this._touch(key)
-    return val
-  }
-
-  set(symbol: string, period: string, data: KLineData[]): void {
-    const key = this._key(symbol, period)
-    this._store.delete(key)
-    this._store.set(key, [...data])
-    this._evict()
-  }
-
-  append(symbol: string, period: string, newData: KLineData[]): void {
-    const key = this._key(symbol, period)
-    const existing = this._store.get(key) ?? []
-    const tsMap = new Map<number, KLineData>()
-    for (const d of existing) tsMap.set(d.timestamp, d)
-    for (const d of newData) tsMap.set(d.timestamp, d)
-    const merged = Array.from(tsMap.values()).sort((a, b) => a.timestamp - b.timestamp)
-    this._store.delete(key)
-    this._store.set(key, merged)
-    this._evict()
-  }
-
-  clear(): void {
-    this._store.clear()
-  }
-
-  delete(symbol: string, period: string): void {
-    this._store.delete(this._key(symbol, period))
-  }
-}
-```
+> 实现代码：[`src/datafeed/DataCache.ts`](src/datafeed/DataCache.ts) (1-62 行)
 
 - [x] **Step 5: Verify**
 
@@ -293,13 +107,11 @@ Run: `npx vitest run && npx tsc --noEmit`
 
 - [x] **Step 6: Commit**
 
-```bash
 git add -A
 git commit -m "refactor: delete UndoRedoManager, add LRU to DataCache
 
 Delete dead code: undoRedo.ts + chart:undo/redo shortcut bindings.
 DataCache: add maxEntries (default 30) with LRU eviction via Map ordering."
-```
 
 ---
 
@@ -312,52 +124,13 @@ DataCache: add maxEntries (default 30) with LRU eviction via Map ordering."
 
 Replace the theme `createEffect` (lines 332-420) with a single `setStyles` call:
 
-```typescript
-  createEffect(() => {
-    const t = theme()
-    const color = t === 'dark' ? '#929AA5' : '#76808F'
-    const iconBase = {
-      position: TooltipIconPosition.Middle,
-      marginTop: 7,
-      marginBottom: 0,
-      paddingLeft: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0,
-      fontFamily: 'icomoon',
-      size: 14,
-      color, activeColor: color,
-      backgroundColor: 'transparent',
-      activeBackgroundColor: 'rgba(22, 119, 255, 0.15)'
-    }
-    widget?.setStyles({
-      ...((typeof t === 'string') ? t : t),
-      indicator: {
-        tooltip: {
-          icons: [
-            { ...iconBase, id: 'visible', marginLeft: 8, marginRight: 0, icon: '\ue903' },
-            { ...iconBase, id: 'invisible', marginLeft: 8, marginRight: 0, icon: '\ue901' },
-            { ...iconBase, id: 'setting', marginLeft: 6, marginRight: 0, icon: '\ue902' },
-            { ...iconBase, id: 'close', marginLeft: 6, marginRight: 0, icon: '\ue900' }
-          ]
-        }
-      }
-    })
-  })
-```
+> 实现代码：[`src/ChartProComponent.tsx`](src/ChartProComponent.tsx) (1-1089 行)
 
 Note: KLineChart's `setStyles(theme_string)` first applies the theme, then the object properties are merged on top. Actually, looking more carefully — `widget?.setStyles(t)` where `t` is a string like `'dark'` or `'light'` applies a theme preset. The second `setStyles` call overlays icon config. These CAN be combined if we detect the string case:
 
 Actually the simplest safe approach: keep two calls IF t is a string, or merge if object. But the real gain is eliminating the redundant canvas redraw. Since KLineChart doesn't support atomic batching, the safest fix is:
 
-```typescript
-  createEffect(() => {
-    const t = theme()
-    widget?.setStyles(t)
-    // Build icon config based on theme colors
-    const color = t === 'dark' ? '#929AA5' : '#76808F'
-    // ... same icon array as before, but in a local variable ...
-    // Apply in single call — merges on top of the theme
-    widget?.setStyles({ indicator: { tooltip: { icons: [...] } } })
-  })
-```
+> 实现代码：[`src/ChartProComponent.tsx`](src/ChartProComponent.tsx) (1-1089 行)
 
 Wait — this is still two calls. The issue is `setStyles(string)` applies a preset and `setStyles(object)` merges a partial style. They can't be combined into one call. But we CAN avoid the second full redraw by batching via `requestAnimationFrame`:
 
@@ -366,22 +139,11 @@ Actually, the simplest approach that halves redraws: just keep it as-is but refa
 **For M6**: Move the deep clone to initialization only.
 
 Replace the styles effect (around lines 430-435):
-```typescript
-  createEffect(() => {
-    if (styles()) {
-      widget?.setStyles(styles())
-    }
-  })
-```
+> 实现代码：[`src/ChartProComponent.tsx`](src/ChartProComponent.tsx) (1-1089 行)
 
 And set `widgetDefaultStyles` once during initialization instead (in onMount, after widget is created):
 After the widget init block, add:
-```typescript
-  // Capture default styles once for "restore defaults" in settings modal
-  if (widget) {
-    setWidgetDefaultStyles(structuredClone(widget.getStyles()))
-  }
-```
+> 实现代码：[`src/ChartProComponent.tsx`](src/ChartProComponent.tsx) (1-1089 行)
 
 (Note: by now `lodashClone` has been replaced with `structuredClone` in Task 1.)
 
@@ -391,13 +153,11 @@ Run: `npx vitest run && npx tsc --noEmit`
 
 - [x] **Step 3: Commit**
 
-```bash
 git add src/ChartProComponent.tsx
 git commit -m "perf: move default styles clone to init, remove per-change clone
 
 widgetDefaultStyles is only needed for 'restore defaults' in settings modal.
 Clone once at init instead of on every style change."
-```
 
 ---
 
@@ -418,56 +178,23 @@ In `src/DefaultDatafeed.ts`:
 - [x] **Step 2: Comparison tolerance**
 
 In `src/KLineChartPro.tsx`, in `addComparison`, replace:
-```typescript
-    compData.forEach((d, i) => { compMap.set(d.timestamp, compPercent[i]) })
-```
+> 实现代码：[`src/KLineChartPro.tsx`](src/KLineChartPro.tsx) (1-491 行)
 with:
-```typescript
-    compData.forEach((d, i) => { compMap.set(d.timestamp, compPercent[i]) })
-```
+> 实现代码：[`src/KLineChartPro.tsx`](src/KLineChartPro.tsx) (1-491 行)
 And in the `calc` function, replace:
-```typescript
-      calc: (dataList) => {
-        return dataList.map(d => ({
-          pct: compMap.get(d.timestamp) ?? undefined
-        }))
-      }
-```
+> 实现代码：[`src/KLineChartPro.tsx`](src/KLineChartPro.tsx) (1-491 行)
 with tolerance-based matching:
-```typescript
-      calc: (dataList) => {
-        return dataList.map(d => {
-          // Exact match first, then ±60s tolerance for cross-symbol timestamp drift
-          let pct = compMap.get(d.timestamp)
-          if (pct === undefined) {
-            for (const [ts, val] of compMap) {
-              if (Math.abs(ts - d.timestamp) <= 60000) { pct = val; break }
-            }
-          }
-          return { pct }
-        })
-      }
-```
+> 实现代码：[`src/KLineChartPro.tsx`](src/KLineChartPro.tsx) (1-491 行)
 
 Also add JSDoc comment above `addComparison`:
-```typescript
-  /**
-   * Add comparison overlay for another symbol.
-   * Known limitation: comparison data is fetched once and not updated with new ticks.
-   */
-```
+> 实现代码：[`src/KLineChartPro.tsx`](src/KLineChartPro.tsx) (1-491 行)
 
 - [x] **Step 3: incrementalCalc optimization**
 
 In `src/indicator/incrementalCalc.ts`, replace line 76:
-```typescript
-    cached = [...cached.slice(0, startIdx), ...tailResult]
-```
+> 实现代码：[`src/indicator/incrementalCalc.ts`](src/indicator/incrementalCalc.ts) (1-73 行)
 with:
-```typescript
-    cached.length = startIdx
-    cached.push(...tailResult)
-```
+> 实现代码：[`src/indicator/incrementalCalc.ts`](src/indicator/incrementalCalc.ts) (1-73 行)
 
 - [x] **Step 4: Verify**
 
@@ -475,14 +202,12 @@ Run: `npx vitest run && npx tsc --noEmit`
 
 - [x] **Step 5: Commit**
 
-```bash
 git add src/DefaultDatafeed.ts src/KLineChartPro.tsx src/indicator/incrementalCalc.ts
 git commit -m "fix: URL encoding, comparison tolerance, incrementalCalc optimization
 
 - encodeURIComponent for search/ticker in DefaultDatafeed API URLs
 - ±60s tolerance for cross-symbol timestamp matching in comparison
 - In-place array mutation in incrementalCalc to reduce GC pressure"
-```
 
 ---
 
@@ -507,9 +232,7 @@ Common patterns to fix:
 - [x] **Step 2: Fix what's fixable, leave the rest with explanatory comments**
 
 For each remaining @ts-expect-error that can't be removed, change the comment to explain why:
-```typescript
-// @ts-expect-error klinecharts OverlayFigure.attrs missing 'coordinates' in type defs
-```
+> 实现代码：[`src/extension/*.ts`](src/extension/*.ts)
 
 - [x] **Step 3: Verify**
 
@@ -517,13 +240,11 @@ Run: `npx vitest run && npx tsc --noEmit`
 
 - [x] **Step 4: Commit**
 
-```bash
 git add -A
 git commit -m "refactor: clean @ts-expect-error comments, improve type safety
 
 Fix removable type suppressions, add explanatory comments to remaining ones
 that are caused by klinecharts type definition gaps."
-```
 
 ---
 

@@ -216,10 +216,10 @@
 
 1. **UndoRedoManager 重建**: 已删除但功能需求仍在, 需基于 Command Pattern 重新设计
 2. **图表类型不足**: Renko/Kagi/P&F/Line Break 未实现
-3. **指标数量**: 68/80+, 还需约 12 个
+3. **指标数量**: 80 (53 自定义 + 27 内置) ✅ 已达标（详见 [2026-07-10-indicator-expansion-design.md](./2026-07-10-indicator-expansion-design.md)）
 4. **Session Breaks**: 盘前盘后分隔线未实现
 5. **主题编辑器**: 无可视化编辑界面
-6. **指标/工具收藏**: 收藏功能未实现
+6. **指标/工具收藏**: ✅ 已实现（详见 [2026-07-10-ux-enhancement-design.md](./2026-07-10-ux-enhancement-design.md)）
 
 ## Out of Scope
 

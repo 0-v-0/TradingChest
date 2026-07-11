@@ -38,28 +38,21 @@ TradingChest 定位为完全对标 TradingView 图表能力的开源交易图表
 
 **剩余差距**: 4 种新图表类型 + 1 种 UI 暴露
 
-### Phase 2: 技术指标扩展（高优先级）
+### Phase 2: 技术指标扩展（高优先级）✅ 已完成
 
-**现状**: 38 个自定义指标 + 30 个引擎内置 = 68 个总计
-**目标**: 80+ 个
+**现状**: 53 个自定义指标 + 27 个引擎内置 = 80 个总计
+**目标**: 80+ 个 ✅ 已达标
 
 | 类别 | 当前数量 | 指标列表 |
 |------|----------|----------|
-| **趋势** | 14 | ATR, SUPERTREND, ICHIMOKU, ALLIGATOR, DEMA, TEMA, WMA, HMA, KAMA, VWMA, ZLEMA, MCGINLEY, LINEARREGRESSION, ENVELOPES, T3 |
-| **波动率** | 8 | KC, DC, HV, STDDEV, CV, MI, UI, BBW |
-| **成交量** | 9 | VWAP, MFI, CMF, AD, VROC, KVO, FI, ELDER_RAY |
-| **动量** | 11 | StochRSI, ADX, AROON, UO, FISHER, COPPOCK, PPO, DPO, KST, TMF |
-| **其他** | 2 | PIVOTPOINTS, ZIGZAG |
+| **趋势** | 25 | MA, EMA, SMA, BOLL, SAR, BBI, ATR, SUPERTREND, ICHIMOKU, ALLIGATOR, DEMA, TEMA, WMA, HMA, KAMA, VWMA, ZLEMA, MCGINLEY, LINEARREGRESSION, ENVELOPES, T3, ChanDeKrollStop, Qstick, RainbowMA, LinearRegressionForecast |
+| **波动率** | 10 | BOLL, KC, DC, HV, STDDEV, CV, MI, UI, BBW, StandardError |
+| **成交量** | 13 | VOL, OBV, PVT, VR, VWAP, MFI, CMF, AD, VROC, KVO, FI, ELDER_RAY, VolumeOscillator |
+| **动量** | 29 | MACD, KDJ, RSI, BIAS, BRAR, CCI, DMI, CR, PSY, DMA, TRIX, WR, MTM, EMV, ROC, AO, StochRSI, ADX, AROON, UO, FISHER, COPPOCK, PPO, DPO, KST, TMF, ConnorsRSI, EhlersLeading, WilliamsR |
+| **其他** | 3 | PIVOTPOINTS, ZIGZAG, CorrelationCoefficient |
 | **交易** | 1 | TradeVis（交易记录可视化 + 点击检测） |
 
-**剩余差距**: ~12 个指标（含引擎内置共需 80+）
-
-待新增指标:
-- **趋势**: McGinley Dynamic 已实现, 还需 Linear Regression Forecast
-- **波动率**: Chaikin Volatility, Mass Index
-- **成交量**: Accumulation/Distribution 已有(AD), Force Index 已有(FI)
-- **动量**: Twiggs Money Flow 已有(TMF), 还需 Williams %R (WR, 引擎内置)
-- **其他**: Fibonacci Pivot Points, Camarilla Pivot Points
+**自定义指标**: ChanDeKrollStop, Qstick, RainbowMA, LinearRegressionForecast, StandardError, CorrelationCoefficient, ConnorsRSI, EhlersLeading, WilliamsR, VolumeOscillator 已在 2026-07-10 扩展中完成（详见 [2026-07-10-indicator-expansion-design.md](./2026-07-10-indicator-expansion-design.md)）
 
 ### Phase 3: 绘图工具扩展（中优先级）
 
@@ -131,13 +124,15 @@ TradingChest 定位为完全对标 TradingView 图表能力的开源交易图表
 
 | 功能 | 状态 | 备注 |
 |------|------|------|
-| 指标搜索 | ✅ 已实现 | 实时过滤 onInput |
-| 指标收藏 | ❌ 未实现 | — |
-| 绘图工具收藏 | ❌ 未实现 | — |
-| 右键菜单 | ⚠️ 部分 | overlay 右键编辑已实现, 通用右键菜单未实现 |
-| 数据窗口 | ❌ 未实现 | — |
-| 图例改进 | ⚠️ 部分 | 可交互图例(显隐/设置/关闭), 无悬停高亮 |
+| 指标搜索 | ✅ 已实现 | 实时过滤 onInput，带搜索图标和清除按钮 |
+| 指标收藏 | ✅ 已实现 | 星标收藏，独立"收藏"Tab（详见 [2026-07-10-ux-enhancement-design.md](./2026-07-10-ux-enhancement-design.md)） |
+| 绘图工具收藏 | ✅ 已实现 | 右键切换收藏，收藏组置顶显示（同上） |
+| 右键菜单 | ✅ 已实现 | 覆盖物右键菜单（编辑/锁定/复制/删除），见 context-menu 组件 |
+| 数据窗口 | ✅ 已实现 | 右侧面板显示 OHLCV + 主区指标值（同上） |
+| 图例改进 | ⚠️ 部分 | 可交互图例(显隐/设置/关闭), 无悬停高亮（引擎限制） |
 | 指标参数设置 | ✅ 已实现 | indicator-setting-modal 支持参数修改 |
+| 删除绘图反馈 | ✅ 已实现 | 属性栏删除按钮闪红动画（Canvas 限制，无法作用于 overlay 本身） |
+| 绘图光标 | ✅ 已实现 | 绘图模式下光标变为十字（klinecharts-pro-drawing CSS class） |
 | 撤销/重做 | ❌ 未实现 | UndoRedoManager 已删除, 需重新设计 |
 
 ### Phase 6: 数据导出（中优先级） ✅ 已完成
@@ -193,10 +188,10 @@ TradingChest 定位为完全对标 TradingView 图表能力的开源交易图表
 | Phase | 完成度 | 状态 |
 |-------|--------|------|
 | 1. 图表类型 | 75% (6/8 原有 + 2 新增, 还需 4 种) | 🟡 进行中 |
-| 2. 技术指标 | 85% (68/80+, 自定义 38 + 引擎 30) | 🟡 进行中 |
+| 2. 技术指标 | 100% (53 自定义 + 27 内置 = 80 总计) | 🟢 完成 |
 | 3. 绘图工具 | 90% (32 自定义 + 引擎内置, 已达标) | 🟢 基本完成 |
 | 4. 快捷键 | 85% (16/18, 缺撤销/重做) | 🟡 进行中 |
-| 5. UI/UX | 50% (搜索/设置已实现, 收藏/右键菜单/数据窗口未实现) | 🟡 进行中 |
+| 5. UI/UX | 80% (搜索/设置/收藏/右键菜单/数据窗口/绘图光标/删除反馈已实现, 缺撤销重做/图例高亮) | 🟡 进行中 |
 | 6. 数据导出 | 100% | 🟢 完成 |
 | 7. 主题系统 | 60% (5 主题 + 部分自定义, 无编辑器/导入导出) | 🟡 进行中 |
 | 8. 高级功能 | 80% (5/6 已实现, 缺 Session Breaks) | 🟢 基本完成 |
