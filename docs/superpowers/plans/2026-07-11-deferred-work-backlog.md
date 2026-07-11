@@ -135,7 +135,7 @@
 
 **预估:** 每个 0.5–1 天，合计 3–5 天
 
-- [ ] **Task B.1a:** Renko 图表类型 + 测试
+- [x] **Task B.1a:** Renko 图表类型 + 测试
 - [ ] **Task B.1b:** Kagi 图表类型 + 测试
 - [ ] **Task B.1c:** Point & Figure 图表类型 + 测试
 - [ ] **Task B.1d:** Line Break 图表类型 + 测试

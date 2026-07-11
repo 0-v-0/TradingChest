@@ -4,6 +4,7 @@
  */
 import baseline from './baseline'
 import heikinAshi from './heikinAshi'
+import renko from './renko'
 
-const chartTypes = [heikinAshi, baseline]
+const chartTypes = [heikinAshi, baseline, renko]
 export default chartTypes
