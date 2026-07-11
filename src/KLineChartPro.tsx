@@ -34,6 +34,7 @@ import {
 } from './indicator/trade/tradeVisualization'
 import { ReplayEngine } from './replay/ReplayEngine'
 import KeyboardShortcutManager from './shortcut'
+import { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 
 export default class KLineChartPro implements ChartPro {
@@ -94,6 +95,7 @@ export default class KLineChartPro implements ChartPro {
             this._clearComparisons()
           }}
           onError={options.onError}
+          undoRedoManager={this._undoRedoManager}
         />
       ),
       this._container,
@@ -146,6 +148,9 @@ export default class KLineChartPro implements ChartPro {
       this._alertManager.onTrigger = options.onAlertTrigger
     }
 
+    // 初始化撤销/重做管理器
+    this._undoRedoManager = new UndoRedoManager()
+
     // 初始化快捷键管理器
     this._shortcutManager = new KeyboardShortcutManager()
     this._shortcutManager.registerActions({
@@ -173,6 +178,12 @@ export default class KLineChartPro implements ChartPro {
       // 图表操作
       'chart:screenshot': () => {
         this.exportScreenshot()
+      },
+      'chart:undo': () => {
+        this._undoRedoManager.undo()
+      },
+      'chart:redo': () => {
+        this._undoRedoManager.redo()
       },
       'chart:cancelDraw': () => {
         this.getChart()?.removeOverlay()
@@ -229,6 +240,7 @@ export default class KLineChartPro implements ChartPro {
   private _chartApi: Nullable<ChartPro> = null
 
   private _shortcutManager: KeyboardShortcutManager
+  private _undoRedoManager: UndoRedoManager
 
   private _comparisons = new Map<string, string>() // ticker → indicatorName
 
@@ -524,8 +536,9 @@ export default class KLineChartPro implements ChartPro {
     this._alertManager.clearAll()
     this._alertManager.onTrigger = null
     cleanupTradeVisInstance(this._instanceId)
-    // 4. Unbind shortcuts
+    // 4. Unbind shortcuts & clear undo/redo
     this._shortcutManager.unbind()
+    this._undoRedoManager.clear()
     // 5. Remove click listener
     if (this._clickHandler && this._clickTarget) {
       this._clickTarget.removeEventListener('click', this._clickHandler, true)

@@ -23,6 +23,8 @@ const defaultBindings: ShortcutBinding[] = [
   { combo: 'alt+m', action: 'draw:dateAndPriceRange', descriptionKey: 'shortcut_measurement' },
 
   // 图表操作快捷键
+  { combo: 'ctrl+z', action: 'chart:undo', descriptionKey: 'shortcut_undo' },
+  { combo: 'ctrl+shift+z', action: 'chart:redo', descriptionKey: 'shortcut_redo' },
   { combo: 'escape', action: 'chart:cancelDraw', descriptionKey: 'shortcut_cancel_draw' },
   { combo: 'delete', action: 'chart:deleteSelected', descriptionKey: 'shortcut_delete_selected' },
   { combo: 'alt+s', action: 'chart:screenshot', descriptionKey: 'shortcut_screenshot' },

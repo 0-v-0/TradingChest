@@ -47,6 +47,8 @@ import { deepSet } from './core/deepSet'
 import { MethodNotAllowedError } from './core/MethodNotAllowedError'
 import { indicatorRegistry } from './indicator'
 import { ReplayEngine } from './replay/ReplayEngine'
+import { OverlayCreateCommand, OverlayRemoveCommand } from './shortcut/overlayCommands'
+import type { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
 import {
   PeriodBar,
@@ -77,6 +79,8 @@ export interface ChartProComponentProps extends Required<
   onDataReset?: () => void
   /** 内部错误回调 */
   onError?: (error: { type: string; message: string; raw?: unknown }) => void
+  /** 撤销/重做管理器 */
+  undoRedoManager?: UndoRedoManager
 }
 
 interface PrevSymbolPeriod {
@@ -303,6 +307,37 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     }
   }
 
+  const pushOverlayCreateCmd = (overlay: Overlay) => {
+    const mgr = props.undoRedoManager
+    if (mgr && widget && overlay.id) {
+      const o = widget.getOverlays({ id: overlay.id })[0] ?? overlay
+      mgr.push(new OverlayCreateCommand(widget, {
+        id: o.id,
+        name: o.name,
+        points: o.points,
+        extendData: o.extendData,
+        styles: o.styles,
+        lock: o.lock,
+        visible: o.visible,
+      }))
+    }
+  }
+
+  const pushOverlayRemoveCmd = (overlay: Overlay) => {
+    const mgr = props.undoRedoManager
+    if (mgr && widget && overlay.id) {
+      mgr.push(new OverlayRemoveCommand(widget, {
+        id: overlay.id,
+        name: overlay.name,
+        points: overlay.points,
+        extendData: overlay.extendData,
+        styles: overlay.styles,
+        lock: overlay.lock,
+        visible: overlay.visible,
+      }))
+    }
+  }
+
   const handleOverlayRightClick = (overlay: Overlay, x: number, y: number) => {
     const textOverlays = ['textAnnotation', 'callout', 'note']
     const items: MenuItem[] = []
@@ -359,6 +394,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         danger: true,
         onClick: () => {
           if (overlay.id) {
+            pushOverlayRemoveCmd(overlay)
             widget?.removeOverlay({ id: overlay.id })
             setSelectedOverlay(null)
           }
@@ -500,6 +536,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (e.key === 'Backspace' || e.key === 'Delete') {
       const info = selectedOverlay()
       if (info && widget) {
+        const overlay = widget.getOverlays({ id: info.id })[0]
+        if (overlay) pushOverlayRemoveCmd(overlay)
         widget.removeOverlay({ id: info.id })
         setSelectedOverlay(null)
         e.preventDefault()
@@ -756,6 +794,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     // 品种/周期切换，通知外层重置状态（如报警 prevPrice）
     if (prev) {
       props.onDataReset?.()
+      props.undoRedoManager?.clear()
     }
     // 触发 chart 的 DataLoader 重新拉取数据
     widget?.setSymbol({
@@ -972,6 +1011,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
                   setDrawingMode(false)
                   promptTextOverlay(event.overlay)
                   notifyOverlay('drawing-bar', event.overlay, 'create')
+                  pushOverlayCreateCmd(event.overlay)
                   return true
                 },
                 onPressedMoveEnd: (event) => {
@@ -989,6 +1029,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
                 onRemoved: (event) => {
                   setDrawingMode(false)
                   notifyOverlay('drawing-bar', event.overlay, 'delete')
+                  pushOverlayRemoveCmd(event.overlay)
                   setSelectedOverlay(null)
                   return true
                 },
@@ -1091,6 +1132,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           onDelete={() => {
             const info = selectedOverlay()
             if (info && widget) {
+              const overlay = widget.getOverlays({ id: info.id })[0]
+              if (overlay) pushOverlayRemoveCmd(overlay)
               widget.removeOverlay({ id: info.id })
               setSelectedOverlay(null)
             }
