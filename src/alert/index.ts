@@ -37,10 +37,14 @@ export class AlertManager {
   }
 
   checkPrice(currentPrice: number, timestamp: number): void {
+    if (!Number.isFinite(currentPrice)) return
     if (this._prevPrice === null) {
       this._prevPrice = currentPrice
       return
     }
+
+    const prevPrice = this._prevPrice
+    this._prevPrice = currentPrice
 
     for (const alert of this._alerts.values()) {
       if (alert.triggered) continue
@@ -49,28 +53,30 @@ export class AlertManager {
       switch (alert.condition) {
         case 'crossing':
           triggered =
-            (this._prevPrice < alert.price && currentPrice >= alert.price) ||
-            (this._prevPrice > alert.price && currentPrice <= alert.price)
+            (prevPrice < alert.price && currentPrice >= alert.price) ||
+            (prevPrice > alert.price && currentPrice <= alert.price)
           break
         case 'above':
-          triggered = this._prevPrice <= alert.price && currentPrice > alert.price
+          triggered = prevPrice <= alert.price && currentPrice > alert.price
           break
         case 'below':
-          triggered = this._prevPrice >= alert.price && currentPrice < alert.price
+          triggered = prevPrice >= alert.price && currentPrice < alert.price
           break
       }
 
       if (triggered) {
         alert.triggered = true
-        this.onTrigger?.({
-          alert,
-          triggerPrice: currentPrice,
-          timestamp,
-        })
+        try {
+          this.onTrigger?.({
+            alert,
+            triggerPrice: currentPrice,
+            timestamp,
+          })
+        } catch (e) {
+          console.warn('[TradingChest] alert onTrigger handler threw:', e)
+        }
       }
     }
-
-    this._prevPrice = currentPrice
   }
 
   /** 重置前价格记录（品种切换时调用，防止跨品种误触发） */
