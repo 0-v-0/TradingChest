@@ -2,13 +2,8 @@
  * Donchian Channels - 唐奇安通道
  * 以过去 N 周期最高价和最低价构成的价格通道
  */
+import { calcHighest, calcLowest } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-
-type DonchianChannelsResult = {
-  upper: number
-  lower: number
-  middle: number
-}
 
 const donchianChannels: IndicatorTemplate = {
   name: 'DC',
@@ -22,33 +17,16 @@ const donchianChannels: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    const result: DonchianChannelsResult[] = []
-
-    for (let i = 0; i < dataList.length; i++) {
-      let upper = NaN
-      let lower = NaN
-      let middle = NaN
-
-      if (i >= period - 1) {
-        // 在回看窗口内查找最高价和最低价
-        let highestHigh = -Infinity
-        let lowestLow = Infinity
-        for (let j = i - period + 1; j <= i; j++) {
-          if (dataList[j].high > highestHigh) {
-            highestHigh = dataList[j].high
-          }
-          if (dataList[j].low < lowestLow) {
-            lowestLow = dataList[j].low
-          }
-        }
-
-        upper = highestHigh
-        lower = lowestLow
-        middle = (highestHigh + lowestLow) / 2
-      }
-      result.push({ upper, lower, middle })
-    }
-    return result
+    if (period <= 0) return dataList.map(() => ({ upper: NaN, lower: NaN, middle: NaN }))
+    const highs = dataList.map(k => k.high)
+    const lows = dataList.map(k => k.low)
+    const uppers = calcHighest(highs, period)
+    const lowers = calcLowest(lows, period)
+    return uppers.map((upper, i) => {
+      const lower = lowers[i]
+      if (Number.isNaN(upper) || Number.isNaN(lower)) return { upper: NaN, lower: NaN, middle: NaN }
+      return { upper, lower, middle: (upper + lower) / 2 }
+    })
   },
 }
 

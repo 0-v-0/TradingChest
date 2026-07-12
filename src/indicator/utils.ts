@@ -143,21 +143,23 @@ export function calcStdDev(data: number[], period: number): number[] {
 /**
  * 区间最高值（Highest value in period）
  * 返回过去 period 根 K 线内的最大值
+ * 使用单调双端队列实现 O(n) 滑动窗口最大值
  */
 export function calcHighest(data: number[], period: number): number[] {
-  const result: number[] = []
-  for (let i = 0; i < data.length; i++) {
-    let val = NaN
-    if (i >= period - 1) {
-      let max = -Infinity
-      for (let j = i - period + 1; j <= i; j++) {
-        if (data[j] > max) {
-          max = data[j]
-        }
-      }
-      val = max
+  const n = data.length
+  const result: number[] = new Array(n).fill(NaN)
+  if (period <= 0) return result
+  const deque: number[] = []
+  let head = 0
+  for (let i = 0; i < n; i++) {
+    while (deque.length > head && data[deque[deque.length - 1]] <= data[i]) {
+      deque.pop()
     }
-    result.push(val)
+    deque.push(i)
+    if (deque[head] <= i - period) head++
+    if (i >= period - 1) {
+      result[i] = data[deque[head]]
+    }
   }
   return result
 }
@@ -165,21 +167,23 @@ export function calcHighest(data: number[], period: number): number[] {
 /**
  * 区间最低值（Lowest value in period）
  * 返回过去 period 根 K 线内的最小值
+ * 使用单调双端队列实现 O(n) 滑动窗口最小值
  */
 export function calcLowest(data: number[], period: number): number[] {
-  const result: number[] = []
-  for (let i = 0; i < data.length; i++) {
-    let val = NaN
-    if (i >= period - 1) {
-      let min = Infinity
-      for (let j = i - period + 1; j <= i; j++) {
-        if (data[j] < min) {
-          min = data[j]
-        }
-      }
-      val = min
+  const n = data.length
+  const result: number[] = new Array(n).fill(NaN)
+  if (period <= 0) return result
+  const deque: number[] = []
+  let head = 0
+  for (let i = 0; i < n; i++) {
+    while (deque.length > head && data[deque[deque.length - 1]] >= data[i]) {
+      deque.pop()
     }
-    result.push(val)
+    deque.push(i)
+    if (deque[head] <= i - period) head++
+    if (i >= period - 1) {
+      result[i] = data[deque[head]]
+    }
   }
   return result
 }

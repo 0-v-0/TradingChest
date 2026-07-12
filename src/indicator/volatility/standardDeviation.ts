@@ -2,9 +2,8 @@
  * Standard Deviation - 标准差
  * 收盘价在回看窗口内的总体标准差
  */
+import { calcStdDev } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-
-type StandardDeviationResult = { stddev: number }
 
 const standardDeviation: IndicatorTemplate = {
   name: 'STDDEV',
@@ -15,29 +14,9 @@ const standardDeviation: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
     if (period <= 0) return dataList.map(() => ({ stddev: NaN }))
-    const result: StandardDeviationResult[] = []
-
-    for (let i = 0; i < dataList.length; i++) {
-      let stddev = NaN
-      if (i >= period - 1) {
-        // 计算窗口内收盘价的均值
-        let sum = 0
-        for (let j = i - period + 1; j <= i; j++) {
-          sum += dataList[j].close
-        }
-        const mean = sum / period
-
-        // 计算总体方差（除以 n）
-        let varianceSum = 0
-        for (let j = i - period + 1; j <= i; j++) {
-          const diff = dataList[j].close - mean
-          varianceSum += diff * diff
-        }
-        stddev = Math.sqrt(varianceSum / period)
-      }
-      result.push({ stddev })
-    }
-    return result
+    const closes = dataList.map(k => k.close)
+    const stddevs = calcStdDev(closes, period)
+    return stddevs.map(stddev => ({ stddev }))
   },
 }
 
