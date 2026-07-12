@@ -699,7 +699,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         } catch (e) {
           props.onError?.({ type: 'data-fetch', message: 'data fetch failed', raw: e })
         } finally {
-          if (seq === fetchSeq && isInit) {
+          if (seq === fetchSeq) {
             setLoadingVisible(false)
           }
         }

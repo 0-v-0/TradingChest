@@ -30,7 +30,7 @@ const SymbolSearchModal: Component<SymbolSearchModalProps> = (props) => {
   const [symbolList] = createResource(value, props.datafeed.searchSymbols.bind(props.datafeed))
 
   return (
-    <Modal title={t('symbol_search', props.locale)} width={460} onClose={props.onClose}>
+    <Modal title={t('symbol_search', props.locale)} width={600} onClose={props.onClose}>
       <Input
         class="klinecharts-pro-symbol-search-modal-input"
         placeholder={t('symbol_code', props.locale)}

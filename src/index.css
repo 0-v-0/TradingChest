@@ -10,7 +10,6 @@
   color: var(--klinecharts-pro-text-color);
   background-color: var(--klinecharts-pro-background-color);
   font-size: 14px;
-  height: 80vh;
 }
 
 .klinecharts-pro-watermark {
