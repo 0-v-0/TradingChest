@@ -26,6 +26,9 @@ const mcginley: IndicatorTemplate = {
       if (i === 0) {
         // 初始值使用第一根 K 线的收盘价
         prevMd = close
+      } else if (prevMd === 0 || close === 0) {
+        // Guard: division by zero in (close / prevMd)^4 when either is 0
+        md = NaN
       } else {
         // MD = MD_prev + (close - MD_prev) / (N * (close / MD_prev)^4)
         prevMd = prevMd + (close - prevMd) / (period * Math.pow(close / prevMd, 4))

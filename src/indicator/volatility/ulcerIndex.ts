@@ -30,14 +30,19 @@ const ulcerIndex: IndicatorTemplate = {
 
         // 计算百分比回撤的平方和
         let sumSquared = 0
-        for (let j = i - period + 1; j <= i; j++) {
-          // 百分比回撤 = (close - highestClose) / highestClose * 100
-          const pctDrawdown = ((dataList[j].close - highestClose) / highestClose) * 100
-          sumSquared += pctDrawdown * pctDrawdown
-        }
+        // Guard: highestClose <= 0 would produce NaN/Infinity in division
+        if (highestClose <= 0) {
+          ui = NaN
+        } else {
+          for (let j = i - period + 1; j <= i; j++) {
+            // 百分比回撤 = (close - highestClose) / highestClose * 100
+            const pctDrawdown = ((dataList[j].close - highestClose) / highestClose) * 100
+            sumSquared += pctDrawdown * pctDrawdown
+          }
 
-        // 溃疡指数 = sqrt(平均平方回撤)
-        ui = Math.sqrt(sumSquared / period)
+          // 溃疡指数 = sqrt(平均平方回撤)
+          ui = Math.sqrt(sumSquared / period)
+        }
       }
       result.push({ ui })
     }

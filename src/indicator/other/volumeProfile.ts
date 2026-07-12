@@ -26,7 +26,8 @@ function calcVolumeProfile(dataList: KLineData[], numBins: number): VolumeProfil
   }
 
   const range = maxPrice - minPrice
-  const binSize = range / numBins
+  // Guard against flat market (all highs === all lows) — avoid division by zero
+  const binSize = range > 0 ? range / numBins : 1
   const bins: VolumeBin[] = Array.from({ length: numBins }, (_, i) => ({
     priceLow: minPrice + i * binSize,
     priceHigh: minPrice + (i + 1) * binSize,
@@ -36,8 +37,13 @@ function calcVolumeProfile(dataList: KLineData[], numBins: number): VolumeProfil
   for (const k of dataList) {
     const vol = k.volume ?? 0
     if (vol === 0) continue
-    const startBin = Math.max(0, Math.min(numBins - 1, Math.floor((k.low - minPrice) / binSize)))
-    const endBin = Math.max(0, Math.min(numBins - 1, Math.floor((k.high - minPrice) / binSize)))
+    // When range === 0, all prices fall into the first bin
+    const startBin = range > 0
+      ? Math.max(0, Math.min(numBins - 1, Math.floor((k.low - minPrice) / binSize)))
+      : 0
+    const endBin = range > 0
+      ? Math.max(0, Math.min(numBins - 1, Math.floor((k.high - minPrice) / binSize)))
+      : numBins - 1
     const span = endBin - startBin + 1
     const volPerBin = vol / span
     for (let i = startBin; i <= endBin; i++) {
