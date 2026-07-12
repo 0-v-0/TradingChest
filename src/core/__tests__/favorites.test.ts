@@ -8,6 +8,7 @@ import {
   addFavoriteTool,
   removeFavoriteTool,
   isFavoriteTool,
+  _resetFavoritesCacheForTesting,
 } from '../favorites'
 
 const store: Record<string, string> = {}
@@ -34,6 +35,7 @@ describe('favorites', () => {
   beforeEach(() => {
     localStorageMock.clear()
     vi.clearAllMocks()
+    _resetFavoritesCacheForTesting()
   })
 
   describe('indicators', () => {
