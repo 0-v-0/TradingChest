@@ -1,19 +1,36 @@
 import defaultBindings from './defaultBindings'
 import type { ShortcutBinding } from './defaultBindings'
 
+type ShortcutTarget = HTMLElement | Window
+
+const KEY_ALIAS: Record<string, string> = {
+  escape: 'escape',
+  delete: 'delete',
+  backspace: 'backspace',
+  home: 'home',
+  end: 'end',
+  '+': 'plus',
+  '-': 'minus',
+  '=': 'plus',
+}
+
+const MODIFIER_KEYS = new Set(['control', 'shift', 'alt', 'meta'])
+
 /**
  * 快捷键管理器
  * 管理图表的键盘快捷键绑定和执行
  */
 export class KeyboardShortcutManager {
   private bindings: ShortcutBinding[]
-  private handler: ((e: KeyboardEvent) => void) | null = null
-  private element: HTMLElement | Window | null = null
+  private boundElements: WeakMap<ShortcutTarget, (e: KeyboardEvent) => void> = new WeakMap()
+  private lookup: Map<string, ShortcutBinding> = new Map()
+  private element: ShortcutTarget | null = null
   private actionHandlers: Map<string, () => void> = new Map()
   private enabled: boolean = true
 
   constructor(customBindings?: ShortcutBinding[]) {
     this.bindings = customBindings ?? [...defaultBindings]
+    this._rebuildLookup()
   }
 
   /**
@@ -27,18 +44,18 @@ export class KeyboardShortcutManager {
    * 批量注册操作处理函数
    */
   registerActions(handlers: Record<string, () => void>): void {
-    Object.entries(handlers).forEach(([action, handler]) => {
+    for (const [action, handler] of Object.entries(handlers)) {
       this.actionHandlers.set(action, handler)
-    })
+    }
   }
 
   /**
    * 添加自定义快捷键
    */
   addBinding(binding: ShortcutBinding): void {
-    // 移除同一 combo 的旧绑定
     this.bindings = this.bindings.filter((b) => b.combo !== binding.combo)
     this.bindings.push(binding)
+    this._rebuildLookup()
   }
 
   /**
@@ -46,6 +63,7 @@ export class KeyboardShortcutManager {
    */
   removeBinding(combo: string): void {
     this.bindings = this.bindings.filter((b) => b.combo !== combo)
+    this._rebuildLookup()
   }
 
   /**
@@ -64,22 +82,9 @@ export class KeyboardShortcutManager {
     if (e.shiftKey) parts.push('shift')
     if (e.altKey) parts.push('alt')
 
-    const key = e.key.toLowerCase()
-    // 标准化特殊键名
-    const keyMap: Record<string, string> = {
-      escape: 'escape',
-      delete: 'delete',
-      backspace: 'backspace',
-      home: 'home',
-      end: 'end',
-      '+': 'plus',
-      '-': 'minus',
-      '=': 'plus', // = 键通常和 + 在同一位置
-    }
-    const normalizedKey = keyMap[key] ?? key
+    const normalizedKey = KEY_ALIAS[e.key.toLowerCase()] ?? e.key.toLowerCase()
 
-    // 跳过修饰键本身
-    if (['control', 'shift', 'alt', 'meta'].includes(normalizedKey)) return ''
+    if (MODIFIER_KEYS.has(normalizedKey)) return ''
 
     parts.push(normalizedKey)
     return parts.join('+')
@@ -88,21 +93,22 @@ export class KeyboardShortcutManager {
   /**
    * 绑定到 DOM 元素
    */
-  bindTo(element: HTMLElement | Window): void {
+  bindTo(element: ShortcutTarget): void {
     this.unbind()
-    this.element = element
-    this.handler = (e: KeyboardEvent) => {
+    const handler = (e: KeyboardEvent) => {
       if (!this.enabled) return
 
-      // 如果焦点在 input/textarea 上，忽略快捷键
-      const target = e.target as HTMLElement
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-        return
+      const target = e.target
+      if (target instanceof HTMLElement) {
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+          return
+        }
+      }
 
       const combo = this.eventToCombo(e)
       if (!combo) return
 
-      const binding = this.bindings.find((b) => b.combo === combo)
+      const binding = this.lookup.get(combo)
       if (binding) {
         const handler = this.actionHandlers.get(binding.action)
         if (handler) {
@@ -112,17 +118,22 @@ export class KeyboardShortcutManager {
         }
       }
     }
-    element.addEventListener('keydown', this.handler as EventListener)
+    element.addEventListener('keydown', handler as EventListener)
+    this.boundElements.set(element, handler)
+    this.element = element
   }
 
   /**
    * 解绑
    */
   unbind(): void {
-    if (this.handler && this.element) {
-      this.element.removeEventListener('keydown', this.handler as EventListener)
+    if (this.element) {
+      const prev = this.boundElements.get(this.element)
+      if (prev) {
+        this.element.removeEventListener('keydown', prev as EventListener)
+        this.boundElements.delete(this.element)
+      }
     }
-    this.handler = null
     this.element = null
   }
 
@@ -137,7 +148,14 @@ export class KeyboardShortcutManager {
    * 获取事件处理函数（用于外部绑定管理）
    */
   getHandler(): ((e: KeyboardEvent) => void) | null {
-    return this.handler
+    return this.element ? this.boundElements.get(this.element) ?? null : null
+  }
+
+  private _rebuildLookup(): void {
+    this.lookup.clear()
+    for (const b of this.bindings) {
+      this.lookup.set(b.combo, b)
+    }
   }
 }
 
