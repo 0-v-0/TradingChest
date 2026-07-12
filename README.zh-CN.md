@@ -17,20 +17,21 @@
 
 ## 特性
 
-### 技术指标（73+）
+### 技术指标（80+）
 
 | 分类 | 数量 | 示例 |
 |------|------|------|
-| 趋势 | 21 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA... |
-| 波动率 | 9 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width... |
-| 成交量 | 12 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray... |
-| 动量 | 26 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO... |
-| 其他 | 2 | Pivot Points, ZigZag |
+| 趋势 | 25 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA, Chande Kroll Stop, Qstick, Rainbow MA, Linear Regression Forecast... |
+| 波动率 | 10 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width, Standard Error... |
+| 成交量 | 13 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray, Volume Oscillator... |
+| 动量 | 29 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO, Connors RSI, Ehlers Leading Indicator, Williams %R... |
+| 其他 | 3 | Pivot Points, ZigZag, Correlation Coefficient... |
 
 - 分类 Tab 快速筛选（趋势/波动率/成交量/动量/其他）
-- 实时搜索过滤
+- 实时搜索过滤（带图标 + 清除按钮）
 - 指标参数可自定义
 - 指标懒加载注册，加速启动
+- **收藏系统**：星标指标，专属"收藏"Tab 快速访问
 
 ### 绘图工具（42+）
 
@@ -51,7 +52,10 @@
   - TradingView 风格 9×8 调色板（72 色）
   - 线宽选择器（1–4px 可视化预览）
   - 线型选择器（实线/虚线/点线）
-  - 锁定/删除快捷按钮
+  - 锁定/删除快捷按钮（删除时 150ms 红色闪烁反馈）
+- **绘图收藏**：右键切换，收藏组置顶显示
+- **右键菜单**：编辑/锁定/复制/删除操作
+- **十字光标**：TradingView 风格十字光标绘图模式
 
 ### 图表类型（8 种）
 
@@ -93,7 +97,8 @@
 
 ### 其他功能
 
-- **键盘快捷键**：15+ 默认绑定（Alt+T 趋势线、Alt+F 斐波那契等），可完全自定义
+- **键盘快捷键**：16+ 默认绑定（Alt+T 趋势线、Alt+F 斐波那契等），可完全自定义
+- **数据窗口**：右侧面板显示 OHLCV + 主区指标值
 - **5 种预设主题**：暗色、亮色、午夜蓝、经典（TradingView 风格）、高对比
 - **数据导出**：CSV（可见区间/全量）、截图（PNG/JPEG）
 - **布局持久化**：localStorage 保存/加载/删除图表布局
@@ -260,9 +265,11 @@ import {
 
 - **渲染引擎**: [KLineChart](https://github.com/klinecharts/KLineChart) 9.x（Canvas，高性能）
 - **UI 框架**: [Solid.js](https://www.solidjs.com/)（响应式，轻量）
-- **构建工具**: [Vite](https://vitejs.dev/)（ESM + UMD 双格式输出）
-- **语言**: TypeScript（项目代码零 `@ts-expect-error`）
-- **测试**: Vitest（211 个测试，18 个测试文件）
+- **构建工具**: [Vite](https://vitejs.dev/) 8（ESM + UMD 双格式输出）
+- **语言**: TypeScript 6（项目代码零 `@ts-expect-error`）
+- **测试**: Vitest 4（211 个测试，18 个测试文件）
+- **代码检查**: ESLint 10
+- **零外部依赖**: 无 lodash，全部使用原生实现（structuredClone + deepSet）
 
 ## 构建
 
@@ -282,17 +289,20 @@ npm run test        # 运行测试
 
 Fork 自 [KLineChart Pro](https://github.com/klinecharts/pro)，在此基础上大幅扩展：
 
-- 45+ 自定义技术指标 + 懒加载注册表
-- 13+ 绘图工具（测量、标注、交易持仓可视化）
+- 53+ 自定义技术指标 + 懒加载注册表（含内置共 80+）
+- 32+ 绘图工具（测量、标注、交易持仓可视化 + 收藏）
 - 绘图选中后浮动属性工具栏（调色板、线宽/线型、锁定、删除）
 - 键盘快捷键系统、主题预设、数据导出、布局持久化
 - 价格报警系统（实时 + 回放双模式）
 - 品种对比叠加（归一化百分比）
 - K 线回放引擎（单步/播放/调速）
 - 交易可视化 + 点击检测
-- 指标面板分类搜索
+- 指标面板分类搜索 + 收藏
 - 设置面板分组 + 颜色选择器
+- 绘图右键菜单（编辑/锁定/复制/删除）
+- 数据窗口右侧面板（OHLCV + 指标值）
 - `dispose()` 完整资源释放，零内存泄漏
+- 安全加固：XSS 防护、WebSocket 消息验证、MutationObserver 超时保护
 
 ## 许可证
 

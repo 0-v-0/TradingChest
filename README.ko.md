@@ -17,20 +17,21 @@
 
 ## 기능
 
-### 기술 지표 (73+)
+### 기술 지표 (80+)
 
 | 카테고리 | 수 | 예시 |
 |----------|----|----|
-| 추세 | 21 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA... |
-| 변동성 | 9 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width... |
-| 거래량 | 12 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray... |
-| 모멘텀 | 26 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO... |
-| 기타 | 2 | Pivot Points, ZigZag |
+| 추세 | 25 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA, Chande Kroll Stop, Qstick, Rainbow MA, Linear Regression Forecast... |
+| 변동성 | 10 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width, Standard Error... |
+| 거래량 | 13 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray, Volume Oscillator... |
+| 모멘텀 | 29 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO, Connors RSI, Ehlers Leading Indicator, Williams %R... |
+| 기타 | 3 | Pivot Points, ZigZag, Correlation Coefficient... |
 
 - 카테고리 탭으로 빠른 필터링 (추세/변동성/거래량/모멘텀/기타)
-- 실시간 검색 필터
+- 실시간 검색 필터 (아이콘 + 클리어 버튼 포함)
 - 지표 파라미터 커스터마이징
 - 지표 지연 로딩으로 빠른 시작
+- **즐겨찾기 시스템**: 지표에 별표 표시, 전용 "즐겨찾기" 탭에서 접근
 
 ### 그리기 도구 (42+)
 
@@ -51,7 +52,10 @@
   - 9×8 컬러 팔레트 (72색)
   - 선 두께 선택기 (1–4px 시각적 미리보기)
   - 선 스타일 선택기 (실선/점선/도트)
-  - 잠금/삭제 빠른 버튼
+  - 잠금/삭제 빠른 버튼 (삭제 시 150ms 빨간색 플래시 피드백)
+- **그리기 즐겨찾기**: 우클릭으로 전환, 즐겨찾기 그룹을 상단에 고정
+- **우클릭 컨텍스트 메뉴**: 편집/잠금/복사/삭제 작업
+- **크로스헤어 커서**: TradingView 스타일 십자선 그리기 모드
 
 ### 차트 유형 (8종)
 
@@ -93,7 +97,8 @@
 
 ### 기타
 
-- **키보드 단축키**: 15+ 기본 바인딩 (Alt+T 추세선, Alt+F 피보나치 등), 완전한 커스터마이징 가능
+- **키보드 단축키**: 16+ 기본 바인딩 (Alt+T 추세선, Alt+F 피보나치 등), 완전한 커스터마이징 가능
+- **데이터 윈도우**: 사이드 패널에 OHLCV + 메인 펜 지표 값 표시
 - **5가지 테마 프리셋**: 다크, 라이트, 미드나잇 블루, 클래식 (TradingView 스타일), 하이 콘트라스트
 - **데이터 내보내기**: CSV (표시 범위/전체), 스크린샷 (PNG/JPEG)
 - **레이아웃 저장**: localStorage로 차트 레이아웃 저장/불러오기/삭제
@@ -260,9 +265,11 @@ import {
 
 - **렌더링 엔진**: [KLineChart](https://github.com/klinecharts/KLineChart) 9.x (Canvas, 고성능)
 - **UI 프레임워크**: [Solid.js](https://www.solidjs.com/) (리액티브, 경량)
-- **빌드 도구**: [Vite](https://vitejs.dev/) (ESM + UMD 이중 출력)
-- **언어**: TypeScript (프로젝트 코드 `@ts-expect-error` 제로)
-- **테스트**: Vitest (211개 테스트, 18개 테스트 파일)
+- **빌드 도구**: [Vite](https://vitejs.dev/) 8 (ESM + UMD 이중 출력)
+- **언어**: TypeScript 6 (프로젝트 코드 `@ts-expect-error` 제로)
+- **테스트**: Vitest 4 (211개 테스트, 18개 테스트 파일)
+- **린팅**: ESLint 10
+- **외부 의존성 제로**: lodash 없음, 모두 네이티브 구현 (structuredClone + deepSet)
 
 ## 빌드
 
@@ -282,17 +289,20 @@ npm run test        # 테스트 실행
 
 [KLineChart Pro](https://github.com/klinecharts/pro)에서 포크하여 대폭 확장:
 
-- 45+ 커스텀 기술 지표 + 지연 로딩 레지스트리
-- 13+ 그리기 도구 (측정, 주석, 트레이드 포지션 시각화)
+- 53+ 커스텀 기술 지표 + 지연 로딩 레지스트리 (빌트인 포함 총 80+)
+- 32+ 그리기 도구 (측정, 주석, 트레이드 포지션 시각화 + 즐겨찾기)
 - 선택한 그리기에 플로팅 속성 도구 모음 (컬러 팔레트, 선 두께/스타일, 잠금, 삭제)
 - 키보드 단축키 시스템, 테마 프리셋, 데이터 내보내기, 레이아웃 저장
 - 가격 알림 시스템 (실시간 + 리플레이 모두 지원)
 - 종목 비교 오버레이 (정규화 퍼센트)
 - 바 리플레이 엔진 (스텝/재생/속도 조절)
 - 트레이드 시각화 + 클릭 감지
-- 지표 패널 카테고리 탭 + 검색
+- 지표 패널 카테고리 탭 + 검색 + 즐겨찾기
 - 설정 패널 그룹화 + 컬러 피커
+- 그리기 우클릭 컨텍스트 메뉴 (편집/잠금/복사/삭제)
+- 데이터 윈도우 사이드 패널 (OHLCV + 지표 값)
 - `dispose()`로 완전한 리소스 해제, 메모리 누수 제로
+- 보안 강화: XSS 방지, WebSocket 메시지 검증, MutationObserver 타임아웃 보호
 
 ## 라이선스
 

@@ -17,20 +17,21 @@
 
 ## Features
 
-### Technical Indicators (73+)
+### Technical Indicators (80+)
 
 | Category | Count | Examples |
 |----------|-------|----------|
-| Trend | 21 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA... |
-| Volatility | 9 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width... |
-| Volume | 12 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray... |
-| Momentum | 26 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO... |
-| Other | 2 | Pivot Points, ZigZag |
+| Trend | 25 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA, Chande Kroll Stop, Qstick, Rainbow MA, Linear Regression Forecast... |
+| Volatility | 10 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width, Standard Error... |
+| Volume | 13 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray, Volume Oscillator... |
+| Momentum | 29 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO, Connors RSI, Ehlers Leading Indicator, Williams %R... |
+| Other | 3 | Pivot Points, ZigZag, Correlation Coefficient... |
 
 - Category tabs for quick filtering (Trend / Volatility / Volume / Momentum / Other)
-- Real-time search filtering
+- Real-time search filtering with icon + clear button
 - Customizable indicator parameters
 - Lazy-loaded indicator registration for faster startup
+- **Favorites system**: Star indicators and access from dedicated "Favorites" tab
 
 ### Drawing Tools (42+)
 
@@ -51,7 +52,10 @@
   - 9×8 color palette (72 colors)
   - Line width selector (1–4px visual preview)
   - Line style selector (solid / dashed / dotted)
-  - Lock / Delete quick buttons
+  - Lock / Delete quick buttons (150ms red flash on delete)
+- **Drawing favorites**: Right-click toggle, favorites group pinned to top
+- **Right-click context menu**: Edit / Lock / Copy / Delete operations
+- **Crosshair cursor**: TradingView-style crosshair drawing mode
 
 ### Chart Types (8)
 
@@ -93,7 +97,8 @@ Candle Solid, Candle Hollow, Up Hollow, Down Hollow, OHLC, Area, **Heikin Ashi**
 
 ### Other
 
-- **Keyboard Shortcuts**: 15+ default bindings (Alt+T trend line, Alt+F Fibonacci, etc.), fully customizable
+- **Keyboard Shortcuts**: 16+ default bindings (Alt+T trend line, Alt+F Fibonacci, etc.), fully customizable
+- **Data Window**: Side panel showing OHLCV + main pane indicator values
 - **5 Theme Presets**: Dark, Light, Midnight Blue, Classic (TradingView-style), High Contrast
 - **Data Export**: CSV (visible range / all data), Screenshot (PNG / JPEG)
 - **Layout Persistence**: Save / Load / Delete chart layouts via localStorage
@@ -262,9 +267,11 @@ import {
 
 - **Rendering Engine**: [KLineChart](https://github.com/klinecharts/KLineChart) 9.x (Canvas, high performance)
 - **UI Framework**: [Solid.js](https://www.solidjs.com/) (reactive, lightweight)
-- **Build Tool**: [Vite](https://vitejs.dev/) (ESM + UMD dual output)
-- **Language**: TypeScript (zero `@ts-expect-error` for project code)
-- **Testing**: Vitest (211 tests, 18 test files)
+- **Build Tool**: [Vite](https://vitejs.dev/) 8 (ESM + UMD dual output)
+- **Language**: TypeScript 6 (zero `@ts-expect-error` for project code)
+- **Testing**: Vitest 4 (211 tests, 18 test files)
+- **Linting**: ESLint 10
+- **Zero external dependencies**: No lodash, all native implementations (structuredClone + deepSet)
 
 ## Build
 
@@ -284,17 +291,20 @@ Build artifacts:
 
 Forked from [KLineChart Pro](https://github.com/klinecharts/pro), significantly extended:
 
-- 45+ custom technical indicators with lazy-loading registry
-- 13+ drawing tools (measurement, annotations, trade position visualization)
+- 53+ custom technical indicators with lazy-loading registry (80+ total including built-in)
+- 32+ drawing tools (measurement, annotations, trade position visualization + favorites)
 - Floating property toolbar on selected drawings (color palette, line width/style, lock/delete)
 - Keyboard shortcut system, theme presets, data export, layout persistence
 - Price alert system with live/replay integration
 - Symbol comparison overlay (normalized percentage)
 - Bar replay engine with step/play/speed controls
 - Trade visualization with click detection
-- Indicator panel with category tabs + search
+- Indicator panel with category tabs + search + favorites
 - Settings panel with grouped options + color picker
+- Right-click context menu for drawings (edit/lock/copy/delete)
+- Data window side panel (OHLCV + indicator values)
 - Full resource cleanup via `dispose()` — zero memory leaks
+- Security-hardened: XSS prevention, WebSocket message validation, MutationObserver timeout protection
 
 ## License
 

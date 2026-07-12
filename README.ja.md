@@ -17,20 +17,21 @@
 
 ## 特徴
 
-### テクニカル指標（73+）
+### テクニカル指標（80+）
 
 | カテゴリ | 数 | 例 |
 |----------|----|----|
-| トレンド | 21 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA... |
-| ボラティリティ | 9 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width... |
-| 出来高 | 12 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray... |
-| モメンタム | 26 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO... |
-| その他 | 2 | Pivot Points, ZigZag |
+| トレンド | 25 | MA, EMA, BOLL, Ichimoku, SuperTrend, Alligator, KAMA, HMA, Chande Kroll Stop, Qstick, Rainbow MA, Linear Regression Forecast... |
+| ボラティリティ | 10 | Keltner Channels, Donchian Channels, ATR, Bollinger Band Width, Standard Error... |
+| 出来高 | 13 | VOL, VWAP, MFI, CMF, Klinger Oscillator, Elder Ray, Volume Oscillator... |
+| モメンタム | 29 | MACD, RSI, KDJ, StochRSI, ADX, Aroon, Fisher Transform, PPO, Connors RSI, Ehlers Leading Indicator, Williams %R... |
+| その他 | 3 | Pivot Points, ZigZag, Correlation Coefficient... |
 
 - カテゴリタブで素早くフィルタリング（トレンド/ボラティリティ/出来高/モメンタム/その他）
-- リアルタイム検索フィルタ
+- リアルタイム検索フィルタ（アイコン + クリアボタン付き）
 - 指標パラメータのカスタマイズ
 - 指標の遅延読み込みで高速起動
+- **お気に入りシステム**：指標に星印をつけ、専用"お気に入り"タブからアクセス
 
 ### 描画ツール（42+）
 
@@ -51,7 +52,10 @@
   - 9×8 カラーパレット（72色）
   - 線幅セレクタ（1–4px ビジュアルプレビュー）
   - 線種セレクタ（実線/破線/点線）
-  - ロック/削除クイックボタン
+  - ロック/削除クイックボタン（削除時 150ms 赤色フラッシュフィードバック）
+- **描画お気に入り**：右クリックで切り替え、お気に入りグループをトップに固定
+- **右クリックコンテキストメニュー**：編集/ロック/コピー/削除操作
+- **クロスヘアカーソル**：TradingView スタイルの十字線描画モード
 
 ### チャートタイプ（8種）
 
@@ -93,7 +97,8 @@
 
 ### その他
 
-- **キーボードショートカット**：15+ のデフォルトバインディング（Alt+T トレンドライン、Alt+F フィボナッチなど）、完全カスタマイズ可能
+- **キーボードショートカット**：16+ のデフォルトバインディング（Alt+T トレンドライン、Alt+F フィボナッチなど）、完全カスタマイズ可能
+- **データウィンドウ**：サイドパネルに OHLCV + メインペイン指標値を表示
 - **5種のテーマプリセット**：ダーク、ライト、ミッドナイトブルー、クラシック（TradingView スタイル）、ハイコントラスト
 - **データエクスポート**：CSV（表示範囲/全データ）、スクリーンショット（PNG/JPEG）
 - **レイアウト永続化**：localStorage でチャートレイアウトの保存/読込/削除
@@ -260,9 +265,11 @@ import {
 
 - **レンダリングエンジン**: [KLineChart](https://github.com/klinecharts/KLineChart) 9.x（Canvas、高パフォーマンス）
 - **UI フレームワーク**: [Solid.js](https://www.solidjs.com/)（リアクティブ、軽量）
-- **ビルドツール**: [Vite](https://vitejs.dev/)（ESM + UMD デュアル出力）
-- **言語**: TypeScript（プロジェクトコードで `@ts-expect-error` ゼロ）
-- **テスト**: Vitest（211テスト、18テストファイル）
+- **ビルドツール**: [Vite](https://vitejs.dev/) 8（ESM + UMD デュアル出力）
+- **言語**: TypeScript 6（プロジェクトコードで `@ts-expect-error` ゼロ）
+- **テスト**: Vitest 4（211テスト、18テストファイル）
+- **リンティング**: ESLint 10
+- **外部依存ゼロ**: lodash なし、すべてネイティブ実装（structuredClone + deepSet）
 
 ## ビルド
 
@@ -282,17 +289,20 @@ npm run test        # テスト実行
 
 [KLineChart Pro](https://github.com/klinecharts/pro) からフォークし、大幅に拡張：
 
-- 45+ カスタムテクニカル指標 + 遅延読み込みレジストリ
-- 13+ 描画ツール（計測、アノテーション、トレードポジション可視化）
+- 53+ カスタムテクニカル指標 + 遅延読み込みレジストリ（ビルトイン含む合計 80+）
+- 32+ 描画ツール（計測、アノテーション、トレードポジション可視化 + お気に入り）
 - 選択した描画にフローティングプロパティツールバー（カラーパレット、線幅/線種、ロック、削除）
 - キーボードショートカットシステム、テーマプリセット、データエクスポート、レイアウト永続化
 - 価格アラートシステム（リアルタイム + リプレイ両モード）
 - 銘柄比較オーバーレイ（正規化パーセンテージ）
 - バーリプレイエンジン（ステップ/再生/速度調整）
 - トレード可視化 + クリック検出
-- 指標パネルのカテゴリタブ + 検索
+- 指標パネルのカテゴリタブ + 検索 + お気に入り
 - 設定パネルのグループ化 + カラーピッカー
+- 描画右クリックコンテキストメニュー（編集/ロック/コピー/削除）
+- データウィンドウサイドパネル（OHLCV + 指標値）
 - `dispose()` による完全なリソース解放、メモリリークゼロ
+- セキュリティ強化：XSS 防止、WebSocket メッセージ検証、MutationObserver タイムアウト保護
 
 ## ライセンス
 
