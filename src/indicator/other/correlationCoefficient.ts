@@ -1,8 +1,10 @@
 /**
  * Correlation Coefficient - 相关系数
- * 皮尔逊相关系数 r = Σ((xi-x̄)(yi-ȳ)) / √(Σ(xi-x̄)² × Σ(yi-ȳ)²)
+ * 皮尔逊相关系数 r = (nΣxy − ΣxΣy) / √((nΣx²−(Σx)²)(nΣy²−(Σy)²))
  * x = close, y = volume（默认），衡量价格与成交量的相关性
  * 输出范围 [-1, 1]
+ *
+ * 使用滑动窗口维护 Σx, Σy, Σx², Σy², Σxy 实现 O(n) 计算
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
@@ -16,38 +18,44 @@ const correlationCoefficient: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
+    const result: { r: number }[] = []
+    if (period <= 0) return dataList.map(() => ({ r: NaN }))
 
-    return dataList.map((_, i) => {
-      if (i < period - 1) {
-        return { r: NaN }
+    let sumX = 0
+    let sumY = 0
+    let sumX2 = 0
+    let sumY2 = 0
+    let sumXY = 0
+
+    for (let i = 0; i < dataList.length; i++) {
+      const close = dataList[i].close
+      const volume = dataList[i].volume ?? 0
+      sumX += close
+      sumY += volume
+      sumX2 += close * close
+      sumY2 += volume * volume
+      sumXY += close * volume
+      if (i >= period) {
+        const outClose = dataList[i - period].close
+        const outVol = dataList[i - period].volume ?? 0
+        sumX -= outClose
+        sumY -= outVol
+        sumX2 -= outClose * outClose
+        sumY2 -= outVol * outVol
+        sumXY -= outClose * outVol
       }
-
-      // 计算 close 和 volume 的均值
-      let sumX = 0
-      let sumY = 0
-      for (let j = 0; j < period; j++) {
-        sumX += dataList[i - period + 1 + j].close
-        sumY += dataList[i - period + 1 + j].volume ?? 0
+      if (i >= period - 1) {
+        const n = period
+        const numerator = n * sumXY - sumX * sumY
+        const denomX = n * sumX2 - sumX * sumX
+        const denomY = n * sumY2 - sumY * sumY
+        const denom = Math.sqrt(denomX * denomY)
+        result.push({ r: denom !== 0 ? numerator / denom : NaN })
+      } else {
+        result.push({ r: NaN })
       }
-      const meanX = sumX / period
-      const meanY = sumY / period
-
-      // 皮尔逊相关系数
-      let sumXY = 0
-      let sumX2 = 0
-      let sumY2 = 0
-      for (let j = 0; j < period; j++) {
-        const dx = dataList[i - period + 1 + j].close - meanX
-        const dy = (dataList[i - period + 1 + j].volume ?? 0) - meanY
-        sumXY += dx * dy
-        sumX2 += dx * dx
-        sumY2 += dy * dy
-      }
-
-      const denom = Math.sqrt(sumX2 * sumY2)
-      const r = denom !== 0 ? sumXY / denom : 0
-      return { r }
-    })
+    }
+    return result
   },
 }
 
