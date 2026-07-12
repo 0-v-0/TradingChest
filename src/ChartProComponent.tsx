@@ -21,7 +21,6 @@ import {
   type OverlayMode,
   type Styles,
   type TooltipFeaturePosition,
-  type PaneOptions,
   type Indicator,
   type IndicatorCreate,
   type Coordinate,
@@ -120,13 +119,14 @@ async function createIndicator(
   widget: Nullable<Chart>,
   indicatorName: string,
   isStack?: boolean,
-  paneOptions?: PaneOptions,
+  paneId?: string,
 ): Promise<Nullable<string>> {
   await indicatorRegistry.ensureRegistered(indicatorName)
   return (
     widget?.createIndicator(
       {
         name: indicatorName,
+        paneId,
         createTooltipDataSource: ({
           indicator,
         }: {
@@ -146,7 +146,7 @@ async function createIndicator(
           return { name: indicator.name, calcParamsText: '', features, legends: [] }
         },
       } as unknown as IndicatorCreate,
-      { isStack, pane: paneOptions },
+      isStack,
     ) ?? null
   )
 }
@@ -614,7 +614,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     ;(async () => {
       for (const indicator of mainIndicators()) {
-        await createIndicator(widget, indicator, true, { id: 'candle_pane' })
+        await createIndicator(widget, indicator, true, 'candle_pane')
       }
       const subIndicatorMap: Record<string, string> = {}
       for (const indicator of props.subIndicators!) {
@@ -874,7 +874,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           onMainIndicatorChange={async (data) => {
             const newMainIndicators = [...mainIndicators()]
             if (data.added) {
-              await createIndicator(widget, data.name, true, { id: 'candle_pane' })
+              await createIndicator(widget, data.name, true, 'candle_pane')
               newMainIndicators.push(data.name)
             } else {
               widget?.removeIndicator({ paneId: 'candle_pane', name: data.name })

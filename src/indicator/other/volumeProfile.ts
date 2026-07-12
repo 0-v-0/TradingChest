@@ -97,13 +97,12 @@ const volumeProfile: IndicatorTemplate = {
     const maxV = vp.bins.reduce((s, b) => Math.max(s, b.volume), 0)
     if (maxV === 0) return true
 
-    const barWidth = 8
     const leftMargin = 8
 
     for (let i = 0; i < vp.bins.length; i++) {
       const bin = vp.bins[i]
-      const y1 = yAxis.yConverter(bin.priceHigh)
-      const y2 = yAxis.yConverter(bin.priceLow)
+      const y1 = yAxis.convertToPixel(bin.priceHigh)
+      const y2 = yAxis.convertToPixel(bin.priceLow)
       const yTop = Math.min(y1, y2)
       const barH = Math.max(2, Math.abs(y2 - y1))
 

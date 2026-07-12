@@ -122,8 +122,6 @@ const kagi: IndicatorTemplate = {
     if (visibleCount <= 0) return false
 
     const segWidth = Math.max(1, bounding.width / visibleCount)
-    const gap = 2
-
     for (let i = from; i < to; i++) {
       const seg = segments[i]
       const x = bounding.left + (i - from) * segWidth + segWidth / 2

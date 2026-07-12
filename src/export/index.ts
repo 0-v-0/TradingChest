@@ -81,6 +81,7 @@ export function exportAllToCSV(chart: Nullable<Chart>, filename?: string): boole
     return true
   } catch {
     /* c8 ignore next 2 */
+    return false
   }
 }
 

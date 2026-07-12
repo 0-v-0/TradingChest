@@ -29,14 +29,16 @@
   "scripts": {
     "build-core": "tsc && vite build",
     "build-dts": "dts-bundle-generator --no-banner true --umd-module-name klinechartspro --external-imports solid-js klinecharts -o dist/index.d.ts src/index.ts",
-    "build": "npm run build-core && npm run build-dts",
+    "build": "pnpm build-core && pnpm build-dts",
+    "lint": "eslint --ext .ts,.tsx src",
+    "lint:fix": "eslint --ext .ts,.tsx src --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "docs:deploy": "npm run docs:build && gh-pages -d website"
+    "docs:deploy": "pnpm run docs:build && gh-pages -d website"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -44,8 +46,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "babel-preset-solid": "^1.9.12",
     "dts-bundle-generator": "^9.5.1",
-    "eslint": "^10.6.0",
-    "eslint-plugin-n": "^18.2.1",
+    "eslint": "^10.7.0",
+    "eslint-plugin-n": "^18.2.2",
     "eslint-plugin-promise": "^7.3.0",
     "gh-pages": "^6.3.0",
     "globals": "^17.7.0",
@@ -61,6 +63,6 @@
     "solid-js": "^1.9.14"
   },
   "peerDependencies": {
-    "klinecharts": "10.0.0-beta3"
+    "klinecharts": "10.0.0"
   }
 }

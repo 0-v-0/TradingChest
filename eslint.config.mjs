@@ -21,9 +21,15 @@ export default tseslint.config(
         ...globals.es2023,
       },
     },
+    settings: {
+      n: {
+        tryExtensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.node'],
+      },
+    },
     rules: {
       'n/no-missing-import': 'off',
       'n/no-unsupported-features/node-builtins': 'off',
+      'promise/always-return': 'off',
       '@typescript-eslint/no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
         caughtErrors: 'all',

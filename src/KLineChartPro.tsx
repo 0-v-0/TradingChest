@@ -360,8 +360,9 @@ export default class KLineChartPro implements ChartPro {
       {
         name: 'TradeVis',
         extendData: { trades, _instanceId: this._instanceId },
+        paneId: (paneOptions as { id?: string })?.id ?? 'candle_pane',
       } as unknown as IndicatorCreate,
-      { isStack: true, pane: paneOptions ?? { id: 'candle_pane' } },
+      true,
     )
   }
 
@@ -489,7 +490,7 @@ export default class KLineChartPro implements ChartPro {
       },
     })
 
-    chart.createIndicator(indicatorName, { isStack: true, pane: { id: 'candle_pane' } })
+    chart.createIndicator({ name: indicatorName, paneId: 'candle_pane' }, true)
     this._comparisons.set(symbol.ticker, indicatorName)
   }
 
