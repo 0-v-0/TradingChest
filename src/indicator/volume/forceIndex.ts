@@ -25,6 +25,7 @@ const forceIndex: IndicatorTemplate = {
     if (dataList.length === 0) {
       return result
     }
+    if (period <= 0) return dataList.map(() => ({ fi: NaN }))
 
     // 第一步：计算每根 K 线的原始力度
     const rawForce: number[] = []

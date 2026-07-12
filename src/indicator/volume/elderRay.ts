@@ -25,6 +25,7 @@ const elderRay: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
+    if (period <= 0) return dataList.map(() => ({ bullPower: NaN, bearPower: NaN }))
     const result: ElderRayResult[] = []
 
     // 内联计算收盘价的 EMA

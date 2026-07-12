@@ -14,6 +14,7 @@ const chaikinVolatility: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
+    if (period <= 0) return dataList.map(() => ({ cv: NaN }))
     const result: ChaikinVolatilityResult[] = []
 
     // EMA 平滑系数

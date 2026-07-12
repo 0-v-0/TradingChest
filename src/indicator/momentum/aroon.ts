@@ -25,6 +25,7 @@ const aroon: IndicatorTemplate = {
   ],
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
+    if (period <= 0) return dataList.map(() => ({ aroonUp: NaN, aroonDown: NaN, oscillator: NaN }))
     const len = dataList.length
     const result: AroonResult[] = []
 

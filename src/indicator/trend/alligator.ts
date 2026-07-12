@@ -37,6 +37,7 @@ const alligator: IndicatorTemplate = {
      * 使用 (high + low) / 2 作为数据源（Median Price）
      */
     function calcSmma(period: number): number[] {
+      if (period <= 0) return dataList.map(() => NaN)
       const values: number[] = []
       let smma = 0
       for (let i = 0; i < dataList.length; i++) {

@@ -23,6 +23,7 @@ const dpo: IndicatorTemplate = {
   figures: [{ key: 'dpo', title: 'DPO: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
     const period = indicator.calcParams[0] as number
+    if (period <= 0) return dataList.map(() => ({ dpo: NaN }))
     const len = dataList.length
     const result: DpoResult[] = []
 

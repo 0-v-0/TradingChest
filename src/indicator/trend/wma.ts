@@ -13,6 +13,7 @@ const wma: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
+    if (period <= 0) return dataList.map(() => ({ wma: NaN }))
     // 权重之和 = n * (n + 1) / 2
     const weightSum = (period * (period + 1)) / 2
 
