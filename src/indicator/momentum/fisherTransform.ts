@@ -35,18 +35,31 @@ const fisherTransform: IndicatorTemplate = {
     let prevNorm = 0 // 前一根的归一化值（用于 EMA 平滑）
     let prevFisher = 0 // 前一根的 Fisher 值（即当前 trigger）
 
+    // 单调队列：O(n) 滚动窗口内的最高/最低 midPrice
+    const maxDeque: number[] = []
+    const minDeque: number[] = []
+
     for (let i = 0; i < len; i++) {
       let fisher = NaN
       let trigger = NaN
 
       if (i >= period - 1) {
-        // 查找窗口内的最高和最低中间价
-        let highest = -Infinity
-        let lowest = Infinity
-        for (let j = i - period + 1; j <= i; j++) {
-          if (midPrices[j] > highest) highest = midPrices[j]
-          if (midPrices[j] < lowest) lowest = midPrices[j]
+        // 维护单调递减队列：队首为窗口最大 midPrice
+        while (maxDeque.length > 0 && maxDeque[0] <= i - period) maxDeque.shift()
+        while (maxDeque.length > 1 && midPrices[maxDeque[maxDeque.length - 1]] <= midPrices[i]) {
+          maxDeque.pop()
         }
+        maxDeque.push(i)
+
+        // 维护单调递增队列：队首为窗口最小 midPrice
+        while (minDeque.length > 0 && minDeque[0] <= i - period) minDeque.shift()
+        while (minDeque.length > 1 && midPrices[minDeque[minDeque.length - 1]] >= midPrices[i]) {
+          minDeque.pop()
+        }
+        minDeque.push(i)
+
+        const highest = midPrices[maxDeque[0]]
+        const lowest = midPrices[minDeque[0]]
 
         // 归一化到 [-1, 1]
         let norm: number
