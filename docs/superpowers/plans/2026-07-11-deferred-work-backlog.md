@@ -18,8 +18,6 @@
 | [`2026-03-18-tradingview-parity.md`](2026-03-18-tradingview-parity.md) | 🟡 部分完成；Phase 1/5 有遗留 |
 | [`2026-03-23-fix-critical-bugs.md`](2026-03-23-fix-critical-bugs.md) | ✅ 全部完成 |
 | [`2026-03-23-fix-quality-perf.md`](2026-03-23-fix-quality-perf.md) | ✅ 全部完成 |
-| [`2026-03-23-indicator-lazy-loading.md`](2026-03-23-indicator-lazy-loading.md) | ✅ 全部完成 |
-| [`2026-03-23-bar-replay.md`](2026-03-23-bar-replay.md) | ✅ 全部完成 |
 | [`specs/2026-03-23-deep-audit-fix-design.md`](../specs/2026-03-23-deep-audit-fix-design.md) | ✅ 三分支完成；Remaining Gaps 待处理 |
 | [`specs/2026-03-18-tradingview-parity-design.md`](../specs/2026-03-18-tradingview-parity-design.md) | 🟡 总体进度 75–90% |
 | [`specs/2026-07-10-ux-enhancement-design.md`](../specs/2026-07-10-ux-enhancement-design.md) | ✅ 主体完成；Known Limitations 待跟进 |
@@ -38,8 +36,6 @@
 | 报警系统 AlertManager + AlertLine | quality-and-capability-upgrade Phase 4 |
 | 多品种对比 Compare API | quality-and-capability-upgrade Phase 5 |
 | lodash 移除 + 渲染性能优化 | fix-quality-perf |
-| 指标懒加载 IndicatorRegistry + incrementalCalc | indicator-lazy-loading |
-| K 线回放 ReplayEngine + ReplayControlBar | bar-replay |
 | 80+ 技术指标 | indicator-expansion-design (2026-07-10) |
 | 45+ 绘图工具 | tradingview-parity Phase 2–3 |
 | 右键菜单 / 数据窗口 / 收藏 / 搜索框 UX | ux-enhancement-design (2026-07-10) |
@@ -60,13 +56,6 @@
 - 绘图 overlay 创建/删除/属性修改
 - 指标添加/移除（可选，二期）
 
-**建议文件:**
-- Create: `src/shortcut/undoRedo.ts` — Command 接口 + UndoRedoManager
-- Create: `src/shortcut/__tests__/undoRedo.test.ts`
-- Modify: `src/shortcut/defaultBindings.ts` — 恢复 undo/redo 绑定
-- Create: `src/shortcut/overlayCommands.ts` — OverlayCreateCommand / OverlayRemoveCommand
-- Modify: `src/ChartProComponent.tsx` — 在 overlay/指标操作处 push command
-
 **依赖:** 无
 
 **预估:** 2–3 天
@@ -77,6 +66,8 @@
 - [x] **Step 4:** 恢复快捷键绑定并验证
 - [x] **Step 5:** 全量测试 + 构建
 
+**验证:** `npx vitest run && npx tsc --noEmit && npm run build`
+
 ---
 
 ### A.2 Datafeed 层区间缓存（DataCache 重新设计）
@@ -86,11 +77,6 @@
 **现状:** 原 `DataCache` 按 symbol+period 整段缓存，未集成到 `DefaultDatafeed`，与 `getHistoryKLineData(from, to)` 区间查询语义不匹配，已于 2026-07-11 删除。
 
 **目标:** 按 `(symbol, period, from, to)` 区间缓存历史 K 线，减少重复 API 请求；支持区间合并与 LRU 淘汰。
-
-**建议文件:**
-- Create: `src/datafeed/IntervalCache.ts`
-- Create: `src/datafeed/__tests__/IntervalCache.test.ts`
-- Modify: `src/DefaultDatafeed.ts` — 在 `getHistoryKLineData` 中读写缓存
 
 **设计要点:**
 - 缓存 key: `${ticker}:${period}:${resolution}`
@@ -106,6 +92,8 @@
 - [ ] **Step 2:** 实现 IntervalCache
 - [ ] **Step 3:** 集成到 DefaultDatafeed.getHistoryKLineData
 - [ ] **Step 4:** 全量测试 + 构建
+
+**验证:** `npx vitest run && npx tsc --noEmit && npm run build`
 
 ---
 
@@ -127,10 +115,7 @@
 | Line Break | `src/chartType/lineBreak.ts` | 中 |
 | Range Bars | `src/chartType/rangeBars.ts` | 中 |
 
-**附加:**
-- Modify: `src/widget/setting-modal/data.ts` — 暴露新类型选项
-- Modify: `src/chartType/index.ts` — 注册并导出
-- 各类型需 i18n 键（4 locale .ini）
+**附加:** 各类型需 i18n 键（4 locale .ini）
 
 **依赖:** 无（可逐个独立交付）
 
@@ -143,6 +128,8 @@
 - [x] **Task B.1e:** Range Bars 图表类型 + 测试
 - [x] **Task B.1f:** setting-modal UI 暴露 + i18n + 构建验证
 
+**验证:** `npx vitest run && npm run build`
+
 ---
 
 ### B.2 Hollow Candles UI 暴露
@@ -153,15 +140,13 @@
 
 **目标:** 在 chart type 选择中增加 Hollow Candles 选项。
 
-**建议文件:**
-- Modify: `src/widget/setting-modal/data.ts`
-- Modify: `src/i18n/*.ini` — 添加 `chart_type_hollow_candles` 键
-
 **预估:** 0.5 天
 
 - [x] **Step 1:** 确认 `candle_stroke` 渲染正常
 - [x] **Step 2:** 添加到 setting-modal 选项列表
 - [x] **Step 3:** i18n + 构建验证
+
+**验证:** `npm run build`
 
 ---
 
@@ -173,12 +158,6 @@
 
 **目标:** 支持配置交易时段（如美股 9:30–16:00 ET），在非交易时段边界绘制分隔线。
 
-**建议文件:**
-- Create: `src/session/types.ts` — SessionConfig 接口
-- Create: `src/session/sessionBreaks.ts` — 计算 break 时间点
-- Create: `src/session/__tests__/sessionBreaks.test.ts`
-- Modify: `src/ChartProComponent.tsx` — 通过 klinecharts 自定义 figure 或 overlay 渲染分隔线
-
 **依赖:** 需调研 klinecharts 是否支持 session 分隔 API；若无则通过 overlay 竖线实现
 
 **预估:** 2–3 天
@@ -188,6 +167,8 @@
 - [ ] **Step 3:** 实现时段计算逻辑
 - [ ] **Step 4:** 集成到 ChartProComponent 渲染
 - [ ] **Step 5:** 添加配置入口（setting-modal 或 API）+ i18n
+
+**验证:** `npx vitest run src/session/__tests__/sessionBreaks.test.ts && npm run build`
 
 ---
 
@@ -199,10 +180,6 @@
 
 **目标:** 遍历所有 indicator pane，提取 crosshair 位置处的指标值并显示。
 
-**建议文件:**
-- Modify: `src/ChartProComponent.tsx` — 扩展 crosshair 订阅，遍历 pane
-- Modify: `src/widget/data-window/index.tsx` — 支持分组显示（主图 / 副图）
-
 **依赖:** 需确认 klinecharts `getIndicatorByPaneId` / pane 列表 API
 
 **预估:** 1 天
@@ -211,6 +188,8 @@
 - [x] **Step 2:** 扩展 dataWindowData 信号结构（遍历所有 pane，分组显示）
 - [x] **Step 3:** 更新 DataWindow UI 分组渲染
 - [x] **Step 4:** 测试 + 构建
+
+**验证:** `npx vitest run && npm run build`
 
 ---
 
@@ -225,12 +204,6 @@
 - 导出当前主题为 JSON 文件
 - 从 JSON 文件导入自定义主题
 
-**建议文件:**
-- Create: `src/theme/editor.ts` — 主题序列化/反序列化
-- Create: `src/widget/theme-editor/index.tsx` — 编辑器 UI
-- Create: `src/theme/__tests__/editor.test.ts`
-- Modify: `src/widget/setting-modal/index.tsx` — 添加入口
-
 **预估:** 2–3 天
 
 - [x] **Step 1:** 定义 ThemeSchema JSON 格式 + 测试（5 tests）
@@ -238,6 +211,8 @@
 - [x] **Step 3:** 创建 ThemeEditor 组件 + 工具栏按钮
 - [x] **Step 4:** 集成到 ChartProComponent + i18n（4 语言）
 - [x] **Step 5:** 全量测试 + 构建
+
+**验证:** `npx vitest run && npm run build`
 
 ---
 
@@ -255,12 +230,6 @@
 | Disjoint Angle | `src/extension/disjointAngle.ts` | 角度工具 |
 | Forecast | `src/extension/forecast.ts` | 预测区间 |
 
-**建议文件（每个工具）:**
-- Create: overlay 实现文件
-- Modify: `src/extension/index.ts` — 注册
-- Modify: `src/widget/drawing-bar/index.tsx` — 添加到工具栏
-- Modify: `src/i18n/*.ini`
-
 **依赖:** 无（可逐个交付）
 
 **预估:** 每个 0.5–1 天
@@ -268,6 +237,8 @@
 - [x] **Task C.1a:** Flat Top/Bottom overlay
 - [x] **Task C.1b:** Disjoint Angle overlay
 - [x] **Task C.1c:** Forecast overlay
+
+**验证:** `npm run build`
 
 ---
 
@@ -279,12 +250,6 @@
 
 **目标:** 实现 Volume Profile 指标（价格-成交量分布 histogram）。
 
-**建议文件:**
-- Create: `src/indicator/other/volumeProfile.ts`
-- Modify: `src/indicator/other/index.ts`
-- Modify: `src/indicator/loaders.ts` — 添加 lazy loader
-- Create: `src/indicator/__tests__/volumeProfile.test.ts`
-
 **依赖:** 需自定义 histogram 渲染（klinecharts figures 或 overlay）
 
 **预估:** 1–2 天
@@ -293,6 +258,8 @@
 - [x] **Step 2:** 实现 calc 逻辑（价格 bin + 成交量累加）
 - [x] **Step 3:** 实现 histogram 渲染
 - [x] **Step 4:** 注册 lazy loader + i18n + 构建
+
+**验证:** `npx vitest run src/indicator/__tests__/volumeProfile.test.ts && npm run build`
 
 ---
 

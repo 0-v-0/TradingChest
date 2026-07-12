@@ -21,36 +21,13 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 1.1: 创建指标计算工具库
 
-**Files:**
-- Create: `src/indicator/utils.ts`
-
 - [x] **Step 1: 创建通用计算函数** — `src/indicator/utils.ts` exists, 63 tests in `src/indicator/__tests__/utils.test.ts`
 
-> 实现代码：[`src/indicator/utils.ts`](src/indicator/utils.ts) (1-256 行)
+**验证:** `npx vitest run src/indicator/__tests__/utils.test.ts`
 
 ### Task 1.2: 注册趋势类指标（15 个）
 
-**Files:**
-- Create: `src/indicator/trend/index.ts`
-- Create: `src/indicator/trend/atr.ts`
-- Create: `src/indicator/trend/superTrend.ts`
-- Create: `src/indicator/trend/ichimoku.ts`
-- Create: `src/indicator/trend/alligator.ts`
-- Create: `src/indicator/trend/dema.ts`
-- Create: `src/indicator/trend/tema.ts`
-- Create: `src/indicator/trend/wma.ts`
-- Create: `src/indicator/trend/hma.ts`
-- Create: `src/indicator/trend/kama.ts`
-- Create: `src/indicator/trend/vwma.ts`
-- Create: `src/indicator/trend/zlema.ts`
-- Create: `src/indicator/trend/mcginley.ts`
-- Create: `src/indicator/trend/linearRegression.ts`
-- Create: `src/indicator/trend/envelopes.ts`
-- Create: `src/indicator/trend/t3.ts`
-
 每个指标文件遵循 klinecharts IndicatorTemplate 模式：
-
-> 实现代码：[`src/indicator/trend/atr.ts`](src/indicator/trend/atr.ts) (1-49 行)
 
 - [x] **Step 1: 创建所有 16 个趋势指标文件** — 15 indicator files + index.ts in `src/indicator/trend/`
 - [x] **Step 2: 创建 trend/index.ts 导出数组** — exists
@@ -58,72 +35,25 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 1.3: 注册波动率类指标（8 个）
 
-**Files:**
-- Create: `src/indicator/volatility/index.ts`
-- Create: `src/indicator/volatility/keltnerChannels.ts`
-- Create: `src/indicator/volatility/donchianChannels.ts`
-- Create: `src/indicator/volatility/historicalVolatility.ts`
-- Create: `src/indicator/volatility/standardDeviation.ts`
-- Create: `src/indicator/volatility/chaikinVolatility.ts`
-- Create: `src/indicator/volatility/massIndex.ts`
-- Create: `src/indicator/volatility/ulcerIndex.ts`
-- Create: `src/indicator/volatility/bollingerBandWidth.ts`
-
 - [x] **Step 1: 创建所有 8 个波动率指标** — all 8 files + index.ts in `src/indicator/volatility/`
 - [x] **Step 2: 创建 index.ts 导出并注册** — exists
 
 ### Task 1.4: 注册成交量类指标（8 个）
-
-**Files:**
-- Create: `src/indicator/volume/index.ts`
-- Create: `src/indicator/volume/vwap.ts`
-- Create: `src/indicator/volume/mfi.ts`
-- Create: `src/indicator/volume/chaikinMoneyFlow.ts`
-- Create: `src/indicator/volume/adLine.ts`
-- Create: `src/indicator/volume/vroc.ts`
-- Create: `src/indicator/volume/klingerOscillator.ts`
-- Create: `src/indicator/volume/forceIndex.ts`
-- Create: `src/indicator/volume/elderRay.ts`
 
 - [x] **Step 1: 创建所有 8 个成交量指标** — all 8 files + index.ts in `src/indicator/volume/`
 - [x] **Step 2: 导出并注册** — exists
 
 ### Task 1.5: 注册动量类指标（10 个）
 
-**Files:**
-- Create: `src/indicator/momentum/index.ts`
-- Create: `src/indicator/momentum/stochasticRsi.ts`
-- Create: `src/indicator/momentum/adx.ts`
-- Create: `src/indicator/momentum/aroon.ts`
-- Create: `src/indicator/momentum/ultimateOscillator.ts`
-- Create: `src/indicator/momentum/fisherTransform.ts`
-- Create: `src/indicator/momentum/coppockCurve.ts`
-- Create: `src/indicator/momentum/ppo.ts`
-- Create: `src/indicator/momentum/dpo.ts`
-- Create: `src/indicator/momentum/kst.ts`
-- Create: `src/indicator/momentum/twiggsMf.ts`
-
 - [x] **Step 1: 创建所有 10 个动量指标** — all 10 files + index.ts in `src/indicator/momentum/`
 - [x] **Step 2: 导出并注册** — exists
 
 ### Task 1.6: 注册其他类指标（5 个）
 
-**Files:**
-- Create: `src/indicator/other/index.ts`
-- Create: `src/indicator/other/pivotPoints.ts`
-- Create: `src/indicator/other/zigzag.ts`
-- Create: `src/indicator/other/volumeProfile.ts`
-- Create: `src/indicator/other/elderRayBull.ts`
-- Create: `src/indicator/other/elderRayBear.ts`
-
 - [x] **Step 1: 创建所有 5 个指标** — PARTIAL: only pivotPoints, zigzag exist in `src/indicator/other/`; missing volumeProfile, elderRayBull, elderRayBear
 - [x] **Step 2: 导出并注册** — index.ts exists with available indicators
 
 ### Task 1.7: 指标注册入口
-
-**Files:**
-- Create: `src/indicator/index.ts`
-- Modify: `src/index.ts`
 
 - [x] **Step 1: 创建 indicator/index.ts 汇总所有指标** — implemented as IndicatorRegistry with lazy loading (`src/indicator/registry.ts` + `src/indicator/loaders.ts`, 43 entries)
 
@@ -135,16 +65,9 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 1.8: 更新 IndicatorModal 支持分类和搜索
 
-**Files:**
-- Modify: `src/widget/indicator-modal/index.tsx`
-
 - [x] **Step 1: 重写 IndicatorModal** — `src/widget/indicator-modal/index.tsx` has category tabs (all/trend/volatility/volume/momentum/other) + search + checkbox selection
 
 ### Task 1.9: 更新 i18n
-
-**Files:**
-- Modify: `src/i18n/zh-CN.json`
-- Modify: `src/i18n/en-US.json`
 
 - [x] **Step 1: 添加所有新指标的中英文翻译** — 4 locale files exist (en-US.ini, zh-CN.ini, ja.ini, ko.ini); format changed from .json to .ini
 
@@ -152,6 +75,8 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 - [x] **Step 1: npm run build 确保编译通过**
 - [x] **Step 2: 提交**
+
+**验证:** `npm run build`
 
 ---
 
@@ -161,44 +86,13 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 2.1: 测量工具
 
-**Files:**
-- Create: `src/extension/priceRange.ts` — 价格区间（显示价差/百分比/柱数）
-- Create: `src/extension/dateRange.ts` — 时间区间测量
-- Create: `src/extension/dateAndPriceRange.ts` — 综合测量
-
 ### Task 2.2: 形态工具
-
-**Files:**
-- Create: `src/extension/pitchfork.ts` — Andrew's Pitchfork
-- Create: `src/extension/schiffPitchfork.ts` — Schiff 变体
-- Create: `src/extension/regressionTrend.ts` — 线性回归趋势
-- Create: `src/extension/regressionChannel.ts` — 回归通道
 
 ### Task 2.3: 标注工具
 
-**Files:**
-- Create: `src/extension/textAnnotation.ts` — 文字标注
-- Create: `src/extension/callout.ts` — 标注气泡
-- Create: `src/extension/note.ts` — 便签
-- Create: `src/extension/brush.ts` — 自由画笔
-
 ### Task 2.4: 交易工具
 
-**Files:**
-- Create: `src/extension/longPosition.ts` — 做多持仓（入场/止损/止盈三区域）
-- Create: `src/extension/shortPosition.ts` — 做空持仓
-
 ### Task 2.5: 更新绘图工具栏
-
-**Files:**
-- Modify: `src/widget/drawing-bar/index.tsx`
-- Create: `src/widget/drawing-bar/icons/pitchfork.ts`
-- Create: `src/widget/drawing-bar/icons/priceRange.ts`
-- Create: `src/widget/drawing-bar/icons/textAnnotation.ts`
-- Create: `src/widget/drawing-bar/icons/longPosition.ts`
-- Create: `src/widget/drawing-bar/icons/shortPosition.ts`
-- Create: `src/widget/drawing-bar/icons/brush.ts`
-- Modify: `src/widget/drawing-bar/icons/index.ts`
 
 新增工具分组:
 - 测量工具组（priceRange, dateRange, dateAndPriceRange）
@@ -213,6 +107,8 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 - [x] **Step 3: 构建验证**
 - [x] **Step 4: 提交**
 
+**验证:** `npm run build`
+
 ---
 
 ## Phase 3: 图表类型扩展 — DONE
@@ -221,26 +117,19 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 3.1: Heikin Ashi 图表
 
-**Files:**
-- Create: `src/chartType/heikinAshi.ts`
-
 通过 registerIndicator 实现：对原始 OHLCV 数据做 HA 变换，渲染为蜡烛图。
 
 ### Task 3.2: Baseline 图表
-
-**Files:**
-- Create: `src/chartType/baseline.ts`
 
 基于收盘价和基准线的双色区域图。
 
 ### Task 3.3: 更新设置面板
 
-**Files:**
-- Modify: `src/widget/setting-modal/data.ts`
-
 在 candle.type 选项中增加 heikin_ashi, baseline 等选项。
 
 ### Task 3.4: i18n + 构建 + 提交
+
+**验证:** `npm run build`
 
 ---
 
@@ -250,23 +139,15 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 4.1: 快捷键管理器
 
-**Files:**
-- Create: `src/shortcut/index.ts` — KeyboardShortcutManager 类
-- Create: `src/shortcut/defaultBindings.ts` — 默认快捷键映射
-
 ### Task 4.2: 集成到 ChartProComponent
-
-**Files:**
-- Modify: `src/ChartProComponent.tsx`
 
 在 onMount 中初始化快捷键监听，onCleanup 中清理。
 
 ### Task 4.3: 撤销/重做系统
 
-**Files:**
-- Create: `src/shortcut/undoRedo.ts` — Command Pattern 实现
-
 ### Task 4.4: 构建 + 提交
+
+**验证:** `npm run build`
 
 ---
 
@@ -276,27 +157,15 @@ KLineChart 引擎内置 30 个指标，TradingChest UI 暴露 28 个。需要：
 
 ### Task 5.1: 右键上下文菜单
 
-**Files:**
-- Create: `src/widget/context-menu/index.tsx`
-
 ### Task 5.2: 数据窗口面板
-
-**Files:**
-- Create: `src/widget/data-window/index.tsx`
 
 光标位置的 OHLCV + 所有活跃指标值。
 
 ### Task 5.3: 改进 PeriodBar
 
-**Files:**
-- Modify: `src/widget/period-bar/index.tsx`
-
 添加：数据窗口按钮、对比按钮、导出按钮。
 
 ### Task 5.4: 数据导出 — DONE
-
-**Files:**
-- Create: `src/widget/export-modal/index.tsx`
 
 CSV 导出可见区间数据。
 
@@ -304,20 +173,15 @@ CSV 导出可见区间数据。
 
 ### Task 5.5: 主题系统增强 — DONE
 
-**Files:**
-- Create: `src/theme/index.ts` — 预设主题（dark, light, midnight, classic）
-- Modify: `src/widget/setting-modal/data.ts` — 主题选择
-
 ### Task 5.6: 绘图持久化（保存/恢复） — DONE
 
 > **Actual implementation:** `src/persistence/index.ts` with saveLayout, loadLayout, etc.
 
-**Files:**
-- Create: `src/persistence/index.ts`
-
 将绘图、指标配置序列化为 JSON，支持 localStorage 保存/恢复。
 
 ### Task 5.7: 构建 + 提交
+
+**验证:** `npm run build`
 
 ---
 
@@ -343,3 +207,5 @@ CSV 导出可见区间数据。
 - `saveLayout()` / `loadLayout(data)`
 
 ### Task 6.4: 最终构建 + 全面测试 + 提交
+
+**验证:** `npx vitest run && npx tsc --noEmit && npm run build`

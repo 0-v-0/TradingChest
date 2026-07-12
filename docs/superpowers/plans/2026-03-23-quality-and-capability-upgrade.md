@@ -12,7 +12,6 @@
 
 ## 文件结构总览
 
-
 新建文件:
   src/indicator/__tests__/            # 指标单元测试
     superTrend.test.ts
@@ -25,7 +24,7 @@
   src/core/__tests__/
     adjustFromTo.test.ts
     buildStyles.test.ts
-  # Vitest 配置在 vite.config.ts 中（无独立 vitest.config.ts）
+  # Vitest 配置在 vite.config.ts 中
   src/core/                           # 从 ChartProComponent 抽取的纯函数
     adjustFromTo.ts
     buildStyles.ts
@@ -54,10 +53,6 @@
 
 ### Task 1.1: 配置 Vitest
 
-**Files:**
-- Create: `vitest.config.ts`
-- Modify: `package.json`
-
 - [x] **Step 1: 创建 vitest.config.ts**（实际：Vitest 配置在 vite.config.ts 中，无独立 vitest.config.ts）
 
 > 实现代码：[`vite.config.ts`](vite.config.ts) (test 配置)
@@ -70,7 +65,6 @@
 "test:watch": "vitest",
 "test:coverage": "vitest run --coverage"
 
-
 - [x] **Step 3: 运行 `npm test` 确认配置正确（应该 0 测试通过）**
 
 Run: `npm test`
@@ -78,20 +72,13 @@ Expected: "No test files found" 或 0 tests
 
 - [x] **Step 4: Commit**
 
-
-git add vitest.config.ts package.json
-git commit -m "chore: configure vitest test infrastructure"
-
+**验证:** `npm test`
 
 ---
 
 ### Task 1.2: 抽取纯函数 — adjustFromTo
 
 从 `ChartProComponent.tsx:134-184` 抽取 `adjustFromTo` 为独立模块，方便测试。
-
-**Files:**
-- Create: `src/core/adjustFromTo.ts`
-- Modify: `src/ChartProComponent.tsx`
 
 - [x] **Step 1: 编写 adjustFromTo 的测试**
 
@@ -117,21 +104,13 @@ Expected: PASS
 
 - [x] **Step 6: Commit**
 
-
-git add src/core/ src/ChartProComponent.tsx
-git commit -m "refactor: extract adjustFromTo to testable module with unit tests"
-
+**验证:** `npx vitest run src/core/__tests__/adjustFromTo.test.ts`
 
 ---
 
 ### Task 1.3: 抽取纯函数 — buildStyles
 
 从 `ChartProComponent.tsx:478-500` 抽取 `buildStyles`。
-
-**Files:**
-- Create: `src/core/buildStyles.ts`
-- Create: `src/core/__tests__/buildStyles.test.ts`
-- Modify: `src/ChartProComponent.tsx`
 
 - [x] **Step 1: 编写 buildStyles 测试**
 
@@ -162,17 +141,11 @@ Expected: 构建成功
 
 - [x] **Step 7: Commit**
 
-
-git add src/core/buildStyles.ts src/core/__tests__/buildStyles.test.ts src/ChartProComponent.tsx
-git commit -m "refactor: extract buildStyles to testable module with unit tests"
-
+**验证:** `npx vitest run src/core/__tests__/buildStyles.test.ts && npm run build-core`
 
 ---
 
 ### Task 1.4: SuperTrend 指标单元测试
-
-**Files:**
-- Create: `src/indicator/__tests__/superTrend.test.ts`
 
 - [x] **Step 1: 编写测试**
 
@@ -185,17 +158,11 @@ Expected: PASS
 
 - [x] **Step 3: Commit**
 
-
-git add src/indicator/__tests__/superTrend.test.ts
-git commit -m "test: add SuperTrend indicator unit tests"
-
+**验证:** `npx vitest run src/indicator/__tests__/superTrend.test.ts`
 
 ---
 
 ### Task 1.5: Persistence 模块单元测试
-
-**Files:**
-- Create: `src/persistence/__tests__/persistence.test.ts`
 
 - [x] **Step 1: 编写测试**
 
@@ -208,17 +175,11 @@ Expected: PASS
 
 - [x] **Step 3: Commit**
 
-
-git add src/persistence/__tests__/persistence.test.ts
-git commit -m "test: add persistence module unit tests"
-
+**验证:** `npx vitest run src/persistence/__tests__/persistence.test.ts`
 
 ---
 
 ### Task 1.6: KeyboardShortcutManager 单元测试
-
-**Files:**
-- Create: `src/shortcut/__tests__/shortcut.test.ts`
 
 - [x] **Step 1: 编写测试**
 
@@ -231,10 +192,7 @@ Expected: PASS
 
 - [x] **Step 3: Commit**
 
-
-git add src/shortcut/__tests__/shortcut.test.ts
-git commit -m "test: add KeyboardShortcutManager unit tests"
-
+**验证:** `npx vitest run src/shortcut/__tests__/shortcut.test.ts`
 
 ---
 
@@ -245,11 +203,6 @@ git commit -m "test: add KeyboardShortcutManager unit tests"
 > **NOTE:** IndicatorClickDetector was implemented then removed — it was never actually wired in. The codebase instead uses module-level `_hitTargetsMap` in `tradeVisualization.ts` with per-instance keys and `getTradeVisHitTargets()`. The original globalThis problem is solved via instance-scoped maps.
 
 用实例级 `IndicatorClickDetector` 替代全局变量。
-
-**Files:**
-- Create: `src/core/indicatorClickDetector.ts`
-- Create: `src/core/__tests__/indicatorClickDetector.test.ts`
-- Modify: `src/KLineChartPro.tsx:81-121`
 
 - [x] **Step 1: 编写测试**
 
@@ -280,17 +233,11 @@ Expected: 构建成功
 
 - [x] **Step 7: Commit**
 
-
-git add src/core/indicatorClickDetector.ts src/core/__tests__/indicatorClickDetector.test.ts src/KLineChartPro.tsx
-git commit -m "fix: replace globalThis.__tradeVisHitTargets with instance-level IndicatorClickDetector"
-
+**验证:** `npm run build-core`
 
 ---
 
 ### Task 2.2: 修复 DefaultDatafeed.unsubscribe 内存泄漏
-
-**Files:**
-- Modify: `src/DefaultDatafeed.ts:93-94`
 
 - [x] **Step 1: 实现 unsubscribe**
 
@@ -307,10 +254,7 @@ Expected: 构建成功
 
 - [x] **Step 4: Commit**
 
-
-git add src/DefaultDatafeed.ts
-git commit -m "fix: implement DefaultDatafeed.unsubscribe to prevent WebSocket memory leak"
-
+**验证:** `npm run build-core`
 
 ---
 
@@ -319,10 +263,6 @@ git commit -m "fix: implement DefaultDatafeed.unsubscribe to prevent WebSocket m
 ### Task 3.1: ReconnectingWebSocket
 
 自动重连 WebSocket，带指数退避。
-
-**Files:**
-- Create: `src/datafeed/ReconnectingWebSocket.ts`
-- Create: `src/datafeed/__tests__/ReconnectingWebSocket.test.ts`
 
 - [x] **Step 1: 编写测试**
 
@@ -339,10 +279,7 @@ Expected: PASS
 
 - [x] **Step 4: Commit**
 
-
-git add src/datafeed/
-git commit -m "feat: add ReconnectingWebSocket with exponential backoff"
-
+**验证:** `npx vitest run src/datafeed/__tests__/ReconnectingWebSocket.test.ts`
 
 ---
 
@@ -356,9 +293,6 @@ git commit -m "feat: add ReconnectingWebSocket with exponential backoff"
 
 ### Task 3.3: 集成 ReconnectingWebSocket 到 DefaultDatafeed
 
-**Files:**
-- Modify: `src/DefaultDatafeed.ts`
-
 - [x] **Step 1: 替换原生 WebSocket 为 ReconnectingWebSocket**
 
 > 实现代码：[`src/DefaultDatafeed.ts`](src/DefaultDatafeed.ts) (1-189 行)
@@ -370,10 +304,7 @@ Expected: 构建成功
 
 - [x] **Step 3: Commit**
 
-
-git add src/DefaultDatafeed.ts
-git commit -m "feat: integrate ReconnectingWebSocket into DefaultDatafeed"
-
+**验证:** `npm run build-core`
 
 ---
 
@@ -381,27 +312,13 @@ git commit -m "feat: integrate ReconnectingWebSocket into DefaultDatafeed"
 
 ### Task 4.1: Alert 类型定义
 
-**Files:**
-- Create: `src/alert/types.ts`
-
 - [x] **Step 1: 创建类型**
 
 > 实现代码：[`src/alert/types.ts`](src/alert/types.ts) (1-14 行)
 
 - [x] **Step 2: Commit**
 
-
-git add src/alert/types.ts
-git commit -m "feat: define alert system type interfaces"
-
-
----
-
 ### Task 4.2: AlertManager 实现
-
-**Files:**
-- Create: `src/alert/index.ts`
-- Create: `src/alert/__tests__/alert.test.ts`
 
 - [x] **Step 1: 编写测试**
 
@@ -418,18 +335,11 @@ Expected: PASS
 
 - [x] **Step 4: Commit**
 
-
-git add src/alert/
-git commit -m "feat: add AlertManager with crossing/above/below conditions"
-
+**验证:** `npx vitest run src/alert/__tests__/alert.test.ts`
 
 ---
 
 ### Task 4.3: Alert Overlay（水平报警线）
-
-**Files:**
-- Create: `src/alert/AlertLine.ts`
-- Modify: `src/extension/index.ts`
 
 - [x] **Step 1: 创建 AlertLine overlay**
 
@@ -446,19 +356,11 @@ Expected: 构建成功
 
 - [x] **Step 4: Commit**
 
-
-git add src/alert/AlertLine.ts src/extension/index.ts
-git commit -m "feat: add alertLine overlay for visual price alerts"
-
+**验证:** `npm run build-core`
 
 ---
 
 ### Task 4.4: 集成 AlertManager 到 ChartPro API
-
-**Files:**
-- Modify: `src/types.ts`
-- Modify: `src/KLineChartPro.tsx`
-- Modify: `src/index.ts`
 
 - [x] **Step 1: 扩展 ChartPro 接口**
 
@@ -479,20 +381,13 @@ Expected: 构建成功
 
 - [x] **Step 5: Commit**
 
-
-git add src/types.ts src/KLineChartPro.tsx src/index.ts
-git commit -m "feat: integrate AlertManager into ChartPro public API"
-
+**验证:** `npm run build-core`
 
 ---
 
 ## Phase 5: 多品种对比（P2）
 
 ### Task 5.1: Compare 数据归一化
-
-**Files:**
-- Create: `src/compare/index.ts`
-- Create: `src/compare/__tests__/compare.test.ts`
 
 - [x] **Step 1: 编写测试**
 
@@ -509,19 +404,11 @@ Expected: PASS
 
 - [x] **Step 4: Commit**
 
-
-git add src/compare/
-git commit -m "feat: add price normalization utility for multi-symbol comparison"
-
+**验证:** `npx vitest run src/compare/__tests__/compare.test.ts`
 
 ---
 
 ### Task 5.2: Compare API 集成
-
-**Files:**
-- Modify: `src/types.ts`
-- Modify: `src/KLineChartPro.tsx`
-- Modify: `src/index.ts`
 
 - [x] **Step 1: 扩展 ChartPro 接口**
 
@@ -542,19 +429,13 @@ Expected: 构建成功
 
 - [x] **Step 5: Commit**
 
-
-git add src/types.ts src/KLineChartPro.tsx src/index.ts
-git commit -m "feat: add multi-symbol comparison API with data fetching"
-
+**验证:** `npm run build-core`
 
 ---
 
 ## Phase 6: 错误处理与代码清理（P1）
 
 ### Task 6.1: DefaultDatafeed 添加错误处理
-
-**Files:**
-- Modify: `src/DefaultDatafeed.ts`
 
 - [x] **Step 1: 为 searchSymbols 添加 try/catch 和 response.ok 检查**
 
@@ -571,17 +452,11 @@ Expected: 构建成功
 
 - [x] **Step 4: Commit**
 
-
-git add src/DefaultDatafeed.ts
-git commit -m "fix: add error handling to DefaultDatafeed API calls"
-
+**验证:** `npm run build-core`
 
 ---
 
 ### Task 6.2: 消除 @ts-expect-error
-
-**Files:**
-- Modify: `src/ChartProComponent.tsx`
 
 - [x] **Step 1: 修复 ChartProComponent.tsx 中的 5 处 @ts-expect-error**
 
@@ -594,10 +469,7 @@ Expected: 构建成功
 
 - [x] **Step 3: Commit**
 
-
-git add src/ChartProComponent.tsx
-git commit -m "fix: resolve all 5 @ts-expect-error with proper type declarations"
-
+**验证:** `npm run build-core`
 
 ---
 
@@ -615,10 +487,7 @@ Expected: 构建成功，dist/ 产物正常
 
 - [x] **Step 3: Final commit**
 
-
-git add -A
-git commit -m "chore: verify all tests pass and build succeeds"
-
+**验证:** `npm test && npm run build`
 
 ---
 
