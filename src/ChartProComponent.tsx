@@ -393,6 +393,48 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         },
       },
       {
+        label: t('menu_bring_forward', locale()),
+        onClick: () => {
+          if (!overlay.id || !overlay.paneId) return
+          const allOnPane = widget!.getOverlays()
+            .filter(o => o.paneId === overlay.paneId)
+            .sort((a, b) => a.zLevel - b.zLevel)
+          const idx = allOnPane.findIndex(o => o.id === overlay.id)
+          if (idx < allOnPane.length - 1) {
+            const front = allOnPane[idx + 1]
+            const ownZ = overlay.zLevel
+            const frontZ = front.zLevel
+            if (ownZ === frontZ) {
+              widget!.overrideOverlay({ id: overlay.id, zLevel: frontZ + 1 })
+            } else {
+              widget!.overrideOverlay({ id: overlay.id, zLevel: frontZ })
+              widget!.overrideOverlay({ id: front.id, zLevel: ownZ })
+            }
+          }
+        },
+      },
+      {
+        label: t('menu_send_backward', locale()),
+        onClick: () => {
+          if (!overlay.id || !overlay.paneId) return
+          const allOnPane = widget!.getOverlays()
+            .filter(o => o.paneId === overlay.paneId)
+            .sort((a, b) => a.zLevel - b.zLevel)
+          const idx = allOnPane.findIndex(o => o.id === overlay.id)
+          if (idx > 0) {
+            const back = allOnPane[idx - 1]
+            const ownZ = overlay.zLevel
+            const backZ = back.zLevel
+            if (ownZ === backZ) {
+              widget!.overrideOverlay({ id: overlay.id, zLevel: backZ - 1 })
+            } else {
+              widget!.overrideOverlay({ id: overlay.id, zLevel: backZ })
+              widget!.overrideOverlay({ id: back.id, zLevel: ownZ })
+            }
+          }
+        },
+      },
+      {
         label: t('menu_delete', locale()),
         danger: true,
         onClick: () => {

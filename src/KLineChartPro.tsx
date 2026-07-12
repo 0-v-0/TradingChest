@@ -383,8 +383,7 @@ export default class KLineChartPro implements ChartPro {
 
   updateAlert(id: string, updates: Partial<Omit<AlertConfig, 'id'>>): boolean {
     this._assertNotDisposed()
-    const ok = this._alertManager.updateAlert(id, updates)
-    if (ok && updates.price !== undefined) {
+    if (this._alertManager.updateAlert(id, updates) && updates.price !== undefined) {
       // 更新 overlay 位置
       const chart = this.getChart()
       if (chart) {
@@ -401,7 +400,7 @@ export default class KLineChartPro implements ChartPro {
         }
       }
     }
-    return ok
+    return this._alertManager.updateAlert(id, updates)
   }
 
   removeAlert(id: string): void {

@@ -44,6 +44,7 @@
 | 45+ 绘图工具 | tradingview-parity Phase 2–3 |
 | 右键菜单 / 数据窗口 / 收藏 / 搜索框 UX | ux-enhancement-design (2026-07-10) |
 | CSV 导出 + 截图 + 布局持久化 | tradingview-parity Phase 5–6 |
+| Overlay z-order（上移/下移） | ux-enhancement-design §6 |
 
 ---
 
@@ -329,9 +330,8 @@
 
 | 功能 | 来源 | 原因 | 版本检查 |
 |------|------|------|----------|
-| 图例悬停高亮 | ux-enhancement-design §8 | 无 legend hover 回调，Canvas 渲染 | ❌ v10.0.0-beta3 无变化 |
-| Overlay z-order（上移/下移） | ux-enhancement-design §6 | 无 overlay 层级 API | 🟡 `zLevel` + `overrideOverlay` 可用，但需自行实现排序逻辑 |
-| Overlay 删除 fade-out 动画 | ux-enhancement-design §3 | Canvas 渲染，CSS 无法作用于 overlay | ❌ v10.0.0-beta3 无变化 |
+| 图例悬停高亮 | ux-enhancement-design §8 | 无 legend hover 回调，Canvas 渲染 | ❌ v10.0.0 无变化 |
+| Overlay 删除 fade-out 动画 | ux-enhancement-design §3 | Canvas 渲染，CSS 无法作用于 overlay | ❌ v10.0.0 无变化 |
 
 **跟进策略:** 若 klinecharts 上游新增相关 API，再重新评估立项。
 
