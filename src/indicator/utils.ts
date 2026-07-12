@@ -111,27 +111,31 @@ export function calcTR(high: number[], low: number[], close: number[]): number[]
 /**
  * 标准差（Standard Deviation）
  * 使用总体标准差（除以 N），与大多数技术分析平台一致（如布林带）
+ *
+ * 实现细节：维护滑动窗口的 sum 与 sumSq，常数时间计算方差
+ * `variance = sumSq / period - (sum / period)^2`，由于浮点误差偶尔小于 0 时取 max。
+ * 这与原本逐条重算的 O(n*period) 算法数值等价但更快。
  */
 export function calcStdDev(data: number[], period: number): number[] {
   const result: number[] = []
+  let sum = 0
+  let sumSq = 0
   for (let i = 0; i < data.length; i++) {
-    let val = NaN
-    if (i >= period - 1) {
-      // 先求区间均值
-      let sum = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        sum += data[j]
-      }
-      const mean = sum / period
-      // 求方差
-      let varianceSum = 0
-      for (let j = i - period + 1; j <= i; j++) {
-        const diff = data[j] - mean
-        varianceSum += diff * diff
-      }
-      val = Math.sqrt(varianceSum / period)
+    const v = data[i]
+    sum += v
+    sumSq += v * v
+    if (i >= period) {
+      const out = data[i - period]
+      sum -= out
+      sumSq -= out * out
     }
-    result.push(val)
+    if (i >= period - 1) {
+      const mean = sum / period
+      const variance = sumSq / period - mean * mean
+      result.push(Math.sqrt(Math.max(variance, 0)))
+    } else {
+      result.push(NaN)
+    }
   }
   return result
 }
@@ -302,6 +306,73 @@ export function calcLoss(data: number[]): number[] {
   const result: number[] = []
   for (let i = 0; i < data.length; i++) {
     result.push(i === 0 ? NaN : Math.max(-(data[i] - data[i - 1]), 0))
+  }
+  return result
+}
+
+/**
+ * 最小二乘线性回归（Least-Squares Linear Regression，滑动窗口）
+ *
+ * 对于等距 x=0..period-1 的窗口，sumX 与 sumX2 是常量：
+ *   sumX  = n(n-1) / 2
+ *   sumX2 = (n-1)n(2n-1) / 6
+ * 所以滚动场景下只需维护 sumY、sumY2、sumXY 三个滑动和，
+ * 每个增量 O(1)，避免原来对每个 i 重新遍历窗口的 O(n*period) 计算。
+ *
+ * 返回与 data 等长的数组，每项 { slope, intercept, stdResid }：
+ *   slope     — 斜率 b
+ *   intercept — 截距 a
+ *   stdResid  — 残差总体标准差 = sqrt(Σ(y - ŷ)² / n)
+ * 窗口尚未填满的索引处三项均为 NaN。
+ */
+export interface LinRegResult {
+  slope: number
+  intercept: number
+  stdResid: number
+}
+
+export function calcLinReg(data: number[], period: number): LinRegResult[] {
+  const n = data.length
+  const result: LinRegResult[] = []
+  if (period < 2) {
+    for (let i = 0; i < n; i++) result.push({ slope: NaN, intercept: NaN, stdResid: NaN })
+    return result
+  }
+  const sumX = (period * (period - 1)) / 2
+  const sumX2 = ((period - 1) * period * (2 * period - 1)) / 6
+  const denom = period * sumX2 - sumX * sumX
+
+  let sumY = 0
+  let sumY2 = 0
+  let sumXY = 0
+
+  for (let i = 0; i < n; i++) {
+    const y = data[i]
+    if (i < period) {
+      sumY += y
+      sumY2 += y * y
+      sumXY += i * y
+    } else {
+      const yIn = y
+      const yOut = data[i - period]
+      sumXY = sumXY - (sumY - yOut) + (period - 1) * yIn
+      sumY += yIn - yOut
+      sumY2 += yIn * yIn - yOut * yOut
+    }
+
+    if (i >= period - 1) {
+      const slope = denom !== 0 ? (period * sumXY - sumX * sumY) / denom : 0
+      const intercept = (sumY - slope * sumX) / period
+      const yMean = sumY / period
+      const xMean = sumX / period
+      const variance =
+        sumY2 / period - yMean * yMean -
+        slope * slope * (sumX2 / period - xMean * xMean)
+      const stdResid = Math.sqrt(Math.max(variance, 0))
+      result.push({ slope, intercept, stdResid })
+    } else {
+      result.push({ slope: NaN, intercept: NaN, stdResid: NaN })
+    }
   }
   return result
 }

@@ -4,6 +4,7 @@
  * SE 衡量价格偏离回归线的程度，值越大波动越剧烈
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcLinReg } from '../utils'
 
 const standardError: IndicatorTemplate = {
   name: 'StandardError',
@@ -13,44 +14,16 @@ const standardError: IndicatorTemplate = {
     { key: 'se', title: 'SE: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-
+    const period = indicator.calcParams[0] as number
+    const closes: number[] = new Array(dataList.length)
+    for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
+    const reg = calcLinReg(closes, period)
     return dataList.map((_, i) => {
-      if (i < period - 1) {
+      const r = reg[i]
+      if (Number.isNaN(r.stdResid) || period <= 2) {
         return { se: NaN }
       }
-
-      // 最小二乘法：y = a + b * x
-      let sumX = 0
-      let sumY = 0
-      let sumXY = 0
-      let sumX2 = 0
-
-      for (let j = 0; j < period; j++) {
-        const x = j
-        const y = dataList[i - period + 1 + j].close
-        sumX += x
-        sumY += y
-        sumXY += x * y
-        sumX2 += x * x
-      }
-
-      const n = period
-      const denominator = n * sumX2 - sumX * sumX
-      const b = denominator !== 0 ? (n * sumXY - sumX * sumY) / denominator : 0
-      const a = (sumY - b * sumX) / n
-
-      // 计算标准误差 SE = √(Σ(y-ŷ)² / (n-2))
-      let sumSqResid = 0
-      for (let j = 0; j < period; j++) {
-        const y = dataList[i - period + 1 + j].close
-        const yHat = a + b * j
-        sumSqResid += (y - yHat) * (y - yHat)
-      }
-
-      const se = n > 2 ? Math.sqrt(sumSqResid / (n - 2)) : 0
-      return { se }
+      return { se: r.stdResid * Math.sqrt(period / (period - 2)) }
     })
   },
 }

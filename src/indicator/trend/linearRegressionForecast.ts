@@ -1,14 +1,14 @@
 /**
  * Linear Regression Forecast - 线性回归预测
- * 与 LINEARREGRESSION 不同，Forecast 版本只输出回归拟合值和斜率方向
- * 不画标准差通道
+ * 输出回归拟合值（每个点）与斜率
  *
- * 算法：最小二乘法拟合 y = a + b*x
- * 输出回归拟合值（每个点）和斜率
+ * 算法：最小二乘法拟合 y = a + b*x，x=0..period-1
+ * 输出每个 i 处的预测值 fitAt(period-1) 与斜率 b
  *
  * 参数: period
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcLinReg } from '../utils'
 
 const linearRegressionForecast: IndicatorTemplate = {
   name: 'LinearRegressionForecast',
@@ -19,38 +19,19 @@ const linearRegressionForecast: IndicatorTemplate = {
     { key: 'slope', title: '斜率: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-
+    const period = indicator.calcParams[0] as number
+    const closes: number[] = new Array(dataList.length)
+    for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
+    const reg = calcLinReg(closes, period)
     return dataList.map((_, i) => {
-      if (i < period - 1) {
+      const r = reg[i]
+      if (Number.isNaN(r.slope)) {
         return { forecast: NaN, slope: NaN }
       }
-
-      // 最小二乘法：y = a + b * x
-      let sumX = 0
-      let sumY = 0
-      let sumXY = 0
-      let sumX2 = 0
-
-      for (let j = 0; j < period; j++) {
-        const x = j
-        const y = dataList[i - period + 1 + j].close
-        sumX += x
-        sumY += y
-        sumXY += x * y
-        sumX2 += x * x
+      return {
+        forecast: r.intercept + r.slope * (period - 1),
+        slope: r.slope,
       }
-
-      const n = period
-      const denominator = n * sumX2 - sumX * sumX
-      const b = denominator !== 0 ? (n * sumXY - sumX * sumY) / denominator : 0
-      const a = (sumY - b * sumX) / n
-
-      // 回归线终点值（x = period - 1）即预测值
-      const forecast = a + b * (period - 1)
-
-      return { forecast, slope: b }
     })
   },
 }

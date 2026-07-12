@@ -1,9 +1,10 @@
 /**
  * Linear Regression - 线性回归通道
  * 使用最小二乘法拟合直线，并计算上下通道
- * 通道宽度基于标准差
+ * 通道宽度基于残差总体标准差
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcLinReg } from '../utils'
 
 const linearRegression: IndicatorTemplate = {
   name: 'LINEARREGRESSION',
@@ -15,51 +16,21 @@ const linearRegression: IndicatorTemplate = {
     { key: 'lower', title: '下轨: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-
+    const period = indicator.calcParams[0] as number
+    const closes: number[] = new Array(dataList.length)
+    for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
+    const reg = calcLinReg(closes, period)
     return dataList.map((_, i) => {
-      if (i < period - 1) {
+      const r = reg[i]
+      if (Number.isNaN(r.slope)) {
         return { value: NaN, upper: NaN, lower: NaN }
       }
-
-      // 最小二乘法：y = a + b * x，x 取 0 到 period-1
-      let sumX = 0
-      let sumY = 0
-      let sumXY = 0
-      let sumX2 = 0
-
-      for (let j = 0; j < period; j++) {
-        const x = j
-        const y = dataList[i - period + 1 + j].close
-        sumX += x
-        sumY += y
-        sumXY += x * y
-        sumX2 += x * x
-      }
-
-      const n = period
-      const denominator = n * sumX2 - sumX * sumX
-      // 斜率和截距
-      const b = denominator !== 0 ? (n * sumXY - sumX * sumY) / denominator : 0
-      const a = (sumY - b * sumX) / n
-
-      // 回归线终点值（x = period - 1）
-      const regValue = a + b * (period - 1)
-
-      // 计算标准差作为通道宽度
-      let sumSqDiff = 0
-      for (let j = 0; j < period; j++) {
-        const y = dataList[i - period + 1 + j].close
-        const yHat = a + b * j
-        sumSqDiff += (y - yHat) * (y - yHat)
-      }
-      const stdDev = Math.sqrt(sumSqDiff / period)
-
+      const regValue = r.intercept + r.slope * (period - 1)
+      const band = 2 * r.stdResid
       return {
         value: regValue,
-        upper: regValue + 2 * stdDev,
-        lower: regValue - 2 * stdDev,
+        upper: regValue + band,
+        lower: regValue - band,
       }
     })
   },
