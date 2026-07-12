@@ -27,6 +27,7 @@ export interface OverlaySerializedData {
 }
 
 const STORAGE_KEY_PREFIX = 'trading-chest-layout-'
+const CURRENT_VERSION = 1
 
 /**
  * 保存布局。返回 true 表示成功，false 表示失败（如 localStorage 已满）。
@@ -36,14 +37,17 @@ export function saveLayout(
   layout: Omit<ChartLayout, 'version' | 'timestamp'>,
 ): boolean {
   const data: ChartLayout = {
-    version: 1,
+    version: CURRENT_VERSION,
     timestamp: Date.now(),
     ...layout,
   }
   try {
     localStorage.setItem(STORAGE_KEY_PREFIX + key, JSON.stringify(data))
     return true
-  } catch {
+  } catch (e) {
+    if (e instanceof Error && e.name !== 'QuotaExceededError') {
+      console.warn('[TradingChest] save layout failed:', e)
+    }
     return false
   }
 }
@@ -56,8 +60,9 @@ export function loadLayout(key: string): ChartLayout | null {
     const raw = localStorage.getItem(STORAGE_KEY_PREFIX + key)
     if (!raw) return null
     const data = JSON.parse(raw) as ChartLayout
-    if (data.version !== 1) return null
-    return data
+    if (typeof data.version !== 'number') return null
+    const migrated = migrateLayout(data)
+    return migrated
   } catch {
     return null
   }
@@ -77,19 +82,33 @@ export function listLayouts(): Array<{ key: string; timestamp: number }> {
   const result: Array<{ key: string; timestamp: number }> = []
   for (let i = 0; i < localStorage.length; i++) {
     const storageKey = localStorage.key(i)
-    if (storageKey?.startsWith(STORAGE_KEY_PREFIX)) {
-      try {
-        const raw = localStorage.getItem(storageKey)
-        if (!raw) continue
-        const data = JSON.parse(raw) as ChartLayout
-        result.push({
-          key: storageKey.replace(STORAGE_KEY_PREFIX, ''),
-          timestamp: data.timestamp,
-        })
-      } catch {
-        /* 忽略损坏的数据 */
-      }
+    if (!storageKey?.startsWith(STORAGE_KEY_PREFIX)) continue
+    try {
+      const raw = localStorage.getItem(storageKey)
+      if (!raw) continue
+      const data = JSON.parse(raw) as ChartLayout
+      result.push({
+        key: storageKey.slice(STORAGE_KEY_PREFIX.length),
+        timestamp: data.timestamp,
+      })
+    } catch {
+      /* 忽略损坏的数据 */
     }
   }
   return result.sort((a, b) => b.timestamp - a.timestamp)
+}
+
+/**
+ * Migrate persisted layouts from older versions to the current schema.
+ * Returns null if the payload cannot be migrated.
+ * Plug new migration steps here when CURRENT_VERSION is bumped.
+ */
+function migrateLayout(data: ChartLayout): ChartLayout | null {
+  if (data.version > CURRENT_VERSION) {
+    console.warn(`[TradingChest] layout version ${data.version} is newer than supported (${CURRENT_VERSION}); ignoring`)
+    return null
+  }
+  if (data.version === CURRENT_VERSION) return data
+  // No migrations yet; future versions chain here.
+  return null
 }

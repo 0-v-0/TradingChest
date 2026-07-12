@@ -8,16 +8,25 @@
  * callers never need to reason about that invariant themselves.
  */
 
+export type LineStyle = 'solid' | 'dashed' | 'dotted'
+
 export interface OverlayStyleInput {
   color: string
   fillColor?: string
   lineWidth: number
-  lineStyle: string
+  lineStyle: LineStyle
 }
+
+const DASH_SOLID: readonly number[] = Object.freeze([0])
+const DASH_DASHED: readonly number[] = Object.freeze([6, 4])
+const DASH_DOTTED: readonly number[] = Object.freeze([1, 3])
 
 export function buildStyles(s: OverlayStyleInput): Record<string, unknown> {
   const lineStyleKC = s.lineStyle === 'dashed' || s.lineStyle === 'dotted' ? 'dashed' : 'solid'
-  const dashedValue = s.lineStyle === 'dashed' ? [6, 4] : s.lineStyle === 'dotted' ? [1, 3] : [0]
+  const dashedValue: readonly number[] =
+    s.lineStyle === 'dashed' ? DASH_DASHED :
+    s.lineStyle === 'dotted' ? DASH_DOTTED : DASH_SOLID
+
   const fc = s.fillColor ?? 'rgba(0,0,0,0)'
   const hasFill = s.fillColor != null
 

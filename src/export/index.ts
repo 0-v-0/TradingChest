@@ -13,18 +13,32 @@ interface CsvRow {
   volume?: number
 }
 
+function csvEscape(v: unknown): string {
+  const s = v == null ? '' : String(v)
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
 function generateCsv(rows: CsvRow[]): string {
   const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
-  const lines = [headers.join(',')]
+  const lines: string[] = [headers.map(csvEscape).join(',')]
   for (const d of rows) {
-    const date = new Date(d.timestamp).toISOString()
-    lines.push([date, d.open, d.high, d.low, d.close, d.volume ?? 0].join(','))
+    const date = Number.isFinite(d.timestamp) ? new Date(d.timestamp).toISOString() : ''
+    const cells = [
+      date,
+      csvEscape(d.open),
+      csvEscape(d.high),
+      csvEscape(d.low),
+      csvEscape(d.close),
+      d.volume == null ? '' : csvEscape(d.volume),
+    ]
+    lines.push(cells.join(','))
   }
   return lines.join('\n')
 }
 
 function downloadCsv(csv: string, filename: string): void {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const BOM = '﻿'
+  const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -110,6 +124,9 @@ export function exportScreenshot(
       filename ??
       `chart-screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${format}`
     link.click()
+    if (url.startsWith('blob:')) {
+      setTimeout(() => URL.revokeObjectURL(url), 0)
+    }
     return true
   } catch {
     return false
