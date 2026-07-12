@@ -9,7 +9,7 @@ export class ReplayEngine {
   private _playing = false
   private _speed: ReplaySpeed = 1
   private _active = false
-  private _timer: ReturnType<typeof setInterval> | null = null
+  private _timer: ReturnType<typeof setTimeout> | null = null
   private _callbacks: ReplayCallbacks
 
   constructor(callbacks: ReplayCallbacks) {
@@ -18,8 +18,8 @@ export class ReplayEngine {
 
   start(data: KLineData[], startPosition: number): void {
     this._fullData = data
-    this._position = Math.max(1, Math.min(startPosition, data.length))
-    this._active = true
+    this._position = data.length === 0 ? 0 : Math.max(1, Math.min(startPosition, data.length))
+    this._active = data.length > 0
     this._playing = false
     this._speed = 1
     this._stopTimer()
@@ -51,7 +51,7 @@ export class ReplayEngine {
   play(): void {
     if (!this._active || this._playing) return
     this._playing = true
-    this._startTimer()
+    this._schedule()
     this._emitState()
   }
 
@@ -65,7 +65,7 @@ export class ReplayEngine {
     this._speed = speed
     if (this._playing) {
       this._stopTimer()
-      this._startTimer()
+      this._schedule()
     }
     this._emitState()
   }
@@ -90,22 +90,29 @@ export class ReplayEngine {
   dispose(): void {
     this._stopTimer()
     this._fullData = []
+    this._active = false
+    this._playing = false
+    this._callbacks = { onDataChange: () => {}, onBarUpdate: () => {}, onStateChange: () => {} }
   }
 
-  private _startTimer(): void {
+  private _schedule(): void {
+    if (!this._playing) return
     const interval = BASE_INTERVAL / this._speed
-    this._timer = setInterval(() => {
+    this._timer = setTimeout(() => {
+      this._timer = null
+      if (!this._playing) return
       if (this._position >= this._fullData.length) {
         this.pause()
         return
       }
       this.stepForward()
+      this._schedule()
     }, interval)
   }
 
   private _stopTimer(): void {
     if (this._timer) {
-      clearInterval(this._timer)
+      clearTimeout(this._timer)
       this._timer = null
     }
   }
