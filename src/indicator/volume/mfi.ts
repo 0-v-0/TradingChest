@@ -10,6 +10,9 @@
  * 4. 负资金流量：典型价格下降时的原始资金流量之和（过去 n 期）
  * 5. 资金流量比率 = 正资金流量 / 负资金流量
  * 6. MFI = 100 - 100 / (1 + 资金流量比率)
+ *
+ * 实现为 O(n) 通过维护最近 period 根 K 线内的正/负资金流量滚动和，
+ * 滑动出窗口或典型价格方向反转时增量更新两个累计值。
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
@@ -21,41 +24,48 @@ const mfi: IndicatorTemplate = {
   calcParams: [14],
   figures: [{ key: 'mfi', title: 'MFI: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const result: MfiResult[] = []
+    const period = indicator.calcParams[0] as number
+    const n = dataList.length
+    const result: MfiResult[] = new Array(n)
 
-    // 预先计算每根 K 线的典型价格和原始资金流量
-    const typicalPrices: number[] = []
-    const rawMoneyFlows: number[] = []
-
-    for (let i = 0; i < dataList.length; i++) {
-      const kline = dataList[i]
-      const tp = (kline.high + kline.low + kline.close) / 3
-      typicalPrices.push(tp)
-      rawMoneyFlows.push(tp * (kline.volume ?? 0))
+    // 预先计算典型价格 / 原始资金流量（每个一根）
+    const tp = new Array<number>(n)
+    const rmf = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      const k = dataList[i]
+      const t = (k.high + k.low + k.close) / 3
+      tp[i] = t
+      rmf[i] = t * (k.volume ?? 0)
     }
 
-    for (let i = 0; i < dataList.length; i++) {
-      let mfi = NaN
-      // 需要至少 period + 1 根 K 线（因为需要比较典型价格方向）
-      if (i >= period) {
-        // 计算窗口内的正负资金流量
-        let positiveFlow = 0
-        let negativeFlow = 0
+    let positiveFlow = 0
+    let negativeFlow = 0
 
-        for (let j = i - period + 1; j <= i; j++) {
-          if (typicalPrices[j] > typicalPrices[j - 1]) {
-            positiveFlow += rawMoneyFlows[j]
-          } else if (typicalPrices[j] < typicalPrices[j - 1]) {
-            negativeFlow += rawMoneyFlows[j]
-          }
-          // 典型价格不变时不计入任何一方
+    for (let i = 0; i < n; i++) {
+      if (i >= 1) {
+        const dir = tp[i] - tp[i - 1]
+        const inRange = i <= period
+        if (dir > 0 && inRange) positiveFlow += rmf[i]
+        else if (dir < 0 && inRange) negativeFlow += rmf[i]
+
+        if (i > period) {
+          const outDir = tp[i - period] - tp[i - period - 1]
+          if (outDir > 0) positiveFlow -= rmf[i - period]
+          else if (outDir < 0) negativeFlow -= rmf[i - period]
         }
-
-        mfi = negativeFlow === 0 ? 100 : 100 - 100 / (1 + positiveFlow / negativeFlow)
       }
-      result.push({ mfi })
+
+      let mfi: number
+      if (i >= period) {
+        if (negativeFlow === 0) {
+          mfi = 100
+        } else {
+          mfi = 100 - 100 / (1 + positiveFlow / negativeFlow)
+        }
+      } else {
+        mfi = NaN
+      }
+      result[i] = { mfi }
     }
     return result
   },

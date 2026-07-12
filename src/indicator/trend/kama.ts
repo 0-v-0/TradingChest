@@ -24,34 +24,34 @@ const kama: IndicatorTemplate = {
 
     const result: KamaResult[] = []
     let prevKama = 0
+    let volSum = 0
+    let prevClose = NaN
 
     for (let i = 0; i < dataList.length; i++) {
+      const close = Number(dataList[i].close)
       let kama = NaN
+
+      if (i >= 1 && Number.isFinite(prevClose)) {
+        volSum += Math.abs(close - prevClose)
+      }
+      if (i > period) {
+        const outClose = Number(dataList[i - period - 1].close)
+        const enteringDiff = Math.abs(Number(dataList[i - period].close) - outClose)
+        volSum -= enteringDiff
+      }
+      prevClose = close
+
       if (i < period) {
         // 数据不足，KAMA 初始值取第 period 根 K 线的收盘价
         if (i === period - 1) {
-          prevKama = dataList[i].close
+          prevKama = close
           kama = prevKama
         }
       } else {
-        const close = dataList[i].close
-
-        // 方向：|close - close[period 之前]|
-        const direction = Math.abs(close - dataList[i - period].close)
-
-        // 波动：period 个周期内相邻收盘价绝对差之和
-        let volatility = 0
-        for (let j = i - period + 1; j <= i; j++) {
-          volatility += Math.abs(dataList[j].close - dataList[j - 1].close)
-        }
-
-        // 效率比率
-        const er = volatility !== 0 ? direction / volatility : 0
-
-        // 自适应平滑常数
+        const startClose = Number(dataList[i - period].close)
+        const direction = Math.abs(close - startClose)
+        const er = volSum !== 0 ? direction / volSum : 0
         const sc = Math.pow(er * (fastSc - slowSc) + slowSc, 2)
-
-        // KAMA = 前值 + sc * (close - 前值)
         prevKama = prevKama + sc * (close - prevKama)
         kama = prevKama
       }

@@ -1,6 +1,10 @@
 /**
  * Historical Volatility - 历史波动率
  * 对数收益率的年化标准差，使用 sqrt(252) 进行年化
+ *
+ * 实现：对数收益率预先计算一次，然后使用闭式方差
+ * `var = (Σy² - (Σy)²/n) / (n-1)`（样本方差贝塞尔校正），
+ * 滚动窗口内仅维护 Σy 与 Σy² 即可 O(1) 更新。
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
@@ -12,50 +16,51 @@ const historicalVolatility: IndicatorTemplate = {
   calcParams: [20],
   figures: [{ key: 'hv', title: 'HV: ', type: 'line' }],
   calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const result: HistoricalVolatilityResult[] = []
-
-    // 年化因子：sqrt(252 个交易日)
+    const period = indicator.calcParams[0] as number
+    const n = dataList.length
     const annualizationFactor = Math.sqrt(252)
+    const result: HistoricalVolatilityResult[] = new Array(n)
 
-    for (let i = 0; i < dataList.length; i++) {
-      let hv = NaN
-      // 需要 period 个对数收益率，即 period + 1 个数据点（从 i - period 到 i）
-      // 所以最早可计算的位置是 i = period
+    // 一次性预计算对数收益率（仅当相邻两个收盘价均为正时）
+    const validLogReturns: number[] = new Array(n).fill(NaN)
+    let prevClose = NaN
+    for (let i = 0; i < n; i++) {
+      const close = Number(dataList[i].close)
+      if (prevClose > 0 && close > 0) {
+        validLogReturns[i] = Math.log(close / prevClose)
+      }
+      prevClose = close
+    }
+
+    // 在有效对数收益率之上跑一个 O(period) 窗口的滚动求和。
+    // 由于无效位置以 NaN 表示，sum/sumSq 累加时需跳过 NaN。
+    let sum = 0
+    let sumSq = 0
+    let queuedCount = 0
+
+    for (let i = 0; i < n; i++) {
+      const lr = validLogReturns[i]
+      if (Number.isFinite(lr)) {
+        sum += lr
+        sumSq += lr * lr
+        queuedCount++
+      }
       if (i >= period) {
-        // 计算回看窗口内的对数收益率
-        const logReturns: number[] = []
-        for (let j = i - period + 1; j <= i; j++) {
-          const prevClose = dataList[j - 1].close
-          const currClose = dataList[j].close
-          // 防止除零或负值
-          if (prevClose > 0 && currClose > 0) {
-            logReturns.push(Math.log(currClose / prevClose))
-          }
-        }
-
-        if (logReturns.length >= 2) {
-          // 计算均值
-          let sum = 0
-          for (let k = 0; k < logReturns.length; k++) {
-            sum += logReturns[k]
-          }
-          const mean = sum / logReturns.length
-
-          // 计算样本方差（使用 n-1 贝塞尔校正）
-          let varianceSum = 0
-          for (let k = 0; k < logReturns.length; k++) {
-            const diff = logReturns[k] - mean
-            varianceSum += diff * diff
-          }
-          const variance = varianceSum / (logReturns.length - 1)
-
-          // 年化标准差
-          hv = Math.sqrt(variance) * annualizationFactor
+        const out = validLogReturns[i - period]
+        if (Number.isFinite(out)) {
+          sum -= out
+          sumSq -= out * out
+          queuedCount--
         }
       }
-      result.push({ hv })
+
+      let hv = NaN
+      if (i >= period && queuedCount >= 2) {
+        const m = sum / queuedCount
+        const variance = Math.max((sumSq - queuedCount * m * m) / (queuedCount - 1), 0)
+        hv = Math.sqrt(variance) * annualizationFactor
+      }
+      result[i] = { hv }
     }
     return result
   },
