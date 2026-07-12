@@ -43,6 +43,7 @@ export default class DefaultDatafeed implements Datafeed {
 
   private _prevSymbolMarket?: string
   private _prevTicker?: string
+  private _currentTicker?: string
 
   private _ws?: ReconnectingWebSocket
 
@@ -115,6 +116,7 @@ export default class DefaultDatafeed implements Datafeed {
   subscribe(symbol: SymbolInfo, period: Period, callback: DatafeedSubscribeCallback): void {
     // 始终更新回调引用，确保切换 ticker 后新回调生效
     this._callback = callback
+    const ticker = symbol.ticker
     if (this._prevSymbolMarket !== symbol.market) {
       // 跨 market 切换：先在旧 socket 上 unsubscribe 旧 ticker，Polygon 不会自我感知 ticker 切换
       if (this._ws && this._prevTicker) {
@@ -124,6 +126,7 @@ export default class DefaultDatafeed implements Datafeed {
           /* ws may already be closed */
         }
       }
+      this._currentTicker = ticker
       this._ws?.close()
       this._ws = new ReconnectingWebSocket(`wss://delayed.polygon.io/${symbol.market}`, {
         maxRetries: 5,
@@ -154,7 +157,9 @@ export default class DefaultDatafeed implements Datafeed {
         if (result[0].ev === 'status') {
           if (result[0].status === 'auth_success') {
             this._onConnectionStateChange?.('connected')
-            this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${symbol.ticker}` }))
+            if (this._currentTicker) {
+              this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${this._currentTicker}` }))
+            }
           }
         } else {
           // Polygon batches multiple aggregate ticks in a single message —
@@ -181,31 +186,42 @@ export default class DefaultDatafeed implements Datafeed {
       }
     } else {
       // 同市场换品种时，先 unsubscribe 旧 ticker
-      if (this._prevTicker && this._prevTicker !== symbol.ticker) {
+      if (this._prevTicker && this._prevTicker !== ticker) {
         try {
           this._ws?.send(JSON.stringify({ action: 'unsubscribe', params: `T.${this._prevTicker}` }))
         } catch {
           /* ws may be closed */
         }
       }
-      this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${symbol.ticker}` }))
+      if (this._currentTicker !== ticker) {
+        this._currentTicker = ticker
+        this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${ticker}` }))
+      }
     }
     this._prevSymbolMarket = symbol.market
-    this._prevTicker = symbol.ticker
+    this._prevTicker = ticker
   }
 
   unsubscribe(symbol: SymbolInfo, _period: Period): void {
     this._callback = undefined
-    if (this._ws) {
+    if (this._ws && this._currentTicker === symbol.ticker) {
       try {
         this._ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${symbol.ticker}` }))
       } catch {
         // WebSocket may already be closed
       }
+      if (this._prevTicker === symbol.ticker) {
+        this._prevTicker = undefined
+        this._currentTicker = undefined
+      } else {
+        this._currentTicker = undefined
+      }
     }
   }
 
   dispose(): void {
+    this._prevTicker = undefined
+    this._currentTicker = undefined
     if (this._ws) {
       this._ws.close()
       this._ws = undefined

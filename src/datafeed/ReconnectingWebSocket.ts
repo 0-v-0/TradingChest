@@ -25,7 +25,17 @@ export class ReconnectingWebSocket {
     this._maxRetries = options?.maxRetries ?? 5
     this._baseDelay = options?.baseDelay ?? 1000
     this._maxDelay = options?.maxDelay ?? 30000
-    this._connect()
+
+    try {
+      this._connect()
+    } catch (e) {
+      this._scheduleReconnect()
+      if (e instanceof Event) {
+        this.onerror?.(e)
+      } else {
+        throw e
+      }
+    }
   }
 
   private _connect(): void {
@@ -46,14 +56,32 @@ export class ReconnectingWebSocket {
     }
 
     this._ws.onclose = (ev) => {
-      this.onclose?.(ev)
-      if (!this._disposed && this._retryCount < this._maxRetries) {
-        const delay = Math.min(this._baseDelay * Math.pow(2, this._retryCount), this._maxDelay)
-        this._retryCount++
-        this.onreconnect?.(this._retryCount)
-        this._retryTimer = setTimeout(() => this._connect(), delay)
+      if (this._disposed) {
+        this.onclose?.(ev)
+        return
       }
+      this.onclose?.(ev)
+      this._scheduleReconnect()
     }
+  }
+
+  private _scheduleReconnect(): void {
+    if (this._retryTimer || this._disposed) return
+    if (this._retryCount >= this._maxRetries) return
+    const base = Math.min(this._baseDelay * Math.pow(2, this._retryCount), this._maxDelay)
+    const jitter = base * (0.5 + Math.random())
+    this._retryCount++
+    this.onreconnect?.(this._retryCount)
+    this._retryTimer = setTimeout(() => {
+      this._retryTimer = null
+      try {
+        this._connect()
+      } catch (e) {
+        this._scheduleReconnect()
+        if (e instanceof Event) this.onerror?.(e)
+        else throw e
+      }
+    }, jitter)
   }
 
   send(data: BufferSource | Blob | string): void {
@@ -63,6 +91,7 @@ export class ReconnectingWebSocket {
   }
 
   close(): void {
+    if (this._disposed) return
     this._disposed = true
     if (this._retryTimer) {
       clearTimeout(this._retryTimer)
@@ -74,5 +103,9 @@ export class ReconnectingWebSocket {
 
   get readyState(): number {
     return this._ws?.readyState ?? WebSocket.CLOSED
+  }
+
+  get isOpen(): boolean {
+    return this.readyState === WebSocket.OPEN
   }
 }
