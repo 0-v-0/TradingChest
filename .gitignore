@@ -6,3 +6,5 @@
 .opencode
 coverage
 .trae
+test-results
+debug.log
