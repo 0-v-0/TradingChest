@@ -116,6 +116,14 @@ export default class DefaultDatafeed implements Datafeed {
     // 始终更新回调引用，确保切换 ticker 后新回调生效
     this._callback = callback
     if (this._prevSymbolMarket !== symbol.market) {
+      // 跨 market 切换：先在旧 socket 上 unsubscribe 旧 ticker，Polygon 不会自我感知 ticker 切换
+      if (this._ws && this._prevTicker) {
+        try {
+          this._ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${this._prevTicker}` }))
+        } catch {
+          /* ws may already be closed */
+        }
+      }
       this._ws?.close()
       this._ws = new ReconnectingWebSocket(`wss://delayed.polygon.io/${symbol.market}`, {
         maxRetries: 5,
@@ -149,8 +157,11 @@ export default class DefaultDatafeed implements Datafeed {
             this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${symbol.ticker}` }))
           }
         } else {
-          if ('sym' in result[0]) {
-            const d = result[0]
+          // Polygon batches multiple aggregate ticks in a single message —
+          // process every entry, not just result[0].
+          for (const frame of result) {
+            if (!('sym' in frame)) continue
+            const d = frame
             if (typeof d.s === 'number' && typeof d.o === 'number' &&
                 typeof d.h === 'number' && typeof d.l === 'number' &&
                 typeof d.c === 'number') {
