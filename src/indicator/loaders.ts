@@ -64,4 +64,5 @@ export const indicatorLoaders: Record<string, IndicatorLoader> = {
   PIVOTPOINTS:            () => import('./other/pivotPoints').then(load),
   ZIGZAG:                 () => import('./other/zigzag').then(load),
   CorrelationCoefficient: () => import('./other/correlationCoefficient').then(load),
+  VOLUME_PROFILE:         () => import('./other/volumeProfile').then(load),
 }

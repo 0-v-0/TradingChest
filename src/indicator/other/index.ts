@@ -4,7 +4,8 @@
  */
 import pivotPoints from './pivotPoints'
 import zigzag from './zigzag'
+import volumeProfile from './volumeProfile'
 
-const otherIndicators = [pivotPoints, zigzag]
+const otherIndicators = [pivotPoints, zigzag, volumeProfile]
 
 export default otherIndicators

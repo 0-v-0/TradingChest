@@ -288,10 +288,10 @@
 
 **预估:** 1–2 天
 
-- [ ] **Step 1:** 编写 volumeProfile 测试
-- [ ] **Step 2:** 实现 calc 逻辑（价格 bin + 成交量累加）
-- [ ] **Step 3:** 实现 histogram 渲染
-- [ ] **Step 4:** 注册 lazy loader + i18n + 构建
+- [x] **Step 1:** 编写 volumeProfile 测试
+- [x] **Step 2:** 实现 calc 逻辑（价格 bin + 成交量累加）
+- [x] **Step 3:** 实现 histogram 渲染
+- [x] **Step 4:** 注册 lazy loader + i18n + 构建
 
 ---
 
@@ -400,7 +400,7 @@ gantt
 - [ ] Session Breaks 分隔线可配置
 - [x] 数据窗口显示所有 pane 指标值
 - [x] 主题可可视化编辑并导入/导出 JSON
-- [ ] Volume Profile 指标可用
+- [x] Volume Profile 指标可用（calc + histogram 渲染 + lazy loader）
 - [x] 3 个缺失绘图工具补齐（Flat Top/Bottom, Disjoint Angle, Forecast）
 - [ ] 多图表布局基础能力（或明确标记为平台层外包）
 
