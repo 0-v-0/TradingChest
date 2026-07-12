@@ -26,6 +26,7 @@ import {
   type Coordinate,
   type PeriodType,
   type Overlay,
+  registerOverlay,
 } from 'klinecharts'
 import {
   createSignal,
@@ -505,6 +506,10 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   }
 
   props.ref({
+    createOverlay: (value) => widget!.createOverlay(value),
+    getOverlays: (filter) => widget!.getOverlays(filter),
+    removeOverlay: (value) => widget!.removeOverlay(value),
+    registerOverlay: (value) => registerOverlay(value),
     setTheme,
     getTheme: () => theme(),
     setStyles,

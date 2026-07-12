@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import type { Overlay, KLineData, Styles, DeepPartial } from 'klinecharts'
+import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate } from 'klinecharts'
 import type KeyboardShortcutManager from './shortcut'
 
 export interface SymbolInfo {
@@ -104,6 +104,10 @@ export interface ChartProOptions {
 }
 
 export interface ChartPro {
+  createOverlay: Chart['createOverlay']
+  getOverlays: Chart['getOverlays']
+  removeOverlay: Chart['removeOverlay']
+  registerOverlay(template: OverlayTemplate): void
   setTheme(theme: string): void
   getTheme(): string
   setStyles(styles: DeepPartial<Styles>): void

@@ -20,6 +20,10 @@ import {
   type Styles,
   type IndicatorCreate,
   type KLineData,
+  type OverlayCreate,
+  type OverlayTemplate,
+  type OverlayFilter,
+  type Overlay,
 } from 'klinecharts'
 import { render } from 'solid-js/web'
 import type { AlertConfig } from './alert/types'
@@ -277,6 +281,22 @@ export default class KLineChartPro implements ChartPro {
         '[TradingChest] Instance has been disposed. Create a new instance to continue.',
       )
     }
+  }
+
+  createOverlay(value: string | OverlayCreate | Array<string | OverlayCreate>) {
+    return this._chartApi!.createOverlay(value)
+  }
+
+  getOverlays(id?: OverlayFilter): Overlay[] {
+    return this._chartApi!.getOverlays(id)
+  }
+
+  removeOverlay(value?: OverlayFilter): boolean {
+    return this._chartApi!.removeOverlay(value)
+  }
+
+  registerOverlay(template: OverlayTemplate): void {
+    return this._chartApi!.registerOverlay(template)
   }
 
   setTheme(theme: string): void {
