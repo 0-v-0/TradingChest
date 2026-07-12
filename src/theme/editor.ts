@@ -18,7 +18,7 @@ export function exportTheme(styles: Styles, name = 'custom-theme'): string {
   const data: ThemeExport = {
     version: 1,
     name,
-    styles: styles as unknown as DeepPartial<Styles>,
+    styles: styles as DeepPartial<Styles>,
     exportedAt: new Date().toISOString(),
   }
   return JSON.stringify(data, null, 2)

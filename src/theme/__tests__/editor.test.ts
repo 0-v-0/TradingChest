@@ -7,7 +7,7 @@ const mockStyles = {
   grid: { horizontal: { color: '#333' }, vertical: { color: '#333' } },
   xAxis: { tickText: { color: '#ccc' } },
   yAxis: { tickText: { color: '#ccc' } },
-} as unknown as Styles
+} as Styles
 
 describe('exportTheme', () => {
   it('returns a JSON string', () => {

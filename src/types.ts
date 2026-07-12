@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate } from 'klinecharts'
+import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate, Nullable } from 'klinecharts'
 import type KeyboardShortcutManager from './shortcut'
 
 export interface SymbolInfo {
@@ -121,7 +121,7 @@ export interface ChartPro {
   setPeriod(period: Period): void
   getPeriod(): Period
   /** 获取内部 klinecharts Chart 实例，用于自定义 overlay 操作 */
-  getChart(): import('klinecharts').Nullable<import('klinecharts').Chart>
+  getChart(): Nullable<Chart>
   /** 导出可见区间数据为 CSV */
   exportCSV(filename?: string): void
   /** 导出全部数据为 CSV */

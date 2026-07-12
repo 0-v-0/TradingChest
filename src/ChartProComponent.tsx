@@ -21,11 +21,14 @@ import {
   type OverlayMode,
   type Styles,
   type TooltipFeaturePosition,
+  type TooltipFeatureStyle,
   type Indicator,
   type IndicatorCreate,
   type Coordinate,
   type PeriodType,
   type Overlay,
+  type KLineData,
+  type Crosshair,
   registerOverlay,
 } from 'klinecharts'
 import {
@@ -42,7 +45,7 @@ import type { ReplayState, ReplaySpeed } from './replay/types'
 import type { OverlayLifecycleEvent, OverlayLifecycleSource } from './types'
 import { Loading, type SelectDataSourceItem } from './component'
 import { adjustFromTo } from './core/adjustFromTo'
-import { buildStyles } from './core/buildStyles'
+import { buildStyles, type LineStyle } from './core/buildStyles'
 import { deepSet } from './core/deepSet'
 import { MethodNotAllowedError } from './core/MethodNotAllowedError'
 import { indicatorRegistry } from './indicator'
@@ -133,8 +136,8 @@ async function createIndicator(
         }: {
           indicator: Indicator
         }) => {
-          const defaultFeatures = (indicator.styles?.tooltip as { features?: import('klinecharts').TooltipFeatureStyle[] })?.features ?? []
-          const features: import('klinecharts').TooltipFeatureStyle[] = []
+          const defaultFeatures = (indicator.styles?.tooltip as { features?: TooltipFeatureStyle[] })?.features ?? []
+          const features: TooltipFeatureStyle[] = []
           if (indicator.visible) {
             if (defaultFeatures[1]) features.push(defaultFeatures[1])
             if (defaultFeatures[2]) features.push(defaultFeatures[2])
@@ -220,7 +223,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     color: string
     fillColor?: string
     lineWidth: number
-    lineStyle: string
+    lineStyle: LineStyle
     locked: boolean
   } | null>(null)
 
@@ -461,8 +464,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   }
   const [replayState, setReplayState] = createSignal<ReplayState>(defaultReplayState)
   let replayEngine: ReplayEngine | null = null
-  let replayDataList: import('klinecharts').KLineData[] = []
-  let subscribeBarCallback: ((data: import('klinecharts').KLineData) => void) | null = null
+  let replayDataList: KLineData[] = []
+  let subscribeBarCallback: ((data: KLineData) => void) | null = null
 
   const setChartPeriod = (nextPeriod: Period) => {
     if (replayEngine) return
@@ -479,11 +482,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     const pos = startPosition ?? dataList.length >>> 1
     replayEngine = new ReplayEngine({
       onDataChange: (data) => {
-        replayDataList = data as unknown as import('klinecharts').KLineData[]
+        replayDataList = data as unknown as KLineData[]
         widget?.resetData()
       },
       onBarUpdate: (bar) => {
-        const kData = bar as unknown as import('klinecharts').KLineData
+        const kData = bar as unknown as KLineData
         replayDataList.push(kData)
         subscribeBarCallback?.(kData)
       },
@@ -640,10 +643,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         const watermark = document.createElement('div')
         watermark.className = 'klinecharts-pro-watermark'
         if (utils.isString(props.watermark)) {
-          const str = (props.watermark as string).replace(/(^\s*)|(\s*$)/g, '')
-          watermark.textContent = str
+          watermark.textContent = props.watermark.replace(/(^\s*)|(\s*$)/g, '')
         } else {
-          watermark.appendChild(props.watermark as Node)
+          watermark.appendChild(props.watermark)
         }
         watermarkContainer.appendChild(watermark)
       }
@@ -675,7 +677,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       props.onError?.({ type: 'indicator-init', message: 'indicator init failed', raw: e })
     })
     widget?.setDataLoader({
-      getBars: (params) => {
+      getBars: async (params) => {
         if (replayEngine) {
           params.callback(replayDataList, false)
           return
@@ -683,7 +685,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         const seq = ++fetchSeq
         const isInit = params.type === 'init'
         if (isInit) setLoadingVisible(true)
-        const get = async () => {
+        try {
           const s = symbol()
           const p = period()
           if (isInit) {
@@ -698,16 +700,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             if (seq !== fetchSeq) return
             params.callback(kLineDataList, kLineDataList.length > 0)
           }
+        } catch (e) {
+          props.onError?.({ type: 'data-fetch', message: 'data fetch failed', raw: e })
+        } finally {
+          if (seq === fetchSeq && isInit) {
+            setLoadingVisible(false)
+          }
         }
-        void get()
-          .catch((e) => {
-            props.onError?.({ type: 'data-fetch', message: 'data fetch failed', raw: e })
-          })
-          .finally(() => {
-            if (seq === fetchSeq && isInit) {
-              setLoadingVisible(false)
-            }
-          })
       },
       subscribeBar: (params) => {
         subscribeBarCallback = params.callback
@@ -715,7 +714,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         const s = symbol()
         const p = period()
         props.datafeed.subscribe(s, p, (data) => {
-          params.callback(data as unknown as import('klinecharts').KLineData)
+          params.callback(data as unknown as KLineData)
           props.onPriceUpdate?.(data.close)
         })
       },
@@ -769,7 +768,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     })
     // 十字光标变化时更新数据窗口
     widget?.subscribeAction('onCrosshairChange', (data: unknown) => {
-      const crosshair = data as import('klinecharts').Crosshair | undefined
+      const crosshair = data as Crosshair | undefined
       if (!crosshair || !crosshair.kLineData) {
         setDataWindowData([])
         return
@@ -777,7 +776,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       const d = crosshair.kLineData as Record<string, unknown>
       const rows: DataWindowRow[] = []
       const addRow = (label: string, val: unknown, color?: string) => {
-        rows.push({ label, value: val != null && !Number.isNaN(Number(val)) ? String(val) : '--', color })
+        rows.push({ label, value: val != null && !isNaN(+val) ? String(val) : '--', color })
       }
       addRow('O', d.open)
       addRow('H', d.high)
@@ -788,7 +787,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       if (widget) {
         const allIndicators = widget.getIndicators()
         if (allIndicators && allIndicators.length > 0) {
-          const paneGroups: Record<string, import('klinecharts').Indicator[]> = {}
+          const paneGroups: Record<string, Indicator[]> = {}
           for (const ind of allIndicators) {
             if (!paneGroups[ind.paneId]) paneGroups[ind.paneId] = []
             paneGroups[ind.paneId].push(ind)
@@ -801,9 +800,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               const vals = ind.result as Record<string, unknown>[] | undefined
               if (vals && vals.length > 0) {
                 const last = vals[vals.length - 1]
-                for (const [k, v] of Object.entries(last)) {
+                for (const k in last) {
                   if (k !== 'timestamp' && k !== 'dataIndex') {
-                    addRow(`${ind.name}.${k}`, v)
+                    addRow(`${ind.name}.${k}`, last[k])
                   }
                 }
               }
@@ -831,8 +830,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   createEffect(() => {
     const s = symbol()
     if (priceUnitDom) {
-      if (s?.priceCurrency) {
-        priceUnitDom.textContent = s?.priceCurrency.toLocaleUpperCase()
+      if (s.priceCurrency) {
+        priceUnitDom.textContent = s.priceCurrency.toLocaleUpperCase()
         priceUnitDom.style.display = 'flex'
       } else {
         priceUnitDom.style.display = 'none'
@@ -840,8 +839,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     }
     widget?.setSymbol({
       ticker: s.ticker,
-      pricePrecision: s?.pricePrecision ?? 2,
-      volumePrecision: s?.volumePrecision ?? 0,
+      pricePrecision: s.pricePrecision ?? 2,
+      volumePrecision: s.volumePrecision ?? 0,
     })
   })
 
@@ -1184,7 +1183,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           onLineStyleChange={(style) => {
             const info = selectedOverlay()
             if (info && widget) {
-              const next = { ...info, lineStyle: style }
+              const next = { ...info, lineStyle: style as LineStyle }
               widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
               setSelectedOverlay(next)
               notifySelectedOverlayUpdate('property-bar', info.id)
