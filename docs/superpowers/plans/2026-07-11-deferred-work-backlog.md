@@ -295,33 +295,10 @@
 
 ---
 
-### C.3 多图表布局
+### C.3 多图表布局（已取消）
 
 **来源:** quality-and-capability-upgrade Phase 7、tradingview-parity-design Out of Scope（平台层）
-
-**现状:** 单图表实例。无多窗格容器、十字线联动、时间轴同步。
-
-**目标:**
-- 多窗格容器组件（1×2、2×2 等布局）
-- 窗格间十字线联动
-- 时间轴同步滚动/缩放
-- 拖拽调整窗格大小
-
-**建议文件:**
-- Create: `src/layout/MultiChartLayout.tsx`
-- Create: `src/layout/types.ts`
-- Create: `src/layout/__tests__/sync.test.ts`
-- Modify: `src/types.ts` — 扩展 ChartPro 或新增 LayoutManager API
-
-**依赖:** 较大 UI 工程，建议独立 spec + 子计划
-
-**预估:** 5–7 天
-
-- [ ] **Step 1:** 编写设计 spec（布局模型、同步协议）
-- [ ] **Step 2:** 实现 MultiChartLayout 容器
-- [ ] **Step 3:** 十字线联动
-- [ ] **Step 4:** 时间轴同步
-- [ ] **Step 5:** 拖拽调整 + i18n + 构建
+**决策:** 不纳入当前 scope。多图表属于平台级功能，建议由 consumers 自行实现多个 ChartPro 实例。
 
 ---
 
@@ -350,11 +327,11 @@
 
 以下功能因 klinecharts 引擎 API 限制，当前无法在不 fork 引擎的情况下实现：
 
-| 功能 | 来源 | 原因 |
-|------|------|------|
-| 图例悬停高亮 | ux-enhancement-design §8 | 无 legend hover 回调，Canvas 渲染 |
-| Overlay z-order（上移/下移） | ux-enhancement-design §6 | 无 overlay 层级 API |
-| Overlay 删除 fade-out 动画 | ux-enhancement-design §3 | Canvas 渲染，CSS 无法作用于 overlay |
+| 功能 | 来源 | 原因 | 版本检查 |
+|------|------|------|----------|
+| 图例悬停高亮 | ux-enhancement-design §8 | 无 legend hover 回调，Canvas 渲染 | ❌ v10.0.0-beta3 无变化 |
+| Overlay z-order（上移/下移） | ux-enhancement-design §6 | 无 overlay 层级 API | 🟡 `zLevel` + `overrideOverlay` 可用，但需自行实现排序逻辑 |
+| Overlay 删除 fade-out 动画 | ux-enhancement-design §3 | Canvas 渲染，CSS 无法作用于 overlay | ❌ v10.0.0-beta3 无变化 |
 
 **跟进策略:** 若 klinecharts 上游新增相关 API，再重新评估立项。
 
@@ -378,9 +355,8 @@ gantt
     section P2
     C.2 Volume Profile     :c2, after b3, 2d
     C.1 Drawing Tools      :c1, after c2, 3d
-    C.3 Multi Chart        :c3, after c1, 7d
     section P3
-    D.1 peerDependency     :d1, after c3, 1d
+    D.1 peerDependency     :d1, after c1, 1d
 ```
 
 **推荐首批（可立即开工）:**
@@ -402,7 +378,7 @@ gantt
 - [x] 主题可可视化编辑并导入/导出 JSON
 - [x] Volume Profile 指标可用（calc + histogram 渲染 + lazy loader）
 - [x] 3 个缺失绘图工具补齐（Flat Top/Bottom, Disjoint Angle, Forecast）
-- [ ] 多图表布局基础能力（或明确标记为平台层外包）
+- [ ] ~~多图表布局基础能力~~（已取消，平台层功能由 consumers 自行实现）
 
 ---
 
