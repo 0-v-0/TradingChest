@@ -20,7 +20,6 @@ const superTrend: IndicatorTemplate = {
     const multiplier = params[1] as number
     const result: SuperTrendResult[] = []
 
-    // 先计算 ATR（Wilder 平滑）
     const atrValues: number[] = []
     let rma = 0
     for (let i = 0; i < dataList.length; i++) {
@@ -38,22 +37,19 @@ const superTrend: IndicatorTemplate = {
       }
       if (i < period) {
         rma += tr
-        if (i === period - 1) {
-          rma = rma / period
-        }
-        atrValues.push(i === period - 1 ? rma : 0)
+        atrValues.push(NaN)
+      } else if (i === period) {
+        rma = (rma + tr) / period
+        atrValues.push(rma)
       } else {
         rma = (rma * (period - 1) + tr) / period
         atrValues.push(rma)
       }
     }
 
-    // 计算 SuperTrend
-    let prevUpperBand = 0
-    let prevLowerBand = 0
-    let prevSuperTrend = 0
-    // 趋势方向：1 = 上升, -1 = 下降
-    let direction: number
+    let prevUpperBand = NaN
+    let prevLowerBand = NaN
+    let direction: number = 0 // 0 = 未初始化, 1 = 上升, -1 = 下降
 
     for (let i = 0; i < dataList.length; i++) {
       let up = NaN
@@ -64,11 +60,9 @@ const superTrend: IndicatorTemplate = {
         const atrVal = atrValues[i]
         const hl2 = (kline.high + kline.low) / 2
 
-        // 基础上下轨
         let upperBand = hl2 + multiplier * atrVal
         let lowerBand = hl2 - multiplier * atrVal
 
-        // 与前值比较，确保波段不会反向收缩
         if (i > period) {
           if (lowerBand <= prevLowerBand && dataList[i - 1].close >= prevLowerBand) {
             lowerBand = prevLowerBand
@@ -78,17 +72,12 @@ const superTrend: IndicatorTemplate = {
           }
         }
 
-        // 判断趋势方向
-        if (i === period) {
+        if (direction === 0) {
           direction = kline.close <= upperBand ? 1 : -1
-        } else {
-          if (prevSuperTrend === prevUpperBand) {
-            // 之前在下降趋势
-            direction = kline.close > upperBand ? 1 : -1
-          } else {
-            // 之前在上升趋势
-            direction = kline.close < lowerBand ? -1 : 1
-          }
+        } else if (direction === -1) {
+          if (kline.close > upperBand) direction = 1
+        } else if (direction === 1) {
+          if (kline.close < lowerBand) direction = -1
         }
 
         const superTrendVal = direction === 1 ? lowerBand : upperBand
@@ -98,7 +87,6 @@ const superTrend: IndicatorTemplate = {
 
         prevUpperBand = upperBand
         prevLowerBand = lowerBand
-        prevSuperTrend = superTrendVal
       }
       result.push({ up, down })
     }
