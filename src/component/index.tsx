@@ -20,9 +20,8 @@ import List from './list'
 import Loading from './loading'
 import Modal from './modal'
 import Select from './select'
-import type { SelectDataSourceItem } from './select'
 import Switch from './switch'
 
 export { Button, Checkbox, ColorInput, List, Modal, Select, Input, Loading, Switch }
 
-export type { SelectDataSourceItem }
+export type { SelectDataSourceItem } from './select'

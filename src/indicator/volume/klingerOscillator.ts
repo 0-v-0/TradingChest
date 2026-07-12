@@ -82,16 +82,17 @@ const klingerOscillator: IndicatorTemplate = {
     const slowEma = calcEmaArray(vf, slowPeriod)
 
     // 第三步：计算 KVO 和信号线
+    // 在快慢 EMA 都未成熟之前，输出 NaN 而非 0，避免污染下游信号线。
     const kvoValues: number[] = []
     for (let i = 0; i < dataList.length; i++) {
       if (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) {
         kvoValues.push(fastEma[i] - slowEma[i])
       } else {
-        kvoValues.push(0)
+        kvoValues.push(NaN)
       }
     }
 
-    // 信号线：对 KVO 值做 EMA
+    // 信号线：对 KVO 值做 EMA（同样要求快慢 EMA 都已成熟）
     // 信号线的起点需要等 KVO 有效后才开始计算
     const slowStart = slowPeriod - 1
     const validKvo: number[] = []
