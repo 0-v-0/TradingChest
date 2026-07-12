@@ -28,9 +28,6 @@ const ppo: IndicatorTemplate = {
     const fastPeriod = params[0] as number
     const slowPeriod = params[1] as number
     const signalPeriod = params[2] as number
-    if (fastPeriod <= 0 || slowPeriod <= 0 || signalPeriod <= 0) {
-      return dataList.map(() => ({ ppo: NaN, signal: NaN, histogram: NaN }))
-    }
     const len = dataList.length
     const result: PpoResult[] = []
 

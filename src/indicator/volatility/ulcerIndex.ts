@@ -21,7 +21,6 @@ const ulcerIndex: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
     const result: UlcerIndexResult[] = []
-    if (period <= 0) return dataList.map(() => ({ ui: NaN }))
 
     // Monotonic deque for rolling window max (same logic as calcHighest)
     const deque: number[] = []

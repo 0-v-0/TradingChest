@@ -23,7 +23,6 @@ const keltnerChannels: IndicatorTemplate = {
     const params = indicator.calcParams
     const emaPeriod = params[0] as number
     const atrMultiplier = params[1] as number
-    if (emaPeriod <= 0) return dataList.map(() => ({ middle: NaN, upper: NaN, lower: NaN }))
     const result: KeltnerChannelsResult[] = []
 
     // EMA 平滑系数

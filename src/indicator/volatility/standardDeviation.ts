@@ -13,7 +13,6 @@ const standardDeviation: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    if (period <= 0) return dataList.map(() => ({ stddev: NaN }))
     const closes = dataList.map(k => k.close)
     const stddevs = calcStdDev(closes, period)
     return stddevs.map(stddev => ({ stddev }))

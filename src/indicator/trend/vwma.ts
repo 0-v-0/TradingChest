@@ -13,7 +13,6 @@ const vwma: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    if (period <= 0) return dataList.map(() => ({ vwma: NaN }))
 
     return dataList.map((_, i) => {
       if (i < period - 1) {

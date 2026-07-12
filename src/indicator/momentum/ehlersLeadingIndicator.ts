@@ -30,7 +30,6 @@ const ehlersLeadingIndicator: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
     const k = params[1] as number
-    if (period <= 0) return dataList.map(() => ({ lead: NaN, signal: NaN }))
 
     const close = dataList.map(d => d.close)
 

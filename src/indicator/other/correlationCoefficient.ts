@@ -19,7 +19,6 @@ const correlationCoefficient: IndicatorTemplate = {
     const params = indicator.calcParams
     const period = params[0] as number
     const result: { r: number }[] = []
-    if (period <= 0) return dataList.map(() => ({ r: NaN }))
 
     let sumX = 0
     let sumY = 0

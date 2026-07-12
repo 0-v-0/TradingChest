@@ -9,7 +9,6 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
  * 计算 WMA 值序列
  */
 function calcWmaArray(values: number[], period: number): number[] {
-  if (period <= 0) return values.map(() => NaN)
   const weightSum = period * (period + 1) / 2
   const result: number[] = []
 

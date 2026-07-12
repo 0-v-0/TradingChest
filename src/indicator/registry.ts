@@ -1,4 +1,4 @@
-import type { IndicatorTemplate } from 'klinecharts'
+import type { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
 
 type IndicatorLoader = () => Promise<IndicatorTemplate>
 type RegisterFn = (template: IndicatorTemplate) => void
@@ -47,7 +47,7 @@ export class IndicatorRegistry {
     }
 
     const promise = loader().then((template) => {
-      this._registerFn(template)
+      this._registerFn(wrapCalcParamsValidation(template))
       this._registered.add(name)
     }).finally(() => {
       this._pending.delete(name)
@@ -56,4 +56,39 @@ export class IndicatorRegistry {
     this._pending.set(name, promise)
     return promise
   }
+}
+
+/**
+ * 统一 calcParams 校验包装器。
+ * 当任何数值参数 < 1 时，跳过真实 calc 调用，直接返回 NaN 填充的结果数组。
+ * 通过 figures 键名构造默认 NaN 对象，避免下游渲染因缺失 key 而出错。
+ */
+function wrapCalcParamsValidation(template: IndicatorTemplate): IndicatorTemplate {
+  const originalCalc = template.calc
+  if (typeof originalCalc !== 'function') return template
+
+  const figures = Array.isArray(template.figures) ? template.figures : []
+  const nanTemplate = createNaNTemplate(figures)
+  const hasKeys = Object.keys(nanTemplate).length > 0
+  const wrappedCalc = (dataList: KLineData[], indicator: Indicator) => {
+    const params = indicator.calcParams
+    if (params.some(p => typeof p === 'number' && p < 1)) {
+      const n = dataList.length
+      const result: Record<string, unknown>[] = new Array(n)
+      if (hasKeys) {
+        for (let i = 0; i < n; i++) result[i] = { ...nanTemplate }
+      } else {
+        for (let i = 0; i < n; i++) result[i] = {}
+      }
+      return result
+    }
+    return originalCalc(dataList, indicator)
+  }
+  return { ...template, calc: wrappedCalc }
+}
+
+function createNaNTemplate(figures: Array<{ key: string }>): Record<string, number> {
+  const tmpl: Record<string, number> = {}
+  for (const f of figures) tmpl[f.key] = NaN
+  return tmpl
 }

@@ -16,7 +16,6 @@ const atr: IndicatorTemplate = {
     const period = params[0] as number
     const result: AtrResult[] = []
     let prevAtr = 0
-    if (period <= 0) return dataList.map(() => ({ atr: NaN }))
 
     for (let i = 0; i < dataList.length; i++) {
       const kline = dataList[i]

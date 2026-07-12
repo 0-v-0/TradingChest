@@ -17,7 +17,6 @@ const donchianChannels: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const params = indicator.calcParams
     const period = params[0] as number
-    if (period <= 0) return dataList.map(() => ({ upper: NaN, lower: NaN, middle: NaN }))
     const highs = dataList.map(k => k.high)
     const lows = dataList.map(k => k.low)
     const uppers = calcHighest(highs, period)
