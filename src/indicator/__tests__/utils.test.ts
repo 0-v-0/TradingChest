@@ -17,13 +17,13 @@ import {
 // ---------------------------------------------------------------------------
 // Helper: compare floating-point arrays with a tolerance
 // ---------------------------------------------------------------------------
-function expectArrayClose(actual: (number | null)[], expected: (number | null)[], eps = 1e-10) {
+function expectArrayClose(actual: number[], expected: number[], eps = 1e-10) {
   expect(actual).toHaveLength(expected.length)
   for (let i = 0; i < expected.length; i++) {
-    if (expected[i] === null) {
-      expect(actual[i]).toBeNull()
+    if (isNaN(expected[i])) {
+      expect(actual[i]).toBeNaN()
     } else {
-      expect(Math.abs((actual[i] as number) - (expected[i] as number))).toBeLessThanOrEqual(eps)
+      expect(Math.abs(actual[i] - expected[i])).toBeLessThanOrEqual(eps)
     }
   }
 }
@@ -32,10 +32,10 @@ function expectArrayClose(actual: (number | null)[], expected: (number | null)[]
 // calcSMA
 // ---------------------------------------------------------------------------
 describe('calcSMA', () => {
-  it('returns null-padded array with correct averages', () => {
+  it('returns NaN-padded array with correct averages', () => {
     // [1,2,3,4,5], period 3
-    // i=0 → null, i=1 → null, i=2 → (1+2+3)/3=2, i=3 → (2+3+4)/3=3, i=4 → (3+4+5)/3=4
-    expectArrayClose(calcSMA([1, 2, 3, 4, 5], 3), [null, null, 2, 3, 4])
+    // i=0 → NaN, i=1 → NaN, i=2 → (1+2+3)/3=2, i=3 → (2+3+4)/3=3, i=4 → (3+4+5)/3=4
+    expectArrayClose(calcSMA([1, 2, 3, 4, 5], 3), [NaN, NaN, 2, 3, 4])
   })
 
   it('period 1 returns every element unchanged', () => {
@@ -43,11 +43,11 @@ describe('calcSMA', () => {
   })
 
   it('period equals data length returns one value', () => {
-    expectArrayClose(calcSMA([1, 2, 3, 4], 4), [null, null, null, 2.5])
+    expectArrayClose(calcSMA([1, 2, 3, 4], 4), [NaN, NaN, NaN, 2.5])
   })
 
-  it('period larger than data length returns all nulls', () => {
-    expectArrayClose(calcSMA([1, 2, 3], 5), [null, null, null])
+  it('period larger than data length returns all NaNs', () => {
+    expectArrayClose(calcSMA([1, 2, 3], 5), [NaN, NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -58,8 +58,8 @@ describe('calcSMA', () => {
     expectArrayClose(calcSMA([42], 1), [42])
   })
 
-  it('single element, period > 1 returns null', () => {
-    expectArrayClose(calcSMA([42], 3), [null])
+  it('single element, period > 1 returns NaN', () => {
+    expectArrayClose(calcSMA([42], 3), [NaN])
   })
 })
 
@@ -73,8 +73,8 @@ describe('calcEMA', () => {
     // i=3: 4*0.5 + 2*0.5 = 3
     // i=4: 5*0.5 + 3*0.5 = 4
     const result = calcEMA([1, 2, 3, 4, 5], 3)
-    expect(result[0]).toBeNull()
-    expect(result[1]).toBeNull()
+    expect(result[0]).toBeNaN()
+    expect(result[1]).toBeNaN()
     expect(result[2]).toBeCloseTo(2, 10)
     expect(result[3]).toBeCloseTo(3, 10)
     expect(result[4]).toBeCloseTo(4, 10)
@@ -87,14 +87,14 @@ describe('calcEMA', () => {
 
   it('period equals data length returns single EMA value', () => {
     const result = calcEMA([1, 2, 3], 3)
-    expect(result[0]).toBeNull()
-    expect(result[1]).toBeNull()
+    expect(result[0]).toBeNaN()
+    expect(result[1]).toBeNaN()
     expect(result[2]).toBeCloseTo(2, 10)
   })
 
-  it('period larger than data length returns all nulls', () => {
+  it('period larger than data length returns all NaNs', () => {
     const result = calcEMA([1, 2], 5)
-    expect(result).toEqual([null, null])
+    expect(result).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -116,8 +116,8 @@ describe('calcWMA', () => {
     // i=3: (2*1 + 3*2 + 4*3)/6 = (2+6+12)/6 = 20/6 ≈ 3.3333
     // i=4: (3*1 + 4*2 + 5*3)/6 = (3+8+15)/6 = 26/6 ≈ 4.3333
     const result = calcWMA([1, 2, 3, 4, 5], 3)
-    expect(result[0]).toBeNull()
-    expect(result[1]).toBeNull()
+    expect(result[0]).toBeNaN()
+    expect(result[1]).toBeNaN()
     expect(result[2]).toBeCloseTo(14 / 6, 10)
     expect(result[3]).toBeCloseTo(20 / 6, 10)
     expect(result[4]).toBeCloseTo(26 / 6, 10)
@@ -131,13 +131,13 @@ describe('calcWMA', () => {
     // data=[1,2,3], period=3, weightSum=6
     // (1*1 + 2*2 + 3*3)/6 = 14/6
     const result = calcWMA([1, 2, 3], 3)
-    expect(result[0]).toBeNull()
-    expect(result[1]).toBeNull()
+    expect(result[0]).toBeNaN()
+    expect(result[1]).toBeNaN()
     expect(result[2]).toBeCloseTo(14 / 6, 10)
   })
 
-  it('period larger than data length returns all nulls', () => {
-    expect(calcWMA([1, 2], 5)).toEqual([null, null])
+  it('period larger than data length returns all NaNs', () => {
+    expect(calcWMA([1, 2], 5)).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -183,7 +183,7 @@ describe('calcTR', () => {
     const close = [9, 10, 11, 12, 13]
     const result = calcTR(high, low, close)
     expect(result).toHaveLength(5)
-    // All values should be non-null numbers
+    // All values should be finite numbers
     result.forEach((v) => expect(typeof v).toBe('number'))
   })
 
@@ -206,8 +206,8 @@ describe('calcStdDev', () => {
     const data = [2, 4, 4, 4, 5, 5, 7, 9]
     const result = calcStdDev(data, 8)
     expect(result[7]).toBeCloseTo(2, 10)
-    // First 7 should be null
-    for (let i = 0; i < 7; i++) expect(result[i]).toBeNull()
+    // First 7 should be NaN
+    for (let i = 0; i < 7; i++) expect(result[i]).toBeNaN()
   })
 
   it('constant data has zero std dev', () => {
@@ -220,8 +220,8 @@ describe('calcStdDev', () => {
     result.forEach((v) => expect(v).toBeCloseTo(0, 10))
   })
 
-  it('period larger than data returns all nulls', () => {
-    expect(calcStdDev([1, 2], 5)).toEqual([null, null])
+  it('period larger than data returns all NaNs', () => {
+    expect(calcStdDev([1, 2], 5)).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -250,8 +250,8 @@ describe('calcRMA', () => {
     // i=3: (2*2 + 4)/3 = 8/3 ≈ 2.6667
     // i=4: (8/3 * 2 + 5)/3 = (16/3 + 5)/3 = 31/9 ≈ 3.4444
     const result = calcRMA([1, 2, 3, 4, 5], 3)
-    expect(result[0]).toBeNull()
-    expect(result[1]).toBeNull()
+    expect(result[0]).toBeNaN()
+    expect(result[1]).toBeNaN()
     expect(result[2]).toBeCloseTo(2, 10)
     expect(result[3]).toBeCloseTo(8 / 3, 10)
     expect(result[4]).toBeCloseTo(31 / 9, 10)
@@ -264,13 +264,13 @@ describe('calcRMA', () => {
 
   it('period equals data length returns single seed value', () => {
     const result = calcRMA([1, 2, 3], 3)
-    expect(result[0]).toBeNull()
-    expect(result[1]).toBeNull()
+    expect(result[0]).toBeNaN()
+    expect(result[1]).toBeNaN()
     expect(result[2]).toBeCloseTo(2, 10)
   })
 
-  it('period larger than data length returns all nulls', () => {
-    expect(calcRMA([1, 2], 5)).toEqual([null, null])
+  it('period larger than data length returns all NaNs', () => {
+    expect(calcRMA([1, 2], 5)).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -284,8 +284,8 @@ describe('calcRMA', () => {
 describe('calcSum', () => {
   it('returns rolling sums correctly', () => {
     // data=[1,2,3,4,5], period=3
-    // i=0 → null, i=1 → null, i=2 → 6, i=3 → 9, i=4 → 12
-    expectArrayClose(calcSum([1, 2, 3, 4, 5], 3), [null, null, 6, 9, 12])
+    // i=0 → NaN, i=1 → NaN, i=2 → 6, i=3 → 9, i=4 → 12
+    expectArrayClose(calcSum([1, 2, 3, 4, 5], 3), [NaN, NaN, 6, 9, 12])
   })
 
   it('period 1 returns each element', () => {
@@ -293,11 +293,11 @@ describe('calcSum', () => {
   })
 
   it('period equals data length returns single sum', () => {
-    expectArrayClose(calcSum([1, 2, 3, 4], 4), [null, null, null, 10])
+    expectArrayClose(calcSum([1, 2, 3, 4], 4), [NaN, NaN, NaN, 10])
   })
 
-  it('period larger than data returns all nulls', () => {
-    expect(calcSum([1, 2], 5)).toEqual([null, null])
+  it('period larger than data returns all NaNs', () => {
+    expect(calcSum([1, 2], 5)).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -309,20 +309,20 @@ describe('calcSum', () => {
 // calcChange
 // ---------------------------------------------------------------------------
 describe('calcChange', () => {
-  it('first element is null, rest are differences', () => {
-    expectArrayClose(calcChange([1, 3, 6, 4]), [null, 2, 3, -2])
+  it('first element is NaN, rest are differences', () => {
+    expectArrayClose(calcChange([1, 3, 6, 4]), [NaN, 2, 3, -2])
   })
 
-  it('single element returns [null]', () => {
-    expect(calcChange([5])).toEqual([null])
+  it('single element returns [NaN]', () => {
+    expect(calcChange([5])).toEqual([NaN])
   })
 
   it('empty array returns empty array', () => {
     expect(calcChange([])).toEqual([])
   })
 
-  it('constant data returns zeros after first null', () => {
-    expectArrayClose(calcChange([7, 7, 7]), [null, 0, 0])
+  it('constant data returns zeros after first NaN', () => {
+    expectArrayClose(calcChange([7, 7, 7]), [NaN, 0, 0])
   })
 })
 
@@ -331,20 +331,20 @@ describe('calcChange', () => {
 // ---------------------------------------------------------------------------
 describe('calcGain', () => {
   it('returns gain when positive, 0 when flat or negative', () => {
-    // [1,3,3,2,5] → [null, 2, 0, 0, 3]
-    expectArrayClose(calcGain([1, 3, 3, 2, 5]), [null, 2, 0, 0, 3])
+    // [1,3,3,2,5] → [NaN, 2, 0, 0, 3]
+    expectArrayClose(calcGain([1, 3, 3, 2, 5]), [NaN, 2, 0, 0, 3])
   })
 
-  it('single element returns [null]', () => {
-    expect(calcGain([10])).toEqual([null])
+  it('single element returns [NaN]', () => {
+    expect(calcGain([10])).toEqual([NaN])
   })
 
   it('empty array returns empty array', () => {
     expect(calcGain([])).toEqual([])
   })
 
-  it('monotonically decreasing returns zeros after null', () => {
-    expectArrayClose(calcGain([5, 4, 3, 2]), [null, 0, 0, 0])
+  it('monotonically decreasing returns zeros after NaN', () => {
+    expectArrayClose(calcGain([5, 4, 3, 2]), [NaN, 0, 0, 0])
   })
 })
 
@@ -353,20 +353,20 @@ describe('calcGain', () => {
 // ---------------------------------------------------------------------------
 describe('calcLoss', () => {
   it('returns absolute loss when negative, 0 when flat or positive', () => {
-    // [5,3,3,4,1] → [null, 2, 0, 0, 3]
-    expectArrayClose(calcLoss([5, 3, 3, 4, 1]), [null, 2, 0, 0, 3])
+    // [5,3,3,4,1] → [NaN, 2, 0, 0, 3]
+    expectArrayClose(calcLoss([5, 3, 3, 4, 1]), [NaN, 2, 0, 0, 3])
   })
 
-  it('single element returns [null]', () => {
-    expect(calcLoss([10])).toEqual([null])
+  it('single element returns [NaN]', () => {
+    expect(calcLoss([10])).toEqual([NaN])
   })
 
   it('empty array returns empty array', () => {
     expect(calcLoss([])).toEqual([])
   })
 
-  it('monotonically increasing returns zeros after null', () => {
-    expectArrayClose(calcLoss([1, 2, 3, 4]), [null, 0, 0, 0])
+  it('monotonically increasing returns zeros after NaN', () => {
+    expectArrayClose(calcLoss([1, 2, 3, 4]), [NaN, 0, 0, 0])
   })
 })
 
@@ -376,7 +376,7 @@ describe('calcLoss', () => {
 describe('calcHighest', () => {
   it('returns rolling max correctly', () => {
     // data=[3,1,4,1,5,9,2,6], period=3
-    expectArrayClose(calcHighest([3, 1, 4, 1, 5, 9, 2, 6], 3), [null, null, 4, 4, 5, 9, 9, 9])
+    expectArrayClose(calcHighest([3, 1, 4, 1, 5, 9, 2, 6], 3), [NaN, NaN, 4, 4, 5, 9, 9, 9])
   })
 
   it('period 1 returns every element', () => {
@@ -386,11 +386,11 @@ describe('calcHighest', () => {
   it('period equals data length returns global max', () => {
     const result = calcHighest([3, 1, 4, 2], 4)
     expect(result[3]).toBe(4)
-    for (let i = 0; i < 3; i++) expect(result[i]).toBeNull()
+    for (let i = 0; i < 3; i++) expect(result[i]).toBeNaN()
   })
 
-  it('period larger than data returns all nulls', () => {
-    expect(calcHighest([1, 2], 5)).toEqual([null, null])
+  it('period larger than data returns all NaNs', () => {
+    expect(calcHighest([1, 2], 5)).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {
@@ -404,7 +404,7 @@ describe('calcHighest', () => {
 describe('calcLowest', () => {
   it('returns rolling min correctly', () => {
     // data=[3,1,4,1,5,9,2,6], period=3
-    expectArrayClose(calcLowest([3, 1, 4, 1, 5, 9, 2, 6], 3), [null, null, 1, 1, 1, 1, 2, 2])
+    expectArrayClose(calcLowest([3, 1, 4, 1, 5, 9, 2, 6], 3), [NaN, NaN, 1, 1, 1, 1, 2, 2])
   })
 
   it('period 1 returns every element', () => {
@@ -414,11 +414,11 @@ describe('calcLowest', () => {
   it('period equals data length returns global min', () => {
     const result = calcLowest([3, 1, 4, 2], 4)
     expect(result[3]).toBe(1)
-    for (let i = 0; i < 3; i++) expect(result[i]).toBeNull()
+    for (let i = 0; i < 3; i++) expect(result[i]).toBeNaN()
   })
 
-  it('period larger than data returns all nulls', () => {
-    expect(calcLowest([1, 2], 5)).toEqual([null, null])
+  it('period larger than data returns all NaNs', () => {
+    expect(calcLowest([1, 2], 5)).toEqual([NaN, NaN])
   })
 
   it('empty array returns empty array', () => {

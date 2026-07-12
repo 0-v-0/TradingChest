@@ -5,7 +5,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type McginleyResult = { md: number | undefined }
+type McginleyResult = { md: number }
 
 const mcginley: IndicatorTemplate = {
   name: 'MCGINLEY',
@@ -22,7 +22,7 @@ const mcginley: IndicatorTemplate = {
     for (let i = 0; i < dataList.length; i++) {
       const close = dataList[i].close
 
-      let md = undefined
+      let md = NaN
       if (i === 0) {
         // 初始值使用第一根 K 线的收盘价
         prevMd = close

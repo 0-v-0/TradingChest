@@ -6,7 +6,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type ZlemaResult = { zlema: number | undefined }
+type ZlemaResult = { zlema: number }
 
 const zlema: IndicatorTemplate = {
   name: 'ZLEMA',
@@ -30,7 +30,7 @@ const zlema: IndicatorTemplate = {
       const adjusted = close + (close - lagClose)
 
       prevZlema = i === 0 ? adjusted : adjusted * k + prevZlema * (1 - k)
-      result.push({ zlema: i >= period - 1 ? prevZlema : undefined })
+      result.push({ zlema: i >= period - 1 ? prevZlema : NaN })
     }
 
     return result

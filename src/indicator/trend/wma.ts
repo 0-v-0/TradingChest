@@ -18,7 +18,7 @@ const wma: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { wma: undefined }
+        return { wma: NaN }
       }
       let sum = 0
       for (let j = 0; j < period; j++) {

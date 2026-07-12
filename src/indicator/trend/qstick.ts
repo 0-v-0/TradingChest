@@ -22,7 +22,7 @@ const qstick: IndicatorTemplate = {
     const sma = calcSMA(diff, period)
 
     return dataList.map((_, i) => ({
-      qstick: sma[i] ?? undefined,
+      qstick: sma[i],
     }))
   },
 }

@@ -38,7 +38,7 @@ const tema: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { tema: undefined }
+        return { tema: NaN }
       }
       return { tema: 3 * ema1[i] - 3 * ema2[i] + ema3[i] }
     })

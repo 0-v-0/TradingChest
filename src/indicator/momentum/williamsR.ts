@@ -25,8 +25,8 @@ const williamsR: IndicatorTemplate = {
     return dataList.map((k, i) => {
       const hh = highest[i]
       const ll = lowest[i]
-      if (hh === null || ll === null || hh === ll) {
-        return { wr: undefined }
+      if (isNaN(hh) || isNaN(ll) || hh === ll) {
+        return { wr: NaN }
       }
       return { wr: ((hh - k.close) / (hh - ll)) * -100 }
     })

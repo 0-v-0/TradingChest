@@ -25,8 +25,8 @@ const envelopes: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       const sma = smaValues[i]
-      if (sma === null) {
-        return { middle: undefined, upper: undefined, lower: undefined }
+      if (isNaN(sma)) {
+        return { middle: NaN, upper: NaN, lower: NaN }
       }
       const offset = sma * percentage / 100
 

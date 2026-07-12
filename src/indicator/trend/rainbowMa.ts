@@ -32,26 +32,26 @@ const rainbowMa: IndicatorTemplate = {
     const close = dataList.map(k => k.close)
 
     // 递归 SMA 堆叠
-    const levels: (number | null)[][] = []
+    const levels: number[][] = []
     let current = close
     for (let level = 0; level < depth; level++) {
       const sma = calcSMA(current, period)
       levels.push(sma)
-      current = sma.map(v => v ?? 0)
+      current = sma.map(v => isNaN(v) ? 0 : v)
     }
 
     // 填充不足 depth 的层
     while (levels.length < MAX_LEVELS) {
-      levels.push(Array(dataList.length).fill(null))
+      levels.push(Array(dataList.length).fill(NaN))
     }
 
     return dataList.map((_, i) => ({
-      ma1: levels[0][i] ?? undefined,
-      ma2: levels[1][i] ?? undefined,
-      ma3: levels[2][i] ?? undefined,
-      ma4: levels[3][i] ?? undefined,
-      ma5: levels[4][i] ?? undefined,
-      ma6: levels[5][i] ?? undefined,
+      ma1: levels[0][i],
+      ma2: levels[1][i],
+      ma3: levels[2][i],
+      ma4: levels[3][i],
+      ma5: levels[4][i],
+      ma6: levels[5][i],
     }))
   },
 }

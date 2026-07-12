@@ -5,18 +5,18 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type IchimokuResult = {
-  tenkanSen: number | undefined
-  kijunSen: number | undefined
-  senkouSpanA: number | undefined
-  senkouSpanB: number | undefined
-  chikouSpan: number | undefined
+  tenkanSen: number
+  kijunSen: number
+  senkouSpanA: number
+  senkouSpanB: number
+  chikouSpan: number
 }
 
 /**
  * 计算指定区间内的最高价与最低价的中间值
  */
-function midPoint(dataList: KLineData[], endIndex: number, period: number): number | undefined {
-  if (endIndex < period - 1) return undefined
+function midPoint(dataList: KLineData[], endIndex: number, period: number): number {
+  if (endIndex < period - 1) return NaN
   let high = -Infinity
   let low = Infinity
   for (let i = endIndex - period + 1; i <= endIndex; i++) {
@@ -45,10 +45,10 @@ const ichimoku: IndicatorTemplate = {
     const displacement = params[3] as number
 
     // 先计算各条线的原始值
-    const tenkanArr: (number | undefined)[] = []
-    const kijunArr: (number | undefined)[] = []
-    const spanAArr: (number | undefined)[] = []
-    const spanBArr: (number | undefined)[] = []
+    const tenkanArr: number[] = []
+    const kijunArr: number[] = []
+    const spanAArr: number[] = []
+    const spanBArr: number[] = []
 
     for (let i = 0; i < dataList.length; i++) {
       const tenkan = midPoint(dataList, i, tenkanPeriod)
@@ -57,10 +57,10 @@ const ichimoku: IndicatorTemplate = {
       kijunArr.push(kijun)
 
       // 先行带 A = (转换线 + 基准线) / 2
-      if (tenkan !== undefined && kijun !== undefined) {
+      if (!isNaN(tenkan) && !isNaN(kijun)) {
         spanAArr.push((tenkan + kijun) / 2)
       } else {
-        spanAArr.push(undefined)
+        spanAArr.push(NaN)
       }
 
       // 先行带 B = (senkouBPeriod 周期内最高价 + 最低价) / 2

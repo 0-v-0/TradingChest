@@ -20,7 +20,7 @@ const linearRegression: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { value: undefined, upper: undefined, lower: undefined }
+        return { value: NaN, upper: NaN, lower: NaN }
       }
 
       // 最小二乘法：y = a + b * x，x 取 0 到 period-1

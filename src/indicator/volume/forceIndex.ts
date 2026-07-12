@@ -10,7 +10,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type ForceIndexResult = { fi: number | undefined }
+type ForceIndexResult = { fi: number }
 
 const forceIndex: IndicatorTemplate = {
   name: 'FI',
@@ -40,10 +40,10 @@ const forceIndex: IndicatorTemplate = {
 
     // 第二步：对原始力度做 EMA 平滑
     const k = 2 / (period + 1)
-    let prevEma: number | null = null
+    let prevEma = NaN
 
     for (let i = 0; i < dataList.length; i++) {
-      let fi = undefined
+      let fi = NaN
       if (i === period - 1) {
         // 用前 period 个原始力度的 SMA 作为 EMA 种子
         let sum = 0
@@ -54,7 +54,7 @@ const forceIndex: IndicatorTemplate = {
         fi = prevEma
       } else if (i >= period) {
         // EMA 递归
-        prevEma = rawForce[i] * k + prevEma! * (1 - k)
+        prevEma = rawForce[i] * k + prevEma * (1 - k)
         fi = prevEma
       }
       result.push({ fi })

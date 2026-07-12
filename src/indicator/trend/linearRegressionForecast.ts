@@ -24,7 +24,7 @@ const linearRegressionForecast: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { forecast: undefined, slope: undefined }
+        return { forecast: NaN, slope: NaN }
       }
 
       // 最小二乘法：y = a + b * x

@@ -5,7 +5,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type MassIndexResult = { mi: number | undefined }
+type MassIndexResult = { mi: number }
 
 const massIndex: IndicatorTemplate = {
   name: 'MI',
@@ -97,7 +97,7 @@ const massIndex: IndicatorTemplate = {
     const miStartIdx = ratioStartIdx + sumPeriod - 1
 
     for (let i = 0; i < dataList.length; i++) {
-      let mi = undefined
+      let mi = NaN
       if (i >= miStartIdx) {
         let sum = 0
         for (let j = i - sumPeriod + 1; j <= i; j++) {

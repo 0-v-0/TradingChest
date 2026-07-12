@@ -15,7 +15,7 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
-type KstResult = { kst: number | undefined; signal: number | undefined }
+type KstResult = { kst: number; signal: number }
 
 const kst: IndicatorTemplate = {
   name: 'KST',
@@ -34,9 +34,9 @@ const kst: IndicatorTemplate = {
     const len = dataList.length
 
     // ---- 计算四条 ROC 序列 ----
-    const rocs: (number | null)[][] = []
+    const rocs = []
     for (let r = 0; r < 4; r++) {
-      const roc: (number | null)[] = Array(len).fill(null)
+      const roc: number[] = Array(len).fill(NaN)
       const rocP = rocPeriods[r]
       for (let i = rocP; i < len; i++) {
         const prev = dataList[i - rocP].close
@@ -49,21 +49,21 @@ const kst: IndicatorTemplate = {
 
     // ---- 对每条 ROC 做 SMA 平滑（复用 calcSMA 滑动窗口，O(n)） ----
     // calcSMA 要求连续 number[] 输入，需将有效 ROC 值提取后传入，结果映射回原索引
-    const smoothedRocs: (number | null)[][] = []
+    const smoothedRocs = []
     for (let r = 0; r < 4; r++) {
       const roc = rocs[r]
       const validValues: number[] = []
       const validIndices: number[] = []
       for (let i = 0; i < len; i++) {
-        if (roc[i] !== null) {
-          validValues.push(roc[i] as number)
+        if (!isNaN(roc[i])) {
+          validValues.push(roc[i])
           validIndices.push(i)
         }
       }
       const smaResult = calcSMA(validValues, smaPeriods[r])
-      const smoothed: (number | null)[] = Array(len).fill(null)
+      const smoothed: number[] = Array(len).fill(NaN)
       for (let j = 0; j < validIndices.length; j++) {
-        if (smaResult[j] !== null) {
+        if (!isNaN(smaResult[j])) {
           smoothed[validIndices[j]] = smaResult[j]
         }
       }
@@ -71,16 +71,16 @@ const kst: IndicatorTemplate = {
     }
 
     // ---- 计算 KST = 加权求和 ----
-    const kstLine: (number | null)[] = Array(len).fill(null)
+    const kstLine: number[] = Array(len).fill(NaN)
     for (let i = 0; i < len; i++) {
       let allValid = true
       let val = 0
       for (let r = 0; r < 4; r++) {
-        if (smoothedRocs[r][i] === null) {
+        if (isNaN(smoothedRocs[r][i])) {
           allValid = false
           break
         }
-        val += weights[r] * (smoothedRocs[r][i] as number)
+        val += weights[r] * smoothedRocs[r][i]
       }
       if (allValid) {
         kstLine[i] = val
@@ -91,15 +91,15 @@ const kst: IndicatorTemplate = {
     const kstValidValues: number[] = []
     const kstValidIndices: number[] = []
     for (let i = 0; i < len; i++) {
-      if (kstLine[i] !== null) {
-        kstValidValues.push(kstLine[i] as number)
+      if (!isNaN(kstLine[i])) {
+        kstValidValues.push(kstLine[i])
         kstValidIndices.push(i)
       }
     }
     const signalSmaResult = calcSMA(kstValidValues, signalPeriod)
-    const signalLine: (number | null)[] = Array(len).fill(null)
+    const signalLine: number[] = Array(len).fill(NaN)
     for (let j = 0; j < kstValidIndices.length; j++) {
-      if (signalSmaResult[j] !== null) {
+      if (!isNaN(signalSmaResult[j])) {
         signalLine[kstValidIndices[j]] = signalSmaResult[j]
       }
     }
@@ -108,8 +108,8 @@ const kst: IndicatorTemplate = {
     const result: KstResult[] = []
     for (let i = 0; i < len; i++) {
       result.push({
-        kst: kstLine[i] ?? undefined,
-        signal: signalLine[i] ?? undefined,
+        kst: kstLine[i],
+        signal: signalLine[i],
       })
     }
 

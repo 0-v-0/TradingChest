@@ -10,7 +10,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type UltimateOscillatorResult = { uo: number | undefined }
+type UltimateOscillatorResult = { uo: number }
 
 const ultimateOscillator: IndicatorTemplate = {
   name: 'UO',
@@ -50,7 +50,7 @@ const ultimateOscillator: IndicatorTemplate = {
     }
 
     for (let i = 0; i < len; i++) {
-      let uo = undefined
+      let uo = NaN
       // 需要至少 maxPeriod 个有效数据点（从索引 1 开始）
       if (i >= maxPeriod) {
         // 区间 [i - periodN + 1, i] 的和

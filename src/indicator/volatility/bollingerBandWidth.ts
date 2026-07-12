@@ -5,7 +5,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type BollingerBandWidthResult = { bbw: number | undefined }
+type BollingerBandWidthResult = { bbw: number }
 
 const bollingerBandWidth: IndicatorTemplate = {
   name: 'BBW',
@@ -21,7 +21,7 @@ const bollingerBandWidth: IndicatorTemplate = {
     for (let i = 0; i < dataList.length; i++) {
       if (i < period - 1) {
         // 数据不足一个完整周期
-        result.push({ bbw: undefined })
+        result.push({ bbw: NaN })
         continue
       }
 

@@ -16,7 +16,7 @@ const vwma: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { vwma: undefined }
+        return { vwma: NaN }
       }
       let cvSum = 0
       let vSum = 0

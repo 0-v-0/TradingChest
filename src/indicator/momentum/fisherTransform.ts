@@ -11,7 +11,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type FisherTransformResult = { fisher: number | undefined; trigger: number | undefined }
+type FisherTransformResult = { fisher: number; trigger: number }
 
 const fisherTransform: IndicatorTemplate = {
   name: 'FISHER',
@@ -36,8 +36,8 @@ const fisherTransform: IndicatorTemplate = {
     let prevFisher = 0 // 前一根的 Fisher 值（即当前 trigger）
 
     for (let i = 0; i < len; i++) {
-      let fisher = undefined
-      let trigger = undefined
+      let fisher = NaN
+      let trigger = NaN
 
       if (i >= period - 1) {
         // 查找窗口内的最高和最低中间价
@@ -69,7 +69,7 @@ const fisherTransform: IndicatorTemplate = {
         fisher = 0.5 * Math.log((1 + norm) / (1 - norm))
 
         // trigger 是前一根的 fisher 值
-        trigger = i === period - 1 ? undefined : prevFisher
+        trigger = i === period - 1 ? NaN : prevFisher
 
         prevNorm = norm
         prevFisher = fisher

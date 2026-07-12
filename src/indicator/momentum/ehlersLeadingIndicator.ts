@@ -14,8 +14,8 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcEMA } from '../utils'
 
 type EhlersLeadingResult = {
-  lead: number | undefined
-  signal: number | undefined
+  lead: number
+  signal: number
 }
 
 const ehlersLeadingIndicator: IndicatorTemplate = {
@@ -57,13 +57,12 @@ const ehlersLeadingIndicator: IndicatorTemplate = {
     const smooth = calcEMA(hp, Math.max(Math.round(period / 2), 2))
 
     // 计算导数（一阶差分）
-    const derivative: (number | null)[] = []
+    const derivative: number[] = []
     for (let i = 0; i < close.length; i++) {
-      if (i === 0 || smooth[i] === null || smooth[i - 1] === null) {
-        derivative.push(null)
-      } else {
-        derivative.push(smooth[i]! - smooth[i - 1]!)
-      }
+      derivative.push(
+        (i === 0 || isNaN(smooth[i]) || isNaN(smooth[i - 1])) ? NaN :
+          smooth[i] - smooth[i - 1]
+      )
     }
 
     // Lead = Smooth + K * Derivative
@@ -71,10 +70,10 @@ const ehlersLeadingIndicator: IndicatorTemplate = {
     for (let i = 0; i < close.length; i++) {
       const s = smooth[i]
       const d = derivative[i]
-      if (s === null) {
-        result.push({ lead: undefined, signal: undefined })
+      if (isNaN(s)) {
+        result.push({ lead: NaN, signal: NaN })
       } else {
-        const lead = d !== null ? s + k * d : s
+        const lead = !isNaN(d) ? s + k * d : s
         result.push({ lead, signal: s })
       }
     }

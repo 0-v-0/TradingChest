@@ -14,8 +14,8 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcTR, calcRMA, calcHighest, calcLowest } from '../utils'
 
 type ChandeKrollStopResult = {
-  longStop: number | undefined
-  shortStop: number | undefined
+  longStop: number
+  shortStop: number
 }
 
 const chandeKrollStop: IndicatorTemplate = {
@@ -39,7 +39,7 @@ const chandeKrollStop: IndicatorTemplate = {
     const highest = calcHighest(high, p)
     const lowest = calcLowest(low, p)
     const tr = calcTR(high, low, close)
-    const atr = calcRMA(tr.map(v => v ?? 0), p)
+    const atr = calcRMA(tr, p)
 
     // 计算初始止损线
     const rawLongStop: number[] = []
@@ -49,7 +49,7 @@ const chandeKrollStop: IndicatorTemplate = {
       const hh = highest[i]
       const ll = lowest[i]
       const a = atr[i]
-      if (hh === null || ll === null || a === null) {
+      if (isNaN(hh) || isNaN(ll) || isNaN(a)) {
         rawLongStop.push(NaN)
         rawShortStop.push(NaN)
       } else {
@@ -65,12 +65,12 @@ const chandeKrollStop: IndicatorTemplate = {
     const result: ChandeKrollStopResult[] = []
     for (let i = 0; i < dataList.length; i++) {
       // 需要 ATR 和 highest/lowest 都有效才输出
-      if (highest[i] === null || lowest[i] === null || atr[i] === null) {
-        result.push({ longStop: undefined, shortStop: undefined })
+      if (isNaN(highest[i]) || isNaN(lowest[i]) || isNaN(atr[i])) {
+        result.push({ longStop: NaN, shortStop: NaN })
       } else {
         result.push({
-          longStop: smoothedLong[i] ?? undefined,
-          shortStop: smoothedShort[i] ?? undefined,
+          longStop: smoothedLong[i],
+          shortStop: smoothedShort[i],
         })
       }
     }

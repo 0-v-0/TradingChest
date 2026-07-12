@@ -11,7 +11,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type ChaikinMoneyFlowResult = { cmf: number | undefined }
+type ChaikinMoneyFlowResult = { cmf: number }
 
 const chaikinMoneyFlow: IndicatorTemplate = {
   name: 'CMF',
@@ -53,7 +53,7 @@ const chaikinMoneyFlow: IndicatorTemplate = {
         sumVol -= dataList[i - period].volume ?? 0
       }
 
-      let cmf = undefined
+      let cmf = NaN
       if (i >= period - 1) {
         // 窗口内总成交量为零时 CMF 为 0，否则为比值
         cmf = sumVol === 0 ? 0 : sumMfv / sumVol

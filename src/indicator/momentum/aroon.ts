@@ -9,9 +9,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AroonResult = {
-  aroonUp: number | undefined
-  aroonDown: number | undefined
-  oscillator: number | undefined
+  aroonUp: number
+  aroonDown: number
+  oscillator: number
 }
 
 const aroon: IndicatorTemplate = {
@@ -29,9 +29,9 @@ const aroon: IndicatorTemplate = {
     const result: AroonResult[] = []
 
     for (let i = 0; i < len; i++) {
-      let aroonUp = undefined
-      let aroonDown = undefined
-      let oscillator = undefined
+      let aroonUp = NaN
+      let aroonDown = NaN
+      let oscillator = NaN
 
       if (i >= period) {
         // 在 [i - period, i] 窗口内查找最高价和最低价的位置

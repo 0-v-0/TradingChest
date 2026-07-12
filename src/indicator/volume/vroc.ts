@@ -9,7 +9,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type VrocResult = { vroc: number | undefined }
+type VrocResult = { vroc: number }
 
 const vroc: IndicatorTemplate = {
   name: 'VROC',
@@ -22,7 +22,7 @@ const vroc: IndicatorTemplate = {
     const result: VrocResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      let vroc = undefined
+      let vroc = NaN
       if (i >= period) {
         const prevVol = dataList[i - period].volume ?? 0
         const curVol = dataList[i].volume ?? 0

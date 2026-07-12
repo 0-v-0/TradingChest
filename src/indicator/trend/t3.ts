@@ -66,7 +66,7 @@ const t3: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < minBars) {
-        return { t3: undefined }
+        return { t3: NaN }
       }
       return { t3: c1 * e6[i] + c2 * e5[i] + c3 * e4[i] + c4 * e3[i] }
     })

@@ -4,7 +4,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type SuperTrendResult = { up: number | undefined; down: number | undefined }
+type SuperTrendResult = { up: number; down: number }
 
 const superTrend: IndicatorTemplate = {
   name: 'SUPERTREND',
@@ -56,8 +56,8 @@ const superTrend: IndicatorTemplate = {
     let direction: number
 
     for (let i = 0; i < dataList.length; i++) {
-      let up = undefined
-      let down = undefined
+      let up = NaN
+      let down = NaN
 
       if (i >= period) {
         const kline = dataList[i]
@@ -93,8 +93,8 @@ const superTrend: IndicatorTemplate = {
 
         const superTrendVal = direction === 1 ? lowerBand : upperBand
 
-        up = direction === 1 ? superTrendVal : undefined
-        down = direction === -1 ? superTrendVal : undefined
+        up = direction === 1 ? superTrendVal : NaN
+        down = direction === -1 ? superTrendVal : NaN
 
         prevUpperBand = upperBand
         prevLowerBand = lowerBand

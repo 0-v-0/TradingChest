@@ -4,7 +4,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type ChaikinVolatilityResult = { cv: number | undefined }
+type ChaikinVolatilityResult = { cv: number }
 
 const chaikinVolatility: IndicatorTemplate = {
   name: 'CV',
@@ -51,7 +51,7 @@ const chaikinVolatility: IndicatorTemplate = {
       // EMA 从 index = period - 1 开始有效
       // ROC 需要 period 前的 EMA 也有效，即 i - period >= period - 1
       // 即 i >= 2 * period - 1
-      let cv = undefined
+      let cv = NaN
       if (i >= 2 * period - 1) {
         const currentEma = hlEma[i]
         const prevEma = hlEma[i - period]

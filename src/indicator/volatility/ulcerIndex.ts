@@ -5,7 +5,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type UlcerIndexResult = { ui: number | undefined }
+type UlcerIndexResult = { ui: number }
 
 const ulcerIndex: IndicatorTemplate = {
   name: 'UI',
@@ -18,7 +18,7 @@ const ulcerIndex: IndicatorTemplate = {
     const result: UlcerIndexResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      let ui = undefined
+      let ui = NaN
       if (i >= period - 1) {
         // 在回看窗口内找到最高收盘价
         let highestClose = -Infinity

@@ -5,9 +5,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type DonchianChannelsResult = {
-  upper: number | undefined
-  lower: number | undefined
-  middle: number | undefined
+  upper: number
+  lower: number
+  middle: number
 }
 
 const donchianChannels: IndicatorTemplate = {
@@ -25,9 +25,9 @@ const donchianChannels: IndicatorTemplate = {
     const result: DonchianChannelsResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      let upper = undefined
-      let lower = undefined
-      let middle = undefined
+      let upper = NaN
+      let lower = NaN
+      let middle = NaN
 
       if (i >= period - 1) {
         // 在回看窗口内查找最高价和最低价

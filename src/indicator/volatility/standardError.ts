@@ -18,7 +18,7 @@ const standardError: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { se: undefined }
+        return { se: NaN }
       }
 
       // 最小二乘法：y = a + b * x

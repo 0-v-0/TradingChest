@@ -14,7 +14,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type KlingerOscillatorResult = { kvo: number | undefined; signal: number | undefined }
+type KlingerOscillatorResult = { kvo: number; signal: number }
 
 const klingerOscillator: IndicatorTemplate = {
   name: 'KVO',
@@ -84,8 +84,8 @@ const klingerOscillator: IndicatorTemplate = {
     // 第三步：计算 KVO 和信号线
     const kvoValues: number[] = []
     for (let i = 0; i < dataList.length; i++) {
-      if (fastEma[i] !== null && slowEma[i] !== null) {
-        kvoValues.push(fastEma[i]! - slowEma[i]!)
+      if (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) {
+        kvoValues.push(fastEma[i] - slowEma[i])
       } else {
         kvoValues.push(0)
       }
@@ -101,14 +101,13 @@ const klingerOscillator: IndicatorTemplate = {
     const signalEma = calcEmaArray(validKvo, signalPeriod)
 
     for (let i = 0; i < dataList.length; i++) {
-      let kvo = undefined
-      let signal = undefined
-      if (fastEma[i] !== null && slowEma[i] !== null) {
+      let kvo = NaN
+      let signal = NaN
+      if (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) {
         kvo = kvoValues[i]
         const signalIdx = i - slowStart
-        const signalVal =
-          signalIdx >= 0 && signalIdx < signalEma.length ? signalEma[signalIdx] : null
-        signal = signalVal ?? undefined
+        signal =
+          signalIdx >= 0 && signalIdx < signalEma.length ? signalEma[signalIdx] : NaN
       }
       result.push({ kvo, signal })
     }
@@ -121,13 +120,13 @@ const klingerOscillator: IndicatorTemplate = {
  * 权重因子 k = 2 / (period + 1)
  * 首个有效值使用 SMA 作为种子
  */
-function calcEmaArray(data: number[], period: number): (number | null)[] {
-  const result: (number | null)[] = []
+function calcEmaArray(data: number[], period: number): number[] {
+  const result: number[] = []
   const k = 2 / (period + 1)
-  let prevEma: number | null = null
+  let prevEma = NaN
 
   for (let i = 0; i < data.length; i++) {
-    let val: number | null = null
+    let val = NaN
     if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为 EMA 种子值
       let sum = 0
@@ -137,7 +136,7 @@ function calcEmaArray(data: number[], period: number): (number | null)[] {
       prevEma = sum / period
       val = prevEma
     } else if (i >= period) {
-      prevEma = data[i] * k + prevEma! * (1 - k)
+      prevEma = data[i] * k + prevEma * (1 - k)
       val = prevEma
     }
     result.push(val)

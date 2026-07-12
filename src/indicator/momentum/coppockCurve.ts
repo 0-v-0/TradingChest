@@ -7,7 +7,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type CoppockCurveResult = { coppock: number | undefined }
+type CoppockCurveResult = { coppock: number }
 
 const coppockCurve: IndicatorTemplate = {
   name: 'COPPOCK',
@@ -26,7 +26,7 @@ const coppockCurve: IndicatorTemplate = {
     const maxRocPeriod = Math.max(roc1Period, roc2Period)
 
     // 计算两条 ROC 之和
-    const rocSum: (number | null)[] = Array(len).fill(null)
+    const rocSum: number[] = Array(len).fill(NaN)
     for (let i = 0; i < len; i++) {
       if (i < maxRocPeriod) {
         continue
@@ -50,7 +50,7 @@ const coppockCurve: IndicatorTemplate = {
     for (let i = 0; i < len; i++) {
       // 需要从 rocSum 中取连续 wmaPeriod 个有效值
       if (i < maxRocPeriod + wmaPeriod - 1) {
-        result.push({ coppock: undefined })
+        result.push({ coppock: NaN })
         continue
       }
 
@@ -59,15 +59,15 @@ const coppockCurve: IndicatorTemplate = {
       let weighted = 0
       for (let j = 0; j < wmaPeriod; j++) {
         const idx = i - wmaPeriod + 1 + j
-        if (rocSum[idx] === null) {
+        if (isNaN(rocSum[idx])) {
           valid = false
           break
         }
         // 权重从 1（最旧）到 wmaPeriod（最新）
-        weighted += (rocSum[idx] as number) * (j + 1)
+        weighted += rocSum[idx] * (j + 1)
       }
 
-      let coppock = undefined
+      let coppock = NaN
       if (valid) {
         coppock = weighted / weightSum
       }

@@ -5,7 +5,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type VwapResult = { vwap: number | undefined }
+type VwapResult = { vwap: number }
 
 const vwap: IndicatorTemplate = {
   name: 'VWAP',
@@ -25,7 +25,7 @@ const vwap: IndicatorTemplate = {
       cumTpv += typicalPrice * (kline.volume ?? 0)
       cumVol += kline.volume ?? 0
 
-      let vwap = undefined
+      let vwap = NaN
       // 累计成交量为零时无法计算 VWAP
       if (cumVol !== 0) {
         vwap = cumTpv / cumVol

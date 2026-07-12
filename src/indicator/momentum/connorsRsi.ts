@@ -13,7 +13,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcRMA } from '../utils'
 
 type ConnorsRsiResult = {
-  crsi: number | undefined
+  crsi: number
 }
 
 const connorsRsi: IndicatorTemplate = {
@@ -83,10 +83,10 @@ const connorsRsi: IndicatorTemplate = {
     const streakAvgLoss = calcRMA(streakLosses, streakRsiPeriod)
 
     // 3. 计算 Percent Rank
-    const percentRanks: (number | null)[] = []
+    const percentRanks: number[] = []
     for (let i = 0; i < dataList.length; i++) {
       if (i === 0) {
-        percentRanks.push(null)
+        percentRanks.push(NaN)
         continue
       }
       const currentChange = dataList[i].close - dataList[i - 1].close
@@ -97,7 +97,7 @@ const connorsRsi: IndicatorTemplate = {
         const pastChange = dataList[j].close - dataList[j - 1].close
         if (pastChange <= currentChange) count++
       }
-      percentRanks.push(lookback > 0 ? (count / lookback) * 100 : null)
+      percentRanks.push(lookback > 0 ? (count / lookback) * 100 : NaN)
     }
 
     // 汇总
@@ -105,8 +105,8 @@ const connorsRsi: IndicatorTemplate = {
     for (let i = 0; i < dataList.length; i++) {
       const ag = avgGain[i]
       const al = avgLoss[i]
-      if (ag === null || al === null) {
-        result.push({ crsi: undefined })
+      if (isNaN(ag) || isNaN(al)) {
+        result.push({ crsi: NaN })
         continue
       }
 
@@ -118,19 +118,13 @@ const connorsRsi: IndicatorTemplate = {
       const sag = streakAvgGain[i]
       const sal = streakAvgLoss[i]
       let streakRsi = 50
-      if (sag !== null && sal !== null) {
+      if (!isNaN(sag) && !isNaN(sal)) {
         const srs = sal !== 0 ? sag / sal : 0
         streakRsi = 100 - 100 / (1 + srs)
       }
 
       // Percent Rank
-      const pr = percentRanks[i]
-
-      if (pr === null) {
-        result.push({ crsi: undefined })
-      } else {
-        result.push({ crsi: (rsi + streakRsi + pr) / 3 })
-      }
+      result.push({ crsi: (rsi + streakRsi + percentRanks[i]) / 3 })
     }
 
     return result

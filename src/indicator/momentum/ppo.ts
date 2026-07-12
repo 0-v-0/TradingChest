@@ -9,9 +9,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type PpoResult = {
-  ppo: number | undefined
-  signal: number | undefined
-  histogram: number | undefined
+  ppo: number
+  signal: number
+  histogram: number
 }
 
 const ppo: IndicatorTemplate = {
@@ -32,9 +32,9 @@ const ppo: IndicatorTemplate = {
     const result: PpoResult[] = []
 
     // ---- 计算快速 EMA ----
-    const emaFast: (number | null)[] = Array(len).fill(null)
+    const emaFast: number[] = Array(len).fill(NaN)
     const kFast = 2 / (fastPeriod + 1)
-    let prevEmaFast: number | null = null
+    let prevEmaFast = NaN
     for (let i = 0; i < len; i++) {
       const close = dataList[i].close
       if (i < fastPeriod - 1) {
@@ -45,15 +45,15 @@ const ppo: IndicatorTemplate = {
         prevEmaFast = sum / fastPeriod
         emaFast[i] = prevEmaFast
       } else {
-        prevEmaFast = close * kFast + prevEmaFast! * (1 - kFast)
+        prevEmaFast = close * kFast + prevEmaFast * (1 - kFast)
         emaFast[i] = prevEmaFast
       }
     }
 
     // ---- 计算慢速 EMA ----
-    const emaSlow: (number | null)[] = Array(len).fill(null)
+    const emaSlow: number[] = Array(len).fill(NaN)
     const kSlow = 2 / (slowPeriod + 1)
-    let prevEmaSlow: number | null = null
+    let prevEmaSlow = NaN
     for (let i = 0; i < len; i++) {
       const close = dataList[i].close
       if (i < slowPeriod - 1) {
@@ -64,39 +64,38 @@ const ppo: IndicatorTemplate = {
         prevEmaSlow = sum / slowPeriod
         emaSlow[i] = prevEmaSlow
       } else {
-        prevEmaSlow = close * kSlow + prevEmaSlow! * (1 - kSlow)
+        prevEmaSlow = close * kSlow + prevEmaSlow * (1 - kSlow)
         emaSlow[i] = prevEmaSlow
       }
     }
 
     // ---- 计算 PPO 序列 ----
-    const ppoLine: (number | null)[] = Array(len).fill(null)
+    const ppoLine: number[] = Array(len).fill(NaN)
     for (let i = 0; i < len; i++) {
-      if (emaFast[i] !== null && emaSlow[i] !== null && emaSlow[i] !== 0) {
-        ppoLine[i] =
-          (((emaFast[i] as number) - (emaSlow[i] as number)) / (emaSlow[i] as number)) * 100
+      if (!isNaN(emaFast[i]) && !isNaN(emaSlow[i]) && emaSlow[i] !== 0) {
+        ppoLine[i] = ((emaFast[i] - emaSlow[i]) / emaSlow[i]) * 100
       }
     }
 
     // ---- 计算 Signal 线（对 PPO 做 EMA） ----
-    const signalLine: (number | null)[] = Array(len).fill(null)
+    const signalLine: number[] = Array(len).fill(NaN)
     const kSignal = 2 / (signalPeriod + 1)
-    let prevSignal: number | null = null
+    let prevSignal = NaN
     let signalSeedCount = 0
     let signalSeedSum = 0
 
     for (let i = 0; i < len; i++) {
-      if (ppoLine[i] === null) continue
+      if (isNaN(ppoLine[i])) continue
 
-      if (prevSignal === null) {
+      if (isNaN(prevSignal)) {
         signalSeedCount++
-        signalSeedSum += ppoLine[i] as number
+        signalSeedSum += ppoLine[i]
         if (signalSeedCount === signalPeriod) {
           prevSignal = signalSeedSum / signalPeriod
           signalLine[i] = prevSignal
         }
       } else {
-        prevSignal = (ppoLine[i] as number) * kSignal + prevSignal * (1 - kSignal)
+        prevSignal = ppoLine[i] * kSignal + prevSignal * (1 - kSignal)
         signalLine[i] = prevSignal
       }
     }
@@ -106,9 +105,9 @@ const ppo: IndicatorTemplate = {
       const p = ppoLine[i]
       const s = signalLine[i]
       result.push({
-        ppo: p !== null ? p : undefined,
-        signal: s !== null ? s : undefined,
-        histogram: p !== null && s !== null ? (p as number) - (s as number) : undefined,
+        ppo: p,
+        signal: s,
+        histogram: !isNaN(p) && !isNaN(s) ? p - s : NaN,
       })
     }
 

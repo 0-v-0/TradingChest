@@ -5,7 +5,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type KamaResult = { kama: number | undefined }
+type KamaResult = { kama: number }
 
 const kama: IndicatorTemplate = {
   name: 'KAMA',
@@ -26,7 +26,7 @@ const kama: IndicatorTemplate = {
     let prevKama = 0
 
     for (let i = 0; i < dataList.length; i++) {
-      let kama = undefined
+      let kama = NaN
       if (i < period) {
         // 数据不足，KAMA 初始值取第 period 根 K 线的收盘价
         if (i === period - 1) {

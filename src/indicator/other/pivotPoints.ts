@@ -47,13 +47,13 @@ const pivotPoints: IndicatorTemplate = {
     const mode = params[0] as number
 
     return dataList.map((_, i) => {
-      let pivot = undefined
-      let r1 = undefined
-      let r2 = undefined
-      let r3 = undefined
-      let s1 = undefined
-      let s2 = undefined
-      let s3 = undefined
+      let pivot = NaN
+      let r1 = NaN
+      let r2 = NaN
+      let r3 = NaN
+      let s1 = NaN
+      let s2 = NaN
+      let s3 = NaN
 
       if (i > 0) {
         const prev = dataList[i - 1]

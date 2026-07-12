@@ -4,7 +4,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type AtrResult = { atr: number | undefined }
+type AtrResult = { atr: number }
 
 const atr: IndicatorTemplate = {
   name: 'ATR',
@@ -32,7 +32,7 @@ const atr: IndicatorTemplate = {
         )
       }
 
-      let atr = undefined
+      let atr = NaN
       if (i < period) {
         // 累积阶段：收集前 period 个 TR 用于首次平均
         prevAtr += tr

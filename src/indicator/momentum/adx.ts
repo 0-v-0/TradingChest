@@ -14,9 +14,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AdxResult = {
-  adx: number | undefined
-  plusDi: number | undefined
-  minusDi: number | undefined
+  adx: number
+  plusDi: number
+  minusDi: number
 }
 
 const adx: IndicatorTemplate = {
@@ -74,9 +74,9 @@ const adx: IndicatorTemplate = {
     let adxCount = 0
 
     for (let i = 0; i < len; i++) {
-      let adx = undefined
-      let plusDi = undefined
-      let minusDi = undefined
+      let adx = NaN
+      let plusDi = NaN
+      let minusDi = NaN
 
       if (i < period) {
         // 累积阶段

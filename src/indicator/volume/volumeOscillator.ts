@@ -25,8 +25,8 @@ const volumeOscillator: IndicatorTemplate = {
     return dataList.map((_, i) => {
       const fast = fastEma[i]
       const slow = slowEma[i]
-      if (fast === null || slow === null) {
-        return { vo: undefined }
+      if (isNaN(fast) || isNaN(slow)) {
+        return { vo: NaN }
       }
       return { vo: fast - slow }
     })

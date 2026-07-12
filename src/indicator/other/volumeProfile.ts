@@ -85,7 +85,7 @@ const volumeProfile: IndicatorTemplate = {
   calc: (dataList: KLineData[], indicator) => {
     const numBins = (indicator.calcParams[0] as number) || DEFAULT_BINS
     const result = calcVolumeProfile(dataList, numBins)
-    return Array(dataList.length).fill({ vp: undefined }).map((v, i) => {
+    return Array(dataList.length).fill({ vp: NaN }).map((v, i) => {
       if (i === 0) return { vp: result.bins[result.pocIndex]?.priceLow ?? 0, __vp: result }
       return v
     })

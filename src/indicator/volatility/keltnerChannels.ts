@@ -5,9 +5,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KeltnerChannelsResult = {
-  middle: number | undefined
-  upper: number | undefined
-  lower: number | undefined
+  middle: number
+  upper: number
+  lower: number
 }
 
 const keltnerChannels: IndicatorTemplate = {
@@ -50,9 +50,9 @@ const keltnerChannels: IndicatorTemplate = {
         )
       }
 
-      let middle = undefined
-      let upper = undefined
-      let lower = undefined
+      let middle = NaN
+      let upper = NaN
+      let lower = NaN
 
       if (i < emaPeriod) {
         // 累积阶段：收集前 emaPeriod 个数据

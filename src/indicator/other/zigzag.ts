@@ -112,7 +112,7 @@ const zigzag: IndicatorTemplate = {
     // 第二步：在相邻转折点之间做线性插值，生成连续折线
     const result: ZigzagResult[] = Array(dataList.length)
     for (let i = 0; i < dataList.length; i++) {
-      result[i] = { zigzag: undefined }
+      result[i] = { zigzag: NaN }
     }
 
     if (pivots.length < 2) {

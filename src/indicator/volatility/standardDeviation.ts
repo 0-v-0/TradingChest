@@ -4,7 +4,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type StandardDeviationResult = { stddev: number | undefined }
+type StandardDeviationResult = { stddev: number }
 
 const standardDeviation: IndicatorTemplate = {
   name: 'STDDEV',
@@ -17,7 +17,7 @@ const standardDeviation: IndicatorTemplate = {
     const result: StandardDeviationResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {
-      let stddev = undefined
+      let stddev = NaN
       if (i >= period - 1) {
         // 计算窗口内收盘价的均值
         let sum = 0

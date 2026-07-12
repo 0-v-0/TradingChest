@@ -4,7 +4,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type HistoricalVolatilityResult = { hv: number | undefined }
+type HistoricalVolatilityResult = { hv: number }
 
 const historicalVolatility: IndicatorTemplate = {
   name: 'HV',
@@ -20,7 +20,7 @@ const historicalVolatility: IndicatorTemplate = {
     const annualizationFactor = Math.sqrt(252)
 
     for (let i = 0; i < dataList.length; i++) {
-      let hv = undefined
+      let hv = NaN
       // 需要 period 个对数收益率，即 period + 1 个数据点（从 i - period 到 i）
       // 所以最早可计算的位置是 i = period
       if (i >= period) {

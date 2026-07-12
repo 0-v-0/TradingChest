@@ -12,7 +12,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type TwiggsMfResult = { tmf: number | undefined }
+type TwiggsMfResult = { tmf: number }
 
 const twiggsMf: IndicatorTemplate = {
   name: 'TMF',
@@ -62,7 +62,7 @@ const twiggsMf: IndicatorTemplate = {
     let smoothVol = 0
 
     for (let i = 0; i < len; i++) {
-      let tmf = undefined
+      let tmf = NaN
       if (i < period - 1) {
         // 累积阶段
         smoothAd += ad[i]

@@ -25,19 +25,19 @@ describe('SuperTrend indicator', () => {
     expect(result).toHaveLength(klines.length)
   })
 
-  it('前 period 个值为 undefined', () => {
+  it('前 period 个值为 NaN', () => {
     const result = superTrend.calc!(klines, indicator)
     for (let i = 0; i < 10; i++) {
-      expect(result[i].up).toBeUndefined()
-      expect(result[i].down).toBeUndefined()
+      expect(result[i].up).toBeNaN()
+      expect(result[i].down).toBeNaN()
     }
   })
 
   it('period 之后每行恰好有 up 或 down 之一', () => {
     const result = superTrend.calc!(klines, indicator)
     for (let i = 10; i < result.length; i++) {
-      const hasUp = result[i].up !== undefined
-      const hasDown = result[i].down !== undefined
+      const hasUp = !isNaN(result[i].up)
+      const hasDown = !isNaN(result[i].down)
       expect(hasUp || hasDown).toBe(true)
       expect(hasUp && hasDown).toBe(false)
     }
@@ -46,7 +46,7 @@ describe('SuperTrend indicator', () => {
   it('上升趋势 up 值应在 close 下方', () => {
     const result = superTrend.calc!(klines, indicator)
     for (let i = 10; i < result.length; i++) {
-      if (result[i].up !== undefined) {
+      if (!isNaN(result[i].up)) {
         expect(result[i].up).toBeLessThan(klines[i].high)
       }
     }
@@ -58,7 +58,6 @@ describe('SuperTrend indicator', () => {
   })
 
   it('下降趋势 direction 为 -1', () => {
-    // Create klines with a sharp drop at bar 15 to trigger direction = -1
     const descending = makeKlines(25)
     for (let i = 12; i < descending.length; i++) {
       descending[i] = {
@@ -70,10 +69,10 @@ describe('SuperTrend indicator', () => {
     }
     const result = superTrend.calc!(descending, indicator)
     // After the drop, some bars should have down values
-    const hasDown = result.some((r) => r.down !== undefined)
+    const hasDown = result.some((r) => !isNaN(r.down))
     expect(hasDown).toBe(true)
     for (let i = 12; i < result.length; i++) {
-      if (result[i].down !== undefined) {
+      if (!isNaN(result[i].down)) {
         expect(result[i].down).toBeGreaterThan(descending[i].low)
       }
     }

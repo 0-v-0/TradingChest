@@ -13,7 +13,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type MfiResult = { mfi: number | undefined }
+type MfiResult = { mfi: number }
 
 const mfi: IndicatorTemplate = {
   name: 'MFI',
@@ -37,7 +37,7 @@ const mfi: IndicatorTemplate = {
     }
 
     for (let i = 0; i < dataList.length; i++) {
-      let mfi = undefined
+      let mfi = NaN
       // 需要至少 period + 1 根 K 线（因为需要比较典型价格方向）
       if (i >= period) {
         // 计算窗口内的正负资金流量

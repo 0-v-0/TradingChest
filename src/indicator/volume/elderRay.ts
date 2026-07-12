@@ -12,7 +12,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type ElderRayResult = { bullPower: number | undefined; bearPower: number | undefined }
+type ElderRayResult = { bullPower: number; bearPower: number }
 
 const elderRay: IndicatorTemplate = {
   name: 'ELDER_RAY',
@@ -29,12 +29,12 @@ const elderRay: IndicatorTemplate = {
 
     // 内联计算收盘价的 EMA
     const k = 2 / (period + 1)
-    let prevEma: number | null = null
+    let prevEma = NaN
 
     for (let i = 0; i < dataList.length; i++) {
       const kline = dataList[i]
-      let bullPower = undefined
-      let bearPower = undefined
+      let bullPower = NaN
+      let bearPower = NaN
 
       if (i < period - 1) {
         // 数据不足，尚未产生第一个 EMA
@@ -49,7 +49,7 @@ const elderRay: IndicatorTemplate = {
         bearPower = kline.low - prevEma
       } else {
         // EMA 递归
-        prevEma = kline.close * k + prevEma! * (1 - k)
+        prevEma = kline.close * k + prevEma * (1 - k)
         bullPower = kline.high - prevEma
         bearPower = kline.low - prevEma
       }

@@ -36,7 +36,7 @@ const dema: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { dema: undefined }
+        return { dema: NaN }
       }
       return { dema: 2 * ema1[i] - ema2[i] }
     })

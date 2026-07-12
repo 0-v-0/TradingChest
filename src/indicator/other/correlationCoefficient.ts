@@ -19,7 +19,7 @@ const correlationCoefficient: IndicatorTemplate = {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {
-        return { r: undefined }
+        return { r: NaN }
       }
 
       // 计算 close 和 volume 的均值

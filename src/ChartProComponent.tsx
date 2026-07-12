@@ -777,7 +777,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       const d = crosshair.kLineData as Record<string, unknown>
       const rows: DataWindowRow[] = []
       const addRow = (label: string, val: unknown, color?: string) => {
-        rows.push({ label, value: val != null ? String(val) : '--', color })
+        rows.push({ label, value: val != null && !Number.isNaN(Number(val)) ? String(val) : '--', color })
       }
       addRow('O', d.open)
       addRow('H', d.high)

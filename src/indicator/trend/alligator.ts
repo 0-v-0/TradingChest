@@ -6,9 +6,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AlligatorResult = {
-  jaw: number | undefined
-  teeth: number | undefined
-  lips: number | undefined
+  jaw: number
+  teeth: number
+  lips: number
 }
 
 const alligator: IndicatorTemplate = {
@@ -36,8 +36,8 @@ const alligator: IndicatorTemplate = {
      * SMMA(i) = (SMMA(i-1) * (period - 1) + close(i)) / period
      * 使用 (high + low) / 2 作为数据源（Median Price）
      */
-    function calcSmma(period: number): (number | undefined)[] {
-      const values: (number | undefined)[] = []
+    function calcSmma(period: number): number[] {
+      const values: number[] = []
       let smma = 0
       for (let i = 0; i < dataList.length; i++) {
         const median = (dataList[i].high + dataList[i].low) / 2
@@ -47,7 +47,7 @@ const alligator: IndicatorTemplate = {
             smma = smma / period
             values.push(smma)
           } else {
-            values.push(undefined)
+            values.push(NaN)
           }
         } else {
           smma = (smma * (period - 1) + median) / period

@@ -14,7 +14,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type DpoResult = { dpo: number | undefined }
+type DpoResult = { dpo: number }
 
 const dpo: IndicatorTemplate = {
   name: 'DPO',
@@ -30,7 +30,7 @@ const dpo: IndicatorTemplate = {
     const shift = Math.floor(period / 2) + 1
 
     // 先计算完整的 SMA 序列
-    const sma: (number | null)[] = Array(len).fill(null)
+    const sma: number[] = Array(len).fill(NaN)
     let windowSum = 0
     for (let i = 0; i < len; i++) {
       windowSum += dataList[i].close
@@ -45,9 +45,9 @@ const dpo: IndicatorTemplate = {
     // DPO[i] = close[i] - SMA[i - shift]
     for (let i = 0; i < len; i++) {
       const smaIdx = i - shift
-      let dpo = undefined
-      if (smaIdx >= 0 && sma[smaIdx] !== null) {
-        dpo = dataList[i].close - (sma[smaIdx] as number)
+      let dpo = NaN
+      if (smaIdx >= 0 && !isNaN(sma[smaIdx])) {
+        dpo = dataList[i].close - sma[smaIdx]
       }
       result.push({ dpo })
     }

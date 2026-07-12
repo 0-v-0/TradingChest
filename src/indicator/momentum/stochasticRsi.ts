@@ -9,7 +9,7 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type StochasticRsiResult = { k: number | undefined; d: number | undefined }
+type StochasticRsiResult = { k: number; d: number }
 
 const stochasticRsi: IndicatorTemplate = {
   name: 'StochRSI',
@@ -28,7 +28,7 @@ const stochasticRsi: IndicatorTemplate = {
     const len = dataList.length
 
     // ---- 第一步：计算 RSI（Wilder 平滑法） ----
-    const rsi: (number | null)[] = Array(len).fill(null)
+    const rsi: number[] = Array(len).fill(NaN)
     let avgGain = 0
     let avgLoss = 0
 
@@ -63,16 +63,16 @@ const stochasticRsi: IndicatorTemplate = {
     }
 
     // ---- 第二步：在 RSI 序列上计算随机指标 ----
-    const stochRsi: (number | null)[] = Array(len).fill(null)
+    const stochRsi: number[] = Array(len).fill(NaN)
     for (let i = 0; i < len; i++) {
-      if (rsi[i] === null) continue
+      if (isNaN(rsi[i])) continue
       // 回溯 stochPeriod 个有效 RSI 值
       let lowest = Infinity
       let highest = -Infinity
       let validCount = 0
       for (let j = i; j >= 0 && validCount < stochPeriod; j--) {
-        if (rsi[j] !== null) {
-          const v = rsi[j] as number
+        if (!isNaN(rsi[j])) {
+          const v = rsi[j]
           if (v < lowest) lowest = v
           if (v > highest) highest = v
           validCount++
@@ -83,22 +83,22 @@ const stochasticRsi: IndicatorTemplate = {
       if (highest === lowest) {
         stochRsi[i] = 0
       } else {
-        stochRsi[i] = ((rsi[i] as number) - lowest) / (highest - lowest)
+        stochRsi[i] = (rsi[i] - lowest) / (highest - lowest)
       }
     }
 
     // ---- 第三步：K = SMA(StochRSI, kSmooth)，D = SMA(K, dSmooth) ----
     // 对有效值序列做 SMA
-    const kLine: (number | null)[] = Array(len).fill(null)
-    const dLine: (number | null)[] = Array(len).fill(null)
+    const kLine: number[] = Array(len).fill(NaN)
+    const dLine: number[] = Array(len).fill(NaN)
 
     // K 线：对 stochRsi 做滑动平均
     const kBuf: number[] = []
     let kSum = 0
     for (let i = 0; i < len; i++) {
-      if (stochRsi[i] !== null) {
-        kBuf.push(stochRsi[i] as number)
-        kSum += stochRsi[i] as number
+      if (!isNaN(stochRsi[i])) {
+        kBuf.push(stochRsi[i])
+        kSum += stochRsi[i]
         if (kBuf.length > kSmooth) {
           kSum -= kBuf[kBuf.length - kSmooth - 1]
         }
@@ -119,8 +119,8 @@ const stochasticRsi: IndicatorTemplate = {
     // D 线：对 K 线做滑动平均
     const dBuf: number[] = []
     for (let i = 0; i < len; i++) {
-      if (kLine[i] !== null) {
-        dBuf.push(kLine[i] as number)
+      if (!isNaN(kLine[i])) {
+        dBuf.push(kLine[i])
         if (dBuf.length >= dSmooth) {
           let s = 0
           for (let w = dBuf.length - dSmooth; w < dBuf.length; w++) {
@@ -135,8 +135,8 @@ const stochasticRsi: IndicatorTemplate = {
     const result: StochasticRsiResult[] = []
     for (let i = 0; i < len; i++) {
       result.push({
-        k: kLine[i] ?? undefined,
-        d: dLine[i] ?? undefined,
+        k: kLine[i],
+        d: dLine[i],
       })
     }
     return result
