@@ -232,9 +232,6 @@ export default class KLineChartPro implements ChartPro {
         const show = s.grid?.show !== false
         chart.setStyles({ grid: { show: !show } })
       },
-      'toggle:logScale': () => {
-        // v10 removed yAxis.type from styles; log scale toggle is no longer available via setStyles
-      },
     })
     this._shortcutManager.bindTo(this._container!)
   }
@@ -403,8 +400,8 @@ export default class KLineChartPro implements ChartPro {
 
   updateAlert(id: string, updates: Partial<Omit<AlertConfig, 'id'>>): boolean {
     this._assertNotDisposed()
-    if (this._alertManager.updateAlert(id, updates) && updates.price !== undefined) {
-      // 更新 overlay 位置
+    const updated = this._alertManager.updateAlert(id, updates)
+    if (updated && updates.price !== undefined) {
       const chart = this.getChart()
       if (chart) {
         chart.removeOverlay({ id: `alert_${id}` })
@@ -420,7 +417,7 @@ export default class KLineChartPro implements ChartPro {
         }
       }
     }
-    return this._alertManager.updateAlert(id, updates)
+    return updated
   }
 
   removeAlert(id: string): void {
