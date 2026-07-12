@@ -97,8 +97,8 @@ export const indicatorCategories: Record<string, { names: string[]; labelKey: st
     ],
     labelKey: 'category_momentum',
   },
-  other: {
-    names: ['PIVOTPOINTS', 'ZIGZAG', 'CorrelationCoefficient'],
-    labelKey: 'category_other',
-  },
+   other: {
+     names: ['PIVOTPOINTS', 'ZIGZAG', 'CorrelationCoefficient', 'TradeVis'],
+     labelKey: 'category_other',
+   },
 }

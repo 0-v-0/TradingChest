@@ -351,19 +351,15 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     if (textOverlays.includes(overlay.name ?? '')) {
       items.push({
-        label: t('menu_edit', locale()),
-        onClick: () => {
-          const label =
-            overlay.name === 'note'
-              ? t('menu_edit', locale())
-              : t('menu_edit', locale())
-          const current =
+         label: t('menu_edit', locale()),
+         onClick: () => {
+           const current =
             typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
               ? overlay.extendData
               : overlay.name === 'note'
                 ? 'Note'
                 : 'Text'
-          const input = window.prompt(label, current)
+          const input = window.prompt(t('menu_edit', locale()), current)
           if (input !== null && input.trim() !== '' && overlay.id) {
             widget?.overrideOverlay({ id: overlay.id, extendData: input.trim() })
           }
