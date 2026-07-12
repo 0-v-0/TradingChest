@@ -81,29 +81,35 @@ const massIndex: IndicatorTemplate = {
     const ratios: number[] = []
     for (let i = 0; i < dataList.length; i++) {
       if (i < ratioStartIdx) {
-        ratios.push(0)
+        // 未成熟：使用 NaN，避免污染后续 rolling sum
+        ratios.push(NaN)
+      } else if (doubleEma[i] === 0) {
+        // 二次 EMA 为 0，无有效比值
+        ratios.push(NaN)
       } else {
-        // 防止除零
-        if (doubleEma[i] === 0) {
-          ratios.push(1)
-        } else {
-          ratios.push(singleEma[i] / doubleEma[i])
-        }
+        ratios.push(singleEma[i] / doubleEma[i])
       }
     }
 
     // 第四步：对比值序列求 sumPeriod 的滚动和
-    // 需要从 ratioStartIdx 开始有 sumPeriod 个有效比值
+    // 仅统计窗口内有效比值（NaN 跳过），窗口需有 sumPeriod 个有效值
     const miStartIdx = ratioStartIdx + sumPeriod - 1
 
     for (let i = 0; i < dataList.length; i++) {
       let mi = NaN
       if (i >= miStartIdx) {
         let sum = 0
+        let validCount = 0
         for (let j = i - sumPeriod + 1; j <= i; j++) {
-          sum += ratios[j]
+          const r = ratios[j]
+          if (!Number.isNaN(r)) {
+            sum += r
+            validCount++
+          }
         }
-        mi = sum
+        if (validCount === sumPeriod) {
+          mi = sum
+        }
       }
       result.push({ mi })
     }

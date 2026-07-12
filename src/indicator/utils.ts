@@ -211,6 +211,41 @@ export function calcRMA(data: number[], period: number): number[] {
 }
 
 /**
+ * NaN 感知的 RMA：在可达 `period` 个连续有效值后才初始化种子，
+ * 之后的 Wilder 递归同样跳过 NaN 输入（保持先前的 `prevRma`）。
+ * 用于将含 NaN 的输入（如前置未成熟区间）平滑到正确的累计序列，
+ * 避免 NaN→0 替换污染累计和。
+ */
+export function calcRMA_NaNAware(data: number[], period: number): number[] {
+  const result: number[] = []
+  let prevRma = NaN
+  let winSum = 0
+  let winCount = 0
+
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i]
+    if (Number.isNaN(v)) {
+      result.push(NaN)
+      continue
+    }
+    winSum += v
+    winCount++
+    if (winCount < period) {
+      result.push(NaN)
+      continue
+    }
+    if (winCount === period) {
+      prevRma = winSum / period
+      winSum = 0
+    } else {
+      prevRma = (prevRma * (period - 1) + v) / period
+    }
+    result.push(prevRma)
+  }
+  return result
+}
+
+/**
  * 滚动求和（Rolling Sum）
  * 返回过去 period 个数据点的累加和
  */

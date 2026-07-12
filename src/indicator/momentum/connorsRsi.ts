@@ -83,6 +83,8 @@ const connorsRsi: IndicatorTemplate = {
     const streakAvgLoss = calcRMA(streakLosses, streakRsiPeriod)
 
     // 3. 计算 Percent Rank
+    // Current value should NOT be counted against itself — standard PercentRank
+    // examines only the trailing window EXCLUDING the current value.
     const percentRanks: number[] = []
     for (let i = 0; i < dataList.length; i++) {
       if (i === 0) {
@@ -92,7 +94,8 @@ const connorsRsi: IndicatorTemplate = {
       const currentChange = dataList[i].close - dataList[i - 1].close
       const lookback = Math.min(i, rankPeriod)
       let count = 0
-      for (let j = i - lookback + 1; j <= i; j++) {
+      // j in [i - lookback, i - 1] — exclude the current bar (j === i)
+      for (let j = i - lookback; j <= i - 1; j++) {
         if (j <= 0) continue
         const pastChange = dataList[j].close - dataList[j - 1].close
         if (pastChange <= currentChange) count++

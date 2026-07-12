@@ -45,10 +45,12 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
       to = to - to % (60 * 60 * 1000)
       from = to - count * period.multiplier * 60 * 60 * 1000
       break
-    case 'day':
-      to = to - to % (60 * 60 * 1000)
+    case 'day': {
+      const date = new Date(to)
+      to = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
       from = to - count * period.multiplier * 24 * 60 * 60 * 1000
       break
+    }
     case 'week': {
       const date = new Date(to)
       const day = date.getUTCDay()

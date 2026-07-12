@@ -11,7 +11,7 @@
  * 参数: P(lookback), X(ATR multiplier), Q(RMA period)
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcTR, calcRMA, calcHighest, calcLowest } from '../utils'
+import { calcTR, calcRMA, calcRMA_NaNAware, calcHighest, calcLowest } from '../utils'
 
 type ChandeKrollStopResult = {
   longStop: number
@@ -58,9 +58,9 @@ const chandeKrollStop: IndicatorTemplate = {
       }
     }
 
-    // RMA 平滑
-    const smoothedLong = calcRMA(rawLongStop.filter(v => !isNaN(v)).length === rawLongStop.length ? rawLongStop : rawLongStop.map(v => isNaN(v) ? 0 : v), q)
-    const smoothedShort = calcRMA(rawShortStop.filter(v => !isNaN(v)).length === rawShortStop.length ? rawShortStop : rawShortStop.map(v => isNaN(v) ? 0 : v), q)
+    // NaN-aware RMA 平滑：保留前导 NaN，避免把无效值替换为 0 污染累计。
+    const smoothedLong = calcRMA_NaNAware(rawLongStop, q)
+    const smoothedShort = calcRMA_NaNAware(rawShortStop, q)
 
     const result: ChandeKrollStopResult[] = []
     for (let i = 0; i < dataList.length; i++) {
