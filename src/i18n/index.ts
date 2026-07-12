@@ -1,25 +1,12 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
-
- * http://www.apache.org/licenses/LICENSE-2.0
-
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 const locales: Record<string, Record<string, string>> = {}
 const loadedLanguages = new Set<string>()
+const inflight = new Map<string, Promise<void>>()
 
 function parseIni(content: string): Record<string, string> {
   const result: Record<string, string> = {}
   for (const line of content.split('\n')) {
     const trimmed = line.trim()
-    if (!trimmed) continue
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith(';')) continue
     const eqIdx = trimmed.indexOf('=')
     if (eqIdx === -1) continue
     const key = trimmed.slice(0, eqIdx)
@@ -29,10 +16,7 @@ function parseIni(content: string): Record<string, string> {
   return result
 }
 
-export async function load(locale: string) {
-  if (loadedLanguages.has(locale)) {
-    return
-  }
+async function loadLocale(locale: string): Promise<void> {
   let content: { default: string }
   switch (locale) {
     case 'zh-CN':
@@ -52,6 +36,17 @@ export async function load(locale: string) {
   }
   locales[locale] = parseIni(content.default)
   loadedLanguages.add(locale)
+}
+
+export function load(locale: string): Promise<void> {
+  if (loadedLanguages.has(locale)) return Promise.resolve()
+  const existing = inflight.get(locale)
+  if (existing) return existing
+  const p = loadLocale(locale).finally(() => {
+    inflight.delete(locale)
+  })
+  inflight.set(locale, p)
+  return p
 }
 
 export default (key: string, locale: string) => {
