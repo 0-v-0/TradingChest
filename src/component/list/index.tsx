@@ -34,8 +34,11 @@ const List: ParentComponent<ListProps> = (props) => {
         <Empty />
       </Show>
       <Show when={props.children}>{props.children}</Show>
-      <Show when={!props.children}>
-        {props.dataSource?.map((data) => props.renderItem?.(data) ?? <li></li>)}
+      <Show when={!props.children && props.renderItem}>
+        {props.dataSource?.map((data) => props.renderItem?.(data))}
+      </Show>
+      <Show when={!props.children && !props.renderItem}>
+        {props.dataSource?.map(() => <li />)}
       </Show>
     </ul>
   )

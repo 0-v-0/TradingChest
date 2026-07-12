@@ -72,57 +72,30 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
     return getFavoriteTools()
   })
 
+  const optionLists = createMemo(() => ({
+    singleLine: createSingleLineOptions(props.locale),
+    moreLine: createMoreLineOptions(props.locale),
+    polygon: createPolygonOptions(props.locale),
+    fibonacci: createFibonacciOptions(props.locale),
+    wave: createWaveOptions(props.locale),
+    measurement: createMeasurementOptions(props.locale),
+    channel: createChannelOptions(props.locale),
+    annotation: createAnnotationOptions(props.locale),
+    position: createPositionOptions(props.locale),
+  }))
+
   const overlays = createMemo(() => {
+    const lists = optionLists()
     return [
-      {
-        key: 'singleLine',
-        icon: singleLineIcon(),
-        list: createSingleLineOptions(props.locale),
-        setter: setSingleLineIcon,
-      },
-      {
-        key: 'moreLine',
-        icon: moreLineIcon(),
-        list: createMoreLineOptions(props.locale),
-        setter: setMoreLineIcon,
-      },
-      {
-        key: 'polygon',
-        icon: polygonIcon(),
-        list: createPolygonOptions(props.locale),
-        setter: setPolygonIcon,
-      },
-      {
-        key: 'fibonacci',
-        icon: fibonacciIcon(),
-        list: createFibonacciOptions(props.locale),
-        setter: setFibonacciIcon,
-      },
-      { key: 'wave', icon: waveIcon(), list: createWaveOptions(props.locale), setter: setWaveIcon },
-      {
-        key: 'measurement',
-        icon: measurementIcon(),
-        list: createMeasurementOptions(props.locale),
-        setter: setMeasurementIcon,
-      },
-      {
-        key: 'channel',
-        icon: channelIcon(),
-        list: createChannelOptions(props.locale),
-        setter: setChannelIcon,
-      },
-      {
-        key: 'annotation',
-        icon: annotationIcon(),
-        list: createAnnotationOptions(props.locale),
-        setter: setAnnotationIcon,
-      },
-      {
-        key: 'position',
-        icon: positionIcon(),
-        list: createPositionOptions(props.locale),
-        setter: setPositionIcon,
-      },
+      { key: 'singleLine', icon: singleLineIcon(), list: lists.singleLine, setter: setSingleLineIcon },
+      { key: 'moreLine', icon: moreLineIcon(), list: lists.moreLine, setter: setMoreLineIcon },
+      { key: 'polygon', icon: polygonIcon(), list: lists.polygon, setter: setPolygonIcon },
+      { key: 'fibonacci', icon: fibonacciIcon(), list: lists.fibonacci, setter: setFibonacciIcon },
+      { key: 'wave', icon: waveIcon(), list: lists.wave, setter: setWaveIcon },
+      { key: 'measurement', icon: measurementIcon(), list: lists.measurement, setter: setMeasurementIcon },
+      { key: 'channel', icon: channelIcon(), list: lists.channel, setter: setChannelIcon },
+      { key: 'annotation', icon: annotationIcon(), list: lists.annotation, setter: setAnnotationIcon },
+      { key: 'position', icon: positionIcon(), list: lists.position, setter: setPositionIcon },
     ]
   })
 

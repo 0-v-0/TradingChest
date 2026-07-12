@@ -38,7 +38,6 @@ const defaultBindings: ShortcutBinding[] = [
   // 显示切换快捷键
   { combo: 'alt+c', action: 'toggle:crosshair', descriptionKey: 'shortcut_crosshair' },
   { combo: 'alt+g', action: 'toggle:grid', descriptionKey: 'shortcut_grid' },
-  { combo: 'alt+l', action: 'toggle:logScale', descriptionKey: 'shortcut_log_scale' },
 ]
 
 export default defaultBindings

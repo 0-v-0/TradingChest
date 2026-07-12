@@ -22,13 +22,21 @@ export interface SwitchProps {
 }
 
 const Switch: Component<SwitchProps> = (props) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      props.onChange?.()
+    }
+  }
   return (
     <div
       style={props.style}
       class={`klinecharts-pro-switch ${props.open ? 'turn-on' : 'turn-off'} ${props.class ?? ''}`}
-      onClick={(_e) => {
-        props.onChange?.()
-      }}
+      role="switch"
+      aria-checked={props.open}
+      tabIndex={0}
+      onClick={() => props.onChange?.()}
+      onKeyDown={handleKeyDown}
     >
       <i class="thumb" />
     </div>

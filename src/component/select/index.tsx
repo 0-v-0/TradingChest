@@ -70,12 +70,15 @@ const Select: Component<SelectProps> = (props) => {
               const v: JSX.Element =
                 (d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text'] ??
                 d.text
+              const isSelected = props.value === v
               return (
                 <li
                   role="option"
+                  aria-selected={isSelected}
+                  tabIndex={open() ? 0 : -1}
                   onClick={(e) => {
                     e.stopPropagation()
-                    if (props.value !== v) {
+                    if (!isSelected) {
                       props.onSelected?.(data)
                     }
                     setOpen(false)

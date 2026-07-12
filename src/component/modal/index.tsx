@@ -24,12 +24,21 @@ export interface ModalProps extends ParentProps {
 }
 
 const Modal: ParentComponent<ModalProps> = (props) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      e.stopPropagation()
+      props.onClose?.()
+    }
+  }
   return (
     <div
       class="klinecharts-pro-modal"
       role="dialog"
       aria-modal="true"
       aria-label={typeof props.title === 'string' ? props.title : undefined}
+      tabIndex={-1}
+      onKeyDown={handleKeyDown}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           props.onClose?.()

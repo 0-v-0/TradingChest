@@ -86,7 +86,10 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
             min={1}
             max={props.state.totalBars}
             value={props.state.position}
-            onInput={(e) => props.onPositionChange(parseInt((e.target as HTMLInputElement).value, 10))}
+            onInput={(e) => {
+              const n = parseInt((e.target as HTMLInputElement).value, 10)
+              if (Number.isFinite(n)) props.onPositionChange(n)
+            }}
           />
           <span>{props.state.totalBars}</span>
         </div>

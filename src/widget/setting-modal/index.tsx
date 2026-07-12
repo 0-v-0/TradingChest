@@ -13,7 +13,7 @@
  */
 
 import { utils, type Styles, type DeepPartial } from 'klinecharts'
-import { createEffect, For, createSignal, type Component } from 'solid-js'
+import { For, createSignal, createMemo, type Component } from 'solid-js'
 import { Modal, Select, Switch, ColorInput, type SelectDataSourceItem } from '../../component'
 import { getOptions, type SettingOption } from './data'
 import { deepSet } from '../../core/deepSet'
@@ -29,11 +29,7 @@ export interface SettingModalProps {
 
 const SettingModal: Component<SettingModalProps> = (props) => {
   const [styles, setStyles] = createSignal(props.currentStyles)
-  const [groups, setGroups] = createSignal(getOptions(props.locale))
-
-  createEffect(() => {
-    setGroups(getOptions(props.locale))
-  })
+  const groups = createMemo(() => getOptions(props.locale))
 
   const update = (option: SettingOption, newValue: unknown) => {
     const style = {} as Record<string, unknown>
@@ -41,14 +37,10 @@ const SettingModal: Component<SettingModalProps> = (props) => {
     const ss = utils.clone(styles())
     deepSet(ss as unknown as Record<string, unknown>, option.key, newValue)
     setStyles(ss)
-    setGroups(getOptions(props.locale))
     props.onChange(style)
   }
 
-  // 将所有分组中的选项展开为扁平数组，用于恢复默认
-  const flatOptions = () => {
-    return groups().flatMap((group) => group.options)
-  }
+  const flatOptions = createMemo(() => groups().flatMap((group) => group.options))
 
   return (
     <Modal
@@ -76,10 +68,11 @@ const SettingModal: Component<SettingModalProps> = (props) => {
                   const value = utils.formatValue(styles(), option.key)
                   switch (option.component) {
                     case 'select': {
+                      const selectValue = typeof value === 'string' ? t(value, props.locale) : String(value ?? '')
                       component = (
                         <Select
                           style={{ width: '120px' }}
-                          value={t(value as string, props.locale)}
+                          value={selectValue}
                           dataSource={option.dataSource}
                           onSelected={(data) => {
                             const newValue = (data as SelectDataSourceItem).key

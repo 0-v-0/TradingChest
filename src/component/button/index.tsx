@@ -26,6 +26,7 @@ export interface ButtonProps extends ParentProps {
 const Button: ParentComponent<ButtonProps> = (props) => {
   return (
     <button
+      type="button"
       style={props.style}
       class={`klinecharts-pro-button ${props.type ?? 'confirm'} ${props.class ?? ''}`}
       onClick={props.onClick}

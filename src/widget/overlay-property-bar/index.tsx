@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { createSignal, Show, type Component } from 'solid-js'
+import { createSignal, Show, onCleanup, type Component } from 'solid-js'
 import t from '../../i18n'
 
 export interface OverlayPropertyBarProps {
@@ -71,6 +71,13 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
   const [showWidthPicker, setShowWidthPicker] = createSignal(false)
   const [showStylePicker, setShowStylePicker] = createSignal(false)
   const [deleting, setDeleting] = createSignal(false)
+  let deleteTimer: ReturnType<typeof setTimeout> | null = null
+  onCleanup(() => {
+    if (deleteTimer !== null) {
+      clearTimeout(deleteTimer)
+      deleteTimer = null
+    }
+  })
 
   const closeAllPopups = () => {
     setShowColorPalette(false)
@@ -304,7 +311,10 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
           onClick={() => {
             if (deleting()) return
             setDeleting(true)
-            setTimeout(() => props.onDelete(), 150)
+            deleteTimer = setTimeout(() => {
+              deleteTimer = null
+              props.onDelete()
+            }, 150)
           }}
           title={t('delete_overlay', props.locale)}
         >
