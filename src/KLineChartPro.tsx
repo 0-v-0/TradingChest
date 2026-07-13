@@ -466,11 +466,38 @@ export default class KLineChartPro implements ChartPro {
 
     const compPercent = normalizeToPercent(compData)
     const compMap = new Map<number, number>()
-    // Sorted arrays for binary search fallback
-    const compTimestamps = compData.map((d) => d.timestamp)
     compData.forEach((d, i) => {
       compMap.set(d.timestamp, compPercent[i])
     })
+
+    // Pre-build a lookup from mainData timestamps to comp percent values,
+    // including nearest-timestamp resolution within 60s tolerance.
+    // This avoids O(n²) binary search inside calc().
+    const compTimestamps = compData.map((d) => d.timestamp)
+    const mainLookup = new Map<number, number | undefined>()
+    for (const d of mainData) {
+      let pct = compMap.get(d.timestamp)
+      if (pct === undefined) {
+        // Binary search for nearest timestamp
+        let lo = 0, hi = compTimestamps.length - 1
+        while (lo < hi) {
+          const mid = (lo + hi) >> 1
+          if (compTimestamps[mid] < d.timestamp) lo = mid + 1
+          else hi = mid
+        }
+        for (const idx of [lo, lo - 1]) {
+          if (
+            idx >= 0 &&
+            idx < compTimestamps.length &&
+            Math.abs(compTimestamps[idx] - d.timestamp) <= 60000
+          ) {
+            pct = compMap.get(compTimestamps[idx])
+            break
+          }
+        }
+      }
+      mainLookup.set(d.timestamp, pct)
+    }
 
     const indicatorName = `COMPARE_${symbol.ticker.replace(/[^A-Z0-9]/g, '_')}`
     registerIndicator({
@@ -479,29 +506,7 @@ export default class KLineChartPro implements ChartPro {
       figures: [{ key: 'pct', title: `${symbol.ticker}: `, type: 'line' }],
       calc: (dataList: KLineData[]) => {
         return dataList.map((d: KLineData) => {
-          let pct = compMap.get(d.timestamp)
-          if (pct === undefined) {
-            // Binary search for nearest timestamp within tolerance
-            let lo = 0,
-              hi = compTimestamps.length - 1
-            while (lo < hi) {
-              const mid = (lo + hi) >> 1
-              if (compTimestamps[mid] < d.timestamp) lo = mid + 1
-              else hi = mid
-            }
-            // Check lo and lo-1 for closest match within 60s
-            for (const idx of [lo, lo - 1]) {
-              if (
-                idx >= 0 &&
-                idx < compTimestamps.length &&
-                Math.abs(compTimestamps[idx] - d.timestamp) <= 60000
-              ) {
-                pct = compMap.get(compTimestamps[idx])
-                break
-              }
-            }
-          }
-          return { pct }
+          return { pct: mainLookup.get(d.timestamp) }
         })
       },
     })
