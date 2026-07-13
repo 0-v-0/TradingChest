@@ -23,13 +23,14 @@ const elderRay: IndicatorTemplate<ElderRayResult, number> = {
     { key: 'bearPower', title: 'Bear: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: ElderRayResult[] = []
+    const n = dataList.length
+    const result: ElderRayResult[] = new Array(n)
 
     // 内联计算收盘价的 EMA
     const k = 2 / (period + 1)
     let prevEma = NaN
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       let bullPower = NaN
       let bearPower = NaN
@@ -51,7 +52,7 @@ const elderRay: IndicatorTemplate<ElderRayResult, number> = {
         bullPower = kline.high - prevEma
         bearPower = kline.low - prevEma
       }
-      result.push({ bullPower, bearPower })
+      result[i] = { bullPower, bearPower }
     }
     return result
   },

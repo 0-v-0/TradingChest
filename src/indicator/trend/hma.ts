@@ -11,12 +11,13 @@ type HmaResult = { hma: number }
  * 计算 WMA 值序列
  */
 function calcWmaArray(values: number[], period: number): number[] {
+  const len = values.length
   const weightSum = period * (period + 1) / 2
-  const result: number[] = []
+  const result = new Array<number>(len)
 
-  for (let i = 0; i < values.length; i++) {
+  for (let i = 0; i < len; i++) {
     if (i < period - 1 || isNaN(values[i])) {
-      result.push(NaN)
+      result[i] = NaN
       continue
     }
     let sum = 0
@@ -29,7 +30,7 @@ function calcWmaArray(values: number[], period: number): number[] {
       }
       sum += val * (j + 1)
     }
-    result.push(valid ? sum / weightSum : NaN)
+    result[i] = valid ? sum / weightSum : NaN
   }
   return result
 }
@@ -40,6 +41,7 @@ const hma: IndicatorTemplate<HmaResult, number> = {
   calcParams: [9],
   figures: [{ key: 'hma', title: 'HMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const halfPeriod = Math.floor(period / 2)
     const sqrtPeriod = Math.round(Math.sqrt(period))
 
@@ -50,21 +52,23 @@ const hma: IndicatorTemplate<HmaResult, number> = {
     const wmaFull = calcWmaArray(closes, period)
 
     // 中间序列：2 * WMA(n/2) - WMA(n)
-    const diffSeries: number[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const diffSeries = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (!isNaN(wmaHalf[i]) && !isNaN(wmaFull[i])) {
-        diffSeries.push(2 * wmaHalf[i] - wmaFull[i])
+        diffSeries[i] = 2 * wmaHalf[i] - wmaFull[i]
       } else {
-        diffSeries.push(NaN)
+        diffSeries[i] = NaN
       }
     }
 
     // 对中间序列再做 WMA(sqrt(n))
     const hmaValues = calcWmaArray(diffSeries, sqrtPeriod)
 
-    return dataList.map((_, i) => ({
-      hma: hmaValues[i],
-    }))
+    const result: HmaResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      result[i] = { hma: hmaValues[i] }
+    }
+    return result
   },
 }
 

@@ -27,6 +27,7 @@ const chandeKrollStop: IndicatorTemplate<ChandeKrollStopResult, number> = {
     { key: 'shortStop', title: '空头止损: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [p, x, q] }) => {
+    const n = dataList.length
 
     const high = dataList.map(k => k.high)
     const low = dataList.map(k => k.low)
@@ -38,19 +39,19 @@ const chandeKrollStop: IndicatorTemplate<ChandeKrollStopResult, number> = {
     const atr = calcRMA(tr, p)
 
     // 计算初始止损线
-    const rawLongStop: number[] = []
-    const rawShortStop: number[] = []
+    const rawLongStop = new Array<number>(n)
+    const rawShortStop = new Array<number>(n)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const hh = highest[i]
       const ll = lowest[i]
       const a = atr[i]
       if (isNaN(hh) || isNaN(ll) || isNaN(a)) {
-        rawLongStop.push(NaN)
-        rawShortStop.push(NaN)
+        rawLongStop[i] = NaN
+        rawShortStop[i] = NaN
       } else {
-        rawLongStop.push(hh - x * a)
-        rawShortStop.push(ll + x * a)
+        rawLongStop[i] = hh - x * a
+        rawShortStop[i] = ll + x * a
       }
     }
 
@@ -58,16 +59,16 @@ const chandeKrollStop: IndicatorTemplate<ChandeKrollStopResult, number> = {
     const smoothedLong = calcRMA_NaNAware(rawLongStop, q)
     const smoothedShort = calcRMA_NaNAware(rawShortStop, q)
 
-    const result: ChandeKrollStopResult[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const result: ChandeKrollStopResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       // 需要 ATR 和 highest/lowest 都有效才输出
       if (isNaN(highest[i]) || isNaN(lowest[i]) || isNaN(atr[i])) {
-        result.push({ longStop: NaN, shortStop: NaN })
+        result[i] = { longStop: NaN, shortStop: NaN }
       } else {
-        result.push({
+        result[i] = {
           longStop: smoothedLong[i],
           shortStop: smoothedShort[i],
-        })
+        }
       }
     }
 

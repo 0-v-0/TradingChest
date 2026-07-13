@@ -18,7 +18,8 @@ const correlationCoefficient: IndicatorTemplate<CorrelationCoefficientResult, nu
     { key: 'r', title: 'Corr: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: { r: number }[] = []
+    const n = dataList.length
+    const result: { r: number }[] = new Array(n)
 
     let sumX = 0
     let sumY = 0
@@ -26,7 +27,7 @@ const correlationCoefficient: IndicatorTemplate<CorrelationCoefficientResult, nu
     let sumY2 = 0
     let sumXY = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = dataList[i].close
       const volume = dataList[i].volume ?? 0
       sumX += close
@@ -44,14 +45,14 @@ const correlationCoefficient: IndicatorTemplate<CorrelationCoefficientResult, nu
         sumXY -= outClose * outVol
       }
       if (i >= period - 1) {
-        const n = period
-        const numerator = n * sumXY - sumX * sumY
-        const denomX = n * sumX2 - sumX * sumX
-        const denomY = n * sumY2 - sumY * sumY
+        const w = period
+        const numerator = w * sumXY - sumX * sumY
+        const denomX = w * sumX2 - sumX * sumX
+        const denomY = w * sumY2 - sumY * sumY
         const denom = Math.sqrt(denomX * denomY)
-        result.push({ r: denom !== 0 ? numerator / denom : NaN })
+        result[i] = { r: denom !== 0 ? numerator / denom : NaN }
       } else {
-        result.push({ r: NaN })
+        result[i] = { r: NaN }
       }
     }
     return result

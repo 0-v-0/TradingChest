@@ -21,7 +21,7 @@ const twiggsMf: IndicatorTemplate<TwiggsMfResult, number> = {
   figures: [{ key: 'tmf', title: 'TMF: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
-    const result: TwiggsMfResult[] = []
+    const result: TwiggsMfResult[] = new Array(len)
 
     if (len === 0) return result
 
@@ -77,7 +77,7 @@ const twiggsMf: IndicatorTemplate<TwiggsMfResult, number> = {
         smoothVol = (smoothVol * (period - 1) + vol[i]) / period
         tmf = smoothVol === 0 ? 0 : smoothAd / smoothVol
       }
-      result.push({ tmf })
+      result[i] = { tmf }
     }
 
     return result

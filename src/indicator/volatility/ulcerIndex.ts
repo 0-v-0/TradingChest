@@ -18,7 +18,8 @@ const ulcerIndex: IndicatorTemplate<UlcerIndexResult, number> = {
   calcParams: [14],
   figures: [{ key: 'ui', title: 'UI: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: UlcerIndexResult[] = []
+    const n = dataList.length
+    const result: UlcerIndexResult[] = new Array(n)
 
     // Monotonic deque for rolling window max (same logic as calcHighest)
     const deque: number[] = []
@@ -26,7 +27,7 @@ const ulcerIndex: IndicatorTemplate<UlcerIndexResult, number> = {
     let sumClose = 0
     let sumCloseSq = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = dataList[i].close
       sumClose += close
       sumCloseSq += close * close
@@ -45,14 +46,14 @@ const ulcerIndex: IndicatorTemplate<UlcerIndexResult, number> = {
       if (i >= period - 1) {
         const H = dataList[deque[head]].close
         if (H <= 0) {
-          result.push({ ui: NaN })
+          result[i] = { ui: NaN }
         } else {
           const H2 = H * H
           const variance = sumCloseSq / H2 - 2 * sumClose / H + period
-          result.push({ ui: Math.sqrt(Math.max(variance / period, 0)) * 100 })
+          result[i] = { ui: Math.sqrt(Math.max(variance / period, 0)) * 100 }
         }
       } else {
-        result.push({ ui: NaN })
+        result[i] = { ui: NaN }
       }
     }
     return result

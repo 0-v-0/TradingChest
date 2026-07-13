@@ -14,15 +14,19 @@ const bollingerBandWidth: IndicatorTemplate<BollingerBandWidthResult, number> = 
   calcParams: [20, 2],
   figures: [{ key: 'bbw', title: 'BBW: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period, stddevMultiplier] }) => {
+    const n = dataList.length
     const closes = dataList.map(k => k.close)
     const smas = calcSMA(closes, period)
     const stddevs = calcStdDev(closes, period)
-    return smas.map((sma, i) => {
+    const result: BollingerBandWidthResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      const sma = smas[i]
       const stddev = stddevs[i]
-      if (Number.isNaN(sma) || Number.isNaN(stddev)) return { bbw: NaN }
+      if (Number.isNaN(sma) || Number.isNaN(stddev)) { result[i] = { bbw: NaN }; continue }
       const bbw = sma === 0 ? 0 : ((2 * stddevMultiplier * stddev) / sma) * 100
-      return { bbw }
-    })
+      result[i] = { bbw }
+    }
+    return result
   },
 }
 

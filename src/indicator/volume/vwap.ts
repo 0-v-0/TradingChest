@@ -13,13 +13,14 @@ const vwap: IndicatorTemplate<VwapResult, number> = {
   calcParams: [],
   figures: [{ key: 'vwap', title: 'VWAP: ', type: 'line' }],
   calc: (dataList: KLineData[]) => {
-    const result: VwapResult[] = []
+    const n = dataList.length
+    const result: VwapResult[] = new Array(n)
     // 累计典型价格 * 成交量
     let cumTpv = 0
     // 累计成交量
     let cumVol = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       const typicalPrice = (kline.high + kline.low + kline.close) / 3
       cumTpv += typicalPrice * (kline.volume ?? 0)
@@ -30,7 +31,7 @@ const vwap: IndicatorTemplate<VwapResult, number> = {
       if (cumVol !== 0) {
         vwap = cumTpv / cumVol
       }
-      result.push({ vwap })
+      result[i] = { vwap }
     }
     return result
   },

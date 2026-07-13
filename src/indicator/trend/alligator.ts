@@ -21,6 +21,7 @@ const alligator: IndicatorTemplate<AlligatorResult, number> = {
     { key: 'lips', title: '唇线: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [jawPeriod, teethPeriod, lipsPeriod] }) => {
+    const n = dataList.length
 
     // 偏移量
     const jawOffset = 8
@@ -33,21 +34,21 @@ const alligator: IndicatorTemplate<AlligatorResult, number> = {
      * 使用 (high + low) / 2 作为数据源（Median Price）
      */
     function calcSmma(period: number): number[] {
-      const values: number[] = []
+      const values = new Array<number>(n)
       let smma = 0
-      for (let i = 0; i < dataList.length; i++) {
+      for (let i = 0; i < n; i++) {
         const median = (dataList[i].high + dataList[i].low) / 2
         if (i < period) {
           smma += median
           if (i === period - 1) {
             smma = smma / period
-            values.push(smma)
+            values[i] = smma
           } else {
-            values.push(NaN)
+            values[i] = NaN
           }
         } else {
           smma = (smma * (period - 1) + median) / period
-          values.push(smma)
+          values[i] = smma
         }
       }
       return values
@@ -58,31 +59,31 @@ const alligator: IndicatorTemplate<AlligatorResult, number> = {
     const lipsSmma = calcSmma(lipsPeriod)
 
     // 应用偏移后组装结果
-    const totalLength = dataList.length + Math.max(jawOffset, teethOffset, lipsOffset)
-    const result: AlligatorResult[] = []
+    const totalLength = n + Math.max(jawOffset, teethOffset, lipsOffset)
+    const result: AlligatorResult[] = new Array(totalLength)
 
     for (let i = 0; i < totalLength; i++) {
       const item: Partial<AlligatorResult> = {}
 
       // 颚线：前移 jawOffset
       const jawSrcIdx = i - jawOffset
-      if (jawSrcIdx >= 0 && jawSrcIdx < dataList.length) {
+      if (jawSrcIdx >= 0 && jawSrcIdx < n) {
         item.jaw = jawSmma[jawSrcIdx]
       }
 
       // 齿线：前移 teethOffset
       const teethSrcIdx = i - teethOffset
-      if (teethSrcIdx >= 0 && teethSrcIdx < dataList.length) {
+      if (teethSrcIdx >= 0 && teethSrcIdx < n) {
         item.teeth = teethSmma[teethSrcIdx]
       }
 
       // 唇线：前移 lipsOffset
       const lipsSrcIdx = i - lipsOffset
-      if (lipsSrcIdx >= 0 && lipsSrcIdx < dataList.length) {
+      if (lipsSrcIdx >= 0 && lipsSrcIdx < n) {
         item.lips = lipsSmma[lipsSrcIdx]
       }
 
-      result.push(item as AlligatorResult)
+      result[i] = item as AlligatorResult
     }
 
     return result

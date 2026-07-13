@@ -18,23 +18,26 @@ const envelopes: IndicatorTemplate<EnvelopesResult, number> = {
     { key: 'lower', title: '下轨: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period, percentage] }) => {
+    const n = dataList.length
 
     const closes = dataList.map((d) => d.close)
     const smaValues = calcSMA(closes, period)
 
-    return dataList.map((_, i) => {
+    const result: EnvelopesResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       const sma = smaValues[i]
       if (isNaN(sma)) {
-        return { middle: NaN, upper: NaN, lower: NaN }
+        result[i] = { middle: NaN, upper: NaN, lower: NaN }
+      } else {
+        const offset = sma * percentage / 100
+        result[i] = {
+          middle: sma,
+          upper: sma + offset,
+          lower: sma - offset,
+        }
       }
-      const offset = sma * percentage / 100
-
-      return {
-        middle: sma,
-        upper: sma + offset,
-        lower: sma - offset,
-      }
-    })
+    }
+    return result
   },
 }
 

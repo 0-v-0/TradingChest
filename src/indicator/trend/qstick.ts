@@ -17,13 +17,16 @@ const qstick: IndicatorTemplate<QstickResult, number> = {
     { key: 'qstick', title: 'Qstick: ', type: 'bar' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
 
     const diff = dataList.map(k => k.close - k.open)
     const sma = calcSMA(diff, period)
 
-    return dataList.map((_, i) => ({
-      qstick: sma[i],
-    }))
+    const result: QstickResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      result[i] = { qstick: sma[i] }
+    }
+    return result
   },
 }
 

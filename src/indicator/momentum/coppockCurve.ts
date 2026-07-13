@@ -16,7 +16,7 @@ const coppockCurve: IndicatorTemplate<CoppockCurveResult, number> = {
   figures: [{ key: 'coppock', title: 'Coppock: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [roc1Period, roc2Period, wmaPeriod] }) => {
     const len = dataList.length
-    const result: CoppockCurveResult[] = []
+    const result: CoppockCurveResult[] = new Array(len)
 
     // 需要足够的历史数据来计算 ROC
     const maxRocPeriod = Math.max(roc1Period, roc2Period)
@@ -46,7 +46,7 @@ const coppockCurve: IndicatorTemplate<CoppockCurveResult, number> = {
     for (let i = 0; i < len; i++) {
       // 需要从 rocSum 中取连续 wmaPeriod 个有效值
       if (i < maxRocPeriod + wmaPeriod - 1) {
-        result.push({ coppock: NaN })
+        result[i] = { coppock: NaN }
         continue
       }
 
@@ -67,7 +67,7 @@ const coppockCurve: IndicatorTemplate<CoppockCurveResult, number> = {
       if (valid) {
         coppock = weighted / weightSum
       }
-      result.push({ coppock })
+      result[i] = { coppock }
     }
 
     return result

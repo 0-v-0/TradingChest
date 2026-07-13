@@ -21,19 +21,23 @@ const linearRegressionForecast: IndicatorTemplate<LinearRegressionForecastResult
     { key: 'slope', title: '斜率: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const closes: number[] = new Array(dataList.length)
-    for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
+    const n = dataList.length
+    const closes: number[] = new Array(n)
+    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
     const reg = calcLinReg(closes, period)
-    return dataList.map((_, i) => {
+    const result: LinearRegressionForecastResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       const r = reg[i]
       if (Number.isNaN(r.slope)) {
-        return { forecast: NaN, slope: NaN }
+        result[i] = { forecast: NaN, slope: NaN }
+      } else {
+        result[i] = {
+          forecast: r.intercept + r.slope * (period - 1),
+          slope: r.slope,
+        }
       }
-      return {
-        forecast: r.intercept + r.slope * (period - 1),
-        slope: r.slope,
-      }
-    })
+    }
+    return result
   },
 }
 

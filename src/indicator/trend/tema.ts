@@ -13,35 +13,39 @@ const tema: IndicatorTemplate<TemaResult, number> = {
   calcParams: [21],
   figures: [{ key: 'tema', title: 'TEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const k = 2 / (period + 1)
 
-    const ema1: number[] = []
-    const ema2: number[] = []
-    const ema3: number[] = []
+    const ema1 = new Array<number>(n)
+    const ema2 = new Array<number>(n)
+    const ema3 = new Array<number>(n)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = dataList[i].close
 
       if (i === 0) {
-        ema1.push(close)
-        ema2.push(close)
-        ema3.push(close)
+        ema1[i] = close
+        ema2[i] = close
+        ema3[i] = close
       } else {
         const e1 = close * k + ema1[i - 1] * (1 - k)
-        ema1.push(e1)
+        ema1[i] = e1
         const e2 = e1 * k + ema2[i - 1] * (1 - k)
-        ema2.push(e2)
+        ema2[i] = e2
         const e3 = e2 * k + ema3[i - 1] * (1 - k)
-        ema3.push(e3)
+        ema3[i] = e3
       }
     }
 
-    return dataList.map((_, i) => {
+    const result: TemaResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       if (i < period - 1) {
-        return { tema: NaN }
+        result[i] = { tema: NaN }
+      } else {
+        result[i] = { tema: 3 * ema1[i] - 3 * ema2[i] + ema3[i] }
       }
-      return { tema: 3 * ema1[i] - 3 * ema2[i] + ema3[i] }
-    })
+    }
+    return result
   },
 }
 

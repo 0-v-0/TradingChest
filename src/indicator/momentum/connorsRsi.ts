@@ -22,18 +22,19 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
     { key: 'crsi', title: 'CRSI: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [rsiPeriod, streakRsiPeriod, rankPeriod] }) => {
+    const n = dataList.length
 
     // 1. 计算标准 RSI
-    const gains: number[] = []
-    const losses: number[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const gains = new Array<number>(n)
+    const losses = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (i === 0) {
-        gains.push(0)
-        losses.push(0)
+        gains[0] = 0
+        losses[0] = 0
       } else {
         const diff = dataList[i].close - dataList[i - 1].close
-        gains.push(diff > 0 ? diff : 0)
-        losses.push(diff < 0 ? -diff : 0)
+        gains[i] = diff > 0 ? diff : 0
+        losses[i] = diff < 0 ? -diff : 0
       }
     }
 
@@ -41,9 +42,9 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
     const avgLoss = calcRMA(losses, rsiPeriod)
 
     // 2. 计算 Streak（连续涨跌天数）
-    const streaks: number[] = []
+    const streaks = new Array<number>(n)
     let streak = 0
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       if (i === 0) {
         streak = 0
       } else {
@@ -55,21 +56,21 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
         }
         // diff === 0 时 streak 不变
       }
-      streaks.push(streak)
+      streaks[i] = streak
     }
 
     // 对 streak 取绝对值后做 RSI 计算
     const absStreaks = streaks.map(v => Math.abs(v))
-    const streakGains: number[] = []
-    const streakLosses: number[] = []
-    for (let i = 0; i < absStreaks.length; i++) {
+    const streakGains = new Array<number>(n)
+    const streakLosses = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (i === 0) {
-        streakGains.push(0)
-        streakLosses.push(0)
+        streakGains[0] = 0
+        streakLosses[0] = 0
       } else {
         const diff = absStreaks[i] - absStreaks[i - 1]
-        streakGains.push(diff > 0 ? diff : 0)
-        streakLosses.push(diff < 0 ? -diff : 0)
+        streakGains[i] = diff > 0 ? diff : 0
+        streakLosses[i] = diff < 0 ? -diff : 0
       }
     }
 
@@ -79,10 +80,10 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
     // 3. 计算 Percent Rank
     // Current value should NOT be counted against itself — standard PercentRank
     // examines only the trailing window EXCLUDING the current value.
-    const percentRanks: number[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const percentRanks = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (i === 0) {
-        percentRanks.push(NaN)
+        percentRanks[0] = NaN
         continue
       }
       const currentChange = dataList[i].close - dataList[i - 1].close
@@ -94,16 +95,16 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
         const pastChange = dataList[j].close - dataList[j - 1].close
         if (pastChange <= currentChange) count++
       }
-      percentRanks.push(lookback > 0 ? (count / lookback) * 100 : NaN)
+      percentRanks[i] = lookback > 0 ? (count / lookback) * 100 : NaN
     }
 
     // 汇总
-    const result: ConnorsRsiResult[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const result: ConnorsRsiResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       const ag = avgGain[i]
       const al = avgLoss[i]
       if (isNaN(ag) || isNaN(al)) {
-        result.push({ crsi: NaN })
+        result[i] = { crsi: NaN }
         continue
       }
 
@@ -121,7 +122,7 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
       }
 
       // Percent Rank
-      result.push({ crsi: (rsi + streakRsi + percentRanks[i]) / 3 })
+      result[i] = { crsi: (rsi + streakRsi + percentRanks[i]) / 3 }
     }
 
     return result

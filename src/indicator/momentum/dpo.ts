@@ -23,7 +23,7 @@ const dpo: IndicatorTemplate<DpoResult, number> = {
   figures: [{ key: 'dpo', title: 'DPO: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
-    const result: DpoResult[] = []
+    const result: DpoResult[] = new Array(len)
 
     // 偏移量
     const shift = Math.floor(period / 2) + 1
@@ -48,7 +48,7 @@ const dpo: IndicatorTemplate<DpoResult, number> = {
       if (smaIdx >= 0 && !isNaN(sma[smaIdx])) {
         dpo = dataList[i].close - sma[smaIdx]
       }
-      result.push({ dpo })
+      result[i] = { dpo }
     }
 
     return result

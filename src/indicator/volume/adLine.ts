@@ -19,10 +19,11 @@ const adLine: IndicatorTemplate<AdLineResult, number> = {
   calcParams: [],
   figures: [{ key: 'ad', title: 'AD: ', type: 'line' }],
   calc: (dataList: KLineData[]) => {
-    const result: AdLineResult[] = []
+    const n = dataList.length
+    const result: AdLineResult[] = new Array(n)
     let ad = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       const hl = kline.high - kline.low
 
@@ -33,7 +34,7 @@ const adLine: IndicatorTemplate<AdLineResult, number> = {
       }
       // 最高价等于最低价时，资金流量为 0，AD 值不变
 
-      result.push({ ad })
+      result[i] = { ad }
     }
     return result
   },

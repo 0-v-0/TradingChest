@@ -16,19 +16,23 @@ const volumeOscillator: IndicatorTemplate<VolumeOscillatorResult, number> = {
     { key: 'vo', title: 'VO: ', type: 'bar' },
   ],
   calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod] }) => {
+    const n = dataList.length
+    const result: VolumeOscillatorResult[] = new Array(n)
 
     const volume = dataList.map(k => k.volume ?? 0)
     const fastEma = calcEMA(volume, fastPeriod)
     const slowEma = calcEMA(volume, slowPeriod)
 
-    return dataList.map((_, i) => {
+    for (let i = 0; i < n; i++) {
       const fast = fastEma[i]
       const slow = slowEma[i]
       if (isNaN(fast) || isNaN(slow)) {
-        return { vo: NaN }
+        result[i] = { vo: NaN }
+      } else {
+        result[i] = { vo: fast - slow }
       }
-      return { vo: fast - slow }
-    })
+    }
+    return result
   },
 }
 

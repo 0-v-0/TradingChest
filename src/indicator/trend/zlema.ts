@@ -14,13 +14,14 @@ const zlema: IndicatorTemplate<ZlemaResult, number> = {
   calcParams: [21],
   figures: [{ key: 'zlema', title: 'ZLEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const lag = Math.floor((period - 1) / 2)
     const k = 2 / (period + 1)
 
-    const result: ZlemaResult[] = []
+    const result: ZlemaResult[] = new Array(n)
     let prevZlema = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = dataList[i].close
       // 获取滞后补偿价格
       const lagClose = i >= lag ? dataList[i - lag].close : close
@@ -28,7 +29,7 @@ const zlema: IndicatorTemplate<ZlemaResult, number> = {
       const adjusted = close + (close - lagClose)
 
       prevZlema = i === 0 ? adjusted : adjusted * k + prevZlema * (1 - k)
-      result.push({ zlema: i >= period - 1 ? prevZlema : NaN })
+      result[i] = { zlema: i >= period - 1 ? prevZlema : NaN }
     }
 
     return result

@@ -23,7 +23,7 @@ const fisherTransform: IndicatorTemplate<FisherTransformResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
-    const result: FisherTransformResult[] = []
+    const result: FisherTransformResult[] = new Array(len)
 
     // 计算中间价序列
     const midPrices: number[] = Array(len)
@@ -87,7 +87,7 @@ const fisherTransform: IndicatorTemplate<FisherTransformResult, number> = {
         prevFisher = fisher
       }
 
-      result.push({ fisher, trigger })
+      result[i] = { fisher, trigger }
     }
 
     return result

@@ -18,22 +18,26 @@ const linearRegression: IndicatorTemplate<LinearRegressionResult, number> = {
     { key: 'lower', title: '下轨: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const closes: number[] = new Array(dataList.length)
-    for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
+    const n = dataList.length
+    const closes: number[] = new Array(n)
+    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
     const reg = calcLinReg(closes, period)
-    return dataList.map((_, i) => {
+    const result: LinearRegressionResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       const r = reg[i]
       if (Number.isNaN(r.slope)) {
-        return { value: NaN, upper: NaN, lower: NaN }
+        result[i] = { value: NaN, upper: NaN, lower: NaN }
+      } else {
+        const regValue = r.intercept + r.slope * (period - 1)
+        const band = 2 * r.stdResid
+        result[i] = {
+          value: regValue,
+          upper: regValue + band,
+          lower: regValue - band,
+        }
       }
-      const regValue = r.intercept + r.slope * (period - 1)
-      const band = 2 * r.stdResid
-      return {
-        value: regValue,
-        upper: regValue + band,
-        lower: regValue - band,
-      }
-    })
+    }
+    return result
   },
 }
 

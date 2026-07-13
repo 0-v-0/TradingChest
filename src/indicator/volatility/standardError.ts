@@ -16,16 +16,20 @@ const standardError: IndicatorTemplate<StandardErrorResult, number> = {
     { key: 'se', title: 'SE: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const closes: number[] = new Array(dataList.length)
-    for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
+    const n = dataList.length
+    const closes: number[] = new Array(n)
+    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
     const reg = calcLinReg(closes, period)
-    return dataList.map((_, i) => {
+    const result: StandardErrorResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       const r = reg[i]
       if (Number.isNaN(r.stdResid) || period <= 2) {
-        return { se: NaN }
+        result[i] = { se: NaN }
+      } else {
+        result[i] = { se: r.stdResid * Math.sqrt(period / (period - 2)) }
       }
-      return { se: r.stdResid * Math.sqrt(period / (period - 2)) }
-    })
+    }
+    return result
   },
 }
 

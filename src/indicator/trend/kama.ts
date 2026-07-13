@@ -13,17 +13,18 @@ const kama: IndicatorTemplate<KamaResult, number> = {
   calcParams: [10, 2, 30],
   figures: [{ key: 'kama', title: 'KAMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period, fastPeriod, slowPeriod] }) => {
+    const n = dataList.length
 
     // 快速与慢速平滑常数
     const fastSc = 2 / (fastPeriod + 1)
     const slowSc = 2 / (slowPeriod + 1)
 
-    const result: KamaResult[] = []
+    const result: KamaResult[] = new Array(n)
     let prevKama = 0
     let volSum = 0
     let prevClose = NaN
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = Number(dataList[i].close)
       let kama = NaN
 
@@ -51,7 +52,7 @@ const kama: IndicatorTemplate<KamaResult, number> = {
         prevKama = prevKama + sc * (close - prevKama)
         kama = prevKama
       }
-      result.push({ kama })
+      result[i] = { kama }
     }
 
     return result

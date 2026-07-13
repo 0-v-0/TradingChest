@@ -27,7 +27,7 @@ const ehlersLeadingIndicator: IndicatorTemplate<EhlersLeadingResult, number> = {
     { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period, k] }) => {
-
+    const n = dataList.length
     const close = dataList.map(d => d.close)
 
     // 2-pole Butterworth 高通滤波
@@ -38,15 +38,14 @@ const ehlersLeadingIndicator: IndicatorTemplate<EhlersLeadingResult, number> = {
     const c2 = (1 + alpha) / 2
     const c3 = alpha
 
-    const hp: number[] = []
-    for (let i = 0; i < close.length; i++) {
+    const hp = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (i < 2) {
-        hp.push(0)
+        hp[i] = 0
       } else {
-        hp.push(
+        hp[i] =
           c1 * close[i] - 2 * c1 * close[i - 1] + c2 * close[i - 2]
-          + c3 * 2 * (hp[i - 1] ?? 0) - c3 * c3 * (hp[i - 2] ?? 0)
-        )
+          + c3 * 2 * hp[i - 1] - c3 * c3 * hp[i - 2]
       }
     }
 
@@ -54,24 +53,23 @@ const ehlersLeadingIndicator: IndicatorTemplate<EhlersLeadingResult, number> = {
     const smooth = calcEMA(hp, Math.max(Math.round(period / 2), 2))
 
     // 计算导数（一阶差分）
-    const derivative: number[] = []
-    for (let i = 0; i < close.length; i++) {
-      derivative.push(
+    const derivative = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      derivative[i] =
         (i === 0 || isNaN(smooth[i]) || isNaN(smooth[i - 1])) ? NaN :
           smooth[i] - smooth[i - 1]
-      )
     }
 
     // Lead = Smooth + K * Derivative
-    const result: EhlersLeadingResult[] = []
-    for (let i = 0; i < close.length; i++) {
+    const result: EhlersLeadingResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       const s = smooth[i]
       const d = derivative[i]
       if (isNaN(s)) {
-        result.push({ lead: NaN, signal: NaN })
+        result[i] = { lead: NaN, signal: NaN }
       } else {
         const lead = !isNaN(d) ? s + k * d : s
-        result.push({ lead, signal: s })
+        result[i] = { lead, signal: s }
       }
     }
 

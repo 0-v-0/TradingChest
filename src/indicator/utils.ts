@@ -11,20 +11,21 @@
  * SMA = 区间内数据的算术平均值
  */
 export function calcSMA(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   // 维护滑动窗口的累加和，避免重复求和
   let windowSum = 0
-  for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < n; i++) {
     windowSum += data[i]
-    let val = NaN
     if (i >= period - 1) {
       if (i >= period) {
         // 滑出窗口最旧的一个值
         windowSum -= data[i - period]
       }
-      val = windowSum / period
+      result[i] = windowSum / period
+    } else {
+      result[i] = NaN
     }
-    result.push(val)
   }
   return result
 }
@@ -35,12 +36,12 @@ export function calcSMA(data: number[], period: number): number[] {
  * 首个有效值使用 SMA 作为种子
  */
 export function calcEMA(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   const k = 2 / (period + 1)
   let prevEma = NaN
 
-  for (let i = 0; i < data.length; i++) {
-    let val = NaN
+  for (let i = 0; i < n; i++) {
     if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为 EMA 种子值
       let sum = 0
@@ -48,13 +49,14 @@ export function calcEMA(data: number[], period: number): number[] {
         sum += data[j]
       }
       prevEma = sum / period
-      val = prevEma
+      result[i] = prevEma
     } else if (i >= period) {
       // EMA = 前值 + k * (当前值 - 前值)
       prevEma = data[i] * k + prevEma * (1 - k)
-      val = prevEma
+      result[i] = prevEma
+    } else {
+      result[i] = NaN
     }
-    result.push(val)
   }
   return result
 }
@@ -65,21 +67,22 @@ export function calcEMA(data: number[], period: number): number[] {
  * WMA = Σ(data[i] * weight[i]) / Σ(weight)
  */
 export function calcWMA(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   // 权重总和 = period * (period + 1) / 2
   const weightSum = (period * (period + 1)) / 2
 
-  for (let i = 0; i < data.length; i++) {
-    let val = NaN
+  for (let i = 0; i < n; i++) {
     if (i >= period - 1) {
       let weighted = 0
       for (let j = 0; j < period; j++) {
         // 窗口内第 j 个元素的权重为 j + 1（越新权重越大）
         weighted += data[i - period + 1 + j] * (j + 1)
       }
-      val = weighted / weightSum
+      result[i] = weighted / weightSum
+    } else {
+      result[i] = NaN
     }
-    result.push(val)
   }
   return result
 }
@@ -90,20 +93,19 @@ export function calcWMA(data: number[], period: number): number[] {
  * 第一根 K 线无前收盘价，TR = high - low
  */
 export function calcTR(high: number[], low: number[], close: number[]): number[] {
-  const result: number[] = []
-  for (let i = 0; i < high.length; i++) {
-    let val: number
+  const n = high.length
+  const result = new Array<number>(n)
+  for (let i = 0; i < n; i++) {
     if (i === 0) {
       // 第一根 K 线没有前一根收盘价，直接用 high - low
-      val = high[i] - low[i]
+      result[i] = high[i] - low[i]
     } else {
       const prevClose = close[i - 1]
       const hl = high[i] - low[i]
       const hc = Math.abs(high[i] - prevClose)
       const lc = Math.abs(low[i] - prevClose)
-      val = Math.max(hl, hc, lc)
+      result[i] = Math.max(hl, hc, lc)
     }
-    result.push(val)
   }
   return result
 }
@@ -117,10 +119,11 @@ export function calcTR(high: number[], low: number[], close: number[]): number[]
  * 这与原本逐条重算的 O(n*period) 算法数值等价但更快。
  */
 export function calcStdDev(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   let sum = 0
   let sumSq = 0
-  for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < n; i++) {
     const v = data[i]
     sum += v
     sumSq += v * v
@@ -132,9 +135,9 @@ export function calcStdDev(data: number[], period: number): number[] {
     if (i >= period - 1) {
       const mean = sum / period
       const variance = sumSq / period - mean * mean
-      result.push(Math.sqrt(Math.max(variance, 0)))
+      result[i] = Math.sqrt(Math.max(variance, 0))
     } else {
-      result.push(NaN)
+      result[i] = NaN
     }
   }
   return result
@@ -195,11 +198,11 @@ export function calcLowest(data: number[], period: number): number[] {
  * 首个有效值使用 SMA 作为种子
  */
 export function calcRMA(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   let prevRma = NaN
 
-  for (let i = 0; i < data.length; i++) {
-    let val = NaN
+  for (let i = 0; i < n; i++) {
     if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为种子
       let sum = 0
@@ -207,13 +210,14 @@ export function calcRMA(data: number[], period: number): number[] {
         sum += data[j]
       }
       prevRma = sum / period
-      val = prevRma
+      result[i] = prevRma
     } else if (i >= period) {
       // Wilder 递归公式
       prevRma = (prevRma * (period - 1) + data[i]) / period
-      val = prevRma
+      result[i] = prevRma
+    } else {
+      result[i] = NaN
     }
-    result.push(val)
   }
   return result
 }
@@ -225,21 +229,22 @@ export function calcRMA(data: number[], period: number): number[] {
  * 避免 NaN→0 替换污染累计和。
  */
 export function calcRMA_NaNAware(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   let prevRma = NaN
   let winSum = 0
   let winCount = 0
 
-  for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < n; i++) {
     const v = data[i]
     if (Number.isNaN(v)) {
-      result.push(NaN)
+      result[i] = NaN
       continue
     }
     winSum += v
     winCount++
     if (winCount < period) {
-      result.push(NaN)
+      result[i] = NaN
       continue
     }
     if (winCount === period) {
@@ -248,7 +253,7 @@ export function calcRMA_NaNAware(data: number[], period: number): number[] {
     } else {
       prevRma = (prevRma * (period - 1) + v) / period
     }
-    result.push(prevRma)
+    result[i] = prevRma
   }
   return result
 }
@@ -258,19 +263,20 @@ export function calcRMA_NaNAware(data: number[], period: number): number[] {
  * 返回过去 period 个数据点的累加和
  */
 export function calcSum(data: number[], period: number): number[] {
-  const result: number[] = []
+  const n = data.length
+  const result = new Array<number>(n)
   let windowSum = 0
 
-  for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < n; i++) {
     windowSum += data[i]
-    let val = NaN
     if (i >= period - 1) {
       if (i >= period) {
         windowSum -= data[i - period]
       }
-      val = windowSum
+      result[i] = windowSum
+    } else {
+      result[i] = NaN
     }
-    result.push(val)
   }
   return result
 }
@@ -281,9 +287,12 @@ export function calcSum(data: number[], period: number): number[] {
  * 第一个元素无前值，返回 NaN
  */
 export function calcChange(data: number[]): number[] {
-  const result: number[] = []
-  for (let i = 0; i < data.length; i++) {
-    result.push(i === 0 ? NaN : data[i] - data[i - 1])
+  const n = data.length
+  if (n === 0) return []
+  const result = new Array<number>(n)
+  result[0] = NaN
+  for (let i = 1; i < n; i++) {
+    result[i] = data[i] - data[i - 1]
   }
   return result
 }
@@ -294,9 +303,12 @@ export function calcChange(data: number[]): number[] {
  * 第一个元素返回 NaN
  */
 export function calcGain(data: number[]): number[] {
-  const result: number[] = []
-  for (let i = 0; i < data.length; i++) {
-    result.push(i === 0 ? NaN : Math.max(data[i] - data[i - 1], 0))
+  const n = data.length
+  if (n === 0) return []
+  const result = new Array<number>(n)
+  result[0] = NaN
+  for (let i = 1; i < n; i++) {
+    result[i] = Math.max(data[i] - data[i - 1], 0)
   }
   return result
 }
@@ -307,9 +319,12 @@ export function calcGain(data: number[]): number[] {
  * 第一个元素返回 NaN
  */
 export function calcLoss(data: number[]): number[] {
-  const result: number[] = []
-  for (let i = 0; i < data.length; i++) {
-    result.push(i === 0 ? NaN : Math.max(-(data[i] - data[i - 1]), 0))
+  const n = data.length
+  if (n === 0) return []
+  const result = new Array<number>(n)
+  result[0] = NaN
+  for (let i = 1; i < n; i++) {
+    result[i] = Math.max(-(data[i] - data[i - 1]), 0)
   }
   return result
 }
@@ -337,9 +352,9 @@ export interface LinRegResult {
 
 export function calcLinReg(data: number[], period: number): LinRegResult[] {
   const n = data.length
-  const result: LinRegResult[] = []
+  const result: LinRegResult[] = new Array(n)
   if (period < 2) {
-    for (let i = 0; i < n; i++) result.push({ slope: NaN, intercept: NaN, stdResid: NaN })
+    for (let i = 0; i < n; i++) result[i] = { slope: NaN, intercept: NaN, stdResid: NaN }
     return result
   }
   const sumX = (period * (period - 1)) / 2
@@ -373,9 +388,9 @@ export function calcLinReg(data: number[], period: number): LinRegResult[] {
         sumY2 / period - yMean * yMean -
         slope * slope * (sumX2 / period - xMean * xMean)
       const stdResid = Math.sqrt(Math.max(variance, 0))
-      result.push({ slope, intercept, stdResid })
+      result[i] = { slope, intercept, stdResid }
     } else {
-      result.push({ slope: NaN, intercept: NaN, stdResid: NaN })
+      result[i] = { slope: NaN, intercept: NaN, stdResid: NaN }
     }
   }
   return result

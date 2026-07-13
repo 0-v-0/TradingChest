@@ -25,19 +25,20 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
     { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod, signalPeriod] }) => {
-    const result: KlingerOscillatorResult[] = []
+    const n = dataList.length
+    const result: KlingerOscillatorResult[] = new Array(n)
 
-    if (dataList.length === 0) {
+    if (n === 0) {
       return result
     }
 
     // 第一步：计算成交量力度数组
-    const vf: number[] = []
+    const vf = new Array<number>(n)
     let prevTrend = 0
     let prevDm = 0
     let cm = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       // 使用 HLC 之和作为典型价格的代理（单调性相同）
       const hlc = kline.high + kline.low + kline.close
@@ -48,7 +49,7 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
         prevTrend = 0
         prevDm = dm
         cm = dm
-        vf.push(0)
+        vf[0] = 0
       } else {
         const prevHlc = dataList[i - 1].high + dataList[i - 1].low + dataList[i - 1].close
         const trend = hlc > prevHlc ? 1 : -1
@@ -62,10 +63,10 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
 
         // 计算成交量力度
         if (cm === 0) {
-          vf.push(0)
+          vf[i] = 0
         } else {
           const vol = kline.volume ?? 0
-          vf.push(vol * Math.abs(2 * (dm / cm) - 1) * trend * 100)
+          vf[i] = vol * Math.abs(2 * (dm / cm) - 1) * trend * 100
         }
 
         prevTrend = trend
@@ -79,25 +80,26 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
 
     // 第三步：计算 KVO 和信号线
     // 在快慢 EMA 都未成熟之前，输出 NaN 而非 0，避免污染下游信号线。
-    const kvoValues: number[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const kvoValues = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) {
-        kvoValues.push(fastEma[i] - slowEma[i])
+        kvoValues[i] = fastEma[i] - slowEma[i]
       } else {
-        kvoValues.push(NaN)
+        kvoValues[i] = NaN
       }
     }
 
     // 信号线：对 KVO 值做 EMA（同样要求快慢 EMA 都已成熟）
     // 信号线的起点需要等 KVO 有效后才开始计算
     const slowStart = slowPeriod - 1
-    const validKvo: number[] = []
-    for (let i = slowStart; i < kvoValues.length; i++) {
-      validKvo.push(kvoValues[i])
+    const validLen = n - slowStart
+    const validKvo = new Array<number>(validLen)
+    for (let i = 0; i < validLen; i++) {
+      validKvo[i] = kvoValues[i + slowStart]
     }
     const signalEma = calcEmaArray(validKvo, signalPeriod)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       let kvo = NaN
       let signal = NaN
       if (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) {
@@ -106,7 +108,7 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
         signal =
           signalIdx >= 0 && signalIdx < signalEma.length ? signalEma[signalIdx] : NaN
       }
-      result.push({ kvo, signal })
+      result[i] = { kvo, signal }
     }
     return result
   },
@@ -118,11 +120,12 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
  * 首个有效值使用 SMA 作为种子
  */
 function calcEmaArray(data: number[], period: number): number[] {
-  const result: number[] = []
+  const len = data.length
+  const result = new Array<number>(len)
   const k = 2 / (period + 1)
   let prevEma = NaN
 
-  for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < len; i++) {
     let val = NaN
     if (i === period - 1) {
       // 用前 period 个数据的 SMA 作为 EMA 种子值
@@ -136,7 +139,7 @@ function calcEmaArray(data: number[], period: number): number[] {
       prevEma = data[i] * k + prevEma * (1 - k)
       val = prevEma
     }
-    result.push(val)
+    result[i] = val
   }
   return result
 }

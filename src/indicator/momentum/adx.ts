@@ -30,7 +30,7 @@ const adx: IndicatorTemplate<AdxResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
-    const result: AdxResult[] = []
+    const result: AdxResult[] = new Array(len)
 
     if (len === 0) return result
 
@@ -123,7 +123,7 @@ const adx: IndicatorTemplate<AdxResult, number> = {
           adx = adxSmooth
         }
       }
-      result.push({ adx, plusDi, minusDi })
+      result[i] = { adx, plusDi, minusDi }
     }
 
     return result

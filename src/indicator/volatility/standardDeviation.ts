@@ -13,9 +13,14 @@ const standardDeviation: IndicatorTemplate<StandardDeviationResult, number> = {
   calcParams: [20],
   figures: [{ key: 'stddev', title: 'STDDEV: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const closes = dataList.map(k => k.close)
     const stddevs = calcStdDev(closes, period)
-    return stddevs.map(stddev => ({ stddev }))
+    const result: StandardDeviationResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      result[i] = { stddev: stddevs[i] }
+    }
+    return result
   },
 }
 

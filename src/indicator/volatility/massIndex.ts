@@ -13,44 +13,45 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
   calcParams: [9, 25],
   figures: [{ key: 'mi', title: 'MI: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [emaPeriod, sumPeriod] }) => {
-    const result: MassIndexResult[] = []
+    const n = dataList.length
+    const result: MassIndexResult[] = new Array(n)
 
     // EMA 平滑系数
     const emaK = 2 / (emaPeriod + 1)
 
     // 第一步：计算 (High - Low) 的单次 EMA
-    const singleEma: number[] = []
+    const singleEma = new Array<number>(n)
     let singleEmaVal = 0
     let singleCumSum = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const hl = dataList[i].high - dataList[i].low
 
       if (i < emaPeriod) {
         singleCumSum += hl
         if (i === emaPeriod - 1) {
           singleEmaVal = singleCumSum / emaPeriod
-          singleEma.push(singleEmaVal)
+          singleEma[i] = singleEmaVal
         } else {
-          singleEma.push(0)
+          singleEma[i] = 0
         }
       } else {
         singleEmaVal = hl * emaK + singleEmaVal * (1 - emaK)
-        singleEma.push(singleEmaVal)
+        singleEma[i] = singleEmaVal
       }
     }
 
     // 第二步：计算单次 EMA 的二次 EMA
-    const doubleEma: number[] = []
+    const doubleEma = new Array<number>(n)
     let doubleEmaVal = 0
     let doubleCumSum = 0
     // 二次 EMA 从 singleEma 有效的位置开始（即 index = emaPeriod - 1）
     let doubleCount = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       if (i < emaPeriod - 1) {
         // 单次 EMA 尚未有效
-        doubleEma.push(0)
+        doubleEma[i] = 0
         continue
       }
 
@@ -59,13 +60,13 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
         doubleCount++
         if (doubleCount === emaPeriod) {
           doubleEmaVal = doubleCumSum / emaPeriod
-          doubleEma.push(doubleEmaVal)
+          doubleEma[i] = doubleEmaVal
         } else {
-          doubleEma.push(0)
+          doubleEma[i] = 0
         }
       } else {
         doubleEmaVal = singleEma[i] * emaK + doubleEmaVal * (1 - emaK)
-        doubleEma.push(doubleEmaVal)
+        doubleEma[i] = doubleEmaVal
       }
     }
 
@@ -75,16 +76,16 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
     const ratioStartIdx = 2 * (emaPeriod - 1)
 
     // 比值序列
-    const ratios: number[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const ratios = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (i < ratioStartIdx) {
         // 未成熟：使用 NaN，避免污染后续 rolling sum
-        ratios.push(NaN)
+        ratios[i] = NaN
       } else if (doubleEma[i] === 0) {
         // 二次 EMA 为 0，无有效比值
-        ratios.push(NaN)
+        ratios[i] = NaN
       } else {
-        ratios.push(singleEma[i] / doubleEma[i])
+        ratios[i] = singleEma[i] / doubleEma[i]
       }
     }
 
@@ -92,7 +93,7 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
     // 仅统计窗口内有效比值（NaN 跳过），窗口需有 sumPeriod 个有效值
     const miStartIdx = ratioStartIdx + sumPeriod - 1
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       let mi = NaN
       if (i >= miStartIdx) {
         let sum = 0
@@ -108,7 +109,7 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
           mi = sum
         }
       }
-      result.push({ mi })
+      result[i] = { mi }
     }
 
     return result

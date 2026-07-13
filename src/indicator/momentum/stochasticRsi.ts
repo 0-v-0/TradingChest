@@ -88,44 +88,48 @@ const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
     const dLine: number[] = Array(len).fill(NaN)
 
     // K 线：对 stochRsi 做滑动窗口平均（O(n)，无需重新求和修正浮点漂移）
-    const kBuf: number[] = []
+    const kBuf = new Array<number>(len)
+    let kBufLen = 0
     let kSum = 0
     for (let i = 0; i < len; i++) {
       if (!isNaN(stochRsi[i])) {
-        kBuf.push(stochRsi[i])
+        kBuf[kBufLen] = stochRsi[i]
+        kBufLen++
         kSum += stochRsi[i]
-        if (kBuf.length > kSmooth) {
-          kSum -= kBuf[kBuf.length - kSmooth - 1]
+        if (kBufLen > kSmooth) {
+          kSum -= kBuf[kBufLen - kSmooth - 1]
         }
-        if (kBuf.length >= kSmooth) {
+        if (kBufLen >= kSmooth) {
           kLine[i] = kSum / kSmooth
         }
       }
     }
 
     // D 线：对 K 线做滑动窗口平均（O(n)，移入/移出窗口同时增减和）
-    const dBuf: number[] = []
+    const dBuf = new Array<number>(len)
+    let dBufLen = 0
     let dSum = 0
     for (let i = 0; i < len; i++) {
       if (!isNaN(kLine[i])) {
-        dBuf.push(kLine[i])
+        dBuf[dBufLen] = kLine[i]
+        dBufLen++
         dSum += kLine[i]
-        if (dBuf.length > dSmooth) {
-          dSum -= dBuf[dBuf.length - dSmooth - 1]
+        if (dBufLen > dSmooth) {
+          dSum -= dBuf[dBufLen - dSmooth - 1]
         }
-        if (dBuf.length >= dSmooth) {
+        if (dBufLen >= dSmooth) {
           dLine[i] = dSum / dSmooth
         }
       }
     }
 
     // ---- 组装输出 ----
-    const result: StochasticRsiResult[] = []
+    const result: StochasticRsiResult[] = new Array(len)
     for (let i = 0; i < len; i++) {
-      result.push({
+      result[i] = {
         k: kLine[i],
         d: dLine[i],
-      })
+      }
     }
     return result
   },

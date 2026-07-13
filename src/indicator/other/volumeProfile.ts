@@ -94,11 +94,15 @@ const volumeProfile: IndicatorTemplate<VolumeProfileResult, number> = {
   series: 'price',
   figures: [{ key: 'vp', title: 'VP: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [numBins = DEFAULT_BINS] }) => {
+    const n = dataList.length
     const result = calcVolumeProfile(dataList, numBins)
-    return Array(dataList.length).fill({ vp: NaN }).map((v, i) => {
-      if (i === 0) return { vp: result.bins[result.pocIndex]?.priceLow ?? 0, __vp: result }
-      return v
-    })
+    const arr: VolumeProfileResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      arr[i] = i === 0
+        ? { vp: result.bins[result.pocIndex]?.priceLow ?? 0, __vp: result }
+        : { vp: NaN }
+    }
+    return arr
   },
   draw: ({ ctx, indicator, bounding, yAxis }) => {
     const result = indicator.result?.[0]

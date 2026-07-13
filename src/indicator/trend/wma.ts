@@ -13,20 +13,24 @@ const wma: IndicatorTemplate<WmaResult, number> = {
   calcParams: [9],
   figures: [{ key: 'wma', title: 'WMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     // 权重之和 = n * (n + 1) / 2
     const weightSum = (period * (period + 1)) / 2
 
-    return dataList.map((_, i) => {
+    const result: WmaResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       if (i < period - 1) {
-        return { wma: NaN }
+        result[i] = { wma: NaN }
+      } else {
+        let sum = 0
+        for (let j = 0; j < period; j++) {
+          // 权重从 1（最旧）到 period（最新）
+          sum += dataList[i - period + 1 + j].close * (j + 1)
+        }
+        result[i] = { wma: sum / weightSum }
       }
-      let sum = 0
-      for (let j = 0; j < period; j++) {
-        // 权重从 1（最旧）到 period（最新）
-        sum += dataList[i - period + 1 + j].close * (j + 1)
-      }
-      return { wma: sum / weightSum }
-    })
+    }
+    return result
   },
 }
 

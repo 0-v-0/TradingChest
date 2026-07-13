@@ -25,7 +25,7 @@ const ppo: IndicatorTemplate<PpoResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod, signalPeriod] }) => {
     const len = dataList.length
-    const result: PpoResult[] = []
+    const result: PpoResult[] = new Array(len)
 
     // ---- 计算快速 EMA ----
     const emaFast: number[] = Array(len).fill(NaN)
@@ -100,11 +100,11 @@ const ppo: IndicatorTemplate<PpoResult, number> = {
     for (let i = 0; i < len; i++) {
       const p = ppoLine[i]
       const s = signalLine[i]
-      result.push({
+      result[i] = {
         ppo: p,
         signal: s,
         histogram: !isNaN(p) && !isNaN(s) ? p - s : NaN,
-      })
+      }
     }
 
     return result

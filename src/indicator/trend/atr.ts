@@ -12,10 +12,11 @@ const atr: IndicatorTemplate<AtrResult, number> = {
   calcParams: [14],
   figures: [{ key: 'atr', title: 'ATR: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: AtrResult[] = []
+    const n = dataList.length
+    const result: AtrResult[] = new Array(n)
     let prevAtr = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       // 计算真实波幅（True Range）
       let tr: number
@@ -43,7 +44,7 @@ const atr: IndicatorTemplate<AtrResult, number> = {
         prevAtr = (prevAtr * (period - 1) + tr) / period
         atr = prevAtr
       }
-      result.push({ atr })
+      result[i] = { atr }
     }
     return result
   },

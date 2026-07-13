@@ -12,17 +12,18 @@ const chaikinVolatility: IndicatorTemplate<ChaikinVolatilityResult, number> = {
   calcParams: [10],
   figures: [{ key: 'cv', title: 'CV: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: ChaikinVolatilityResult[] = []
+    const n = dataList.length
+    const result: ChaikinVolatilityResult[] = new Array(n)
 
     // EMA 平滑系数
     const emaK = 2 / (period + 1)
 
     // 第一步：计算 (High - Low) 的 EMA 序列
-    const hlEma: number[] = []
+    const hlEma = new Array<number>(n)
     let emaValue = 0
     let cumSum = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const hl = dataList[i].high - dataList[i].low
 
       if (i < period) {
@@ -31,21 +32,21 @@ const chaikinVolatility: IndicatorTemplate<ChaikinVolatilityResult, number> = {
         if (i === period - 1) {
           // 首个 EMA 值为 SMA
           emaValue = cumSum / period
-          hlEma.push(emaValue)
+          hlEma[i] = emaValue
         } else {
-          hlEma.push(0)
+          hlEma[i] = 0
         }
       } else {
         // EMA 递推
         emaValue = hl * emaK + emaValue * (1 - emaK)
-        hlEma.push(emaValue)
+        hlEma[i] = emaValue
       }
     }
 
     // 第二步：计算 EMA 的变化率（ROC）
     // ROC = (当前 EMA - period 前的 EMA) / period 前的 EMA * 100
     // 需要至少 2 * period - 1 个数据点
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       // EMA 从 index = period - 1 开始有效
       // ROC 需要 period 前的 EMA 也有效，即 i - period >= period - 1
       // 即 i >= 2 * period - 1
@@ -56,7 +57,7 @@ const chaikinVolatility: IndicatorTemplate<ChaikinVolatilityResult, number> = {
         // 防止除零
         cv = prevEma === 0 ? 0 : ((currentEma - prevEma) / prevEma) * 100
       }
-      result.push({ cv })
+      result[i] = { cv }
     }
 
     return result

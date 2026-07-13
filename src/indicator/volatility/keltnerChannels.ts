@@ -20,7 +20,8 @@ const keltnerChannels: IndicatorTemplate<KeltnerChannelsResult, number> = {
     { key: 'lower', title: 'LOW: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [emaPeriod, atrMultiplier] }) => {
-    const result: KeltnerChannelsResult[] = []
+    const n = dataList.length
+    const result: KeltnerChannelsResult[] = new Array(n)
 
     // EMA 平滑系数
     const emaK = 2 / (emaPeriod + 1)
@@ -31,7 +32,7 @@ const keltnerChannels: IndicatorTemplate<KeltnerChannelsResult, number> = {
     let emaCumSum = 0
     let atrCumSum = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
 
       // 计算真实波幅（True Range）
@@ -74,7 +75,7 @@ const keltnerChannels: IndicatorTemplate<KeltnerChannelsResult, number> = {
         upper = emaValue + atrMultiplier * atrValue
         lower = emaValue - atrMultiplier * atrValue
       }
-      result.push({ middle, upper, lower })
+      result[i] = { middle, upper, lower }
     }
     return result
   },

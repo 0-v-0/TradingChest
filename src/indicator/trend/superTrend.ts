@@ -15,11 +15,12 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
     { key: 'down', title: 'Down: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period, multiplier] }) => {
-    const result: SuperTrendResult[] = []
+    const n = dataList.length
+    const result: SuperTrendResult[] = new Array(n)
 
-    const atrValues: number[] = []
+    const atrValues = new Array<number>(n)
     let rma = 0
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       let tr: number
       if (i === 0) {
@@ -34,13 +35,13 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
       }
       if (i < period) {
         rma += tr
-        atrValues.push(NaN)
+        atrValues[i] = NaN
       } else if (i === period) {
         rma = (rma + tr) / period
-        atrValues.push(rma)
+        atrValues[i] = rma
       } else {
         rma = (rma * (period - 1) + tr) / period
-        atrValues.push(rma)
+        atrValues[i] = rma
       }
     }
 
@@ -48,7 +49,7 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
     let prevLowerBand = NaN
     let direction: number = 0 // 0 = 未初始化, 1 = 上升, -1 = 下降
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       let up = NaN
       let down = NaN
 
@@ -85,7 +86,7 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
         prevUpperBand = upperBand
         prevLowerBand = lowerBand
       }
-      result.push({ up, down })
+      result[i] = { up, down }
     }
 
     return result

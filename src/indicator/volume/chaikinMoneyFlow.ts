@@ -19,21 +19,22 @@ const chaikinMoneyFlow: IndicatorTemplate<ChaikinMoneyFlowResult, number> = {
   calcParams: [20],
   figures: [{ key: 'cmf', title: 'CMF: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: ChaikinMoneyFlowResult[] = []
+    const n = dataList.length
+    const result: ChaikinMoneyFlowResult[] = new Array(n)
 
     // 预先计算每根 K 线的资金流量成交量
-    const mfVolumes: number[] = []
+    const mfVolumes = new Array<number>(n)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       const hl = kline.high - kline.low
       if (hl === 0) {
         // 最高价等于最低价，无法判断资金方向，乘数为 0
-        mfVolumes.push(0)
+        mfVolumes[i] = 0
       } else {
         // 资金流量乘数：衡量收盘价在当日波幅中的相对位置
         const mfMultiplier = (kline.close - kline.low - (kline.high - kline.close)) / hl
-        mfVolumes.push(mfMultiplier * (kline.volume ?? 0))
+        mfVolumes[i] = mfMultiplier * (kline.volume ?? 0)
       }
     }
 
@@ -41,7 +42,7 @@ const chaikinMoneyFlow: IndicatorTemplate<ChaikinMoneyFlowResult, number> = {
     let sumMfv = 0
     let sumVol = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       sumMfv += mfVolumes[i]
       sumVol += dataList[i].volume ?? 0
 
@@ -56,7 +57,7 @@ const chaikinMoneyFlow: IndicatorTemplate<ChaikinMoneyFlowResult, number> = {
         // 窗口内总成交量为零时 CMF 为 0，否则为比值
         cmf = sumVol === 0 ? 0 : sumMfv / sumVol
       }
-      result.push({ cmf })
+      result[i] = { cmf }
     }
     return result
   },

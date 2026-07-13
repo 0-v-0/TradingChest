@@ -25,7 +25,7 @@ const aroon: IndicatorTemplate<AroonResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
-    const result: AroonResult[] = []
+    const result: AroonResult[] = new Array(len)
 
     for (let i = 0; i < len; i++) {
       let aroonUp = NaN
@@ -59,7 +59,7 @@ const aroon: IndicatorTemplate<AroonResult, number> = {
         oscillator = aroonUp - aroonDown
       }
 
-      result.push({ aroonUp, aroonDown, oscillator })
+      result[i] = { aroonUp, aroonDown, oscillator }
     }
 
     return result

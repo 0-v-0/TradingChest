@@ -18,20 +18,21 @@ const forceIndex: IndicatorTemplate<ForceIndexResult, number> = {
   calcParams: [13],
   figures: [{ key: 'fi', title: 'FI: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: ForceIndexResult[] = []
+    const n = dataList.length
+    const result: ForceIndexResult[] = new Array(n)
 
-    if (dataList.length === 0) {
+    if (n === 0) {
       return result
     }
     // 第一步：计算每根 K 线的原始力度
-    const rawForce: number[] = []
-    for (let i = 0; i < dataList.length; i++) {
+    const rawForce = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
       if (i === 0) {
         // 第一根 K 线无前收盘价，原始力度为 0
-        rawForce.push(0)
+        rawForce[i] = 0
       } else {
         const priceChange = dataList[i].close - dataList[i - 1].close
-        rawForce.push(priceChange * (dataList[i].volume ?? 0))
+        rawForce[i] = priceChange * (dataList[i].volume ?? 0)
       }
     }
 
@@ -39,7 +40,7 @@ const forceIndex: IndicatorTemplate<ForceIndexResult, number> = {
     const k = 2 / (period + 1)
     let prevEma = NaN
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       let fi = NaN
       if (i === period - 1) {
         // 用前 period 个原始力度的 SMA 作为 EMA 种子
@@ -54,7 +55,7 @@ const forceIndex: IndicatorTemplate<ForceIndexResult, number> = {
         prevEma = rawForce[i] * k + prevEma * (1 - k)
         fi = prevEma
       }
-      result.push({ fi })
+      result[i] = { fi }
     }
     return result
   },

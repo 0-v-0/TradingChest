@@ -13,11 +13,12 @@ const mcginley: IndicatorTemplate<McginleyResult, number> = {
   calcParams: [14],
   figures: [{ key: 'md', title: 'MD: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
 
-    const result: McginleyResult[] = []
+    const result: McginleyResult[] = new Array(n)
     let prevMd = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = dataList[i].close
 
       let md = NaN
@@ -34,7 +35,7 @@ const mcginley: IndicatorTemplate<McginleyResult, number> = {
           md = prevMd
         }
       }
-      result.push({ md })
+      result[i] = { md }
     }
 
     return result

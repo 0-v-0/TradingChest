@@ -45,8 +45,10 @@ const pivotPoints: IndicatorTemplate<PivotPointsResult, number> = {
     { key: 's3', title: 'S3: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [mode] }) => {
+    const n = dataList.length
+    const result: PivotPointsResult[] = new Array(n)
 
-    return dataList.map((_, i) => {
+    for (let i = 0; i < n; i++) {
       let pivot = NaN
       let r1 = NaN
       let r2 = NaN
@@ -91,8 +93,10 @@ const pivotPoints: IndicatorTemplate<PivotPointsResult, number> = {
         }
       }
 
-      return { pivot, r1, r2, r3, s1, s2, s3 }
-    })
+      result[i] = { pivot, r1, r2, r3, s1, s2, s3 }
+    }
+
+    return result
   },
 }
 

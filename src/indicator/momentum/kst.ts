@@ -50,17 +50,19 @@ const kst: IndicatorTemplate<KstResult, number> = {
     const smoothedRocs = []
     for (let r = 0; r < 4; r++) {
       const roc = rocs[r]
-      const validValues: number[] = []
-      const validIndices: number[] = []
+      const validValues = new Array<number>(len)
+      const validIndices = new Array<number>(len)
+      let validCount = 0
       for (let i = 0; i < len; i++) {
         if (!isNaN(roc[i])) {
-          validValues.push(roc[i])
-          validIndices.push(i)
+          validValues[validCount] = roc[i]
+          validIndices[validCount] = i
+          validCount++
         }
       }
-      const smaResult = calcSMA(validValues, smaPeriods[r])
+      const smaResult = calcSMA(validValues.slice(0, validCount), smaPeriods[r])
       const smoothed: number[] = Array(len).fill(NaN)
-      for (let j = 0; j < validIndices.length; j++) {
+      for (let j = 0; j < validCount; j++) {
         if (!isNaN(smaResult[j])) {
           smoothed[validIndices[j]] = smaResult[j]
         }
@@ -86,29 +88,31 @@ const kst: IndicatorTemplate<KstResult, number> = {
     }
 
     // ---- 计算 Signal = SMA(KST, signalPeriod) ----
-    const kstValidValues: number[] = []
-    const kstValidIndices: number[] = []
+    const kstValidValues = new Array<number>(len)
+    const kstValidIndices = new Array<number>(len)
+    let kstValidCount = 0
     for (let i = 0; i < len; i++) {
       if (!isNaN(kstLine[i])) {
-        kstValidValues.push(kstLine[i])
-        kstValidIndices.push(i)
+        kstValidValues[kstValidCount] = kstLine[i]
+        kstValidIndices[kstValidCount] = i
+        kstValidCount++
       }
     }
-    const signalSmaResult = calcSMA(kstValidValues, signalPeriod)
+    const signalSmaResult = calcSMA(kstValidValues.slice(0, kstValidCount), signalPeriod)
     const signalLine: number[] = Array(len).fill(NaN)
-    for (let j = 0; j < kstValidIndices.length; j++) {
+    for (let j = 0; j < kstValidCount; j++) {
       if (!isNaN(signalSmaResult[j])) {
         signalLine[kstValidIndices[j]] = signalSmaResult[j]
       }
     }
 
     // ---- 组装输出 ----
-    const result: KstResult[] = []
+    const result: KstResult[] = new Array(len)
     for (let i = 0; i < len; i++) {
-      result.push({
+      result[i] = {
         kst: kstLine[i],
         signal: signalLine[i],
-      })
+      }
     }
 
     return result

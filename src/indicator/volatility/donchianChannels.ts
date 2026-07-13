@@ -17,15 +17,19 @@ const donchianChannels: IndicatorTemplate<DonchianChannelsResult, number> = {
     { key: 'middle', title: 'MID: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const highs = dataList.map(k => k.high)
     const lows = dataList.map(k => k.low)
     const uppers = calcHighest(highs, period)
     const lowers = calcLowest(lows, period)
-    return uppers.map((upper, i) => {
+    const result: DonchianChannelsResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      const upper = uppers[i]
       const lower = lowers[i]
-      if (Number.isNaN(upper) || Number.isNaN(lower)) return { upper: NaN, lower: NaN, middle: NaN }
-      return { upper, lower, middle: (upper + lower) / 2 }
-    })
+      if (Number.isNaN(upper) || Number.isNaN(lower)) { result[i] = { upper: NaN, lower: NaN, middle: NaN }; continue }
+      result[i] = { upper, lower, middle: (upper + lower) / 2 }
+    }
+    return result
   },
 }
 

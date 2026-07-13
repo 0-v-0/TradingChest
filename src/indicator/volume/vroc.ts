@@ -17,9 +17,10 @@ const vroc: IndicatorTemplate<VrocResult, number> = {
   calcParams: [14],
   figures: [{ key: 'vroc', title: 'VROC: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
-    const result: VrocResult[] = []
+    const n = dataList.length
+    const result: VrocResult[] = new Array(n)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       let vroc = NaN
       if (i >= period) {
         const prevVol = dataList[i - period].volume ?? 0
@@ -29,7 +30,7 @@ const vroc: IndicatorTemplate<VrocResult, number> = {
           vroc = ((curVol - prevVol) / prevVol) * 100
         }
       }
-      result.push({ vroc })
+      result[i] = { vroc }
     }
     return result
   },

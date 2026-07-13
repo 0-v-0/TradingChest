@@ -38,56 +38,57 @@ const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
     { key: 'chikouSpan', title: '迟行带: ', type: 'line' },
   ],
   calc: (dataList: KLineData[], { calcParams: [tenkanPeriod, kijunPeriod, senkouBPeriod, displacement] }) => {
+    const n = dataList.length
 
     // 先计算各条线的原始值
-    const tenkanArr: number[] = []
-    const kijunArr: number[] = []
-    const spanAArr: number[] = []
-    const spanBArr: number[] = []
+    const tenkanArr = new Array<number>(n)
+    const kijunArr = new Array<number>(n)
+    const spanAArr = new Array<number>(n)
+    const spanBArr = new Array<number>(n)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const tenkan = midPoint(dataList, i, tenkanPeriod)
       const kijun = midPoint(dataList, i, kijunPeriod)
-      tenkanArr.push(tenkan)
-      kijunArr.push(kijun)
+      tenkanArr[i] = tenkan
+      kijunArr[i] = kijun
 
       // 先行带 A = (转换线 + 基准线) / 2
       if (!isNaN(tenkan) && !isNaN(kijun)) {
-        spanAArr.push((tenkan + kijun) / 2)
+        spanAArr[i] = (tenkan + kijun) / 2
       } else {
-        spanAArr.push(NaN)
+        spanAArr[i] = NaN
       }
 
       // 先行带 B = (senkouBPeriod 周期内最高价 + 最低价) / 2
-      spanBArr.push(midPoint(dataList, i, senkouBPeriod))
+      spanBArr[i] = midPoint(dataList, i, senkouBPeriod)
     }
 
     // 组装结果，先行带需要前移 displacement 个周期，迟行带需要后移 displacement 个周期
-    const totalLength = dataList.length + displacement
-    const result: IchimokuResult[] = []
+    const totalLength = n + displacement
+    const result: IchimokuResult[] = new Array(totalLength)
 
     for (let i = 0; i < totalLength; i++) {
       const item: Partial<IchimokuResult> = {}
 
-      if (i < dataList.length) {
+      if (i < n) {
         item.tenkanSen = tenkanArr[i]
         item.kijunSen = kijunArr[i]
       }
 
       // 先行带：当前位置的值来自 displacement 个周期之前
       const spanSrcIdx = i - displacement
-      if (spanSrcIdx >= 0 && spanSrcIdx < dataList.length) {
+      if (spanSrcIdx >= 0 && spanSrcIdx < n) {
         item.senkouSpanA = spanAArr[spanSrcIdx]
         item.senkouSpanB = spanBArr[spanSrcIdx]
       }
 
       // 迟行带：将当前收盘价显示在 displacement 个周期之前
       const chikouSrcIdx = i + displacement
-      if (chikouSrcIdx < dataList.length) {
+      if (chikouSrcIdx < n) {
         item.chikouSpan = dataList[chikouSrcIdx].close
       }
 
-      result.push(item as IchimokuResult)
+      result[i] = item as IchimokuResult
     }
 
     return result

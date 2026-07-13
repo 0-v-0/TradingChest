@@ -20,7 +20,7 @@ const ultimateOscillator: IndicatorTemplate<UltimateOscillatorResult, number> = 
   calc: (dataList: KLineData[], { calcParams: [period1, period2, period3] }) => {
     const maxPeriod = Math.max(period1, period2, period3)
     const len = dataList.length
-    const result: UltimateOscillatorResult[] = []
+    const result: UltimateOscillatorResult[] = new Array(len)
 
     // 预计算 BP 和 TR 序列（从索引 1 开始有效）
     const bp: number[] = Array(len).fill(0)
@@ -67,7 +67,7 @@ const ultimateOscillator: IndicatorTemplate<UltimateOscillatorResult, number> = 
           uo = 100 * (4 * avg1 + 2 * avg2 + avg3) / 7
         }
       }
-      result.push({ uo })
+      result[i] = { uo }
     }
 
     return result

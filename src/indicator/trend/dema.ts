@@ -13,33 +13,37 @@ const dema: IndicatorTemplate<DemaResult, number> = {
   calcParams: [21],
   figures: [{ key: 'dema', title: 'DEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const k = 2 / (period + 1)
 
     // 第一层 EMA
-    const ema1: number[] = []
+    const ema1 = new Array<number>(n)
     // 第二层 EMA（对第一层 EMA 再做 EMA）
-    const ema2: number[] = []
+    const ema2 = new Array<number>(n)
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const close = dataList[i].close
 
       if (i === 0) {
-        ema1.push(close)
-        ema2.push(close)
+        ema1[i] = close
+        ema2[i] = close
       } else {
         const e1 = close * k + ema1[i - 1] * (1 - k)
-        ema1.push(e1)
+        ema1[i] = e1
         const e2 = e1 * k + ema2[i - 1] * (1 - k)
-        ema2.push(e2)
+        ema2[i] = e2
       }
     }
 
-    return dataList.map((_, i) => {
+    const result: DemaResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
       if (i < period - 1) {
-        return { dema: NaN }
+        result[i] = { dema: NaN }
+      } else {
+        result[i] = { dema: 2 * ema1[i] - ema2[i] }
       }
-      return { dema: 2 * ema1[i] - ema2[i] }
-    })
+    }
+    return result
   },
 }
 
