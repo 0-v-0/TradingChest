@@ -48,7 +48,7 @@ function calcATR(dataList: KLineData[], period: number): number {
   return sum / count
 }
 
-const rangeBars: IndicatorTemplate<{}, number> = {
+const rangeBars: IndicatorTemplate<object, number> = {
   name: 'RangeBars',
   shortName: 'RB',
   calcParams: [14],

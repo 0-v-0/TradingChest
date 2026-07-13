@@ -103,7 +103,7 @@ export function calcPointAndFigure(dataList: KLineData[], boxSize: number, rever
   return columns
 }
 
-const pointAndFigure: IndicatorTemplate<{}, number> = {
+const pointAndFigure: IndicatorTemplate<object, number> = {
   name: 'PointAndFigure',
   shortName: 'PF',
   calcParams: [1, 3],

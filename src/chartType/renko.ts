@@ -48,7 +48,7 @@ function calcATR(dataList: KLineData[], period: number): number {
   return sum / count
 }
 
-const renko: IndicatorTemplate<{}, number> = {
+const renko: IndicatorTemplate<object, number> = {
   name: 'Renko',
   shortName: 'RN',
   calcParams: [14],

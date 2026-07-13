@@ -99,7 +99,7 @@ export function calcKagi(dataList: KLineData[], reversal: number): KagiSegment[]
   return segments
 }
 
-const kagi: IndicatorTemplate<{}, number> = {
+const kagi: IndicatorTemplate<object, number> = {
   name: 'Kagi',
   shortName: 'KG',
   calcParams: [14],

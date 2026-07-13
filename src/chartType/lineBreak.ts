@@ -111,7 +111,7 @@ export function calcLineBreak(dataList: KLineData[], lines: number): LineBreakLi
   return result
 }
 
-const lineBreak: IndicatorTemplate<{}, number> = {
+const lineBreak: IndicatorTemplate<object, number> = {
   name: 'LineBreak',
   shortName: 'LB',
   calcParams: [3],
