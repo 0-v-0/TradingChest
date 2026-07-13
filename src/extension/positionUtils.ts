@@ -134,7 +134,7 @@ function createPositionFigures(
       })
 
       const rrY = side === 'long' ? entryY - 16 : entryY + 16
-      const rrBaseline = side === 'long' ? 'bottom' as const : 'top' as const
+      const rrBaseline = side === 'long' ? 'bottom' : 'top'
 
       figures.push({
         type: 'rectText',
