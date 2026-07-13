@@ -190,7 +190,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [period, setPeriod] = createSignal(props.period)
   const [indicatorModalVisible, setIndicatorModalVisible] = createSignal(false)
   const [mainIndicators, setMainIndicators] = createSignal([...props.mainIndicators!])
-  const [subIndicators, setSubIndicators] = createSignal({})
+  const [subIndicators, setSubIndicators] = createSignal<Record<string, string>>({})
 
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
   const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
