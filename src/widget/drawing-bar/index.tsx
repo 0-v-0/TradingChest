@@ -46,16 +46,23 @@ export interface DrawingBarProps {
 
 const GROUP_ID = 'drawing_tools'
 
+type GroupKey = 'singleLine' | 'moreLine' | 'polygon' | 'fibonacci' | 'wave' | 'measurement' | 'channel' | 'annotation' | 'position'
+
+const INIT_ICON_MAP: Record<GroupKey, string> = {
+  singleLine: 'horizontalStraightLine',
+  moreLine: 'priceChannelLine',
+  polygon: 'circle',
+  fibonacci: 'fibonacciLine',
+  wave: 'xabcd',
+  measurement: 'dateAndPriceRange',
+  channel: 'pitchfork',
+  annotation: 'textAnnotation',
+  position: 'longPosition',
+}
+
 const DrawingBar: Component<DrawingBarProps> = (props) => {
-  const [singleLineIcon, setSingleLineIcon] = createSignal('horizontalStraightLine')
-  const [moreLineIcon, setMoreLineIcon] = createSignal('priceChannelLine')
-  const [polygonIcon, setPolygonIcon] = createSignal('circle')
-  const [fibonacciIcon, setFibonacciIcon] = createSignal('fibonacciLine')
-  const [waveIcon, setWaveIcon] = createSignal('xabcd')
-  const [measurementIcon, setMeasurementIcon] = createSignal('dateAndPriceRange')
-  const [channelIcon, setChannelIcon] = createSignal('pitchfork')
-  const [annotationIcon, setAnnotationIcon] = createSignal('textAnnotation')
-  const [positionIcon, setPositionIcon] = createSignal('longPosition')
+  const [iconMap, setIconMap] = createSignal<Record<GroupKey, string>>({ ...INIT_ICON_MAP })
+  const setIcon = (key: GroupKey) => (v: string) => setIconMap({ ...iconMap(), [key]: v })
 
   const [modeIcon, setModeIcon] = createSignal('weak_magnet')
   const [mode, setMode] = createSignal('normal')
@@ -86,17 +93,13 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
 
   const overlays = createMemo(() => {
     const lists = optionLists()
-    return [
-      { key: 'singleLine', icon: singleLineIcon(), list: lists.singleLine, setter: setSingleLineIcon },
-      { key: 'moreLine', icon: moreLineIcon(), list: lists.moreLine, setter: setMoreLineIcon },
-      { key: 'polygon', icon: polygonIcon(), list: lists.polygon, setter: setPolygonIcon },
-      { key: 'fibonacci', icon: fibonacciIcon(), list: lists.fibonacci, setter: setFibonacciIcon },
-      { key: 'wave', icon: waveIcon(), list: lists.wave, setter: setWaveIcon },
-      { key: 'measurement', icon: measurementIcon(), list: lists.measurement, setter: setMeasurementIcon },
-      { key: 'channel', icon: channelIcon(), list: lists.channel, setter: setChannelIcon },
-      { key: 'annotation', icon: annotationIcon(), list: lists.annotation, setter: setAnnotationIcon },
-      { key: 'position', icon: positionIcon(), list: lists.position, setter: setPositionIcon },
-    ]
+    const icons = iconMap()
+    return (Object.keys(INIT_ICON_MAP) as GroupKey[]).map((key) => ({
+      key,
+      icon: icons[key],
+      list: lists[key],
+      setter: setIcon(key),
+    }))
   })
 
   const modes = createMemo(() => createMagnetOptions(props.locale))
