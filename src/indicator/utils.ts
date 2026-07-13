@@ -151,7 +151,7 @@ export function calcStdDev(data: number[], period: number): number[] {
 export function calcHighest(data: number[], period: number): number[] {
   const n = data.length
   const result: number[] = new Array(n).fill(NaN)
-  if (period <= 0) return result
+  console.assert(period > 0, 'calcHighest: period must be > 0')
   const deque: number[] = []
   let head = 0
   for (let i = 0; i < n; i++) {
@@ -175,7 +175,7 @@ export function calcHighest(data: number[], period: number): number[] {
 export function calcLowest(data: number[], period: number): number[] {
   const n = data.length
   const result: number[] = new Array(n).fill(NaN)
-  if (period <= 0) return result
+  console.assert(period > 0, 'calcLowest: period must be > 0')
   const deque: number[] = []
   let head = 0
   for (let i = 0; i < n; i++) {
@@ -353,10 +353,7 @@ export interface LinRegResult {
 export function calcLinReg(data: number[], period: number): LinRegResult[] {
   const n = data.length
   const result: LinRegResult[] = new Array(n)
-  if (period < 2) {
-    for (let i = 0; i < n; i++) result[i] = { slope: NaN, intercept: NaN, stdResid: NaN }
-    return result
-  }
+  console.assert(period >= 2, 'calcLinReg: period must be >= 2')
   const sumX = (period * (period - 1)) / 2
   const sumX2 = ((period - 1) * period * (2 * period - 1)) / 6
   const denom = period * sumX2 - sumX * sumX

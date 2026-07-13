@@ -22,8 +22,7 @@ const twiggsMf: IndicatorTemplate<TwiggsMfResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
     const result: TwiggsMfResult[] = new Array(len)
-
-    if (len === 0) return result
+    console.assert(len > 0, 'TwiggsMf: dataList should not be empty')
 
     // ---- 计算 AD 和 volume 序列 ----
     const ad: number[] = Array(len).fill(0)

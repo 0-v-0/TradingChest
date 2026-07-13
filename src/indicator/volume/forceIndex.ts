@@ -20,10 +20,7 @@ const forceIndex: IndicatorTemplate<ForceIndexResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
     const result: ForceIndexResult[] = new Array(n)
-
-    if (n === 0) {
-      return result
-    }
+    console.assert(n > 0, 'ForceIndex: dataList should not be empty')
     // 第一步：计算每根 K 线的原始力度
     const rawForce = new Array<number>(n)
     for (let i = 0; i < n; i++) {

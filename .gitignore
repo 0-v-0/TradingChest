@@ -2,9 +2,11 @@
 /dist
 /website
 /docs/.vitepress/cache.worktrees
+.cac
 .cursor
 .opencode
-coverage
 .trae
 test-results
+coverage
 debug.log
+AGENTS.md

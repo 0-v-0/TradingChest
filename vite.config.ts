@@ -1,22 +1,33 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 
+/** 移除 console.assert 调用（生产构建用） */
+function stripConsoleAssert(): Plugin {
+  return {
+    name: 'strip-console-assert',
+    enforce: 'post',
+    renderChunk(code) {
+      return code.replace(/console\.assert\([^;]*\);?/g, '')
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [solidPlugin()],
+  plugins: [solidPlugin(), stripConsoleAssert()],
   server: {
     fs: {
       strict: false
     }
   },
   build: {
-    cssTarget: 'chrome61',
+    target: 'esnext',
     sourcemap: false,
     rollupOptions: {
       external: ['klinecharts'],
       output: {
         assetFileNames: (chunkInfo) => {
-          if (chunkInfo.name === 'style.css') {
+          if (chunkInfo.names?.includes('style.css')) {
             return 'trading-chest.css'
           }
           return '[name][extname]'

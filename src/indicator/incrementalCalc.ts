@@ -38,6 +38,7 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
     const len = dataList.length
 
     if (len === 0) {
+      console.warn('wrapWithIncrementalCalc: dataList should not be empty')
       prevLen = 0
       prevSecondLastTs = 0
       cached = []

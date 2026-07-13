@@ -27,10 +27,7 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod, signalPeriod] }) => {
     const n = dataList.length
     const result: KlingerOscillatorResult[] = new Array(n)
-
-    if (n === 0) {
-      return result
-    }
+    console.assert(n > 0, 'KlingerOscillator: dataList should not be empty')
 
     // 第一步：计算成交量力度数组
     const vf = new Array<number>(n)

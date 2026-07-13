@@ -31,8 +31,7 @@ const adx: IndicatorTemplate<AdxResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
     const result: AdxResult[] = new Array(len)
-
-    if (len === 0) return result
+    console.assert(len > 0, 'ADX: dataList should not be empty')
 
     // 原始 +DM、-DM、TR 序列
     const plusDmRaw: number[] = Array(len).fill(0)
