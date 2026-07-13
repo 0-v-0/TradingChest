@@ -68,11 +68,11 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
   )
 
   // 根据分类和搜索筛选指标
-  const filteredMainIndicators = createMemo(() => {
-    favVersion() // depend on fav toggles
+  const filterIndicatorNames = (source: readonly string[]) => {
+    favVersion()
     const search = searchText().toLowerCase()
     const cat = activeCategory()
-    return MAIN_INDICATORS.filter((name) => {
+    return source.filter((name) => {
       if (
         search &&
         !name.toLowerCase().includes(search) &&
@@ -85,26 +85,10 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
       const category = indicatorCategories[cat]
       return category?.names.includes(name) ?? false
     })
-  })
+  }
 
-  const filteredSubIndicators = createMemo(() => {
-    favVersion() // depend on fav toggles
-    const search = searchText().toLowerCase()
-    const cat = activeCategory()
-    return SUB_INDICATORS.filter((name) => {
-      if (
-        search &&
-        !name.toLowerCase().includes(search) &&
-        !t(name.toLowerCase(), props.locale).toLowerCase().includes(search)
-      ) {
-        return false
-      }
-      if (cat === 'all') return true
-      if (cat === 'favorites') return isFavoriteIndicator(name)
-      const category = indicatorCategories[cat]
-      return category?.names.includes(name) ?? false
-    })
-  })
+  const filteredMainIndicators = createMemo(() => filterIndicatorNames(MAIN_INDICATORS))
+  const filteredSubIndicators = createMemo(() => filterIndicatorNames(SUB_INDICATORS))
 
   const getCategoryLabel = (key: string): string => {
     if (key === 'all') return t('all_categories', props.locale)
