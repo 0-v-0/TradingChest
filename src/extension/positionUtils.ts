@@ -2,6 +2,17 @@ import type { OverlayTemplate, OverlayFigure } from 'klinecharts'
 
 type PositionSide = 'long' | 'short'
 
+// 交易视觉颜色常量
+const STOP_LOSS_FILL = 'rgba(239, 83, 80, 0.15)'
+const STOP_LOSS_BORDER = 'rgba(239, 83, 80, 0.6)'
+const STOP_LOSS_TEXT = 'rgba(239, 83, 80, 1)'
+const TAKE_PROFIT_FILL = 'rgba(38, 166, 154, 0.15)'
+const TAKE_PROFIT_BORDER = 'rgba(38, 166, 154, 0.6)'
+const TAKE_PROFIT_TEXT = 'rgba(38, 166, 154, 1)'
+const ENTRY_LINE = '#1677FF'
+const RR_BG = 'rgba(22, 119, 255, 0.1)'
+const RR_BORDER = 'rgba(22, 119, 255, 0.4)'
+
 function createPositionFigures(
   side: PositionSide,
 ): NonNullable<OverlayTemplate['createPointFigures']> {
@@ -22,9 +33,6 @@ function createPositionFigures(
 
     const figures: OverlayFigure[] = []
 
-    const redColor = 'rgba(239, 83, 80, 0.15)'
-    const redBorder = 'rgba(239, 83, 80, 0.6)'
-
     figures.push({
       type: 'polygon',
       ignoreEvent: true,
@@ -36,7 +44,7 @@ function createPositionFigures(
           { x: leftX, y: stopLossY },
         ],
       },
-      styles: { style: 'fill', color: redColor },
+      styles: { style: 'fill', color: STOP_LOSS_FILL },
     })
 
     figures.push({
@@ -47,7 +55,7 @@ function createPositionFigures(
           { x: rightX, y: entryY },
         ],
       },
-      styles: { color: '#1677FF', style: 'dashed' },
+      styles: { color: ENTRY_LINE, style: 'dashed' },
     })
 
     figures.push({
@@ -59,7 +67,7 @@ function createPositionFigures(
           { x: rightX, y: stopLossY },
         ],
       },
-      styles: { color: redBorder },
+      styles: { color: STOP_LOSS_BORDER },
     })
 
     const riskAmount = Math.abs(entryPrice - stopLossPrice)
@@ -74,7 +82,7 @@ function createPositionFigures(
         align: 'left',
       },
       styles: {
-        color: 'rgba(239, 83, 80, 1)',
+        color: STOP_LOSS_TEXT,
         size: 11,
       },
     })
@@ -82,9 +90,6 @@ function createPositionFigures(
     if (coordinates.length > 2) {
       const takeProfitPrice = points[2].value!
       const takeProfitY = coordinates[2].y
-
-      const greenColor = 'rgba(38, 166, 154, 0.15)'
-      const greenBorder = 'rgba(38, 166, 154, 0.6)'
 
       figures.push({
         type: 'polygon',
@@ -97,7 +102,7 @@ function createPositionFigures(
             { x: leftX, y: takeProfitY },
           ],
         },
-        styles: { style: 'fill', color: greenColor },
+        styles: { style: 'fill', color: TAKE_PROFIT_FILL },
       })
 
       figures.push({
@@ -109,7 +114,7 @@ function createPositionFigures(
             { x: rightX, y: takeProfitY },
           ],
         },
-        styles: { color: greenBorder },
+        styles: { color: TAKE_PROFIT_BORDER },
       })
 
       const rewardAmount = side === 'long'
@@ -128,7 +133,7 @@ function createPositionFigures(
           align: 'left',
         },
         styles: {
-          color: 'rgba(38, 166, 154, 1)',
+          color: TAKE_PROFIT_TEXT,
           size: 11,
         },
       })
@@ -148,9 +153,9 @@ function createPositionFigures(
         },
         styles: {
           style: 'stroke_fill',
-          color: '#1677FF',
-          backgroundColor: 'rgba(22, 119, 255, 0.1)',
-          borderColor: 'rgba(22, 119, 255, 0.4)',
+          color: ENTRY_LINE,
+          backgroundColor: RR_BG,
+          borderColor: RR_BORDER,
           borderSize: 1,
           borderRadius: 3,
           paddingLeft: 6,

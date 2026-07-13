@@ -13,9 +13,33 @@
  *   信号线周期: 9
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcSMA } from '../utils'
 
 type KstResult = { kst: number; signal: number }
+
+/**
+ * NaN 感知的滑动窗口 SMA：跳过 NaN，只在连续有效值上计算。
+ * 避免创建 validValues/validIndices 中间数组。
+ */
+function calcSparseSMA(source: number[], period: number): number[] {
+  const len = source.length
+  const result: number[] = Array(len).fill(NaN)
+  const buf = new Array<number>(len)
+  let bufLen = 0
+  let sum = 0
+  for (let i = 0; i < len; i++) {
+    if (isNaN(source[i])) continue
+    buf[bufLen] = source[i]
+    bufLen++
+    sum += source[i]
+    if (bufLen > period) {
+      sum -= buf[bufLen - period - 1]
+    }
+    if (bufLen >= period) {
+      result[i] = sum / period
+    }
+  }
+  return result
+}
 
 const kst: IndicatorTemplate<KstResult, number> = {
   name: 'KST',
@@ -31,44 +55,22 @@ const kst: IndicatorTemplate<KstResult, number> = {
     const weights = [1, 2, 3, 4]
     const len = dataList.length
 
-    // ---- 计算四条 ROC 序列 ----
-    const rocs = []
+    // ---- 计算四条 ROC 序列并直接 SMA 平滑 ----
+    // 不再存储 rocs + 后处理 validValues/validIndices，改为每步直接平滑
+    const smoothedRocs: number[][] = []
     for (let r = 0; r < 4; r++) {
-      const roc: number[] = Array(len).fill(NaN)
       const rocP = rocPeriods[r]
+      const roc: number[] = Array(len).fill(NaN)
       for (let i = rocP; i < len; i++) {
         const prev = dataList[i - rocP].close
         if (prev !== 0) {
           roc[i] = (dataList[i].close / prev - 1) * 100
         }
       }
-      rocs.push(roc)
+      // 直接对含 NaN 的 roc 做稀疏 SMA，无需提取 validValues/validIndices
+      smoothedRocs.push(calcSparseSMA(roc, smaPeriods[r]))
     }
-
-    // ---- 对每条 ROC 做 SMA 平滑（复用 calcSMA 滑动窗口，O(n)） ----
-    // calcSMA 要求连续 number[] 输入，需将有效 ROC 值提取后传入，结果映射回原索引
-    const smoothedRocs = []
-    for (let r = 0; r < 4; r++) {
-      const roc = rocs[r]
-      const validValues = new Array<number>(len)
-      const validIndices = new Array<number>(len)
-      let validCount = 0
-      for (let i = 0; i < len; i++) {
-        if (!isNaN(roc[i])) {
-          validValues[validCount] = roc[i]
-          validIndices[validCount] = i
-          validCount++
-        }
-      }
-      const smaResult = calcSMA(validValues.slice(0, validCount), smaPeriods[r])
-      const smoothed: number[] = Array(len).fill(NaN)
-      for (let j = 0; j < validCount; j++) {
-        if (!isNaN(smaResult[j])) {
-          smoothed[validIndices[j]] = smaResult[j]
-        }
-      }
-      smoothedRocs.push(smoothed)
-    }
+    // rocs 数组可 GC——不再引用
 
     // ---- 计算 KST = 加权求和 ----
     const kstLine: number[] = Array(len).fill(NaN)
@@ -76,11 +78,12 @@ const kst: IndicatorTemplate<KstResult, number> = {
       let allValid = true
       let val = 0
       for (let r = 0; r < 4; r++) {
-        if (isNaN(smoothedRocs[r][i])) {
+        const v = smoothedRocs[r][i]
+        if (isNaN(v)) {
           allValid = false
           break
         }
-        val += weights[r] * smoothedRocs[r][i]
+        val += weights[r] * v
       }
       if (allValid) {
         kstLine[i] = val
@@ -88,31 +91,12 @@ const kst: IndicatorTemplate<KstResult, number> = {
     }
 
     // ---- 计算 Signal = SMA(KST, signalPeriod) ----
-    const kstValidValues = new Array<number>(len)
-    const kstValidIndices = new Array<number>(len)
-    let kstValidCount = 0
-    for (let i = 0; i < len; i++) {
-      if (!isNaN(kstLine[i])) {
-        kstValidValues[kstValidCount] = kstLine[i]
-        kstValidIndices[kstValidCount] = i
-        kstValidCount++
-      }
-    }
-    const signalSmaResult = calcSMA(kstValidValues.slice(0, kstValidCount), signalPeriod)
-    const signalLine: number[] = Array(len).fill(NaN)
-    for (let j = 0; j < kstValidCount; j++) {
-      if (!isNaN(signalSmaResult[j])) {
-        signalLine[kstValidIndices[j]] = signalSmaResult[j]
-      }
-    }
+    const signalLine = calcSparseSMA(kstLine, signalPeriod)
 
     // ---- 组装输出 ----
     const result: KstResult[] = new Array(len)
     for (let i = 0; i < len; i++) {
-      result[i] = {
-        kst: kstLine[i],
-        signal: signalLine[i],
-      }
+      result[i] = { kst: kstLine[i], signal: signalLine[i] }
     }
 
     return result

@@ -8,8 +8,33 @@
  * 输出范围 0-1（部分平台显示为 0-100，此处使用 0-1）
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcHighest, calcLowest } from '../utils'
 
 type StochasticRsiResult = { k: number; d: number }
+
+/**
+ * NaN 感知的滑动窗口 SMA：跳过 NaN，只在连续有效值上计算。
+ */
+function calcSparseSMA(source: number[], period: number): number[] {
+  const len = source.length
+  const result: number[] = Array(len).fill(NaN)
+  const buf = new Array<number>(len)
+  let bufLen = 0
+  let sum = 0
+  for (let i = 0; i < len; i++) {
+    if (isNaN(source[i])) continue
+    buf[bufLen] = source[i]
+    bufLen++
+    sum += source[i]
+    if (bufLen > period) {
+      sum -= buf[bufLen - period - 1]
+    }
+    if (bufLen >= period) {
+      result[i] = sum / period
+    }
+  }
+  return result
+}
 
 const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
   name: 'StochRSI',
@@ -57,79 +82,30 @@ const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
       }
     }
 
-    // ---- 第二步：在 RSI 序列上计算随机指标 ----
+    // ---- 第二步：用滑动窗口 O(n) 计算 StochRSI ----
+    // RSI 从 rsiPeriod 起连续有效，提取有效段后用 calcHighest/Lowest
+    const validRsi = rsi.slice(rsiPeriod)
+    const rsiHigh = calcHighest(validRsi, stochPeriod)
+    const rsiLow = calcLowest(validRsi, stochPeriod)
+
     const stochRsi: number[] = Array(len).fill(NaN)
-    for (let i = 0; i < len; i++) {
-      if (isNaN(rsi[i])) continue
-      // 回溯 stochPeriod 个有效 RSI 值
-      let lowest = Infinity
-      let highest = -Infinity
-      let validCount = 0
-      for (let j = i; j >= 0 && validCount < stochPeriod; j--) {
-        if (!isNaN(rsi[j])) {
-          const v = rsi[j]
-          if (v < lowest) lowest = v
-          if (v > highest) highest = v
-          validCount++
-        }
-      }
-      if (validCount < stochPeriod) continue
-      // 分母为零时（RSI 区间内无变化），输出 0
-      if (highest === lowest) {
-        stochRsi[i] = 0
-      } else {
-        stochRsi[i] = (rsi[i] - lowest) / (highest - lowest)
+    for (let i = rsiPeriod; i < len; i++) {
+      const vi = i - rsiPeriod
+      if (vi >= stochPeriod - 1) {
+        const h = rsiHigh[vi]
+        const l = rsiLow[vi]
+        stochRsi[i] = h === l ? 0 : (rsi[i] - l) / (h - l)
       }
     }
 
     // ---- 第三步：K = SMA(StochRSI, kSmooth)，D = SMA(K, dSmooth) ----
-    // 对有效值序列做 SMA
-    const kLine: number[] = Array(len).fill(NaN)
-    const dLine: number[] = Array(len).fill(NaN)
-
-    // K 线：对 stochRsi 做滑动窗口平均（O(n)，无需重新求和修正浮点漂移）
-    const kBuf = new Array<number>(len)
-    let kBufLen = 0
-    let kSum = 0
-    for (let i = 0; i < len; i++) {
-      if (!isNaN(stochRsi[i])) {
-        kBuf[kBufLen] = stochRsi[i]
-        kBufLen++
-        kSum += stochRsi[i]
-        if (kBufLen > kSmooth) {
-          kSum -= kBuf[kBufLen - kSmooth - 1]
-        }
-        if (kBufLen >= kSmooth) {
-          kLine[i] = kSum / kSmooth
-        }
-      }
-    }
-
-    // D 线：对 K 线做滑动窗口平均（O(n)，移入/移出窗口同时增减和）
-    const dBuf = new Array<number>(len)
-    let dBufLen = 0
-    let dSum = 0
-    for (let i = 0; i < len; i++) {
-      if (!isNaN(kLine[i])) {
-        dBuf[dBufLen] = kLine[i]
-        dBufLen++
-        dSum += kLine[i]
-        if (dBufLen > dSmooth) {
-          dSum -= dBuf[dBufLen - dSmooth - 1]
-        }
-        if (dBufLen >= dSmooth) {
-          dLine[i] = dSum / dSmooth
-        }
-      }
-    }
+    const kLine = calcSparseSMA(stochRsi, kSmooth)
+    const dLine = calcSparseSMA(kLine, dSmooth)
 
     // ---- 组装输出 ----
     const result: StochasticRsiResult[] = new Array(len)
     for (let i = 0; i < len; i++) {
-      result[i] = {
-        k: kLine[i],
-        d: dLine[i],
-      }
+      result[i] = { k: kLine[i], d: dLine[i] }
     }
     return result
   },

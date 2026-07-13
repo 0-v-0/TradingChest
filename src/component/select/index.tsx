@@ -1,4 +1,4 @@
-import { createSignal, type Component, type JSX } from 'solid-js'
+import { createSignal, createMemo, type Component, type JSX } from 'solid-js'
 
 export interface SelectDataSourceItem {
   key: string
@@ -16,6 +16,20 @@ export interface SelectProps {
 
 const Select: Component<SelectProps> = (props) => {
   const [open, setOpen] = createSignal(false)
+
+  const items = createMemo(() =>
+    props.dataSource?.map((data) => {
+      const d: SelectDataSourceItem =
+        typeof data === 'string'
+          ? { key: data, text: data }
+          : data as SelectDataSourceItem
+      const v: JSX.Element =
+        (d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text'] ??
+        d.text
+      const isSelected = props.value === v
+      return { data, v, isSelected }
+    }) ?? [],
+  )
 
   return (
     <div
@@ -45,35 +59,25 @@ const Select: Component<SelectProps> = (props) => {
         <span class="value">{props.value}</span>
         <i class="arrow" />
       </div>
-      {props.dataSource && props.dataSource.length > 0 && (
+      {items().length > 0 && (
         <div class="drop-down-container">
           <ul role="listbox">
-            {props.dataSource.map((data) => {
-              const d: SelectDataSourceItem =
-                typeof data === 'string'
-                  ? { key: data, text: data }
-                  : data as SelectDataSourceItem
-              const v: JSX.Element =
-                (d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text'] ??
-                d.text
-              const isSelected = props.value === v
-              return (
-                <li
-                  role="option"
-                  aria-selected={isSelected}
-                  tabIndex={open() ? 0 : -1}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (!isSelected) {
-                      props.onSelected?.(data)
-                    }
-                    setOpen(false)
-                  }}
-                >
-                  {v}
-                </li>
-              )
-            })}
+            {items().map(({ data, v, isSelected }) => (
+              <li
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={open() ? 0 : -1}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!isSelected) {
+                    props.onSelected?.(data)
+                  }
+                  setOpen(false)
+                }}
+              >
+                {v}
+              </li>
+            ))}
           </ul>
         </div>
       )}

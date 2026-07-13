@@ -40,15 +40,14 @@ export function calcEMA(data: number[], period: number): number[] {
   const result = new Array<number>(n)
   const k = 2 / (period + 1)
   let prevEma = NaN
+  // 累积和用于 i === period - 1 时的 SMA 种子
+  let windowSum = 0
 
   for (let i = 0; i < n; i++) {
+    windowSum += data[i]
     if (i === period - 1) {
-      // 用前 period 个数据的 SMA 作为 EMA 种子值
-      let sum = 0
-      for (let j = 0; j < period; j++) {
-        sum += data[j]
-      }
-      prevEma = sum / period
+      // windowSum 已累积了前 period 个数据的和
+      prevEma = windowSum / period
       result[i] = prevEma
     } else if (i >= period) {
       // EMA = 前值 + k * (当前值 - 前值)
@@ -69,17 +68,27 @@ export function calcEMA(data: number[], period: number): number[] {
 export function calcWMA(data: number[], period: number): number[] {
   const n = data.length
   const result = new Array<number>(n)
+  if (n === 0) return result
   // 权重总和 = period * (period + 1) / 2
   const weightSum = (period * (period + 1)) / 2
 
+  // 滑动窗口 O(n) 实现：
+  // 窗口右移时，旧窗口元素权重各减 1，新元素权重为 period
+  // newWeightedSum = oldWeightedSum - oldWinSum + newValue * period
+  let winSum = 0      // 当前窗口元素的和
+  let weightedSum = 0  // 当前窗口的加权和
   for (let i = 0; i < n; i++) {
+    if (i >= period) {
+      // 此时 winSum = sum(data[i-period..i-1]) = 滑动前的窗口和
+      weightedSum = weightedSum - winSum + data[i] * period
+      winSum = winSum - data[i - period] + data[i]
+    } else {
+      winSum += data[i]
+      weightedSum += data[i] * (i + 1)
+    }
+
     if (i >= period - 1) {
-      let weighted = 0
-      for (let j = 0; j < period; j++) {
-        // 窗口内第 j 个元素的权重为 j + 1（越新权重越大）
-        weighted += data[i - period + 1 + j] * (j + 1)
-      }
-      result[i] = weighted / weightSum
+      result[i] = weightedSum / weightSum
     } else {
       result[i] = NaN
     }
@@ -201,15 +210,13 @@ export function calcRMA(data: number[], period: number): number[] {
   const n = data.length
   const result = new Array<number>(n)
   let prevRma = NaN
+  let windowSum = 0
 
   for (let i = 0; i < n; i++) {
+    windowSum += data[i]
     if (i === period - 1) {
-      // 用前 period 个数据的 SMA 作为种子
-      let sum = 0
-      for (let j = 0; j < period; j++) {
-        sum += data[j]
-      }
-      prevRma = sum / period
+      // windowSum 已累积前 period 个数据的和
+      prevRma = windowSum / period
       result[i] = prevRma
     } else if (i >= period) {
       // Wilder 递归公式

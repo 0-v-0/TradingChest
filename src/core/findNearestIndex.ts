@@ -23,17 +23,12 @@ export function findNearestIndex(
     else hi = mid
   }
 
-  // 检查 lo 和 lo-1，取更近的一个
-  let bestIdx = -1
-  let bestDist = Infinity
-  for (const idx of [lo, lo - 1]) {
-    if (idx >= 0 && idx < len) {
-      const dist = Math.abs(sorted[idx] - target)
-      if (dist <= tolerance && dist < bestDist) {
-        bestDist = dist
-        bestIdx = idx
-      }
-    }
+  // 比较 lo 和 lo-1，取更近且在 tolerance 范围内的
+  if (
+    lo > 0 &&
+    Math.abs(sorted[lo - 1] - target) <= Math.abs(sorted[lo] - target)
+  ) {
+    return Math.abs(sorted[lo - 1] - target) <= tolerance ? lo - 1 : -1
   }
-  return bestIdx
+  return Math.abs(sorted[lo] - target) <= tolerance ? lo : -1
 }

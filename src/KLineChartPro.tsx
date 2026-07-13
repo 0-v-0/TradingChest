@@ -30,6 +30,19 @@ import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 
 export default class KLineChartPro implements ChartPro {
   constructor(options: ChartProOptions) {
+    this._initContainer(options)
+    this._initSolidRender(options)
+    this._datafeed = options.datafeed
+    this._initTradeVisClickHandler(options)
+    if (options.onAlertTrigger) {
+      this._alertManager.onTrigger = options.onAlertTrigger
+    }
+    this._undoRedoManager = new UndoRedoManager()
+    this._initShortcutManager()
+  }
+
+  /** 1. 解析并设置容器元素 */
+  private _initContainer(options: ChartProOptions): void {
     if (utils.isString(options.container)) {
       this._container = document.getElementById(options.container as string)
       if (!this._container) {
@@ -40,7 +53,10 @@ export default class KLineChartPro implements ChartPro {
     }
     this._container.classList.add('klinecharts-pro')
     this._container.setAttribute('data-theme', options.theme ?? 'light')
+  }
 
+  /** 2. Solid.js 渲染 ChartProComponent */
+  private _initSolidRender(options: ChartProOptions): void {
     this._solidDispose = render(
       () => (
         <ChartProComponent
@@ -82,70 +98,59 @@ export default class KLineChartPro implements ChartPro {
           }}
           onDataReset={() => {
             this._alertManager.resetPrevPrice()
-            // 品种/周期切换时清理比较指标（旧数据时间戳不再对齐）
             this._clearComparisons()
           }}
           onError={options.onError}
           undoRedoManager={this._undoRedoManager}
         />
       ),
-      this._container,
+      this._container!,
     ) as () => void
+  }
 
-    this._datafeed = options.datafeed
-
-    // 指标图形点击检测（TradeVis 标签）
-    // 直接绑定到 container（最外层），使用模块级 hitTargets（draw 每帧更新）
-    {
-      const onIndClick = options.onIndicatorClick
-      this._clickTarget = this._container!
-      this._clickHandler = (e: Event) => {
-        const me = e as MouseEvent
+  /** 3. TradeVis 交易标签点击检测 */
+  private _initTradeVisClickHandler(options: ChartProOptions): void {
+    const onIndClick = options.onIndicatorClick
+    this._clickTarget = this._container!
+    this._clickHandler = (e: Event) => {
+      const me = e as MouseEvent
         // hitTargets 的 x/y 是 pane canvas 内部坐标（xAxis/yAxis.convertToPixel）
         // 用 event.target（canvas）的 rect 匹配坐标系
-        const target = me.target as HTMLElement
-        const rect = target.getBoundingClientRect()
-        const clickX = me.clientX - rect.left
-        const clickY = me.clientY - rect.top
+      const target = me.target as HTMLElement
+      const rect = target.getBoundingClientRect()
+      const clickX = me.clientX - rect.left
+      const clickY = me.clientY - rect.top
 
         // 从实例级 hitTargets 查找最近的交易标签
-        const hitTargets = getTradeVisHitTargets(this._instanceId)
-        let closest: { x: number; y: number; trade: TradeRecord; type: string } | null = null
-        let minDist = Infinity
-        for (const ht of hitTargets) {
-          const dx = clickX - ht.x
-          const dy = clickY - ht.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 40 && dist < minDist) {
-            minDist = dist
-            closest = ht
-          }
-        }
-
-        if (closest && onIndClick) {
-          onIndClick({
-            indicatorName: 'TradeVis',
-            data: { ...closest.trade, type: closest.type },
-            x: clickX,
-            y: clickY,
-          })
+      const hitTargets = getTradeVisHitTargets(this._instanceId)
+      let closest: { x: number; y: number; trade: TradeRecord; type: string } | null = null
+      let minDist = Infinity
+      for (const ht of hitTargets) {
+        const dx = clickX - ht.x
+        const dy = clickY - ht.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < 40 && dist < minDist) {
+          minDist = dist
+          closest = ht
         }
       }
-      this._container!.addEventListener('click', this._clickHandler, true)
+
+      if (closest && onIndClick) {
+        onIndClick({
+          indicatorName: 'TradeVis',
+          data: { ...closest.trade, type: closest.type },
+          x: clickX,
+          y: clickY,
+        })
+      }
     }
+    this._container!.addEventListener('click', this._clickHandler, true)
+  }
 
-    // 初始化报警管理器
-    if (options.onAlertTrigger) {
-      this._alertManager.onTrigger = options.onAlertTrigger
-    }
-
-    // 初始化撤销/重做管理器
-    this._undoRedoManager = new UndoRedoManager()
-
-    // 初始化快捷键管理器
+  /** 4. 初始化快捷键管理器 */
+  private _initShortcutManager(): void {
     this._shortcutManager = new KeyboardShortcutManager()
     this._shortcutManager.registerActions({
-      // 导航
       'nav:scrollToEnd': () => {
         this.getChart()?.scrollToRealTime()
       },
@@ -223,12 +228,12 @@ export default class KLineChartPro implements ChartPro {
     this._shortcutManager.bindTo(this._container!)
   }
 
-  private _container: Nullable<HTMLElement>
+  private _container!: Nullable<HTMLElement>
 
   private _chartApi: Nullable<ChartPro> = null
 
-  private _shortcutManager: KeyboardShortcutManager
-  private _undoRedoManager: UndoRedoManager
+  private _shortcutManager!: KeyboardShortcutManager
+  private _undoRedoManager!: UndoRedoManager
 
   private _comparisons = new Map<string, string>() // ticker → indicatorName
 
