@@ -1,10 +1,9 @@
 import type { IndicatorTemplate } from 'klinecharts'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type IndicatorLoader = () => Promise<IndicatorTemplate<any, any>>
+type IndicatorLoader = () => Promise<IndicatorTemplate>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const load = (m: { default: IndicatorTemplate<any, any> }): IndicatorTemplate<any, any> => m.default
+const load = <D, C>(m: { default: IndicatorTemplate<D, C> }): IndicatorTemplate =>
+  m.default as unknown as IndicatorTemplate
 
 // oxfmt-ignore
 export const indicatorLoaders: Record<string, IndicatorLoader> = {

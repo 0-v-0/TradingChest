@@ -11,6 +11,5 @@ import pointAndFigure from './pointAndFigure'
 import lineBreak from './lineBreak'
 import rangeBars from './rangeBars'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const chartTypes: IndicatorTemplate<any, number>[] = [heikinAshi, baseline, renko, kagi, pointAndFigure, lineBreak, rangeBars]
+const chartTypes: IndicatorTemplate[] = [heikinAshi, baseline, renko, kagi, pointAndFigure, lineBreak, rangeBars] as IndicatorTemplate[]
 export default chartTypes
