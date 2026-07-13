@@ -16,6 +16,7 @@ import type { AlertConfig } from './alert/types'
 import { AlertManager } from './alert'
 import ChartProComponent from './ChartProComponent'
 import { normalizeToPercent } from './compare'
+import { findNearestIndex } from './core/findNearestIndex'
 import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
 import {
   type TradeRecord,
@@ -464,22 +465,9 @@ export default class KLineChartPro implements ChartPro {
     for (const d of mainData) {
       let pct = compMap.get(d.timestamp)
       if (pct === undefined) {
-        // Binary search for nearest timestamp
-        let lo = 0, hi = compTimestamps.length - 1
-        while (lo < hi) {
-          const mid = (lo + hi) >> 1
-          if (compTimestamps[mid] < d.timestamp) lo = mid + 1
-          else hi = mid
-        }
-        for (const idx of [lo, lo - 1]) {
-          if (
-            idx >= 0 &&
-            idx < compTimestamps.length &&
-            Math.abs(compTimestamps[idx] - d.timestamp) <= 60000
-          ) {
-            pct = compMap.get(compTimestamps[idx])
-            break
-          }
+        const idx = findNearestIndex(compTimestamps, d.timestamp, 60000)
+        if (idx >= 0) {
+          pct = compMap.get(compTimestamps[idx])
         }
       }
       mainLookup.set(d.timestamp, pct)

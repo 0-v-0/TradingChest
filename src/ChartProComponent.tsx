@@ -352,6 +352,26 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     }
   }
 
+  /** 交换 overlay 的 zLevel（direction: 1=前移, -1=后移） */
+  const swapZLevel = (overlay: Overlay, direction: 1 | -1) => {
+    if (!overlay.id || !overlay.paneId || !widget) return
+    const allOnPane = widget.getOverlays()
+      .filter(o => o.paneId === overlay.paneId)
+      .sort((a, b) => a.zLevel - b.zLevel)
+    const idx = allOnPane.findIndex(o => o.id === overlay.id)
+    const targetIdx = idx + direction
+    if (targetIdx < 0 || targetIdx >= allOnPane.length) return
+    const target = allOnPane[targetIdx]
+    const ownZ = overlay.zLevel
+    const targetZ = target.zLevel
+    if (ownZ === targetZ) {
+      widget.overrideOverlay({ id: overlay.id, zLevel: targetZ + direction })
+    } else {
+      widget.overrideOverlay({ id: overlay.id, zLevel: targetZ })
+      widget.overrideOverlay({ id: target.id, zLevel: ownZ })
+    }
+  }
+
   const handleOverlayRightClick = (overlay: Overlay, x: number, y: number) => {
     const textOverlays = ['textAnnotation', 'callout', 'note']
     const items: MenuItem[] = []
@@ -401,45 +421,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       },
       {
         label: t('menu_bring_forward', locale()),
-        onClick: () => {
-          if (!overlay.id || !overlay.paneId) return
-          const allOnPane = widget!.getOverlays()
-            .filter(o => o.paneId === overlay.paneId)
-            .sort((a, b) => a.zLevel - b.zLevel)
-          const idx = allOnPane.findIndex(o => o.id === overlay.id)
-          if (idx < allOnPane.length - 1) {
-            const front = allOnPane[idx + 1]
-            const ownZ = overlay.zLevel
-            const frontZ = front.zLevel
-            if (ownZ === frontZ) {
-              widget!.overrideOverlay({ id: overlay.id, zLevel: frontZ + 1 })
-            } else {
-              widget!.overrideOverlay({ id: overlay.id, zLevel: frontZ })
-              widget!.overrideOverlay({ id: front.id, zLevel: ownZ })
-            }
-          }
-        },
+        onClick: () => swapZLevel(overlay, 1),
       },
       {
         label: t('menu_send_backward', locale()),
-        onClick: () => {
-          if (!overlay.id || !overlay.paneId) return
-          const allOnPane = widget!.getOverlays()
-            .filter(o => o.paneId === overlay.paneId)
-            .sort((a, b) => a.zLevel - b.zLevel)
-          const idx = allOnPane.findIndex(o => o.id === overlay.id)
-          if (idx > 0) {
-            const back = allOnPane[idx - 1]
-            const ownZ = overlay.zLevel
-            const backZ = back.zLevel
-            if (ownZ === backZ) {
-              widget!.overrideOverlay({ id: overlay.id, zLevel: backZ - 1 })
-            } else {
-              widget!.overrideOverlay({ id: overlay.id, zLevel: backZ })
-              widget!.overrideOverlay({ id: back.id, zLevel: ownZ })
-            }
-          }
-        },
+        onClick: () => swapZLevel(overlay, -1),
       },
       {
         label: t('menu_delete', locale()),
@@ -668,16 +654,20 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     ;(async () => {
       for (const indicator of mainIndicators()) {
+        if (disposed) return
         await createIndicator(widget, indicator, true, 'candle_pane')
       }
       const subIndicatorMap: Record<string, string> = {}
       for (const indicator of props.subIndicators!) {
+        if (disposed) return
         const paneId = await createIndicator(widget, indicator, true)
         if (paneId) {
           subIndicatorMap[indicator] = paneId
         }
       }
-      setSubIndicators(subIndicatorMap)
+      if (!disposed) {
+        setSubIndicators(subIndicatorMap)
+      }
     })().catch((e) => {
       props.onError?.({ type: 'indicator-init', message: 'indicator init failed', raw: e })
     })

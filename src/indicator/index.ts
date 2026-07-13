@@ -42,7 +42,7 @@ export const indicatorCategories: Record<string, { names: string[]; labelKey: st
     labelKey: 'category_trend',
   },
   volatility: {
-    names: ['BOLL', 'KC', 'DC', 'HV', 'STDDEV', 'CV', 'MI', 'UI', 'BBW', 'StandardError'],
+    names: ['KC', 'DC', 'HV', 'STDDEV', 'CV', 'MI', 'UI', 'BBW', 'StandardError'],
     labelKey: 'category_volatility',
   },
   volume: {

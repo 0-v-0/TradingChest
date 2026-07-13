@@ -59,9 +59,17 @@ export function loadLayout(key: string): ChartLayout | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_PREFIX + key)
     if (!raw) return null
-    const data = JSON.parse(raw) as ChartLayout
+    const data = JSON.parse(raw) as Record<string, unknown>
     if (typeof data.version !== 'number') return null
-    const migrated = migrateLayout(data)
+    if (typeof data.timestamp !== 'number') return null
+    if (typeof data.theme !== 'string') return null
+    if (typeof data.locale !== 'string') return null
+    if (typeof data.timezone !== 'string') return null
+    if (!Array.isArray(data.mainIndicators) || !data.mainIndicators.every((v: unknown) => typeof v === 'string')) return null
+    if (!Array.isArray(data.subIndicators) || !data.subIndicators.every((v: unknown) => typeof v === 'string')) return null
+    if (data.styles !== null && typeof data.styles !== 'object') return null
+    if (!Array.isArray(data.overlayData)) return null
+    const migrated = migrateLayout(data as unknown as ChartLayout)
     return migrated
   } catch {
     return null
