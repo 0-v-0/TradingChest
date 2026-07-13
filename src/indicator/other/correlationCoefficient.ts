@@ -8,16 +8,16 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const correlationCoefficient: IndicatorTemplate = {
+type CorrelationCoefficientResult = { r: number }
+
+const correlationCoefficient: IndicatorTemplate<CorrelationCoefficientResult, number> = {
   name: 'CorrelationCoefficient',
   shortName: 'Corr',
   calcParams: [14],
   figures: [
     { key: 'r', title: 'Corr: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: { r: number }[] = []
 
     let sumX = 0

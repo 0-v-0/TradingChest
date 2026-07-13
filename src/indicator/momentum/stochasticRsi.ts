@@ -11,7 +11,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type StochasticRsiResult = { k: number; d: number }
 
-const stochasticRsi: IndicatorTemplate = {
+const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
   name: 'StochRSI',
   shortName: 'StochRSI',
   calcParams: [14, 14, 3, 3],
@@ -19,12 +19,7 @@ const stochasticRsi: IndicatorTemplate = {
     { key: 'k', title: 'K: ', type: 'line' },
     { key: 'd', title: 'D: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const rsiPeriod = params[0] as number
-    const stochPeriod = params[1] as number
-    const kSmooth = params[2] as number
-    const dSmooth = params[3] as number
+  calc: (dataList: KLineData[], { calcParams: [rsiPeriod, stochPeriod, kSmooth, dSmooth] }) => {
     const len = dataList.length
 
     // ---- 第一步：计算 RSI（Wilder 平滑法） ----

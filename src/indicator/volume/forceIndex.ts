@@ -12,14 +12,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ForceIndexResult = { fi: number }
 
-const forceIndex: IndicatorTemplate = {
+const forceIndex: IndicatorTemplate<ForceIndexResult, number> = {
   name: 'FI',
   shortName: 'FI',
   calcParams: [13],
   figures: [{ key: 'fi', title: 'FI: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: ForceIndexResult[] = []
 
     if (dataList.length === 0) {

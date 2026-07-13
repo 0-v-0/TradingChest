@@ -7,16 +7,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KamaResult = { kama: number }
 
-const kama: IndicatorTemplate = {
+const kama: IndicatorTemplate<KamaResult, number> = {
   name: 'KAMA',
   shortName: 'KAMA',
   calcParams: [10, 2, 30],
   figures: [{ key: 'kama', title: 'KAMA: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const fastPeriod = params[1] as number
-    const slowPeriod = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [period, fastPeriod, slowPeriod] }) => {
 
     // 快速与慢速平滑常数
     const fastSc = 2 / (fastPeriod + 1)

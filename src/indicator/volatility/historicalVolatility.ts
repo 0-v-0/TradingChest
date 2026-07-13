@@ -10,13 +10,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type HistoricalVolatilityResult = { hv: number }
 
-const historicalVolatility: IndicatorTemplate = {
+const historicalVolatility: IndicatorTemplate<HistoricalVolatilityResult, number> = {
   name: 'HV',
   shortName: 'HV',
   calcParams: [20],
   figures: [{ key: 'hv', title: 'HV: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
     const annualizationFactor = Math.sqrt(252)
     const result: HistoricalVolatilityResult[] = new Array(n)

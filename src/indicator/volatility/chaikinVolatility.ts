@@ -6,14 +6,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ChaikinVolatilityResult = { cv: number }
 
-const chaikinVolatility: IndicatorTemplate = {
+const chaikinVolatility: IndicatorTemplate<ChaikinVolatilityResult, number> = {
   name: 'CV',
   shortName: 'CV',
   calcParams: [10],
   figures: [{ key: 'cv', title: 'CV: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: ChaikinVolatilityResult[] = []
 
     // EMA 平滑系数

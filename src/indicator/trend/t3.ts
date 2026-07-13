@@ -10,15 +10,14 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const t3: IndicatorTemplate = {
+type T3Result = { t3: number }
+
+const t3: IndicatorTemplate<T3Result, number> = {
   name: 'T3',
   shortName: 'T3',
   calcParams: [5, 0.7],
   figures: [{ key: 't3', title: 'T3: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const vf = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [period, vf] }) => {
     const k = 2 / (period + 1)
 
     // T3 系数（基于 volume factor）

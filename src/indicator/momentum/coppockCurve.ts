@@ -9,16 +9,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type CoppockCurveResult = { coppock: number }
 
-const coppockCurve: IndicatorTemplate = {
+const coppockCurve: IndicatorTemplate<CoppockCurveResult, number> = {
   name: 'COPPOCK',
   shortName: 'Coppock',
   calcParams: [14, 11, 10],
   figures: [{ key: 'coppock', title: 'Coppock: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const roc1Period = params[0] as number
-    const roc2Period = params[1] as number
-    const wmaPeriod = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [roc1Period, roc2Period, wmaPeriod] }) => {
     const len = dataList.length
     const result: CoppockCurveResult[] = []
 

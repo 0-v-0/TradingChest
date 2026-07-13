@@ -11,14 +11,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type VrocResult = { vroc: number }
 
-const vroc: IndicatorTemplate = {
+const vroc: IndicatorTemplate<VrocResult, number> = {
   name: 'VROC',
   shortName: 'VROC',
   calcParams: [14],
   figures: [{ key: 'vroc', title: 'VROC: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: VrocResult[] = []
 
     for (let i = 0; i < dataList.length; i++) {

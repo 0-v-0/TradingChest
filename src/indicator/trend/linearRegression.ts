@@ -6,7 +6,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcLinReg } from '../utils'
 
-const linearRegression: IndicatorTemplate = {
+type LinearRegressionResult = { value: number; upper: number; lower: number }
+
+const linearRegression: IndicatorTemplate<LinearRegressionResult, number> = {
   name: 'LINEARREGRESSION',
   shortName: 'LinReg',
   calcParams: [14],
@@ -15,8 +17,7 @@ const linearRegression: IndicatorTemplate = {
     { key: 'upper', title: '上轨: ', type: 'line' },
     { key: 'lower', title: '下轨: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const closes: number[] = new Array(dataList.length)
     for (let i = 0; i < dataList.length; i++) closes[i] = dataList[i].close
     const reg = calcLinReg(closes, period)

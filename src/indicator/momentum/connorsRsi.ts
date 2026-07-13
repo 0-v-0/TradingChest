@@ -12,22 +12,16 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcRMA } from '../utils'
 
-type ConnorsRsiResult = {
-  crsi: number
-}
+type ConnorsRsiResult = { crsi: number }
 
-const connorsRsi: IndicatorTemplate = {
+const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
   name: 'ConnorsRSI',
   shortName: 'CRSI',
   calcParams: [3, 2, 100],
   figures: [
     { key: 'crsi', title: 'CRSI: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const rsiPeriod = params[0] as number
-    const streakRsiPeriod = params[1] as number
-    const rankPeriod = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [rsiPeriod, streakRsiPeriod, rankPeriod] }) => {
 
     // 1. 计算标准 RSI
     const gains: number[] = []

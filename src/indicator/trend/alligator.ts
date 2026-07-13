@@ -11,7 +11,7 @@ type AlligatorResult = {
   lips: number
 }
 
-const alligator: IndicatorTemplate = {
+const alligator: IndicatorTemplate<AlligatorResult, number> = {
   name: 'ALLIGATOR',
   shortName: 'Alligator',
   calcParams: [13, 8, 5],
@@ -20,11 +20,7 @@ const alligator: IndicatorTemplate = {
     { key: 'teeth', title: '齿线: ', type: 'line' },
     { key: 'lips', title: '唇线: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const jawPeriod = params[0] as number
-    const teethPeriod = params[1] as number
-    const lipsPeriod = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [jawPeriod, teethPeriod, lipsPeriod] }) => {
 
     // 偏移量
     const jawOffset = 8

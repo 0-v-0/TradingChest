@@ -5,14 +5,14 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const dema: IndicatorTemplate = {
+type DemaResult = { dema: number }
+
+const dema: IndicatorTemplate<DemaResult, number> = {
   name: 'DEMA',
   shortName: 'DEMA',
   calcParams: [21],
   figures: [{ key: 'dema', title: 'DEMA: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const k = 2 / (period + 1)
 
     // 第一层 EMA

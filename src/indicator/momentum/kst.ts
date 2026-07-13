@@ -17,7 +17,7 @@ import { calcSMA } from '../utils'
 
 type KstResult = { kst: number; signal: number }
 
-const kst: IndicatorTemplate = {
+const kst: IndicatorTemplate<KstResult, number> = {
   name: 'KST',
   shortName: 'KST',
   calcParams: [10, 15, 20, 30, 10, 10, 10, 15, 9],
@@ -25,11 +25,9 @@ const kst: IndicatorTemplate = {
     { key: 'kst', title: 'KST: ', type: 'line' },
     { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const p = indicator.calcParams
-    const rocPeriods = [p[0] as number, p[1] as number, p[2] as number, p[3] as number]
-    const smaPeriods = [p[4] as number, p[5] as number, p[6] as number, p[7] as number]
-    const signalPeriod = p[8] as number
+  calc: (dataList: KLineData[], { calcParams: [roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signalPeriod] }) => {
+    const rocPeriods = [roc1, roc2, roc3, roc4]
+    const smaPeriods = [sma1, sma2, sma3, sma4]
     const weights = [1, 2, 3, 4]
     const len = dataList.length
 

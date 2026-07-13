@@ -7,14 +7,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type McginleyResult = { md: number }
 
-const mcginley: IndicatorTemplate = {
+const mcginley: IndicatorTemplate<McginleyResult, number> = {
   name: 'MCGINLEY',
   shortName: 'McGinley',
   calcParams: [14],
   figures: [{ key: 'md', title: 'MD: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
 
     const result: McginleyResult[] = []
     let prevMd = 0

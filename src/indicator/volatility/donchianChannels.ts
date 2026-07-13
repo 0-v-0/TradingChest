@@ -5,7 +5,9 @@
 import { calcHighest, calcLowest } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const donchianChannels: IndicatorTemplate = {
+type DonchianChannelsResult = { upper: number; lower: number; middle: number }
+
+const donchianChannels: IndicatorTemplate<DonchianChannelsResult, number> = {
   name: 'DC',
   shortName: 'DC',
   calcParams: [20],
@@ -14,9 +16,7 @@ const donchianChannels: IndicatorTemplate = {
     { key: 'lower', title: 'LOW: ', type: 'line' },
     { key: 'middle', title: 'MID: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const highs = dataList.map(k => k.high)
     const lows = dataList.map(k => k.low)
     const uppers = calcHighest(highs, period)

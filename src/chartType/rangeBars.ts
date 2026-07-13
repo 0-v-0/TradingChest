@@ -48,7 +48,7 @@ function calcATR(dataList: KLineData[], period: number): number {
   return sum / count
 }
 
-const rangeBars: IndicatorTemplate = {
+const rangeBars: IndicatorTemplate<{}, number> = {
   name: 'RangeBars',
   shortName: 'RB',
   calcParams: [14],
@@ -56,12 +56,12 @@ const rangeBars: IndicatorTemplate = {
   calc: (dataList: KLineData[]) => {
     return dataList.map(() => ({}))
   },
-  draw: ({ ctx, chart, indicator, bounding, yAxis }) => {
+  draw: ({ ctx, chart, indicator: { calcParams: [period = 14] }, bounding, yAxis }) => {
     const dataList = chart.getDataList()
     if (!dataList || dataList.length < 2) return false
 
-    const period = Math.max(2, (indicator.calcParams[0] as number) || 14)
-    const atrVal = calcATR(dataList, period)
+    const adjustedPeriod = Math.max(2, period)
+    const atrVal = calcATR(dataList, adjustedPeriod)
     const rangeSize = Math.max(atrVal, 0.01)
     if (rangeSize <= 0) return false
 

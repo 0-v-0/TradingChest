@@ -82,12 +82,12 @@ export function findClosestBar(dataList: Pick<KLineData, 'timestamp'>[], targetT
   return lo
 }
 
-const tradeVisualization: IndicatorTemplate<BarTradeInfo> = {
+const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
   name: 'TradeVis',
   shortName: 'Trades',
   calcParams: [],
   figures: [],
-  calc: (dataList: KLineData[], indicator: Indicator<BarTradeInfo>) => {
+  calc: (dataList: KLineData[], indicator: Indicator<BarTradeInfo, number>) => {
     const ext = indicator.extendData as TradeVisExtendData | TradeRecord[] | undefined
     const trades = Array.isArray(ext) ? ext : ext?.trades
     const instanceId = (!Array.isArray(ext) && ext?._instanceId) || '_default'

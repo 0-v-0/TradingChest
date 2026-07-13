@@ -19,7 +19,7 @@ type AdxResult = {
   minusDi: number
 }
 
-const adx: IndicatorTemplate = {
+const adx: IndicatorTemplate<AdxResult, number> = {
   name: 'ADX',
   shortName: 'ADX',
   calcParams: [14],
@@ -28,8 +28,7 @@ const adx: IndicatorTemplate = {
     { key: 'plusDi', title: '+DI: ', type: 'line' },
     { key: 'minusDi', title: '-DI: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
     const result: AdxResult[] = []
 

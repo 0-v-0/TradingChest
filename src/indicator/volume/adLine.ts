@@ -13,7 +13,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AdLineResult = { ad: number }
 
-const adLine: IndicatorTemplate = {
+const adLine: IndicatorTemplate<AdLineResult, number> = {
   name: 'AD',
   shortName: 'AD',
   calcParams: [],

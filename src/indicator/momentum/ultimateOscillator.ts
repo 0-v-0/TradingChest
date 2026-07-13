@@ -12,16 +12,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type UltimateOscillatorResult = { uo: number }
 
-const ultimateOscillator: IndicatorTemplate = {
+const ultimateOscillator: IndicatorTemplate<UltimateOscillatorResult, number> = {
   name: 'UO',
   shortName: 'UO',
   calcParams: [7, 14, 28],
   figures: [{ key: 'uo', title: 'UO: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period1 = params[0] as number
-    const period2 = params[1] as number
-    const period3 = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [period1, period2, period3] }) => {
     const maxPeriod = Math.max(period1, period2, period3)
     const len = dataList.length
     const result: UltimateOscillatorResult[] = []

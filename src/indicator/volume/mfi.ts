@@ -18,13 +18,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type MfiResult = { mfi: number }
 
-const mfi: IndicatorTemplate = {
+const mfi: IndicatorTemplate<MfiResult, number> = {
   name: 'MFI',
   shortName: 'MFI',
   calcParams: [14],
   figures: [{ key: 'mfi', title: 'MFI: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
     const result: MfiResult[] = new Array(n)
 

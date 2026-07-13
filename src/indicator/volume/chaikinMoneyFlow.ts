@@ -13,14 +13,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ChaikinMoneyFlowResult = { cmf: number }
 
-const chaikinMoneyFlow: IndicatorTemplate = {
+const chaikinMoneyFlow: IndicatorTemplate<ChaikinMoneyFlowResult, number> = {
   name: 'CMF',
   shortName: 'CMF',
   calcParams: [20],
   figures: [{ key: 'cmf', title: 'CMF: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: ChaikinMoneyFlowResult[] = []
 
     // 预先计算每根 K 线的资金流量成交量

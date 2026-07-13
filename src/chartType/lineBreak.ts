@@ -111,7 +111,7 @@ export function calcLineBreak(dataList: KLineData[], lines: number): LineBreakLi
   return result
 }
 
-const lineBreak: IndicatorTemplate = {
+const lineBreak: IndicatorTemplate<{}, number> = {
   name: 'LineBreak',
   shortName: 'LB',
   calcParams: [3],
@@ -119,12 +119,12 @@ const lineBreak: IndicatorTemplate = {
   calc: (dataList: KLineData[]) => {
     return dataList.map(() => ({}))
   },
-  draw: ({ ctx, chart, indicator, bounding, yAxis }) => {
+  draw: ({ ctx, chart, indicator: { calcParams: [lines = 3] }, bounding, yAxis }) => {
     const dataList = chart.getDataList()
     if (!dataList || dataList.length < 2) return false
 
-    const lines = Math.max(2, (indicator.calcParams[0] as number) || 3)
-    const lineBreakLines = calcLineBreak(dataList, lines)
+    const adjustedLines = Math.max(2, lines)
+    const lineBreakLines = calcLineBreak(dataList, adjustedLines)
     if (lineBreakLines.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()

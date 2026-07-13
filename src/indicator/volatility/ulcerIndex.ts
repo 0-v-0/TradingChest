@@ -12,14 +12,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type UlcerIndexResult = { ui: number }
 
-const ulcerIndex: IndicatorTemplate = {
+const ulcerIndex: IndicatorTemplate<UlcerIndexResult, number> = {
   name: 'UI',
   shortName: 'UI',
   calcParams: [14],
   figures: [{ key: 'ui', title: 'UI: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: UlcerIndexResult[] = []
 
     // Monotonic deque for rolling window max (same logic as calcHighest)

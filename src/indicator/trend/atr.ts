@@ -6,14 +6,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type AtrResult = { atr: number }
 
-const atr: IndicatorTemplate = {
+const atr: IndicatorTemplate<AtrResult, number> = {
   name: 'ATR',
   shortName: 'ATR',
   calcParams: [14],
   figures: [{ key: 'atr', title: 'ATR: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const result: AtrResult[] = []
     let prevAtr = 0
 

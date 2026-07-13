@@ -6,7 +6,9 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const baseline: IndicatorTemplate = {
+type BaselineResult = { close: number; baseline: number }
+
+const baseline: IndicatorTemplate<BaselineResult, number> = {
   name: 'Baseline',
   shortName: 'BL',
   calcParams: [],

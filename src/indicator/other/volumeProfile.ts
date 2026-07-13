@@ -6,7 +6,7 @@ export interface VolumeBin {
   volume: number
 }
 
-export interface VolumeProfileResult {
+export interface VolumeProfileData {
   bins: VolumeBin[]
   pocIndex: number
   totalVolume: number
@@ -14,9 +14,14 @@ export interface VolumeProfileResult {
   vaHigh: number
 }
 
+interface VolumeProfileResult {
+  vp: number
+  __vp?: VolumeProfileData
+}
+
 const DEFAULT_BINS = 24
 
-function calcVolumeProfile(dataList: KLineData[], numBins: number): VolumeProfileResult {
+function calcVolumeProfile(dataList: KLineData[], numBins: number): VolumeProfileData {
   let maxPrice = -Infinity
   let minPrice = Infinity
 
@@ -82,14 +87,13 @@ function calcVolumeProfile(dataList: KLineData[], numBins: number): VolumeProfil
   return { bins, pocIndex, totalVolume, vaLow, vaHigh }
 }
 
-const volumeProfile: IndicatorTemplate = {
+const volumeProfile: IndicatorTemplate<VolumeProfileResult, number> = {
   name: 'VOLUME_PROFILE',
   shortName: 'VP',
   calcParams: [DEFAULT_BINS],
   series: 'price',
   figures: [{ key: 'vp', title: 'VP: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const numBins = (indicator.calcParams[0] as number) || DEFAULT_BINS
+  calc: (dataList: KLineData[], { calcParams: [numBins = DEFAULT_BINS] }) => {
     const result = calcVolumeProfile(dataList, numBins)
     return Array(dataList.length).fill({ vp: NaN }).map((v, i) => {
       if (i === 0) return { vp: result.bins[result.pocIndex]?.priceLow ?? 0, __vp: result }
@@ -97,7 +101,7 @@ const volumeProfile: IndicatorTemplate = {
     })
   },
   draw: ({ ctx, indicator, bounding, yAxis }) => {
-    const result = indicator.result?.[0] as ({ vp: number } & { __vp?: VolumeProfileResult }) | undefined
+    const result = indicator.result?.[0]
     if (!result?.__vp) return true
     const vp = result.__vp
     const maxV = vp.bins.reduce((s, b) => Math.max(s, b.volume), 0)

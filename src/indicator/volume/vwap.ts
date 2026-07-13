@@ -7,7 +7,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type VwapResult = { vwap: number }
 
-const vwap: IndicatorTemplate = {
+const vwap: IndicatorTemplate<VwapResult, number> = {
   name: 'VWAP',
   shortName: 'VWAP',
   calcParams: [],

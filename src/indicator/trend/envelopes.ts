@@ -6,7 +6,9 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
-const envelopes: IndicatorTemplate = {
+type EnvelopesResult = { middle: number; upper: number; lower: number }
+
+const envelopes: IndicatorTemplate<EnvelopesResult, number> = {
   name: 'ENVELOPES',
   shortName: 'Envelopes',
   calcParams: [20, 2.5],
@@ -15,10 +17,7 @@ const envelopes: IndicatorTemplate = {
     { key: 'upper', title: '上轨: ', type: 'line' },
     { key: 'lower', title: '下轨: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const percentage = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [period, percentage] }) => {
 
     const closes = dataList.map((d) => d.close)
     const smaValues = calcSMA(closes, period)

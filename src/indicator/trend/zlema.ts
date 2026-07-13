@@ -8,14 +8,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ZlemaResult = { zlema: number }
 
-const zlema: IndicatorTemplate = {
+const zlema: IndicatorTemplate<ZlemaResult, number> = {
   name: 'ZLEMA',
   shortName: 'ZLEMA',
   calcParams: [21],
   figures: [{ key: 'zlema', title: 'ZLEMA: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const lag = Math.floor((period - 1) / 2)
     const k = 2 / (period + 1)
 

@@ -16,7 +16,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KlingerOscillatorResult = { kvo: number; signal: number }
 
-const klingerOscillator: IndicatorTemplate = {
+const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
   name: 'KVO',
   shortName: 'KVO',
   calcParams: [34, 55, 13],
@@ -24,11 +24,7 @@ const klingerOscillator: IndicatorTemplate = {
     { key: 'kvo', title: 'KVO: ', type: 'line' },
     { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const fastPeriod = params[0] as number
-    const slowPeriod = params[1] as number
-    const signalPeriod = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod, signalPeriod] }) => {
     const result: KlingerOscillatorResult[] = []
 
     if (dataList.length === 0) {

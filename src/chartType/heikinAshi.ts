@@ -14,7 +14,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type HeikinAshiResult = { haOpen: number; haHigh: number; haLow: number; haClose: number }
 
-const heikinAshi: IndicatorTemplate = {
+const heikinAshi: IndicatorTemplate<HeikinAshiResult, number> = {
   name: 'HeikinAshi',
   shortName: 'HA',
   calcParams: [],

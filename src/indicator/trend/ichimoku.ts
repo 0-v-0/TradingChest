@@ -26,7 +26,7 @@ function midPoint(dataList: KLineData[], endIndex: number, period: number): numb
   return (high + low) / 2
 }
 
-const ichimoku: IndicatorTemplate = {
+const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
   name: 'ICHIMOKU',
   shortName: 'Ichimoku',
   calcParams: [9, 26, 52, 26],
@@ -37,12 +37,7 @@ const ichimoku: IndicatorTemplate = {
     { key: 'senkouSpanB', title: '先行带B: ', type: 'line' },
     { key: 'chikouSpan', title: '迟行带: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const tenkanPeriod = params[0] as number
-    const kijunPeriod = params[1] as number
-    const senkouBPeriod = params[2] as number
-    const displacement = params[3] as number
+  calc: (dataList: KLineData[], { calcParams: [tenkanPeriod, kijunPeriod, senkouBPeriod, displacement] }) => {
 
     // 先计算各条线的原始值
     const tenkanArr: number[] = []

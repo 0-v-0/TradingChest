@@ -10,7 +10,7 @@ type KeltnerChannelsResult = {
   lower: number
 }
 
-const keltnerChannels: IndicatorTemplate = {
+const keltnerChannels: IndicatorTemplate<KeltnerChannelsResult, number> = {
   name: 'KC',
   shortName: 'KC',
   calcParams: [20, 1.5],
@@ -19,10 +19,7 @@ const keltnerChannels: IndicatorTemplate = {
     { key: 'upper', title: 'UP: ', type: 'line' },
     { key: 'lower', title: 'LOW: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const emaPeriod = params[0] as number
-    const atrMultiplier = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [emaPeriod, atrMultiplier] }) => {
     const result: KeltnerChannelsResult[] = []
 
     // EMA 平滑系数

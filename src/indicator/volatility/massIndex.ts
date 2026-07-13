@@ -7,15 +7,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type MassIndexResult = { mi: number }
 
-const massIndex: IndicatorTemplate = {
+const massIndex: IndicatorTemplate<MassIndexResult, number> = {
   name: 'MI',
   shortName: 'MI',
   calcParams: [9, 25],
   figures: [{ key: 'mi', title: 'MI: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const emaPeriod = params[0] as number
-    const sumPeriod = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [emaPeriod, sumPeriod] }) => {
     const result: MassIndexResult[] = []
 
     // EMA 平滑系数

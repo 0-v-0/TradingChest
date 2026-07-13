@@ -6,17 +6,16 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcEMA } from '../utils'
 
-const volumeOscillator: IndicatorTemplate = {
+type VolumeOscillatorResult = { vo: number }
+
+const volumeOscillator: IndicatorTemplate<VolumeOscillatorResult, number> = {
   name: 'VolumeOscillator',
   shortName: 'VO',
   calcParams: [14, 28],
   figures: [
     { key: 'vo', title: 'VO: ', type: 'bar' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const fastPeriod = params[0] as number
-    const slowPeriod = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod] }) => {
 
     const volume = dataList.map(k => k.volume ?? 0)
     const fastEma = calcEMA(volume, fastPeriod)

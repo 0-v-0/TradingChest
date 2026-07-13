@@ -99,7 +99,7 @@ export function calcKagi(dataList: KLineData[], reversal: number): KagiSegment[]
   return segments
 }
 
-const kagi: IndicatorTemplate = {
+const kagi: IndicatorTemplate<{}, number> = {
   name: 'Kagi',
   shortName: 'KG',
   calcParams: [14],
@@ -107,11 +107,11 @@ const kagi: IndicatorTemplate = {
   calc: (dataList: KLineData[]) => {
     return dataList.map(() => ({}))
   },
-  draw: ({ ctx, chart, indicator, bounding, yAxis }) => {
+  draw: ({ ctx, chart, indicator: { calcParams: [reversal = 14] }, bounding, yAxis }) => {
     const dataList = chart.getDataList()
     if (!dataList || dataList.length < 2) return false
 
-    const reversal = Math.max(1, (indicator.calcParams[0] as number) || 14)
+    reversal = Math.max(1, reversal)
     const segments = calcKagi(dataList, reversal)
     if (segments.length === 0) return false
 

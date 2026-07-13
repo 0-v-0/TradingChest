@@ -5,6 +5,8 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
+type HmaResult = { hma: number }
+
 /**
  * 计算 WMA 值序列
  */
@@ -32,14 +34,12 @@ function calcWmaArray(values: number[], period: number): number[] {
   return result
 }
 
-const hma: IndicatorTemplate = {
+const hma: IndicatorTemplate<HmaResult, number> = {
   name: 'HMA',
   shortName: 'HMA',
   calcParams: [9],
   figures: [{ key: 'hma', title: 'HMA: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const halfPeriod = Math.floor(period / 2)
     const sqrtPeriod = Math.round(Math.sqrt(period))
 

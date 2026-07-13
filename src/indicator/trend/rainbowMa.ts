@@ -10,9 +10,11 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
+type RainbowMaResult = { ma1: number; ma2: number; ma3: number; ma4: number; ma5: number; ma6: number }
+
 const MAX_LEVELS = 6
 
-const rainbowMa: IndicatorTemplate = {
+const rainbowMa: IndicatorTemplate<RainbowMaResult, number> = {
   name: 'RainbowMA',
   shortName: 'Rainbow',
   calcParams: [2, 10],
@@ -24,10 +26,8 @@ const rainbowMa: IndicatorTemplate = {
     { key: 'ma5', title: 'MA5: ', type: 'line' },
     { key: 'ma6', title: 'MA6: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const depth = Math.min(params[0] as number, MAX_LEVELS)
-    const period = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [depthParam, period] }) => {
+    const depth = Math.min(depthParam, MAX_LEVELS)
 
     const close = dataList.map(k => k.close)
 

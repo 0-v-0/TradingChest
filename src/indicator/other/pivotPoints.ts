@@ -29,7 +29,9 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const pivotPoints: IndicatorTemplate = {
+type PivotPointsResult = { pivot: number; r1: number; r2: number; r3: number; s1: number; s2: number; s3: number }
+
+const pivotPoints: IndicatorTemplate<PivotPointsResult, number> = {
   name: 'PIVOTPOINTS',
   shortName: 'PivotPoints',
   calcParams: [0],
@@ -42,9 +44,7 @@ const pivotPoints: IndicatorTemplate = {
     { key: 's2', title: 'S2: ', type: 'line' },
     { key: 's3', title: 'S3: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const mode = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [mode] }) => {
 
     return dataList.map((_, i) => {
       let pivot = NaN

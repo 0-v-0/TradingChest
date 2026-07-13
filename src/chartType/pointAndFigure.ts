@@ -103,7 +103,7 @@ export function calcPointAndFigure(dataList: KLineData[], boxSize: number, rever
   return columns
 }
 
-const pointAndFigure: IndicatorTemplate = {
+const pointAndFigure: IndicatorTemplate<{}, number> = {
   name: 'PointAndFigure',
   shortName: 'PF',
   calcParams: [1, 3],
@@ -111,14 +111,14 @@ const pointAndFigure: IndicatorTemplate = {
   calc: (dataList: KLineData[]) => {
     return dataList.map(() => ({}))
   },
-  draw: ({ ctx, chart, indicator, bounding, yAxis }) => {
+  draw: ({ ctx, chart, indicator: { calcParams: [boxSize = 1, reversal = 3] }, bounding, yAxis }) => {
     const dataList = chart.getDataList()
     if (!dataList || dataList.length === 0) return false
 
-    const boxSize = Math.max((indicator.calcParams[0] as number) || 1, 0.01)
-    const reversal = Math.max((indicator.calcParams[1] as number) || 3, 1)
+    const adjustedBoxSize = Math.max(boxSize, 0.01)
+    const adjustedReversal = Math.max(reversal, 1)
 
-    const columns = calcPointAndFigure(dataList, boxSize, reversal)
+    const columns = calcPointAndFigure(dataList, adjustedBoxSize, adjustedReversal)
     if (columns.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()
@@ -139,7 +139,7 @@ const pointAndFigure: IndicatorTemplate = {
       const x = bounding.left + (ci - from) * colWidth + colWidth / 2
 
       for (const box of col.boxes) {
-        const yTop = yAxis.convertToPixel(box.priceLevel + boxSize)
+        const yTop = yAxis.convertToPixel(box.priceLevel + adjustedBoxSize)
         const yBottom = yAxis.convertToPixel(box.priceLevel)
         const yCenter = (yTop + yBottom) / 2
         const boxHeight = yBottom - yTop

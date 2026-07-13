@@ -18,7 +18,7 @@ type EhlersLeadingResult = {
   signal: number
 }
 
-const ehlersLeadingIndicator: IndicatorTemplate = {
+const ehlersLeadingIndicator: IndicatorTemplate<EhlersLeadingResult, number> = {
   name: 'EhlersLeading',
   shortName: 'EhlersLead',
   calcParams: [10, 1.0],
@@ -26,10 +26,7 @@ const ehlersLeadingIndicator: IndicatorTemplate = {
     { key: 'lead', title: 'Lead: ', type: 'line' },
     { key: 'signal', title: 'Signal: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const k = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [period, k] }) => {
 
     const close = dataList.map(d => d.close)
 

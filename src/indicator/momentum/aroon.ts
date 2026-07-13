@@ -14,7 +14,7 @@ type AroonResult = {
   oscillator: number
 }
 
-const aroon: IndicatorTemplate = {
+const aroon: IndicatorTemplate<AroonResult, number> = {
   name: 'AROON',
   shortName: 'Aroon',
   calcParams: [25],
@@ -23,8 +23,7 @@ const aroon: IndicatorTemplate = {
     { key: 'aroonDown', title: 'Down: ', type: 'line' },
     { key: 'oscillator', title: 'Osc: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
     const result: AroonResult[] = []
 

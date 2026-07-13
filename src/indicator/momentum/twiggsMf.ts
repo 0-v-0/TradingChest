@@ -14,13 +14,12 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type TwiggsMfResult = { tmf: number }
 
-const twiggsMf: IndicatorTemplate = {
+const twiggsMf: IndicatorTemplate<TwiggsMfResult, number> = {
   name: 'TMF',
   shortName: 'TMF',
   calcParams: [21],
   figures: [{ key: 'tmf', title: 'TMF: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
     const result: TwiggsMfResult[] = []
 

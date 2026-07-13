@@ -5,14 +5,14 @@
 import { calcStdDev } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const standardDeviation: IndicatorTemplate = {
+type StandardDeviationResult = { stddev: number }
+
+const standardDeviation: IndicatorTemplate<StandardDeviationResult, number> = {
   name: 'STDDEV',
   shortName: 'StdDev',
   calcParams: [20],
   figures: [{ key: 'stddev', title: 'STDDEV: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const closes = dataList.map(k => k.close)
     const stddevs = calcStdDev(closes, period)
     return stddevs.map(stddev => ({ stddev }))

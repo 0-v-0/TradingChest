@@ -6,7 +6,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type SuperTrendResult = { up: number; down: number }
 
-const superTrend: IndicatorTemplate = {
+const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
   name: 'SUPERTREND',
   shortName: 'SuperTrend',
   calcParams: [10, 3],
@@ -14,10 +14,7 @@ const superTrend: IndicatorTemplate = {
     { key: 'up', title: 'Up: ', type: 'line' },
     { key: 'down', title: 'Down: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const multiplier = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [period, multiplier] }) => {
     const result: SuperTrendResult[] = []
 
     const atrValues: number[] = []

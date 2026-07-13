@@ -6,16 +6,16 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcHighest, calcLowest } from '../utils'
 
-const williamsR: IndicatorTemplate = {
+type WilliamsRResult = { wr: number }
+
+const williamsR: IndicatorTemplate<WilliamsRResult, number> = {
   name: 'WilliamsR',
   shortName: 'Williams %R',
   calcParams: [14],
   figures: [
     { key: 'wr', title: '%R: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
 
     const high = dataList.map(k => k.high)
     const low = dataList.map(k => k.low)

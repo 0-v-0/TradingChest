@@ -13,7 +13,7 @@ import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type FisherTransformResult = { fisher: number; trigger: number }
 
-const fisherTransform: IndicatorTemplate = {
+const fisherTransform: IndicatorTemplate<FisherTransformResult, number> = {
   name: 'FISHER',
   shortName: 'Fisher',
   calcParams: [9],
@@ -21,8 +21,7 @@ const fisherTransform: IndicatorTemplate = {
     { key: 'fisher', title: 'Fisher: ', type: 'line' },
     { key: 'trigger', title: 'Trigger: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const period = indicator.calcParams[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const len = dataList.length
     const result: FisherTransformResult[] = []
 

@@ -6,15 +6,14 @@
 import { calcSMA, calcStdDev } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const bollingerBandWidth: IndicatorTemplate = {
+type BollingerBandWidthResult = { bbw: number }
+
+const bollingerBandWidth: IndicatorTemplate<BollingerBandWidthResult, number> = {
   name: 'BBW',
   shortName: 'BBW',
   calcParams: [20, 2],
   figures: [{ key: 'bbw', title: 'BBW: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
-    const stddevMultiplier = params[1] as number
+  calc: (dataList: KLineData[], { calcParams: [period, stddevMultiplier] }) => {
     const closes = dataList.map(k => k.close)
     const smas = calcSMA(closes, period)
     const stddevs = calcStdDev(closes, period)

@@ -14,16 +14,15 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-type ZigzagResult = { zigzag: number | undefined }
+type ZigzagResult = { zigzag: number }
 
-const zigzag: IndicatorTemplate = {
+const zigzag: IndicatorTemplate<ZigzagResult, number> = {
   name: 'ZIGZAG',
   shortName: 'ZigZag',
   calcParams: [5],
   figures: [{ key: 'zigzag', title: 'ZigZag: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const deviation = (params[0] as number) / 100
+  calc: (dataList: KLineData[], { calcParams: [deviation] }) => {
+    deviation = deviation / 100
 
     if (dataList.length === 0) {
       return []

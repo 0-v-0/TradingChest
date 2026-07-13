@@ -1,8 +1,8 @@
 import type { IndicatorTemplate } from 'klinecharts'
 
-type IndicatorLoader = () => Promise<IndicatorTemplate>
+type IndicatorLoader = () => Promise<IndicatorTemplate<any, any>>
 
-const load = (m: { default: IndicatorTemplate }): IndicatorTemplate => m.default
+const load = (m: { default: IndicatorTemplate<any, any> }): IndicatorTemplate<any, any> => m.default
 
 // oxfmt-ignore
 export const indicatorLoaders: Record<string, IndicatorLoader> = {

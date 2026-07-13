@@ -5,14 +5,14 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const vwma: IndicatorTemplate = {
+type VwmaResult = { vwma: number }
+
+const vwma: IndicatorTemplate<VwmaResult, number> = {
   name: 'VWMA',
   shortName: 'VWMA',
   calcParams: [20],
   figures: [{ key: 'vwma', title: 'VWMA: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
 
     return dataList.map((_, i) => {
       if (i < period - 1) {

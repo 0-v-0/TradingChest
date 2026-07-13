@@ -14,7 +14,7 @@ type PpoResult = {
   histogram: number
 }
 
-const ppo: IndicatorTemplate = {
+const ppo: IndicatorTemplate<PpoResult, number> = {
   name: 'PPO',
   shortName: 'PPO',
   calcParams: [12, 26, 9],
@@ -23,11 +23,7 @@ const ppo: IndicatorTemplate = {
     { key: 'signal', title: 'Signal: ', type: 'line' },
     { key: 'histogram', title: 'Hist: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const fastPeriod = params[0] as number
-    const slowPeriod = params[1] as number
-    const signalPeriod = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [fastPeriod, slowPeriod, signalPeriod] }) => {
     const len = dataList.length
     const result: PpoResult[] = []
 

@@ -18,7 +18,7 @@ type ChandeKrollStopResult = {
   shortStop: number
 }
 
-const chandeKrollStop: IndicatorTemplate = {
+const chandeKrollStop: IndicatorTemplate<ChandeKrollStopResult, number> = {
   name: 'ChanDeKrollStop',
   shortName: 'CK Stop',
   calcParams: [10, 2, 9],
@@ -26,11 +26,7 @@ const chandeKrollStop: IndicatorTemplate = {
     { key: 'longStop', title: '多头止损: ', type: 'line' },
     { key: 'shortStop', title: '空头止损: ', type: 'line' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const p = params[0] as number
-    const x = params[1] as number
-    const q = params[2] as number
+  calc: (dataList: KLineData[], { calcParams: [p, x, q] }) => {
 
     const high = dataList.map(k => k.high)
     const low = dataList.map(k => k.low)

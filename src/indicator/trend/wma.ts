@@ -5,14 +5,14 @@
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
-const wma: IndicatorTemplate = {
+type WmaResult = { wma: number }
+
+const wma: IndicatorTemplate<WmaResult, number> = {
   name: 'WMA',
   shortName: 'WMA',
   calcParams: [9],
   figures: [{ key: 'wma', title: 'WMA: ', type: 'line' }],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
     // 权重之和 = n * (n + 1) / 2
     const weightSum = (period * (period + 1)) / 2
 

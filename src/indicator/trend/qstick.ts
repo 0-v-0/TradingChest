@@ -7,16 +7,16 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcSMA } from '../utils'
 
-const qstick: IndicatorTemplate = {
+type QstickResult = { qstick: number }
+
+const qstick: IndicatorTemplate<QstickResult, number> = {
   name: 'Qstick',
   shortName: 'Qstick',
   calcParams: [14],
   figures: [
     { key: 'qstick', title: 'Qstick: ', type: 'bar' },
   ],
-  calc: (dataList: KLineData[], indicator) => {
-    const params = indicator.calcParams
-    const period = params[0] as number
+  calc: (dataList: KLineData[], { calcParams: [period] }) => {
 
     const diff = dataList.map(k => k.close - k.open)
     const sma = calcSMA(diff, period)
