@@ -34,6 +34,7 @@ import {
 import {
   createSignal,
   createEffect,
+  createMemo,
   onMount,
   Show,
   onCleanup,
@@ -92,6 +93,23 @@ interface PrevSymbolPeriod {
   period: Period
 }
 
+const FILL_OVERLAY_NAMES: ReadonlySet<string> = new Set([
+  'rect',
+  'circle',
+  'triangle',
+  'parallelogram',
+  'gannBox',
+  'regressionChannel',
+  'xabcd',
+  'positionRange',
+  'longPosition',
+  'shortPosition',
+  'dateAndPriceRange',
+  'dateRange',
+  'priceRange',
+  'fibonacciCircle',
+])
+
 function tooltipFeatures(theme: string) {
   const color = theme === 'dark' ? '#929AA5' : '#76808F'
   const base = {
@@ -119,6 +137,11 @@ function tooltipFeatures(theme: string) {
   ]
 }
 
+const TOOLTIP_FEATURE_INDICES: Readonly<Record<'visible' | 'hidden', readonly number[]>> = Object.freeze({
+  visible: Object.freeze([1, 2, 3]),
+  hidden: Object.freeze([0, 2, 3]),
+})
+
 async function createIndicator(
   widget: Nullable<Chart>,
   indicatorName: string,
@@ -137,17 +160,12 @@ async function createIndicator(
           indicator: Indicator
         }) => {
           const defaultFeatures = (indicator.styles?.tooltip as { features?: TooltipFeatureStyle[] })?.features ?? []
-          const features: TooltipFeatureStyle[] = []
-          if (indicator.visible) {
-            if (defaultFeatures[1]) features.push(defaultFeatures[1])
-            if (defaultFeatures[2]) features.push(defaultFeatures[2])
-            if (defaultFeatures[3]) features.push(defaultFeatures[3])
-          } else {
-            if (defaultFeatures[0]) features.push(defaultFeatures[0])
-            if (defaultFeatures[2]) features.push(defaultFeatures[2])
-            if (defaultFeatures[3]) features.push(defaultFeatures[3])
-          }
-          return { name: indicator.name, calcParamsText: '', features, legends: [] }
+          const indices = TOOLTIP_FEATURE_INDICES[indicator.visible ? 'visible' : 'hidden']
+          const features: TooltipFeatureStyle[] = indices.flatMap((i) => {
+            const f = defaultFeatures[i]
+            return f ? [f] : []
+          })
+          return { name: indicator.name, calcParams: '', features, legends: [] }
         },
       } as unknown as IndicatorCreate,
       isStack,
@@ -177,6 +195,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let fetchSeq = 0 // 单调递增的请求序号，用于丢弃过期响应
 
   const [theme, setTheme] = createSignal(props.theme)
+  const tooltipFeaturesMemo = createMemo(() => tooltipFeatures(theme()))
   const [styles, setStyles] = createSignal(props.styles)
   const [locale, setLocale] = createSignal(props.locale)
 
@@ -216,6 +235,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   })
 
   // 绘图 overlay 选中状态（浮动属性工具栏）
+  type SelectedOverlay = NonNullable<ReturnType<typeof selectedOverlay>>
   const [selectedOverlay, setSelectedOverlay] = createSignal<{
     id: string
     x: number
@@ -277,23 +297,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         x = (pixel?.x ?? 200) + 52
         y = (pixel?.y ?? 100) - 50
       }
-      const fillOverlays = [
-        'rect',
-        'circle',
-        'triangle',
-        'parallelogram',
-        'gannBox',
-        'regressionChannel',
-        'xabcd',
-        'positionRange',
-        'longPosition',
-        'shortPosition',
-        'dateAndPriceRange',
-        'dateRange',
-        'priceRange',
-        'fibonacciCircle',
-      ]
-      const hasFill = fillOverlays.includes(overlay.name ?? '')
+      const hasFill = overlay.name != null && FILL_OVERLAY_NAMES.has(overlay.name)
       setSelectedOverlay({
         id: overlay.id,
         x: Math.max(100, x),
@@ -312,6 +316,22 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (overlay) {
       notifyOverlay(source, overlay, 'update')
     }
+  }
+
+  const applyOverlayStyleChange = <K extends 'color' | 'fillColor' | 'lineWidth' | 'lineStyle'>(
+    propKey: K,
+    rawValue: SelectedOverlay[K],
+  ) => {
+    const info = selectedOverlay()
+    if (!info || !widget) return
+    const value: SelectedOverlay[K] =
+      propKey === 'fillColor' && rawValue === 'transparent'
+        ? ('rgba(0,0,0,0)' as SelectedOverlay[K])
+        : rawValue
+    const next: SelectedOverlay = { ...info, [propKey]: value }
+    widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
+    setSelectedOverlay(next)
+    notifySelectedOverlayUpdate('property-bar', info.id)
   }
 
   const pushOverlayCreateCmd = (overlay: Overlay) => {
@@ -599,10 +619,12 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   }
 
   onMount(() => {
+    const ref = widgetRef
+    if (!ref) return
     window.addEventListener('resize', documentResize)
     // 绑定到 container 而非 window，避免图表外的按键误触发
-    widgetRef!.addEventListener('keydown', handleKeyDown)
-    widget = init(widgetRef!, {
+    ref.addEventListener('keydown', handleKeyDown)
+    widget = init(ref, {
       formatter: {
         formatDate: ({
           dateTimeFormat,
@@ -812,7 +834,10 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   onCleanup(() => {
     window.removeEventListener('resize', documentResize)
-    widgetRef!.removeEventListener('keydown', handleKeyDown)
+    if (widgetRef) {
+      widgetRef.removeEventListener('keydown', handleKeyDown)
+      dispose(widgetRef)
+    }
     // 取消实时数据订阅，防止组件卸载后幽灵回调
     props.datafeed.unsubscribe(symbol(), period())
     if (replayEngine) {
@@ -820,11 +845,16 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       replayEngine.dispose()
       replayEngine = null
     }
-    dispose(widgetRef!)
   })
 
-  createEffect(() => {
+  createEffect((prev?: PrevSymbolPeriod) => {
     const s = symbol()
+    const p = period()
+    if (prev) {
+      props.datafeed.unsubscribe(prev.symbol, prev.period)
+      props.onDataReset?.()
+      props.undoRedoManager?.clear()
+    }
     if (priceUnitDom) {
       if (s.priceCurrency) {
         priceUnitDom.textContent = s.priceCurrency.toLocaleUpperCase()
@@ -833,25 +863,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         priceUnitDom.style.display = 'none'
       }
     }
-    widget?.setSymbol({
-      ticker: s.ticker,
-      pricePrecision: s.pricePrecision ?? 2,
-      volumePrecision: s.volumePrecision ?? 0,
-    })
-  })
-
-  createEffect((prev?: PrevSymbolPeriod) => {
-    if (prev) {
-      props.datafeed.unsubscribe(prev.symbol, prev.period)
-    }
-    const s = symbol()
-    const p = period()
-    // 品种/周期切换，通知外层重置状态（如报警 prevPrice）
-    if (prev) {
-      props.onDataReset?.()
-      props.undoRedoManager?.clear()
-    }
-    // 触发 chart 的 DataLoader 重新拉取数据
     widget?.setSymbol({
       ticker: s.ticker,
       pricePrecision: s.pricePrecision ?? 2,
@@ -867,7 +878,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     // setStyles(object) merges partial overrides. The API does not support
     // combining both in a single call.
     widget?.setStyles(t)
-    widget?.setStyles({ indicator: { tooltip: { features: tooltipFeatures(t) } } })
+    widget?.setStyles({ indicator: { tooltip: { features: tooltipFeaturesMemo() } } })
   })
 
   createEffect(() => {
@@ -1146,45 +1157,10 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           currentLineWidth={selectedOverlay()?.lineWidth ?? 1}
           currentLineStyle={selectedOverlay()?.lineStyle ?? 'solid'}
           locked={selectedOverlay()?.locked ?? false}
-          onColorChange={(color) => {
-            const info = selectedOverlay()
-            if (info && widget) {
-              const next = { ...info, color }
-              widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
-              setSelectedOverlay(next)
-              notifySelectedOverlayUpdate('property-bar', info.id)
-            }
-          }}
-          onFillColorChange={(fillColor) => {
-            const info = selectedOverlay()
-            if (info && widget) {
-              const next = {
-                ...info,
-                fillColor: fillColor === 'transparent' ? 'rgba(0,0,0,0)' : fillColor,
-              }
-              widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
-              setSelectedOverlay(next)
-              notifySelectedOverlayUpdate('property-bar', info.id)
-            }
-          }}
-          onLineWidthChange={(width) => {
-            const info = selectedOverlay()
-            if (info && widget) {
-              const next = { ...info, lineWidth: width }
-              widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
-              setSelectedOverlay(next)
-              notifySelectedOverlayUpdate('property-bar', info.id)
-            }
-          }}
-          onLineStyleChange={(style) => {
-            const info = selectedOverlay()
-            if (info && widget) {
-              const next = { ...info, lineStyle: style as LineStyle }
-              widget.overrideOverlay({ id: info.id, styles: buildStyles(next) })
-              setSelectedOverlay(next)
-              notifySelectedOverlayUpdate('property-bar', info.id)
-            }
-          }}
+          onColorChange={(color) => applyOverlayStyleChange('color', color)}
+          onFillColorChange={(fillColor) => applyOverlayStyleChange('fillColor', fillColor)}
+          onLineWidthChange={(width) => applyOverlayStyleChange('lineWidth', width)}
+          onLineStyleChange={(style) => applyOverlayStyleChange('lineStyle', style as LineStyle)}
           onLockChange={(locked) => {
             const info = selectedOverlay()
             if (info && widget) {
