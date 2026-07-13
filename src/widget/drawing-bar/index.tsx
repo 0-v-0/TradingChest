@@ -1,5 +1,5 @@
 import type { OverlayCreate, OverlayMode } from 'klinecharts'
-import { createMemo, createSignal, Show, type Component } from 'solid-js'
+import { createMemo, createSignal, Show, For, type Component } from 'solid-js'
 import { List } from '../../component'
 import {
   createSingleLineOptions,
@@ -94,7 +94,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
     <div class="klinecharts-pro-drawing-bar">
       <Show when={favoriteTools().length > 0}>
         <div class="favorites-group">
-          {favoriteTools().map((toolName) => (
+          <For each={favoriteTools()}>{(toolName) => (
             <div
               class="item"
               title={toolName}
@@ -119,11 +119,11 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
                 <Icon name={toolName} />
               </span>
             </div>
-          ))}
+          )}</For>
         </div>
         <span class="split-line" />
       </Show>
-      {overlays().map((item) => {
+      <For each={overlays()}>{(item) => {
         const currentLabel = () => String(item.list.find((d) => d.key === item.icon)?.text ?? '')
         return (
           <div
@@ -198,7 +198,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
             )}
           </div>
         )
-      })}
+      }}</For>
       <span class="split-line" />
       <div
         class="item"

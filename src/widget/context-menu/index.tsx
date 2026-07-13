@@ -1,4 +1,4 @@
-import { Show, onCleanup, onMount, type Component } from 'solid-js'
+import { Show, For, onCleanup, onMount, type Component } from 'solid-js'
 
 export interface MenuItem {
   label: string
@@ -44,7 +44,7 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
 
   return (
     <div class="klinecharts-pro-context-menu" style={{ left: `${x}px`, top: `${y}px` }}>
-      {props.items.map((item) => (
+      <For each={props.items}>{(item) => (
         <div
           class={`klinecharts-pro-context-menu-item${item.danger ? ' danger' : ''}${item.disabled ? ' disabled' : ''}`}
           onClick={(e) => {
@@ -60,7 +60,7 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
           </Show>
           <span>{item.label}</span>
         </div>
-      ))}
+      )}</For>
     </div>
   )
 }

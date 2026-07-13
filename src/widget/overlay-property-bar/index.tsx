@@ -1,4 +1,4 @@
-import { createSignal, Show, onCleanup, type Component } from 'solid-js'
+import { createSignal, Show, For, onCleanup, type Component } from 'solid-js'
 import t from '../../i18n'
 
 export interface OverlayPropertyBarProps {
@@ -96,7 +96,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
           />
           <Show when={showColorPalette()}>
             <div class="klinecharts-pro-overlay-property-bar-palette">
-              {PALETTE_COLORS.map((color) => (
+              <For each={PALETTE_COLORS}>{(color) => (
                 <div
                   class={`klinecharts-pro-overlay-property-bar-palette-item${color === props.currentColor ? ' active' : ''}`}
                   style={{ 'background-color': color }}
@@ -106,7 +106,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                     setShowColorPalette(false)
                   }}
                 />
-              ))}
+              )}</For>
             </div>
           </Show>
         </div>
@@ -150,7 +150,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                     setShowFillPalette(false)
                   }}
                 />
-                {PALETTE_COLORS.map((color) => (
+                <For each={PALETTE_COLORS}>{(color) => (
                   <div
                     class={`klinecharts-pro-overlay-property-bar-palette-item${color === props.currentFillColor ? ' active' : ''}`}
                     style={{ 'background-color': color + '40' }}
@@ -160,7 +160,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                       setShowFillPalette(false)
                     }}
                   />
-                ))}
+                )}</For>
               </div>
             </Show>
           </div>
