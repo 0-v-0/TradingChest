@@ -1,4 +1,5 @@
 import type { OverlayTemplate } from 'klinecharts'
+import { formatDuration } from './utils'
 
 /**
  * 时间区间测量工具
@@ -85,30 +86,6 @@ const dateRange: OverlayTemplate = {
     }
     return []
   },
-}
-
-/**
- * 将毫秒时间差格式化为可读文本
- * 根据跨度自动选择合适的单位
- */
-function formatDuration(ms: number): string {
-  const seconds = Math.floor(ms / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-
-  if (days > 0) {
-    const remainHours = hours % 24
-    return remainHours > 0 ? `${days}天${remainHours}小时` : `${days}天`
-  }
-  if (hours > 0) {
-    const remainMinutes = minutes % 60
-    return remainMinutes > 0 ? `${hours}小时${remainMinutes}分` : `${hours}小时`
-  }
-  if (minutes > 0) {
-    return `${minutes}分钟`
-  }
-  return `${seconds}秒`
 }
 
 export default dateRange
