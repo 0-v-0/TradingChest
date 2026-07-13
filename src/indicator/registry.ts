@@ -75,11 +75,7 @@ function wrapCalcParamsValidation(template: IndicatorTemplate): IndicatorTemplat
     if (params.some(p => typeof p === 'number' && p < 1)) {
       const n = dataList.length
       const result: Record<string, unknown>[] = new Array(n)
-      if (hasKeys) {
-        for (let i = 0; i < n; i++) result[i] = { ...nanTemplate }
-      } else {
-        for (let i = 0; i < n; i++) result[i] = {}
-      }
+      result.fill(hasKeys ? { ...nanTemplate } : {})
       return result
     }
     return originalCalc(dataList, indicator)
