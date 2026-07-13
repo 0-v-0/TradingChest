@@ -1,4 +1,5 @@
 import type { OverlayTemplate, DeepPartial, OverlayStyle } from 'klinecharts'
+import { DASH_DASHED } from '../core/buildStyles'
 
 const alertLine: OverlayTemplate = {
   name: 'alertLine',
@@ -23,7 +24,7 @@ const alertLine: OverlayTemplate = {
           color,
           size: 1,
           style: 'dashed',
-          dashedValue: [6, 4],
+          dashedValue: DASH_DASHED,
         },
       },
     ]

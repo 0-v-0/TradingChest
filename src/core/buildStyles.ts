@@ -17,9 +17,9 @@ export interface OverlayStyleInput {
   lineStyle: LineStyle
 }
 
-const DASH_SOLID: readonly number[] = Object.freeze([0])
-const DASH_DASHED: readonly number[] = Object.freeze([6, 4])
-const DASH_DOTTED: readonly number[] = Object.freeze([1, 3])
+export const DASH_SOLID: readonly number[] = Object.freeze([0])
+export const DASH_DASHED: readonly number[] = Object.freeze([6, 4])
+export const DASH_DOTTED: readonly number[] = Object.freeze([1, 3])
 
 export function buildStyles(s: OverlayStyleInput): Record<string, unknown> {
   const lineStyleKC = s.lineStyle === 'dashed' || s.lineStyle === 'dotted' ? 'dashed' : 'solid'
