@@ -1,4 +1,4 @@
-import { utils, type Coordinate, type Bounding, type LineAttrs, type CircleAttrs, type TextAttrs } from 'klinecharts'
+import { utils, type Coordinate, type Bounding, type LineAttrs, type CircleAttrs, type TextAttrs, type OverlayTemplate } from 'klinecharts'
 
 export function getRotateCoordinate(
   coordinate: Coordinate,
@@ -148,4 +148,32 @@ export function formatDuration(ms: number): string {
     return `${minutes}分钟`
   }
   return `${seconds}秒`
+}
+
+export function createWaveOverlay(name: string, totalStep: number): OverlayTemplate {
+  return {
+    name,
+    totalStep,
+    needDefaultPointFigure: true,
+    needDefaultXAxisFigure: true,
+    needDefaultYAxisFigure: true,
+    createPointFigures: ({ coordinates }) => {
+      const texts = coordinates.map((coordinate, i) => ({
+        ...coordinate,
+        text: `(${i})`,
+        baseline: 'bottom',
+      }))
+      return [
+        {
+          type: 'line',
+          attrs: { coordinates },
+        },
+        {
+          type: 'text',
+          ignoreEvent: true,
+          attrs: texts,
+        },
+      ]
+    },
+  }
 }
