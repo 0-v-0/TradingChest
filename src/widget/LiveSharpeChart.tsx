@@ -1,4 +1,5 @@
 import { type Component, For } from 'solid-js'
+import { finite, pathFromPoints } from './svg-utils'
 
 export interface LiveSharpePoint {
   timestamp: string
@@ -20,15 +21,7 @@ const DEFAULT_HEIGHT = 240
 const PAD_X = 44
 const PAD_Y = 26
 
-const finite = (value: number | null | undefined): value is number =>
-  typeof value === 'number' && Number.isFinite(value)
-
 const formatValue = (value: number): string => value.toFixed(2)
-
-const pathFromPoints = (points: ReadonlyArray<[number, number]>): string =>
-  points
-    .map(([x, y], index) => `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`)
-    .join(' ')
 
 export const LiveSharpeChart: Component<LiveSharpeChartProps> = (props) => {
   // charter D-03 + L-25 — DO NOT change the default M+1 threshold to mask bad live evidence.

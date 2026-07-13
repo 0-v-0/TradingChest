@@ -1,4 +1,5 @@
 import { type Component, For } from 'solid-js'
+import { finite, pathFromPoints } from './svg-utils'
 
 export interface DrawdownPoint {
   timestamp: string
@@ -15,14 +16,6 @@ const WIDTH = 720
 const DEFAULT_HEIGHT = 220
 const PAD_X = 44
 const PAD_Y = 24
-
-const finite = (value: number | null | undefined): value is number =>
-  typeof value === 'number' && Number.isFinite(value)
-
-const pathFromPoints = (points: ReadonlyArray<[number, number]>): string =>
-  points
-    .map(([x, y], index) => `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`)
-    .join(' ')
 
 export const DrawdownAreaChart: Component<DrawdownAreaChartProps> = (props) => {
   const height = props.height ?? DEFAULT_HEIGHT
