@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { utils, type Coordinate, type Bounding, type LineAttrs } from 'klinecharts'
+import { utils, type Coordinate, type Bounding, type LineAttrs, type CircleAttrs, type TextAttrs } from 'klinecharts'
 
 export function getRotateCoordinate(
   coordinate: Coordinate,
@@ -71,4 +71,71 @@ export function getDistance(coordinate1: Coordinate, coordinate2: Coordinate): n
   const xDis = Math.abs(coordinate1.x - coordinate2.x)
   const yDis = Math.abs(coordinate1.y - coordinate2.y)
   return Math.sqrt(xDis * xDis + yDis * yDis)
+}
+
+/**
+ * Creates horizontal line segments at fibonacci percentage levels.
+ * Each line spans from leftX to rightX at a y-position computed as:
+ *   y = baseY + yDiff * percent
+ *
+ * @param percents - Fibonacci percentage levels (e.g. [1, 0.786, 0.618, ...])
+ * @param leftX - X coordinate of the left end of each line
+ * @param rightX - X coordinate of the right end of each line
+ * @param baseY - The y coordinate corresponding to percent=0
+ * @param yDiff - The y-difference (topY - bottomY) used to compute y for each percent
+ * @param priceMapper - Function that maps a percent to its price label string
+ */
+export function createFibHorizontalLines(
+  percents: number[],
+  leftX: number,
+  rightX: number,
+  baseY: number,
+  yDiff: number,
+  priceMapper: (percent: number) => string,
+): { lines: LineAttrs[], texts: TextAttrs[] } {
+  const lines: LineAttrs[] = []
+  const texts: TextAttrs[] = []
+  const textX = leftX < rightX ? leftX : rightX
+  for (const percent of percents) {
+    const y = baseY + yDiff * percent
+    lines.push({
+      coordinates: [
+        { x: leftX, y },
+        { x: rightX, y },
+      ],
+    })
+    texts.push({
+      x: textX,
+      y,
+      text: priceMapper(percent),
+      baseline: 'bottom',
+    })
+  }
+  return { lines, texts }
+}
+
+/**
+ * Creates concentric circles at fibonacci percentage levels around a center point.
+ *
+ * @param percents - Fibonacci percentage levels (e.g. [0.236, 0.382, ...])
+ * @param center - Center coordinate of the circles
+ * @param radius - Full radius (100%) from center
+ */
+export function createFibConcentricCircles(
+  percents: number[],
+  center: Coordinate,
+  radius: number,
+): { circles: CircleAttrs[], texts: TextAttrs[] } {
+  const circles: CircleAttrs[] = []
+  const texts: TextAttrs[] = []
+  for (const percent of percents) {
+    const r = radius * percent
+    circles.push({ ...center, r })
+    texts.push({
+      x: center.x,
+      y: center.y + r + 6,
+      text: `${(percent * 100).toFixed(1)}%`,
+    })
+  }
+  return { circles, texts }
 }

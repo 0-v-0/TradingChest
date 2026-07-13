@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import type { OverlayTemplate, CircleAttrs, TextAttrs } from 'klinecharts'
+import type { OverlayTemplate } from 'klinecharts'
+import { createFibConcentricCircles } from './utils'
 
 const fibonacciCircle: OverlayTemplate = {
   name: 'fibonacciCircle',
@@ -26,17 +27,7 @@ const fibonacciCircle: OverlayTemplate = {
       const yDis = Math.abs(coordinates[0].y - coordinates[1].y)
       const radius = Math.sqrt(xDis * xDis + yDis * yDis)
       const percents = [0.236, 0.382, 0.5, 0.618, 0.786, 1]
-      const circles: CircleAttrs[] = []
-      const texts: TextAttrs[] = []
-      percents.forEach((percent) => {
-        const r = radius * percent
-        circles.push({ ...coordinates[0], r })
-        texts.push({
-          x: coordinates[0].x,
-          y: coordinates[0].y + r + 6,
-          text: `${(percent * 100).toFixed(1)}%`,
-        })
-      })
+      const { circles, texts } = createFibConcentricCircles(percents, coordinates[0], radius)
       return [
         {
           type: 'circle',
