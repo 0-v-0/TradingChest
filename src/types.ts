@@ -14,6 +14,7 @@
 
 import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate, Nullable } from 'klinecharts'
 import type KeyboardShortcutManager from './shortcut'
+import type { AlertConfig, AlertEvent } from './alert/types'
 
 export interface SymbolInfo {
   ticker: string
@@ -98,7 +99,7 @@ export interface ChartProOptions {
   /** 绘图 overlay 被删除时的回调 */
   onOverlayDelete?: (event: OverlayLifecycleEvent) => void
   /** 报警触发时的回调 */
-  onAlertTrigger?: (event: import('./alert/types').AlertEvent) => void
+  onAlertTrigger?: (event: AlertEvent) => void
   /** 内部错误回调（数据加载失败、指标初始化失败等） */
   onError?: (error: { type: string; message: string; raw?: unknown }) => void
 }
@@ -135,16 +136,16 @@ export interface ChartPro {
   /** 获取快捷键管理器 */
   getShortcutManager(): KeyboardShortcutManager
   /** 添加报警线 */
-  addAlert(config: import('./alert/types').AlertConfig): void
+  addAlert(config: AlertConfig): void
   /** 更新报警配置（保留触发状态） */
   updateAlert(
     id: string,
-    updates: Partial<Omit<import('./alert/types').AlertConfig, 'id'>>,
+    updates: Partial<Omit<AlertConfig, 'id'>>,
   ): boolean
   /** 移除报警线 */
   removeAlert(id: string): void
   /** 获取所有报警 */
-  getAlerts(): import('./alert/types').AlertConfig[]
+  getAlerts(): AlertConfig[]
   /** 添加对比品种（归一化为百分比变化叠加在主图） */
   addComparison(symbol: SymbolInfo): Promise<void>
   /** 移除对比品种 */

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { createSignal, createEffect, type Component, type JSX } from 'solid-js'
+import { createSignal, createEffect, mergeProps, type Component, type JSX } from 'solid-js'
 
 const checkedIcon = (
   <svg viewBox="0 0 1024 1024" class="icon">
@@ -35,12 +35,11 @@ export interface CheckboxProps {
 }
 
 const Checkbox: Component<CheckboxProps> = (props) => {
-  const [innerChecked, setInnerChecked] = createSignal(props.checked ?? false)
+  const merged = mergeProps({ checked: false }, props)
+  const [innerChecked, setInnerChecked] = createSignal(merged.checked)
 
   createEffect(() => {
-    if ('checked' in props) {
-      setInnerChecked(props.checked as boolean)
-    }
+    setInnerChecked(merged.checked)
   })
 
   return (
