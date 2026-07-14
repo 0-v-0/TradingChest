@@ -18,8 +18,13 @@ const donchianChannels: IndicatorTemplate<DonchianChannelsResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
-    const highs = dataList.map(k => k.high)
-    const lows = dataList.map(k => k.low)
+    const highs = new Array<number>(n)
+    const lows = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      const k = dataList[i]
+      highs[i] = k.high
+      lows[i] = k.low
+    }
     const uppers = calcHighest(highs, period)
     const lowers = calcLowest(lows, period)
     const result: DonchianChannelsResult[] = new Array(n)

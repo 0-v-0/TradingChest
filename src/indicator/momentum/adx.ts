@@ -34,12 +34,14 @@ const adx: IndicatorTemplate<AdxResult, number> = {
     console.assert(len > 0, 'ADX: dataList should not be empty')
 
     // 原始 +DM、-DM、TR 序列
-    const plusDmRaw: number[] = Array(len).fill(0)
-    const minusDmRaw: number[] = Array(len).fill(0)
-    const trRaw: number[] = Array(len).fill(0)
+    const plusDmRaw: number[] = new Array(len)
+    const minusDmRaw: number[] = new Array(len)
+    const trRaw: number[] = new Array(len)
 
     for (let i = 0; i < len; i++) {
       if (i === 0) {
+        plusDmRaw[0] = 0
+        minusDmRaw[0] = 0
         trRaw[i] = dataList[i].high - dataList[i].low
       } else {
         const prevClose = dataList[i - 1].close
@@ -57,9 +59,13 @@ const adx: IndicatorTemplate<AdxResult, number> = {
 
         if (upMove > downMove && upMove > 0) {
           plusDmRaw[i] = upMove
+        } else {
+          plusDmRaw[i] = 0
         }
         if (downMove > upMove && downMove > 0) {
           minusDmRaw[i] = downMove
+        } else {
+          minusDmRaw[i] = 0
         }
       }
     }

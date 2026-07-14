@@ -29,9 +29,15 @@ const chandeKrollStop: IndicatorTemplate<ChandeKrollStopResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [p, x, q] }) => {
     const n = dataList.length
 
-    const high = dataList.map(k => k.high)
-    const low = dataList.map(k => k.low)
-    const close = dataList.map(k => k.close)
+    const high = new Array<number>(n)
+    const low = new Array<number>(n)
+    const close = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      const k = dataList[i]
+      high[i] = k.high
+      low[i] = k.low
+      close[i] = k.close
+    }
 
     const highest = calcHighest(high, p)
     const lowest = calcLowest(low, p)

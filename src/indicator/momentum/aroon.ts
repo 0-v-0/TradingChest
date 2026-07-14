@@ -28,8 +28,13 @@ const aroon: IndicatorTemplate<AroonResult, number> = {
     const len = dataList.length
     const result: AroonResult[] = new Array(len)
 
-    const highs = dataList.map(d => d.high)
-    const lows = dataList.map(d => d.low)
+    const highs = new Array<number>(len)
+    const lows = new Array<number>(len)
+    for (let i = 0; i < len; i++) {
+      const d = dataList[i]
+      highs[i] = d.high
+      lows[i] = d.low
+    }
 
     // Aroon 窗口为 period+1 个元素（含当前 bar）
     const highestIdxs = calcHighestIdx(highs, period + 1)

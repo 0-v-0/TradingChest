@@ -119,14 +119,17 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
         const outVal = changes[outIdx]
         if (!isNaN(outVal)) {
           const pos = bisectLeft(sortedWindow, outVal)
-          sortedWindow.splice(pos, 1)
+          sortedWindow.copyWithin(pos, pos + 1)
+          sortedWindow.length--
         }
       }
       // 插入上一根 bar 的 change（i-1 进入窗口）
       const inVal = changes[i - 1]
       if (!isNaN(inVal)) {
         const pos = bisectRight(sortedWindow, inVal)
-        sortedWindow.splice(pos, 0, inVal)
+        sortedWindow.length++
+        sortedWindow.copyWithin(pos + 1, pos)
+        sortedWindow[pos] = inVal
       }
       // 排名 = 窗口内 <= currentChange 的个数
       const count = bisectRight(sortedWindow, currentChange)

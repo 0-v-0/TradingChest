@@ -3,6 +3,7 @@
  * 以 EMA 为中轨，ATR 乘以倍数为上下轨的波动率通道指标
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcTR, calcEMA, calcRMA } from '../utils'
 
 type KeltnerChannelsResult = {
   middle: number
@@ -21,61 +22,33 @@ const keltnerChannels: IndicatorTemplate<KeltnerChannelsResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [emaPeriod, atrMultiplier] }) => {
     const n = dataList.length
-    const result: KeltnerChannelsResult[] = new Array(n)
-
-    // EMA 平滑系数
-    const emaK = 2 / (emaPeriod + 1)
-
-    // ATR 使用 Wilder 平滑（RMA）
-    let emaValue = 0
-    let atrValue = 0
-    let emaCumSum = 0
-    let atrCumSum = 0
-
+    const high = new Array<number>(n)
+    const low = new Array<number>(n)
+    const close = new Array<number>(n)
     for (let i = 0; i < n; i++) {
-      const kline = dataList[i]
+      const d = dataList[i]
+      high[i] = d.high
+      low[i] = d.low
+      close[i] = d.close
+    }
 
-      // 计算真实波幅（True Range）
-      let tr: number
-      if (i === 0) {
-        tr = kline.high - kline.low
+    const emaArr = calcEMA(close, emaPeriod)
+    const tr = calcTR(high, low, close)
+    const atrArr = calcRMA(tr, emaPeriod)
+
+    const result: KeltnerChannelsResult[] = new Array(n)
+    for (let i = 0; i < n; i++) {
+      const mid = emaArr[i]
+      if (Number.isNaN(mid)) {
+        result[i] = { middle: NaN, upper: NaN, lower: NaN }
       } else {
-        const prevClose = dataList[i - 1].close
-        tr = Math.max(
-          kline.high - kline.low,
-          Math.abs(kline.high - prevClose),
-          Math.abs(kline.low - prevClose),
-        )
-      }
-
-      let middle = NaN
-      let upper = NaN
-      let lower = NaN
-
-      if (i < emaPeriod) {
-        // 累积阶段：收集前 emaPeriod 个数据
-        emaCumSum += kline.close
-        atrCumSum += tr
-
-        if (i === emaPeriod - 1) {
-          // 首个 EMA 值为 SMA
-          emaValue = emaCumSum / emaPeriod
-          // 首个 ATR 值为 TR 的简单平均
-          atrValue = atrCumSum / emaPeriod
-          middle = emaValue
-          upper = emaValue + atrMultiplier * atrValue
-          lower = emaValue - atrMultiplier * atrValue
+        const atr = atrArr[i]
+        result[i] = {
+          middle: mid,
+          upper: mid + atrMultiplier * atr,
+          lower: mid - atrMultiplier * atr,
         }
-      } else {
-        // EMA 递推
-        emaValue = kline.close * emaK + emaValue * (1 - emaK)
-        // ATR Wilder 平滑
-        atrValue = (atrValue * (emaPeriod - 1) + tr) / emaPeriod
-        middle = emaValue
-        upper = emaValue + atrMultiplier * atrValue
-        lower = emaValue - atrMultiplier * atrValue
       }
-      result[i] = { middle, upper, lower }
     }
     return result
   },

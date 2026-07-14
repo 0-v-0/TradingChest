@@ -421,21 +421,21 @@ export function calcLoss(data: number[]): number[] {
  * 所以滚动场景下只需维护 sumY、sumY2、sumXY 三个滑动和，
  * 每个增量 O(1)，避免原来对每个 i 重新遍历窗口的 O(n*period) 计算。
  *
- * 返回与 data 等长的数组，每项 { slope, intercept, stdResid }：
- *   slope     — 斜率 b
- *   intercept — 截距 a
- *   stdResid  — 残差总体标准差 = sqrt(Σ(y - ŷ)² / n)
- * 窗口尚未填满的索引处三项均为 NaN。
+ * 返回三个等长 number[] 数组（slope, intercept, stdResid），
+ * 窗口尚未填满的索引处为 NaN。
+ * 使用扁平数组避免每索引创建对象，减少 GC 压力。
  */
-export interface LinRegResult {
-  slope: number
-  intercept: number
-  stdResid: number
+export interface LinRegArrays {
+  slope: number[]
+  intercept: number[]
+  stdResid: number[]
 }
 
-export function calcLinReg(data: number[], period: number): LinRegResult[] {
+export function calcLinReg(data: number[], period: number): LinRegArrays {
   const n = data.length
-  const result: LinRegResult[] = new Array(n)
+  const slopeArr = new Array<number>(n)
+  const interceptArr = new Array<number>(n)
+  const stdResidArr = new Array<number>(n)
   console.assert(period >= 2, 'calcLinReg: period must be >= 2')
   const sumX = (period * (period - 1)) / 2
   const sumX2 = ((period - 1) * period * (2 * period - 1)) / 6
@@ -467,11 +467,14 @@ export function calcLinReg(data: number[], period: number): LinRegResult[] {
       const variance =
         sumY2 / period - yMean * yMean -
         slope * slope * (sumX2 / period - xMean * xMean)
-      const stdResid = Math.sqrt(Math.max(variance, 0))
-      result[i] = { slope, intercept, stdResid }
+      slopeArr[i] = slope
+      interceptArr[i] = intercept
+      stdResidArr[i] = Math.sqrt(Math.max(variance, 0))
     } else {
-      result[i] = { slope: NaN, intercept: NaN, stdResid: NaN }
+      slopeArr[i] = NaN
+      interceptArr[i] = NaN
+      stdResidArr[i] = NaN
     }
   }
-  return result
+  return { slope: slopeArr, intercept: interceptArr, stdResid: stdResidArr }
 }

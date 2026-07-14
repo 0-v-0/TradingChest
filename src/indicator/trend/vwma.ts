@@ -16,9 +16,16 @@ const vwma: IndicatorTemplate<VwmaResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
 
-    const closeTimesVol = dataList.map(d => d.close * (d.volume ?? 0))
-    const volumes = dataList.map(d => d.volume ?? 0)
-    const closes = dataList.map(d => d.close)
+    const closeTimesVol = new Array<number>(n)
+    const volumes = new Array<number>(n)
+    const closes = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      const d = dataList[i]
+      const vol = d.volume ?? 0
+      closeTimesVol[i] = d.close * vol
+      volumes[i] = vol
+      closes[i] = d.close
+    }
 
     const cvSums = calcSum(closeTimesVol, period)
     const vSums = calcSum(volumes, period)

@@ -19,14 +19,13 @@ const standardError: IndicatorTemplate<StandardErrorResult, number> = {
     const n = dataList.length
     const closes: number[] = new Array(n)
     for (let i = 0; i < n; i++) closes[i] = dataList[i].close
-    const reg = calcLinReg(closes, period)
+    const { stdResid } = calcLinReg(closes, period)
     const result: StandardErrorResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      const r = reg[i]
-      if (Number.isNaN(r.stdResid) || period <= 2) {
+      if (Number.isNaN(stdResid[i]) || period <= 2) {
         result[i] = { se: NaN }
       } else {
-        result[i] = { se: r.stdResid * Math.sqrt(period / (period - 2)) }
+        result[i] = { se: stdResid[i] * Math.sqrt(period / (period - 2)) }
       }
     }
     return result

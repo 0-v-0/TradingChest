@@ -18,8 +18,15 @@ const williamsR: IndicatorTemplate<WilliamsRResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
 
-    const high = dataList.map(k => k.high)
-    const low = dataList.map(k => k.low)
+    const high = new Array<number>(n)
+    const low = new Array<number>(n)
+    const close = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      const k = dataList[i]
+      high[i] = k.high
+      low[i] = k.low
+      close[i] = k.close
+    }
     const highest = calcHighest(high, period)
     const lowest = calcLowest(low, period)
 
@@ -30,7 +37,7 @@ const williamsR: IndicatorTemplate<WilliamsRResult, number> = {
       if (isNaN(hh) || isNaN(ll) || hh === ll) {
         result[i] = { wr: NaN }
       } else {
-        result[i] = { wr: ((hh - dataList[i].close) / (hh - ll)) * -100 }
+        result[i] = { wr: ((hh - close[i]) / (hh - ll)) * -100 }
       }
     }
     return result

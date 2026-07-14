@@ -3,6 +3,7 @@
  * 基于 ATR 波段的趋势方向判断指标
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcTR, calcRMA } from '../utils'
 
 type SuperTrendResult = { up: number; down: number }
 
@@ -18,32 +19,18 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
     const n = dataList.length
     const result: SuperTrendResult[] = new Array(n)
 
-    const atrValues = new Array<number>(n)
-    let rma = 0
+    const high = new Array<number>(n)
+    const low = new Array<number>(n)
+    const close = new Array<number>(n)
     for (let i = 0; i < n; i++) {
-      const kline = dataList[i]
-      let tr: number
-      if (i === 0) {
-        tr = kline.high - kline.low
-      } else {
-        const prevClose = dataList[i - 1].close
-        tr = Math.max(
-          kline.high - kline.low,
-          Math.abs(kline.high - prevClose),
-          Math.abs(kline.low - prevClose),
-        )
-      }
-      if (i < period - 1) {
-        rma += tr
-        atrValues[i] = NaN
-      } else if (i === period - 1) {
-        rma = (rma + tr) / period
-        atrValues[i] = rma
-      } else {
-        rma = (rma * (period - 1) + tr) / period
-        atrValues[i] = rma
-      }
+      const d = dataList[i]
+      high[i] = d.high
+      low[i] = d.low
+      close[i] = d.close
     }
+
+    const tr = calcTR(high, low, close)
+    const atrValues = calcRMA(tr, period)
 
     let prevUpperBand = NaN
     let prevLowerBand = NaN
@@ -54,28 +41,27 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
       let down = NaN
 
       if (i >= period - 1) {
-        const kline = dataList[i]
         const atrVal = atrValues[i]
-        const hl2 = (kline.high + kline.low) / 2
+        const hl2 = (high[i] + low[i]) / 2
 
         let upperBand = hl2 + multiplier * atrVal
         let lowerBand = hl2 - multiplier * atrVal
 
         if (i > period - 1) {
-          if (lowerBand <= prevLowerBand && dataList[i - 1].close >= prevLowerBand) {
+          if (lowerBand <= prevLowerBand && close[i - 1] >= prevLowerBand) {
             lowerBand = prevLowerBand
           }
-          if (upperBand >= prevUpperBand && dataList[i - 1].close <= prevUpperBand) {
+          if (upperBand >= prevUpperBand && close[i - 1] <= prevUpperBand) {
             upperBand = prevUpperBand
           }
         }
 
         if (direction === 0) {
-          direction = kline.close <= upperBand ? 1 : -1
+          direction = close[i] <= upperBand ? 1 : -1
         } else if (direction === -1) {
-          if (kline.close > upperBand) direction = 1
+          if (close[i] > upperBand) direction = 1
         } else if (direction === 1) {
-          if (kline.close < lowerBand) direction = -1
+          if (close[i] < lowerBand) direction = -1
         }
 
         const superTrendVal = direction === 1 ? lowerBand : upperBand

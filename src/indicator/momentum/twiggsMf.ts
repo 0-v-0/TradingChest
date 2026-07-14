@@ -25,8 +25,8 @@ const twiggsMf: IndicatorTemplate<TwiggsMfResult, number> = {
     console.assert(len > 0, 'TwiggsMf: dataList should not be empty')
 
     // ---- 计算 AD 和 volume 序列 ----
-    const ad: number[] = Array(len).fill(0)
-    const vol: number[] = Array(len).fill(0)
+    const ad: number[] = new Array(len)
+    const vol: number[] = new Array(len)
 
     for (let i = 0; i < len; i++) {
       const kline = dataList[i]
