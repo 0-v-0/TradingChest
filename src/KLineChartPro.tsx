@@ -42,6 +42,9 @@ const DEFAULT_PERIODS: readonly Period[] = [
   { multiplier: 1, timespan: 'year' as const, text: 'Y' },
 ]
 
+/** Hit detection radius for trade visualization click (px) */
+const TRADE_HIT_RADIUS = 40
+
 export default class KLineChartPro implements ChartPro {
   /** Pre-load locale data before creating an instance (avoids initial flash of untranslated keys) */
   static async preloadLocale(locale: string): Promise<void> {
@@ -137,7 +140,7 @@ export default class KLineChartPro implements ChartPro {
         const dx = clickX - ht.x
         const dy = clickY - ht.y
         const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < 40 && dist < minDist) {
+        if (dist < TRADE_HIT_RADIUS && dist < minDist) {
           minDist = dist
           closest = ht
         }

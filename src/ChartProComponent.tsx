@@ -157,6 +157,11 @@ const TOOLTIP_FEATURE_INDICES: Readonly<Record<'visible' | 'hidden', readonly nu
   hidden: Object.freeze([0, 2, 3]),
 })
 
+/** Overlay property bar X offset from the overlay point (px) */
+const OVERLAY_BAR_OFFSET_X = 52
+/** Overlay property bar Y offset from the overlay point (px) */
+const OVERLAY_BAR_OFFSET_Y = 50
+
 async function createIndicator(
   widget: Nullable<Chart>,
   indicatorName: string,
@@ -324,8 +329,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           { timestamp: points[0].timestamp, value: points[0].value },
           { paneId: 'candle_pane' },
         ) as Partial<Coordinate>
-        x = (pixel?.x ?? 200) + 52
-        y = (pixel?.y ?? 100) - 50
+        x = (pixel?.x ?? 200) + OVERLAY_BAR_OFFSET_X
+        y = (pixel?.y ?? 100) - OVERLAY_BAR_OFFSET_Y
       }
       const hasFill = overlay.name != null && FILL_OVERLAY_NAMES.has(overlay.name)
       setSelectedOverlay({

@@ -5,6 +5,11 @@
 import type { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
 import type { Direction } from '../../types'
 
+/** Label connector line length (px) */
+const LABEL_OFFSET = 35
+/** Label box height (px) */
+const LABEL_HEIGHT = 18
+
 export interface TradeRecord {
   entryTs: number
   exitTs: number
@@ -255,7 +260,7 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
         const label = isLong ? 'B' : 'S'
         drawLabel(ctx, barX, y, label, color, c.labelTextColor)
         // trade reference is pre-stored in calc phase — no trades.find() needed
-        hitTargets.push({ x: barX, y: y - 35 - 9, trade: info.entry.trade, type: 'entry' })
+        hitTargets.push({ x: barX, y: y - LABEL_OFFSET - LABEL_HEIGHT / 2, trade: info.entry.trade, type: 'entry' })
       }
 
       if (info.exit) {
@@ -265,7 +270,7 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
         const label = isLong ? 'S' : 'B'
         const pnlStr = `${label} ${info.exit.pnl >= 0 ? '+' : ''}${info.exit.pnl.toFixed(0)}`
         drawLabel(ctx, barX, y, pnlStr, color, c.labelTextColor)
-        hitTargets.push({ x: barX, y: y - 35 - 9, trade: info.exit.trade, type: 'exit' })
+        hitTargets.push({ x: barX, y: y - LABEL_OFFSET - LABEL_HEIGHT / 2, trade: info.exit.trade, type: 'exit' })
       }
     }
 
@@ -285,7 +290,7 @@ function drawLabel(
   color: string,
   textColor = '#fff',
 ) {
-  const offset = 35
+  const offset = LABEL_OFFSET
 
   ctx.strokeStyle = color
   ctx.lineWidth = 1
@@ -299,7 +304,7 @@ function drawLabel(
   ctx.font = '11px sans-serif'
   const tw = ctx.measureText(text).width
   const w = tw + 10
-  const h = 18
+  const h = LABEL_HEIGHT
   const lx = x - w / 2
   const ly = y - offset - h
   const r = 3
