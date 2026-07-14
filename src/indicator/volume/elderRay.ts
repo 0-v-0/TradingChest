@@ -10,6 +10,7 @@
  * 牛力 > 0 表示多方控制，熊力 < 0 表示空方控制
  * EMA 权重因子 k = 2 / (n + 1)，首个有效值使用 SMA 种子
  */
+import { calcEMA } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ElderRayResult = { bullPower: number; bearPower: number }
@@ -25,34 +26,17 @@ const elderRay: IndicatorTemplate<ElderRayResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
     const result: ElderRayResult[] = new Array(n)
-
-    // 内联计算收盘价的 EMA
-    const k = 2 / (period + 1)
-    let prevEma = NaN
+    const closes = new Array<number>(n)
+    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const ema = calcEMA(closes, period)
 
     for (let i = 0; i < n; i++) {
       const kline = dataList[i]
-      let bullPower = NaN
-      let bearPower = NaN
-
-      if (i < period - 1) {
-        // 数据不足，尚未产生第一个 EMA
-      } else if (i === period - 1) {
-        // 用前 period 个收盘价的 SMA 作为 EMA 种子
-        let sum = 0
-        for (let j = 0; j < period; j++) {
-          sum += dataList[j].close
-        }
-        prevEma = sum / period
-        bullPower = kline.high - prevEma
-        bearPower = kline.low - prevEma
-      } else {
-        // EMA 递归
-        prevEma = kline.close * k + prevEma * (1 - k)
-        bullPower = kline.high - prevEma
-        bearPower = kline.low - prevEma
+      const emaVal = ema[i]
+      result[i] = {
+        bullPower: !Number.isNaN(emaVal) ? kline.high - emaVal : NaN,
+        bearPower: !Number.isNaN(emaVal) ? kline.low - emaVal : NaN,
       }
-      result[i] = { bullPower, bearPower }
     }
     return result
   },

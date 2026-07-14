@@ -12,6 +12,7 @@
  * 5. KVO = EMA(VF, 快线周期) - EMA(VF, 慢线周期)
  * 6. 信号线 = EMA(KVO, 信号周期)
  */
+import { calcEMA } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type KlingerOscillatorResult = { kvo: number; signal: number }
@@ -72,8 +73,8 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
     }
 
     // 第二步：计算快慢 EMA
-    const fastEma = calcEmaArray(vf, fastPeriod)
-    const slowEma = calcEmaArray(vf, slowPeriod)
+    const fastEma = calcEMA(vf, fastPeriod)
+    const slowEma = calcEMA(vf, slowPeriod)
 
     // 第三步：计算 KVO 和信号线
     // 在快慢 EMA 都未成熟之前，输出 NaN 而非 0，避免污染下游信号线。
@@ -94,7 +95,7 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
     for (let i = 0; i < validLen; i++) {
       validKvo[i] = kvoValues[i + slowStart]
     }
-    const signalEma = calcEmaArray(validKvo, signalPeriod)
+    const signalEma = calcEMA(validKvo, signalPeriod)
 
     for (let i = 0; i < n; i++) {
       let kvo = NaN
@@ -109,36 +110,6 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
     }
     return result
   },
-}
-
-/**
- * 内联 EMA 计算（避免外部依赖）
- * 权重因子 k = 2 / (period + 1)
- * 首个有效值使用 SMA 作为种子
- */
-function calcEmaArray(data: number[], period: number): number[] {
-  const len = data.length
-  const result = new Array<number>(len)
-  const k = 2 / (period + 1)
-  let prevEma = NaN
-
-  for (let i = 0; i < len; i++) {
-    let val = NaN
-    if (i === period - 1) {
-      // 用前 period 个数据的 SMA 作为 EMA 种子值
-      let sum = 0
-      for (let j = 0; j < period; j++) {
-        sum += data[j]
-      }
-      prevEma = sum / period
-      val = prevEma
-    } else if (i >= period) {
-      prevEma = data[i] * k + prevEma * (1 - k)
-      val = prevEma
-    }
-    result[i] = val
-  }
-  return result
 }
 
 export default klingerOscillator

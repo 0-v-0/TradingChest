@@ -471,11 +471,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     const pos = startPosition ?? dataList.length >>> 1
     replayEngine = new ReplayEngine({
       onDataChange: (data) => {
-        replayDataList = data as unknown as KLineData[]
+        replayDataList = data
         widget?.resetData()
       },
       onBarUpdate: (bar) => {
-        const kData = bar as unknown as KLineData
+        const kData = bar
         replayDataList.push(kData)
         subscribeBarCallback?.(kData)
       },

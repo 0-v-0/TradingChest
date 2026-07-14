@@ -551,9 +551,13 @@ export default class KLineChartPro implements ChartPro {
       this._solidDispose()
       this._solidDispose = null
     }
-    // 7. Release datafeed resources (WebSocket etc.)
-    this._datafeed.dispose?.()
-    // 8. Clean container
+    // 7. Release datafeed resources (WebSocket etc.) — wrap in try to avoid blocking cleanup
+    try {
+      this._datafeed.dispose?.()
+    } catch {
+      /* datafeed cleanup failure must not prevent container/chart release */
+    }
+    // 8. Clean container and reset refs — always executed
     this._container?.classList.remove('klinecharts-pro')
     this._container?.removeAttribute('data-theme')
     this._chartApi = null

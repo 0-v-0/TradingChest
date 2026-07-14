@@ -6,6 +6,7 @@
  * Signal = EMA(PPO, signalPeriod)
  * Histogram = PPO - Signal
  */
+import { calcEMA } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type PpoResult = {
@@ -27,43 +28,15 @@ const ppo: IndicatorTemplate<PpoResult, number> = {
     const len = dataList.length
     const result: PpoResult[] = new Array(len)
 
+    // ---- 提取收盘价序列 ----
+    const closes = new Array<number>(len)
+    for (let i = 0; i < len; i++) closes[i] = dataList[i].close
+
     // ---- 计算快速 EMA ----
-    const emaFast: number[] = Array(len).fill(NaN)
-    const kFast = 2 / (fastPeriod + 1)
-    let prevEmaFast = NaN
-    for (let i = 0; i < len; i++) {
-      const close = dataList[i].close
-      if (i < fastPeriod - 1) {
-        // 累积阶段
-      } else if (i === fastPeriod - 1) {
-        let sum = 0
-        for (let j = 0; j < fastPeriod; j++) sum += dataList[j].close
-        prevEmaFast = sum / fastPeriod
-        emaFast[i] = prevEmaFast
-      } else {
-        prevEmaFast = close * kFast + prevEmaFast * (1 - kFast)
-        emaFast[i] = prevEmaFast
-      }
-    }
+    const emaFast = calcEMA(closes, fastPeriod)
 
     // ---- 计算慢速 EMA ----
-    const emaSlow: number[] = Array(len).fill(NaN)
-    const kSlow = 2 / (slowPeriod + 1)
-    let prevEmaSlow = NaN
-    for (let i = 0; i < len; i++) {
-      const close = dataList[i].close
-      if (i < slowPeriod - 1) {
-        // 累积阶段
-      } else if (i === slowPeriod - 1) {
-        let sum = 0
-        for (let j = 0; j < slowPeriod; j++) sum += dataList[j].close
-        prevEmaSlow = sum / slowPeriod
-        emaSlow[i] = prevEmaSlow
-      } else {
-        prevEmaSlow = close * kSlow + prevEmaSlow * (1 - kSlow)
-        emaSlow[i] = prevEmaSlow
-      }
-    }
+    const emaSlow = calcEMA(closes, slowPeriod)
 
     // ---- 计算 PPO 序列 ----
     const ppoLine: number[] = Array(len).fill(NaN)

@@ -12,6 +12,7 @@
  * 标准实现：DPO[i] = close[i] - SMA_at(i - floor(period/2) - 1)
  * 其中 SMA_at(j) = 以 j 为终点的 period 周期 SMA
  */
+import { calcSMA } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type DpoResult = { dpo: number }
@@ -29,17 +30,9 @@ const dpo: IndicatorTemplate<DpoResult, number> = {
     const shift = Math.floor(period / 2) + 1
 
     // 先计算完整的 SMA 序列
-    const sma: number[] = Array(len).fill(NaN)
-    let windowSum = 0
-    for (let i = 0; i < len; i++) {
-      windowSum += dataList[i].close
-      if (i >= period) {
-        windowSum -= dataList[i - period].close
-      }
-      if (i >= period - 1) {
-        sma[i] = windowSum / period
-      }
-    }
+    const closes = new Array<number>(len)
+    for (let i = 0; i < len; i++) closes[i] = dataList[i].close
+    const sma = calcSMA(closes, period)
 
     // DPO[i] = close[i] - SMA[i - shift]
     for (let i = 0; i < len; i++) {

@@ -8,6 +8,7 @@
  *
  * EMA 权重因子 k = 2 / (n + 1)，首个有效值使用 SMA 种子
  */
+import { calcEMA } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ForceIndexResult = { fi: number }
@@ -34,25 +35,9 @@ const forceIndex: IndicatorTemplate<ForceIndexResult, number> = {
     }
 
     // 第二步：对原始力度做 EMA 平滑
-    const k = 2 / (period + 1)
-    let prevEma = NaN
-
+    const ema = calcEMA(rawForce, period)
     for (let i = 0; i < n; i++) {
-      let fi = NaN
-      if (i === period - 1) {
-        // 用前 period 个原始力度的 SMA 作为 EMA 种子
-        let sum = 0
-        for (let j = 0; j < period; j++) {
-          sum += rawForce[j]
-        }
-        prevEma = sum / period
-        fi = prevEma
-      } else if (i >= period) {
-        // EMA 递归
-        prevEma = rawForce[i] * k + prevEma * (1 - k)
-        fi = prevEma
-      }
-      result[i] = { fi }
+      result[i] = { fi: ema[i] }
     }
     return result
   },
