@@ -7,6 +7,7 @@
  * Aroon Oscillator = AroonUp - AroonDown
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcHighestIdx, calcLowestIdx } from '../utils'
 
 type AroonResult = {
   aroonUp: number
@@ -27,32 +28,21 @@ const aroon: IndicatorTemplate<AroonResult, number> = {
     const len = dataList.length
     const result: AroonResult[] = new Array(len)
 
+    const highs = dataList.map(d => d.high)
+    const lows = dataList.map(d => d.low)
+
+    // Aroon 窗口为 period+1 个元素（含当前 bar）
+    const highestIdxs = calcHighestIdx(highs, period + 1)
+    const lowestIdxs = calcLowestIdx(lows, period + 1)
+
     for (let i = 0; i < len; i++) {
       let aroonUp = NaN
       let aroonDown = NaN
       let oscillator = NaN
 
       if (i >= period) {
-        // 在 [i - period, i] 窗口内查找最高价和最低价的位置
-        let highestIdx = i - period
-        let lowestIdx = i - period
-        let highestVal = dataList[i - period].high
-        let lowestVal = dataList[i - period].low
-
-        for (let j = i - period + 1; j <= i; j++) {
-          // 相同值时取最近的（用 >= 和 <=）
-          if (dataList[j].high >= highestVal) {
-            highestVal = dataList[j].high
-            highestIdx = j
-          }
-          if (dataList[j].low <= lowestVal) {
-            lowestVal = dataList[j].low
-            lowestIdx = j
-          }
-        }
-
-        const daysSinceHigh = i - highestIdx
-        const daysSinceLow = i - lowestIdx
+        const daysSinceHigh = i - highestIdxs[i]
+        const daysSinceLow = i - lowestIdxs[i]
 
         aroonUp = ((period - daysSinceHigh) / period) * 100
         aroonDown = ((period - daysSinceLow) / period) * 100

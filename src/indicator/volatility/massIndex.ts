@@ -89,27 +89,25 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
       }
     }
 
-    // 第四步：对比值序列求 sumPeriod 的滚动和
+    // 第四步：对比值序列求 sumPeriod 的滚动和（O(n) 滑动窗口）
     // 仅统计窗口内有效比值（NaN 跳过），窗口需有 sumPeriod 个有效值
-    const miStartIdx = ratioStartIdx + sumPeriod - 1
+    let sum = 0
+    let validInWindow = 0
 
     for (let i = 0; i < n; i++) {
-      let mi = NaN
-      if (i >= miStartIdx) {
-        let sum = 0
-        let validCount = 0
-        for (let j = i - sumPeriod + 1; j <= i; j++) {
-          const r = ratios[j]
-          if (!Number.isNaN(r)) {
-            sum += r
-            validCount++
-          }
-        }
-        if (validCount === sumPeriod) {
-          mi = sum
+      const r = ratios[i]
+      if (!Number.isNaN(r)) {
+        sum += r
+        validInWindow++
+      }
+      if (i >= sumPeriod) {
+        const oldR = ratios[i - sumPeriod]
+        if (!Number.isNaN(oldR)) {
+          sum -= oldR
+          validInWindow--
         }
       }
-      result[i] = { mi }
+      result[i] = validInWindow === sumPeriod ? { mi: sum } : { mi: NaN }
     }
 
     return result

@@ -31,6 +31,32 @@ export function calcSMA(data: number[], period: number): number[] {
 }
 
 /**
+ * NaN 感知的简单移动平均（NaN-aware SMA）
+ * 跳过 NaN 输入，仅在连续有效值上计算滑动窗口均值
+ * 窗口内 NaN 不计入窗口大小，需要连续 period 个有效值才产出结果
+ */
+export function calcSMA_NaNAware(data: number[], period: number): number[] {
+  const len = data.length
+  const result: number[] = new Array(len).fill(NaN)
+  const buf = new Array<number>(len)
+  let bufLen = 0
+  let sum = 0
+  for (let i = 0; i < len; i++) {
+    if (Number.isNaN(data[i])) continue
+    buf[bufLen] = data[i]
+    bufLen++
+    sum += data[i]
+    if (bufLen > period) {
+      sum -= buf[bufLen - period - 1]
+    }
+    if (bufLen >= period) {
+      result[i] = sum / period
+    }
+  }
+  return result
+}
+
+/**
  * 指数移动平均（Exponential Moving Average）
  * 权重因子 k = 2 / (period + 1)
  * 首个有效值使用 SMA 作为种子
@@ -195,6 +221,56 @@ export function calcLowest(data: number[], period: number): number[] {
     if (deque[head] <= i - period) head++
     if (i >= period - 1) {
       result[i] = data[deque[head]]
+    }
+  }
+  return result
+}
+
+/**
+ * 区间最高值索引（Index of Highest value in period）
+ * 返回过去 period 个数据内最高值的绝对索引
+ * 使用单调双端队列实现 O(n) 滑动窗口
+ * 值相同时取最近的索引（与 calcHighest 一致）
+ */
+export function calcHighestIdx(data: number[], period: number): number[] {
+  const n = data.length
+  const result: number[] = new Array(n).fill(NaN)
+  console.assert(period > 0, 'calcHighestIdx: period must be > 0')
+  const deque: number[] = []
+  let head = 0
+  for (let i = 0; i < n; i++) {
+    while (deque.length > head && data[deque[deque.length - 1]] <= data[i]) {
+      deque.pop()
+    }
+    deque.push(i)
+    if (deque[head] <= i - period) head++
+    if (i >= period - 1) {
+      result[i] = deque[head]
+    }
+  }
+  return result
+}
+
+/**
+ * 区间最低值索引（Index of Lowest value in period）
+ * 返回过去 period 个数据内最低值的绝对索引
+ * 使用单调双端队列实现 O(n) 滑动窗口
+ * 值相同时取最近的索引（与 calcLowest 一致）
+ */
+export function calcLowestIdx(data: number[], period: number): number[] {
+  const n = data.length
+  const result: number[] = new Array(n).fill(NaN)
+  console.assert(period > 0, 'calcLowestIdx: period must be > 0')
+  const deque: number[] = []
+  let head = 0
+  for (let i = 0; i < n; i++) {
+    while (deque.length > head && data[deque[deque.length - 1]] >= data[i]) {
+      deque.pop()
+    }
+    deque.push(i)
+    if (deque[head] <= i - period) head++
+    if (i >= period - 1) {
+      result[i] = deque[head]
     }
   }
   return result

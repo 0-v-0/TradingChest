@@ -1,4 +1,5 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { drawBricks } from './utils'
 
 export interface LineBreakLine {
   lbOpen: number
@@ -51,9 +52,14 @@ export function calcLineBreak(dataList: KLineData[], lines: number): LineBreakLi
     const d = dataList[i]
     const close = d.close
 
-    const lookback = result.slice(-lines)
-    const highestHigh = Math.max(...lookback.map(l => l.lbHigh))
-    const lowestLow = Math.min(...lookback.map(l => l.lbLow))
+    // 直接在尾部 lines 条记录中找最高/最低，避免 slice + map 分配
+    const start = Math.max(0, result.length - lines)
+    let highestHigh = result[start].lbHigh
+    let lowestLow = result[start].lbLow
+    for (let j = start + 1; j < result.length; j++) {
+      if (result[j].lbHigh > highestHigh) highestHigh = result[j].lbHigh
+      if (result[j].lbLow < lowestLow) lowestLow = result[j].lbLow
+    }
 
     const lastLine = result[result.length - 1]
 
@@ -133,30 +139,7 @@ const lineBreak: IndicatorTemplate<object, number> = {
     const visibleCount = to - from
     if (visibleCount <= 0) return false
 
-    const lineWidth = Math.max(1, bounding.width / visibleCount)
-    const gap = 1
-
-    for (let i = from; i < to; i++) {
-      const lb = lineBreakLines[i]
-      const x = bounding.left + (i - from) * lineWidth
-      const yTop = yAxis.convertToPixel(lb.lbHigh)
-      const yBottom = yAxis.convertToPixel(lb.lbLow)
-      const height = Math.max(yBottom - yTop, 1)
-
-      if (lb.trend > 0) {
-        ctx.fillStyle = '#26a69a'
-        ctx.fillRect(x + gap, yTop, lineWidth - gap * 2, height)
-        ctx.strokeStyle = '#26a69a'
-        ctx.lineWidth = 1
-        ctx.strokeRect(x + gap, yTop, lineWidth - gap * 2, height)
-      } else {
-        ctx.fillStyle = '#ef5350'
-        ctx.fillRect(x + gap, yTop, lineWidth - gap * 2, height)
-        ctx.strokeStyle = '#ef5350'
-        ctx.lineWidth = 1
-        ctx.strokeRect(x + gap, yTop, lineWidth - gap * 2, height)
-      }
-    }
+    drawBricks(ctx, lineBreakLines, lb => lb.lbHigh, lb => lb.lbLow, lb => lb.trend, from, to, bounding, yAxis)
 
     return true
   },

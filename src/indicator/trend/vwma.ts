@@ -4,6 +4,7 @@
  * 在成交量较大的价格区域赋予更多权重
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcSum } from '../utils'
 
 type VwmaResult = { vwma: number }
 
@@ -15,28 +16,23 @@ const vwma: IndicatorTemplate<VwmaResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
 
+    const closeTimesVol = dataList.map(d => d.close * (d.volume ?? 0))
+    const volumes = dataList.map(d => d.volume ?? 0)
+    const closes = dataList.map(d => d.close)
+
+    const cvSums = calcSum(closeTimesVol, period)
+    const vSums = calcSum(volumes, period)
+    const closeSums = calcSum(closes, period)
+
     const result: VwmaResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (i < period - 1) {
+      if (Number.isNaN(cvSums[i])) {
         result[i] = { vwma: NaN }
-      } else {
-        let cvSum = 0
-        let vSum = 0
-        for (let j = i - period + 1; j <= i; j++) {
-          const vol = dataList[j].volume ?? 0
-          cvSum += dataList[j].close * vol
-          vSum += vol
-        }
+      } else if (vSums[i] === 0) {
         // 无成交量时退化为简单均线
-        if (vSum === 0) {
-          let closeSum = 0
-          for (let j = i - period + 1; j <= i; j++) {
-            closeSum += dataList[j].close
-          }
-          result[i] = { vwma: closeSum / period }
-        } else {
-          result[i] = { vwma: cvSum / vSum }
-        }
+        result[i] = { vwma: closeSums[i] / period }
+      } else {
+        result[i] = { vwma: cvSums[i] / vSums[i] }
       }
     }
     return result

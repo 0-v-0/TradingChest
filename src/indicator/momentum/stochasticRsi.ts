@@ -8,33 +8,9 @@
  * 输出范围 0-1（部分平台显示为 0-100，此处使用 0-1）
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcHighest, calcLowest } from '../utils'
+import { calcHighest, calcLowest, calcSMA_NaNAware } from '../utils'
 
 type StochasticRsiResult = { k: number; d: number }
-
-/**
- * NaN 感知的滑动窗口 SMA：跳过 NaN，只在连续有效值上计算。
- */
-function calcSparseSMA(source: number[], period: number): number[] {
-  const len = source.length
-  const result: number[] = Array(len).fill(NaN)
-  const buf = new Array<number>(len)
-  let bufLen = 0
-  let sum = 0
-  for (let i = 0; i < len; i++) {
-    if (isNaN(source[i])) continue
-    buf[bufLen] = source[i]
-    bufLen++
-    sum += source[i]
-    if (bufLen > period) {
-      sum -= buf[bufLen - period - 1]
-    }
-    if (bufLen >= period) {
-      result[i] = sum / period
-    }
-  }
-  return result
-}
 
 const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
   name: 'StochRSI',
@@ -99,8 +75,8 @@ const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
     }
 
     // ---- 第三步：K = SMA(StochRSI, kSmooth)，D = SMA(K, dSmooth) ----
-    const kLine = calcSparseSMA(stochRsi, kSmooth)
-    const dLine = calcSparseSMA(kLine, dSmooth)
+    const kLine = calcSMA_NaNAware(stochRsi, kSmooth)
+    const dLine = calcSMA_NaNAware(kLine, dSmooth)
 
     // ---- 组装输出 ----
     const result: StochasticRsiResult[] = new Array(len)

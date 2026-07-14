@@ -1,4 +1,5 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcATR, drawBricks } from './utils'
 
 export interface RenkoBrick {
   brickOpen: number
@@ -36,18 +37,6 @@ export function calcRenkoBricks(dataList: KLineData[], brickSize: number): Renko
   return bricks
 }
 
-function calcATR(dataList: KLineData[], period: number): number {
-  if (dataList.length < 2) return 0
-  let sum = 0
-  const count = Math.min(period, dataList.length - 1)
-  for (let i = 1; i <= count; i++) {
-    const d = dataList[i]
-    const prev = dataList[i - 1]
-    sum += Math.max(d.high - d.low, Math.abs(d.high - prev.close), Math.abs(d.low - prev.close))
-  }
-  return sum / count
-}
-
 const renko: IndicatorTemplate<object, number> = {
   name: 'Renko',
   shortName: 'RN',
@@ -71,34 +60,8 @@ const renko: IndicatorTemplate<object, number> = {
     const visibleRange = chart.getVisibleRange()
     const from = Math.max(0, visibleRange.from)
     const to = Math.min(bricks.length, visibleRange.to)
-    const visibleCount = to - from
-    if (visibleCount <= 0) return false
 
-    const brickWidth = Math.max(1, bounding.width / visibleCount)
-    const gap = 1
-
-    for (let i = from; i < to; i++) {
-      const brick = bricks[i]
-      const x = bounding.left + (i - from) * brickWidth
-      const yTop = yAxis.convertToPixel(brick.brickHigh)
-      const yBottom = yAxis.convertToPixel(brick.brickLow)
-      const height = Math.max(yBottom - yTop, 1)
-
-      if (brick.trend > 0) {
-        ctx.fillStyle = '#26a69a'
-        ctx.fillRect(x + gap, yTop, brickWidth - gap * 2, height)
-        ctx.strokeStyle = '#26a69a'
-        ctx.lineWidth = 1
-        ctx.strokeRect(x + gap, yTop, brickWidth - gap * 2, height)
-      } else {
-        ctx.fillStyle = '#ef5350'
-        ctx.fillRect(x + gap, yTop, brickWidth - gap * 2, height)
-        ctx.strokeStyle = '#ef5350'
-        ctx.lineWidth = 1
-        ctx.strokeRect(x + gap, yTop, brickWidth - gap * 2, height)
-      }
-    }
-
+    drawBricks(ctx, bricks, b => b.brickHigh, b => b.brickLow, b => b.trend, from, to, bounding, yAxis)
     return true
   },
 }
