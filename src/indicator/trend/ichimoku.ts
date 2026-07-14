@@ -3,6 +3,7 @@
  * 包含转换线、基准线、先行带A/B、迟行带五条线
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcHighest, calcLowest } from '../utils'
 
 type IchimokuResult = {
   tenkanSen: number
@@ -10,20 +11,6 @@ type IchimokuResult = {
   senkouSpanA: number
   senkouSpanB: number
   chikouSpan: number
-}
-
-/**
- * 计算指定区间内的最高价与最低价的中间值
- */
-function midPoint(dataList: KLineData[], endIndex: number, period: number): number {
-  if (endIndex < period - 1) return NaN
-  let high = -Infinity
-  let low = Infinity
-  for (let i = endIndex - period + 1; i <= endIndex; i++) {
-    if (dataList[i].high > high) high = dataList[i].high
-    if (dataList[i].low < low) low = dataList[i].low
-  }
-  return (high + low) / 2
 }
 
 const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
@@ -40,15 +27,32 @@ const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [tenkanPeriod, kijunPeriod, senkouBPeriod, displacement] }) => {
     const n = dataList.length
 
-    // 先计算各条线的原始值
+    // 预提取 high/low 并用 O(n) 滑动窗口一次算出所有周期的 highest/lowest
+    const highs = new Array<number>(n)
+    const lows = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      highs[i] = dataList[i].high
+      lows[i] = dataList[i].low
+    }
+    const tenkanHigh = calcHighest(highs, tenkanPeriod)
+    const tenkanLow = calcLowest(lows, tenkanPeriod)
+    const kijunHigh = calcHighest(highs, kijunPeriod)
+    const kijunLow = calcLowest(lows, kijunPeriod)
+    const senkouBHigh = calcHighest(highs, senkouBPeriod)
+    const senkouBLow = calcLowest(lows, senkouBPeriod)
+
     const tenkanArr = new Array<number>(n)
     const kijunArr = new Array<number>(n)
     const spanAArr = new Array<number>(n)
     const spanBArr = new Array<number>(n)
 
     for (let i = 0; i < n; i++) {
-      const tenkan = midPoint(dataList, i, tenkanPeriod)
-      const kijun = midPoint(dataList, i, kijunPeriod)
+      const tenkan = !isNaN(tenkanHigh[i]) && !isNaN(tenkanLow[i])
+        ? (tenkanHigh[i] + tenkanLow[i]) / 2
+        : NaN
+      const kijun = !isNaN(kijunHigh[i]) && !isNaN(kijunLow[i])
+        ? (kijunHigh[i] + kijunLow[i]) / 2
+        : NaN
       tenkanArr[i] = tenkan
       kijunArr[i] = kijun
 
@@ -60,7 +64,9 @@ const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
       }
 
       // 先行带 B = (senkouBPeriod 周期内最高价 + 最低价) / 2
-      spanBArr[i] = midPoint(dataList, i, senkouBPeriod)
+      spanBArr[i] = !isNaN(senkouBHigh[i]) && !isNaN(senkouBLow[i])
+        ? (senkouBHigh[i] + senkouBLow[i]) / 2
+        : NaN
     }
 
     // 组装结果，先行带需要前移 displacement 个周期，迟行带需要后移 displacement 个周期

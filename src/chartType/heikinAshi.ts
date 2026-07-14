@@ -25,11 +25,12 @@ const heikinAshi: IndicatorTemplate<HeikinAshiResult, number> = {
     { key: 'haClose', title: 'C: ', type: 'line' },
   ],
   calc: (dataList: KLineData[]) => {
-    const result: HeikinAshiResult[] = []
+    const n = dataList.length
+    const result: HeikinAshiResult[] = new Array(n)
     let prevHaOpen = 0
     let prevHaClose = 0
 
-    for (let i = 0; i < dataList.length; i++) {
+    for (let i = 0; i < n; i++) {
       const d = dataList[i]
       // HA 收盘价：四价平均
       const haClose = (d.open + d.high + d.low + d.close) / 4
@@ -39,7 +40,7 @@ const heikinAshi: IndicatorTemplate<HeikinAshiResult, number> = {
       const haHigh = Math.max(d.high, haOpen, haClose)
       const haLow = Math.min(d.low, haOpen, haClose)
 
-      result.push({ haOpen, haHigh, haLow, haClose })
+      result[i] = { haOpen, haHigh, haLow, haClose }
       prevHaOpen = haOpen
       prevHaClose = haClose
     }

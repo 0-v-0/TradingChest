@@ -107,7 +107,7 @@ export default class DefaultDatafeed implements Datafeed {
     }
   }
 
-  subscribe(symbol: SymbolInfo, period: Period, callback: DatafeedSubscribeCallback): void {
+  subscribe(symbol: SymbolInfo, _period: Period, callback: DatafeedSubscribeCallback): void {
     // 始终更新回调引用，确保切换 ticker 后新回调生效
     this._callback = callback
     const ticker = symbol.ticker

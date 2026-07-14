@@ -209,8 +209,8 @@ describe('KeyboardShortcutManager', () => {
         key: 't',
         ctrlKey: true,
         bubbles: true,
-        target: input,
       })
+      Object.defineProperty(event, 'target', { value: input })
       input.dispatchEvent(event)
       expect(handler).not.toHaveBeenCalled()
       document.body.removeChild(input)
@@ -224,14 +224,13 @@ describe('KeyboardShortcutManager', () => {
       document.body.appendChild(textarea)
       manager.bindTo(document.body)
       textarea.focus()
-      textarea.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          key: 't',
-          ctrlKey: true,
-          bubbles: true,
-          target: textarea,
-        }),
-      )
+      const event = new KeyboardEvent('keydown', {
+        key: 't',
+        ctrlKey: true,
+        bubbles: true,
+      })
+      Object.defineProperty(event, 'target', { value: textarea })
+      textarea.dispatchEvent(event)
       expect(handler).not.toHaveBeenCalled()
       document.body.removeChild(textarea)
     })

@@ -72,7 +72,7 @@ function generateKLineData(count: number): KLineData[] {
 function extractField(dataList: KLineData[], field: 'close' | 'high' | 'low' | 'open' | 'volume'): number[] {
   const n = dataList.length
   const arr = new Array<number>(n)
-  for (let i = 0; i < n; i++) arr[i] = dataList[i][field]
+  for (let i = 0; i < n; i++) arr[i] = dataList[i][field] ?? 0
   return arr
 }
 

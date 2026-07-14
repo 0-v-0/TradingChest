@@ -43,15 +43,15 @@ const mfi: IndicatorTemplate<MfiResult, number> = {
     for (let i = 0; i < n; i++) {
       if (i >= 1) {
         const dir = tp[i] - tp[i - 1]
-        const inRange = i <= period
-        if (dir > 0 && inRange) positiveFlow += rmf[i]
-        else if (dir < 0 && inRange) negativeFlow += rmf[i]
-
-        if (i > period) {
+        // i < period: 在初始累积窗口内，直接累加
+        // i >= period: 滑出窗口最旧值后再累加当前值
+        if (i >= period) {
           const outDir = tp[i - period] - tp[i - period - 1]
           if (outDir > 0) positiveFlow -= rmf[i - period]
           else if (outDir < 0) negativeFlow -= rmf[i - period]
         }
+        if (dir > 0) positiveFlow += rmf[i]
+        else if (dir < 0) negativeFlow += rmf[i]
       }
 
       let mfi: number

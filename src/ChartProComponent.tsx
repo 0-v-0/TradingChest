@@ -79,6 +79,17 @@ interface PrevSymbolPeriod {
   period: Period
 }
 
+const FORMAT_TABLE: Readonly<Record<string, { xAxis: string; default: string }>> = {
+  ms: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
+  second: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
+  minute: { xAxis: 'HH:mm', default: 'YYYY-MM-DD HH:mm' },
+  hour: { xAxis: 'MM-DD HH:mm', default: 'YYYY-MM-DD HH:mm' },
+  day: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
+  week: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
+  month: { xAxis: 'YYYY-MM', default: 'YYYY-MM-DD' },
+  year: { xAxis: 'YYYY', default: 'YYYY-MM-DD' },
+}
+
 const FILL_OVERLAY_NAMES: ReadonlySet<string> = new Set([
   'rect',
   'circle',
@@ -609,17 +620,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           template: string
           type: string
         }) => {
-          const formatTable: Record<string, { xAxis: string; default: string }> = {
-            ms: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
-            second: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
-            minute: { xAxis: 'HH:mm', default: 'YYYY-MM-DD HH:mm' },
-            hour: { xAxis: 'MM-DD HH:mm', default: 'YYYY-MM-DD HH:mm' },
-            day: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
-            week: { xAxis: 'YYYY-MM-DD', default: 'YYYY-MM-DD' },
-            month: { xAxis: 'YYYY-MM', default: 'YYYY-MM-DD' },
-            year: { xAxis: 'YYYY', default: 'YYYY-MM-DD' },
-          }
-          const formatInfo = formatTable[period().timespan]
+          const formatInfo = FORMAT_TABLE[period().timespan]
           return utils.formatDate(dateTimeFormat, timestamp,
             type === 'xAxis' ? formatInfo?.xAxis ?? 'YYYY-MM-DD HH:mm' :
               formatInfo?.default ?? 'YYYY-MM-DD HH:mm'

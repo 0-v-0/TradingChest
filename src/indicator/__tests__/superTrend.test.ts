@@ -2,6 +2,8 @@ import { KLineData } from 'klinecharts'
 import { describe, it, expect } from 'vitest'
 import superTrend from '../trend/superTrend'
 
+type SuperTrendResult = { up: number; down: number; direction: number }
+
 function makeKlines(count: number): KLineData[] {
   const base = 100
   return Array.from({ length: count }, (_, i) => ({
@@ -15,18 +17,22 @@ function makeKlines(count: number): KLineData[] {
   }))
 }
 
+// calc 返回类型包含 Promise 联合，但实际同步执行；断言为具体数组类型
+function calc(dataList: KLineData[], indicator: { calcParams: number[] }): SuperTrendResult[] {
+  return superTrend.calc!(dataList, indicator as any) as SuperTrendResult[]
+}
+
 describe('SuperTrend indicator', () => {
   const klines = makeKlines(30)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const indicator = { calcParams: [10, 3] } as any
+  const indicator = { calcParams: [10, 3] }
 
   it('返回与输入等长的数组', () => {
-    const result = superTrend.calc!(klines, indicator)
+    const result = calc(klines, indicator)
     expect(result).toHaveLength(klines.length)
   })
 
   it('前 period-1 个值为 NaN', () => {
-    const result = superTrend.calc!(klines, indicator)
+    const result = calc(klines, indicator)
     for (let i = 0; i < 9; i++) {
       expect(result[i].up).toBeNaN()
       expect(result[i].down).toBeNaN()
@@ -34,7 +40,7 @@ describe('SuperTrend indicator', () => {
   })
 
   it('period-1 之后每行恰好有 up 或 down 之一', () => {
-    const result = superTrend.calc!(klines, indicator)
+    const result = calc(klines, indicator)
     for (let i = 9; i < result.length; i++) {
       const hasUp = !isNaN(result[i].up)
       const hasDown = !isNaN(result[i].down)
@@ -44,7 +50,7 @@ describe('SuperTrend indicator', () => {
   })
 
   it('上升趋势 up 值应在 close 下方', () => {
-    const result = superTrend.calc!(klines, indicator)
+    const result = calc(klines, indicator)
     for (let i = 9; i < result.length; i++) {
       if (!isNaN(result[i].up)) {
         expect(result[i].up).toBeLessThan(klines[i].high)
@@ -53,7 +59,7 @@ describe('SuperTrend indicator', () => {
   })
 
   it('空数据返回空数组', () => {
-    const result = superTrend.calc!([], indicator)
+    const result = calc([], indicator)
     expect(result).toHaveLength(0)
   })
 
@@ -67,7 +73,7 @@ describe('SuperTrend indicator', () => {
         close: descending[i].close - 20,
       }
     }
-    const result = superTrend.calc!(descending, indicator)
+    const result = calc(descending, indicator)
     // After the drop, some bars should have down values
     const hasDown = result.some((r) => !isNaN(r.down))
     expect(hasDown).toBe(true)
