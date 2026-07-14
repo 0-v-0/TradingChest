@@ -609,101 +609,101 @@ export const mapping = {
   ),
 }
 
-export function createSingleLineOptions(locale: string): SelectDataSourceItem[] {
+export function createSingleLineOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'horizontalStraightLine', text: t('horizontal_straight_line', locale) },
-    { key: 'horizontalRayLine', text: t('horizontal_ray_line', locale) },
-    { key: 'horizontalSegment', text: t('horizontal_segment', locale) },
-    { key: 'verticalStraightLine', text: t('vertical_straight_line', locale) },
-    { key: 'verticalRayLine', text: t('vertical_ray_line', locale) },
-    { key: 'verticalSegment', text: t('vertical_segment', locale) },
-    { key: 'straightLine', text: t('straight_line', locale) },
-    { key: 'rayLine', text: t('ray_line', locale) },
-    { key: 'segment', text: t('segment', locale) },
-    { key: 'arrow', text: t('arrow', locale) },
-    { key: 'priceLine', text: t('price_line', locale) },
+    { key: 'horizontalStraightLine', text: t('horizontal_straight_line', lang) },
+    { key: 'horizontalRayLine', text: t('horizontal_ray_line', lang) },
+    { key: 'horizontalSegment', text: t('horizontal_segment', lang) },
+    { key: 'verticalStraightLine', text: t('vertical_straight_line', lang) },
+    { key: 'verticalRayLine', text: t('vertical_ray_line', lang) },
+    { key: 'verticalSegment', text: t('vertical_segment', lang) },
+    { key: 'straightLine', text: t('straight_line', lang) },
+    { key: 'rayLine', text: t('ray_line', lang) },
+    { key: 'segment', text: t('segment', lang) },
+    { key: 'arrow', text: t('arrow', lang) },
+    { key: 'priceLine', text: t('price_line', lang) },
   ]
 }
 
-export function createMoreLineOptions(locale: string): SelectDataSourceItem[] {
+export function createMoreLineOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'priceChannelLine', text: t('price_channel_line', locale) },
-    { key: 'parallelStraightLine', text: t('parallel_straight_line', locale) },
-    { key: 'flatTopBottom', text: t('flat_top_bottom', locale) },
+    { key: 'priceChannelLine', text: t('price_channel_line', lang) },
+    { key: 'parallelStraightLine', text: t('parallel_straight_line', lang) },
+    { key: 'flatTopBottom', text: t('flat_top_bottom', lang) },
   ]
 }
 
-export function createPolygonOptions(locale: string): SelectDataSourceItem[] {
+export function createPolygonOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'circle', text: t('circle', locale) },
-    { key: 'rect', text: t('rect', locale) },
-    { key: 'parallelogram', text: t('parallelogram', locale) },
-    { key: 'triangle', text: t('triangle', locale) },
+    { key: 'circle', text: t('circle', lang) },
+    { key: 'rect', text: t('rect', lang) },
+    { key: 'parallelogram', text: t('parallelogram', lang) },
+    { key: 'triangle', text: t('triangle', lang) },
   ]
 }
 
-export function createFibonacciOptions(locale: string): SelectDataSourceItem[] {
+export function createFibonacciOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'fibonacciLine', text: t('fibonacci_line', locale) },
-    { key: 'fibonacciSegment', text: t('fibonacci_segment', locale) },
-    { key: 'fibonacciCircle', text: t('fibonacci_circle', locale) },
-    { key: 'fibonacciSpiral', text: t('fibonacci_spiral', locale) },
-    { key: 'fibonacciSpeedResistanceFan', text: t('fibonacci_speed_resistance_fan', locale) },
-    { key: 'fibonacciExtension', text: t('fibonacci_extension', locale) },
-    { key: 'gannBox', text: t('gann_box', locale) },
+    { key: 'fibonacciLine', text: t('fibonacci_line', lang) },
+    { key: 'fibonacciSegment', text: t('fibonacci_segment', lang) },
+    { key: 'fibonacciCircle', text: t('fibonacci_circle', lang) },
+    { key: 'fibonacciSpiral', text: t('fibonacci_spiral', lang) },
+    { key: 'fibonacciSpeedResistanceFan', text: t('fibonacci_speed_resistance_fan', lang) },
+    { key: 'fibonacciExtension', text: t('fibonacci_extension', lang) },
+    { key: 'gannBox', text: t('gann_box', lang) },
   ]
 }
 
-export function createWaveOptions(locale: string): SelectDataSourceItem[] {
+export function createWaveOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'xabcd', text: t('xabcd', locale) },
-    { key: 'abcd', text: t('abcd', locale) },
-    { key: 'threeWaves', text: t('three_waves', locale) },
-    { key: 'fiveWaves', text: t('five_waves', locale) },
-    { key: 'eightWaves', text: t('eight_waves', locale) },
-    { key: 'anyWaves', text: t('any_waves', locale) },
+    { key: 'xabcd', text: t('xabcd', lang) },
+    { key: 'abcd', text: t('abcd', lang) },
+    { key: 'threeWaves', text: t('three_waves', lang) },
+    { key: 'fiveWaves', text: t('five_waves', lang) },
+    { key: 'eightWaves', text: t('eight_waves', lang) },
+    { key: 'anyWaves', text: t('any_waves', lang) },
   ]
 }
 
-export function createMeasurementOptions(locale: string): SelectDataSourceItem[] {
+export function createMeasurementOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'priceRange', text: t('price_range', locale) },
-    { key: 'dateRange', text: t('date_range', locale) },
-    { key: 'dateAndPriceRange', text: t('date_and_price_range', locale) },
-    { key: 'disjointAngle', text: t('disjoint_angle', locale) },
-    { key: 'forecast', text: t('forecast', locale) },
+    { key: 'priceRange', text: t('price_range', lang) },
+    { key: 'dateRange', text: t('date_range', lang) },
+    { key: 'dateAndPriceRange', text: t('date_and_price_range', lang) },
+    { key: 'disjointAngle', text: t('disjoint_angle', lang) },
+    { key: 'forecast', text: t('forecast', lang) },
   ]
 }
 
-export function createChannelOptions(locale: string): SelectDataSourceItem[] {
+export function createChannelOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'pitchfork', text: t('pitchfork', locale) },
-    { key: 'schiffPitchfork', text: t('schiff_pitchfork', locale) },
-    { key: 'regressionTrend', text: t('regression_trend', locale) },
-    { key: 'regressionChannel', text: t('regression_channel', locale) },
+    { key: 'pitchfork', text: t('pitchfork', lang) },
+    { key: 'schiffPitchfork', text: t('schiff_pitchfork', lang) },
+    { key: 'regressionTrend', text: t('regression_trend', lang) },
+    { key: 'regressionChannel', text: t('regression_channel', lang) },
   ]
 }
 
-export function createAnnotationOptions(locale: string): SelectDataSourceItem[] {
+export function createAnnotationOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'textAnnotation', text: t('text_annotation', locale) },
-    { key: 'callout', text: t('callout', locale) },
-    { key: 'note', text: t('note', locale) },
-    { key: 'brush', text: t('brush', locale) },
+    { key: 'textAnnotation', text: t('text_annotation', lang) },
+    { key: 'callout', text: t('callout', lang) },
+    { key: 'note', text: t('note', lang) },
+    { key: 'brush', text: t('brush', lang) },
   ]
 }
 
-export function createPositionOptions(locale: string): SelectDataSourceItem[] {
+export function createPositionOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'longPosition', text: t('long_position', locale) },
-    { key: 'shortPosition', text: t('short_position', locale) },
+    { key: 'longPosition', text: t('long_position', lang) },
+    { key: 'shortPosition', text: t('short_position', lang) },
   ]
 }
 
-export function createMagnetOptions(locale: string): SelectDataSourceItem[] {
+export function createMagnetOptions(lang: string): SelectDataSourceItem[] {
   return [
-    { key: 'weak_magnet', text: t('weak_magnet', locale) },
-    { key: 'strong_magnet', text: t('strong_magnet', locale) },
+    { key: 'weak_magnet', text: t('weak_magnet', lang) },
+    { key: 'strong_magnet', text: t('strong_magnet', lang) },
   ]
 }
 

@@ -57,12 +57,13 @@ import {
 } from './widget'
 import type { MenuItem } from './widget/context-menu'
 import type { DataWindowRow } from './widget/data-window'
-import t from './i18n'
+import t, { load as loadLocale, subscribeLocaleChange, getLocaleVersion } from './i18n'
 import { translateTimezone } from './widget/timezone-modal/data'
 
 export interface ChartProComponentProps extends Required<
-  Omit<ChartProOptions, 'container' | 'onAlertTrigger' | 'onError'>
+  Omit<ChartProOptions, 'container' | 'onAlertTrigger' | 'onError' | 'locale'>
 > {
+  lang: string
   ref: (chart: ChartPro) => void
   /** 内部回调：实时数据到达时通知外层（用于报警检测） */
   onPriceUpdate?: (price: number) => void
@@ -195,7 +196,21 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [theme, setTheme] = createSignal(props.theme)
   const tooltipFeaturesMemo = createMemo(() => tooltipFeatures(theme()))
   const [styles, setStyles] = createSignal(props.styles)
-  const [locale, setLocale] = createSignal(props.locale)
+  const [locale, setLocale] = createSignal(props.lang)
+  // Reactive locale version: subscribes to i18n module locale change events
+  const [localeVersion, setLocaleVersion] = createSignal(getLocaleVersion())
+  const setLocaleAndLoad = (newLocale: string) => {
+    setLocale(newLocale)
+    loadLocale(newLocale)
+  }
+  // Subscribe to i18n locale data changes
+  onMount(() => {
+    const unsub = subscribeLocaleChange(() => setLocaleVersion(v => v + 1))
+    loadLocale(locale())
+    onCleanup(unsub)
+  })
+  // Reactive translation: re-evaluates when locale or localeVersion changes
+  const tr = (key: string) => { localeVersion(); return t(key, locale()) }
 
   const [symbol, setSymbol] = createSignal(props.symbol)
   const [period, setPeriod] = createSignal(props.period)
@@ -206,7 +221,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
   const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
     key: props.timezone,
-    text: translateTimezone(props.timezone, props.locale),
+    text: translateTimezone(props.timezone, props.lang),
   })
 
   const [settingModalVisible, setSettingModalVisible] = createSignal(false)
@@ -389,7 +404,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     if (textOverlays.includes(overlay.name ?? '')) {
       items.push({
-         label: t('menu_edit', locale()),
+         label: tr('menu_edit'),
          onClick: () => {
            const current =
             typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
@@ -397,7 +412,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               : overlay.name === 'note'
                 ? 'Note'
                 : 'Text'
-          const input = window.prompt(t('menu_edit', locale()), current)
+          const input = window.prompt(tr('menu_edit'), current)
           if (input !== null && input.trim() !== '' && overlay.id) {
             widget?.overrideOverlay({ id: overlay.id, extendData: input.trim() })
           }
@@ -407,7 +422,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     items.push(
       {
-        label: t(overlay.lock ? 'menu_unlock' : 'menu_lock', locale()),
+        label: tr(overlay.lock ? 'menu_unlock' : 'menu_lock'),
         onClick: () => {
           if (overlay.id) {
             widget?.overrideOverlay({ id: overlay.id, lock: !overlay.lock })
@@ -415,7 +430,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         },
       },
       {
-        label: t('menu_copy', locale()),
+        label: tr('menu_copy'),
         onClick: () => {
           if (overlay.id) {
             const o = widget?.getOverlays({ id: overlay.id })[0]
@@ -431,15 +446,15 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         },
       },
       {
-        label: t('menu_bring_forward', locale()),
+        label: tr('menu_bring_forward'),
         onClick: () => swapZLevel(overlay, 1),
       },
       {
-        label: t('menu_send_backward', locale()),
+        label: tr('menu_send_backward'),
         onClick: () => swapZLevel(overlay, -1),
       },
       {
-        label: t('menu_delete', locale()),
+        label: tr('menu_delete'),
         danger: true,
         onClick: () => {
           if (overlay.id) {
@@ -517,7 +532,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     getTheme: () => theme(),
     setStyles,
     getStyles: () => widget?.getStyles() ?? {} as Styles,
-    setLocale,
+    setLocale: setLocaleAndLoad,
     getLocale: () => locale(),
     setTimezone: (tz: string) => {
       setTimezone({ key: tz, text: translateTimezone(tz, locale()) })
@@ -764,7 +779,15 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     })
     // 十字光标变化时更新数据窗口
     widget?.subscribeAction('onCrosshairChange', (data: unknown) => {
-      const crosshair = data as Crosshair | undefined
+      let crosshair = data as Crosshair | undefined
+      // klinecharts v10 bug: subscribeAction callback receives the raw input {x, y, paneId}
+      // without kLineData. Read the full internal crosshair state as a fallback.
+      if (crosshair && !crosshair.kLineData) {
+        const store = (widget as any)?._chartStore
+        if (store?._crosshair) {
+          crosshair = store._crosshair as Crosshair
+        }
+      }
       if (!crosshair || !crosshair.kLineData) {
         setDataWindowData([])
         return
@@ -889,7 +912,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       <i class="icon-close klinecharts-pro-load-icon" />
       <Show when={symbolSearchModalVisible()}>
         <SymbolSearchModal
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           datafeed={props.datafeed}
           onSymbolSelected={(symbol) => {
             setSymbol(symbol)
@@ -901,7 +924,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       </Show>
       <Show when={indicatorModalVisible()}>
         <IndicatorModal
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           mainIndicators={mainIndicators()}
           subIndicators={subIndicators()}
           onClose={() => {
@@ -937,7 +960,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       </Show>
       <Show when={timezoneModalVisible()}>
         <TimezoneModal
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           timezone={timezone()}
           onClose={() => {
             setTimezoneModalVisible(false)
@@ -947,7 +970,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       </Show>
       <Show when={settingModalVisible()}>
         <SettingModal
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           currentStyles={utils.clone(widget!.getStyles())}
           onClose={() => {
             setSettingModalVisible(false)
@@ -967,7 +990,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       </Show>
       <Show when={screenshotUrl().length > 0}>
         <ScreenshotModal
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           url={screenshotUrl()}
           onClose={() => {
             setScreenshotUrl('')
@@ -976,7 +999,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       </Show>
       <Show when={themeEditorVisible()}>
         <ThemeEditor
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           currentStyles={widget!.getStyles()}
           onClose={() => setThemeEditorVisible(false)}
           onApply={(style) => widget?.setStyles(style)}
@@ -984,7 +1007,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       </Show>
       <Show when={indicatorSettingModalParams().visible}>
         <IndicatorSettingModal
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           params={indicatorSettingModalParams()}
           onClose={() => {
             setIndicatorSettingModalParams({
@@ -1003,7 +1026,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         />
       </Show>
       <PeriodBar
-        locale={props.locale}
+        lang={locale()} localeKey={localeVersion()}
         symbol={symbol()}
         spread={drawingBarVisible()}
         period={period()}
@@ -1060,7 +1083,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         </Show>
         <Show when={drawingBarVisible()}>
           <DrawingBar
-            locale={props.locale}
+            lang={locale()} localeKey={localeVersion()}
             onDrawingItemClick={(overlay) => {
               setDrawingMode(true)
               widget?.createOverlay({
@@ -1124,14 +1147,14 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           data-data-window-visible={dataWindowVisible()}
         />
         <DataWindow
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           visible={dataWindowVisible()}
           onToggle={() => setDataWindowVisible(false)}
           data={dataWindowData()}
         />
         {/* 绘图 overlay 浮动属性工具栏 */}
         <OverlayPropertyBar
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           visible={selectedOverlay() !== null}
           position={{ x: selectedOverlay()?.x ?? 0, y: selectedOverlay()?.y ?? 0 }}
           overlayId={selectedOverlay()?.id ?? ''}
@@ -1164,7 +1187,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           onClose={() => setSelectedOverlay(null)}
         />
         <ReplayControlBar
-          locale={props.locale}
+          lang={locale()} localeKey={localeVersion()}
           state={replayState()}
           onPlay={() => {
             replayEngine?.play()

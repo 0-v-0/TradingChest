@@ -6,13 +6,15 @@ import { deepSet } from '../../core/deepSet'
 import t from '../../i18n'
 
 export interface ThemeEditorProps {
-  locale: string
+  lang: string
+  localeKey?: number
   currentStyles: Styles
   onClose: () => void
   onApply: (styles: DeepPartial<Styles>) => void
 }
 
 const ThemeEditor: Component<ThemeEditorProps> = (props) => {
+  void props.localeKey
   const [localStyles, setLocalStyles] = createSignal<Record<string, unknown>>(
     utils.clone(props.currentStyles) as unknown as Record<string, unknown>
   )
@@ -60,12 +62,12 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
 
   return (
     <Modal
-      title={t('theme_editor', props.locale)}
+      title={t('theme_editor', props.lang)}
       width={480}
       buttons={[
-        { children: t('export', props.locale), onClick: handleExport },
-        { children: t('import', props.locale), onClick: handleImport },
-        { children: t('confirm', props.locale), onClick: handleApply },
+        { children: t('export', props.lang), onClick: handleExport },
+        { children: t('import', props.lang), onClick: handleImport },
+        { children: t('confirm', props.lang), onClick: handleApply },
       ]}
       onClose={props.onClose}
     >
@@ -77,7 +79,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
           ) as string | undefined
           return (
             <div class="klinecharts-pro-theme-editor-row">
-              <span>{t(field.label, props.locale)}</span>
+              <span>{t(field.label, props.lang)}</span>
               <ColorInput
                 value={value ?? '#000000'}
                 onChange={(color) => handleColorChange(field.key, color)}

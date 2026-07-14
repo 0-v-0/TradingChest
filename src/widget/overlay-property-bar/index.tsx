@@ -2,7 +2,8 @@ import { createSignal, Show, For, onCleanup, type Component } from 'solid-js'
 import t from '../../i18n'
 
 export interface OverlayPropertyBarProps {
-  locale: string
+  lang: string
+  localeKey?: number
   visible: boolean
   position: { x: number; y: number }
   overlayId: string
@@ -52,6 +53,7 @@ const LINE_STYLES: { key: string; labelKey: string }[] = [
 ]
 
 const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
+  void props.localeKey
   const [showColorPalette, setShowColorPalette] = createSignal(false)
   const [showFillPalette, setShowFillPalette] = createSignal(false)
   const [showWidthPicker, setShowWidthPicker] = createSignal(false)
@@ -261,7 +263,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                       }
                     />
                   </svg>
-                  <span>{t(s.labelKey, props.locale)}</span>
+                  <span>{t(s.labelKey, props.lang)}</span>
                 </div>
               ))}
             </div>
@@ -274,7 +276,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
         <div
           class={`klinecharts-pro-overlay-property-bar-item${props.locked ? ' active' : ''}`}
           onClick={() => props.onLockChange(!props.locked)}
-          title={t('lock', props.locale)}
+          title={t('lock', props.lang)}
         >
           <svg width="16" height="16" viewBox="0 0 16 16">
             {props.locked ? (
@@ -302,7 +304,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
               props.onDelete()
             }, 150)
           }}
-          title={t('delete_overlay', props.locale)}
+          title={t('delete_overlay', props.lang)}
         >
           <svg width="16" height="16" viewBox="0 0 16 16">
             <path

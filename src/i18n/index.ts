@@ -2,6 +2,22 @@ const locales: Record<string, Record<string, string>> = {}
 const loadedLanguages = new Set<string>()
 const inflight = new Map<string, Promise<void>>()
 
+// Solid.js reactivity integration: bump this counter after loading locale data
+// so that any reactive computation depending on translations re-evaluates.
+let _version = 0
+const listeners = new Set<() => void>()
+
+function notifyListeners() {
+  _version++
+  for (const fn of listeners) fn()
+}
+
+export function subscribeLocaleChange(fn: () => void): () => void {
+  listeners.add(fn)
+  return () => listeners.delete(fn)
+}
+
+export function getLocaleVersion() { return _version }
 function parseIni(content: string): Record<string, string> {
   const result: Record<string, string> = {}
   for (const line of content.split('\n')) {
@@ -36,6 +52,7 @@ async function loadLocale(locale: string): Promise<void> {
   }
   locales[locale] = parseIni(content.default)
   loadedLanguages.add(locale)
+  notifyListeners()
 }
 
 export function load(locale: string): Promise<void> {

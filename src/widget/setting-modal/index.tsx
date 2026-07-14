@@ -6,7 +6,8 @@ import { deepSet } from '../../core/deepSet'
 import t from '../../i18n'
 
 export interface SettingModalProps {
-  locale: string
+  lang: string
+  localeKey?: number
   currentStyles: Styles
   onClose: () => void
   onChange: (style: DeepPartial<Styles>) => void
@@ -14,8 +15,9 @@ export interface SettingModalProps {
 }
 
 const SettingModal: Component<SettingModalProps> = (props) => {
+  void props.localeKey
   const [styles, setStyles] = createSignal(props.currentStyles)
-  const groups = createMemo(() => getOptions(props.locale))
+  const groups = createMemo(() => getOptions(props.lang))
 
   const update = (option: SettingOption, newValue: unknown) => {
     const style = {} as Record<string, unknown>
@@ -30,11 +32,11 @@ const SettingModal: Component<SettingModalProps> = (props) => {
 
   return (
     <Modal
-      title={t('setting', props.locale)}
+      title={t('setting', props.lang)}
       width={560}
       buttons={[
         {
-          children: t('restore_default', props.locale),
+          children: t('restore_default', props.lang),
           onClick: () => {
             props.onRestoreDefault(flatOptions())
             props.onClose()
@@ -54,7 +56,7 @@ const SettingModal: Component<SettingModalProps> = (props) => {
                   const value = utils.formatValue(styles(), option.key)
                   switch (option.component) {
                     case 'select': {
-                      const selectValue = typeof value === 'string' ? t(value, props.locale) : String(value ?? '')
+                      const selectValue = typeof value === 'string' ? t(value, props.lang) : String(value ?? '')
                       component = (
                         <Select
                           style={{ width: '120px' }}

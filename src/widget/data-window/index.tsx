@@ -8,19 +8,21 @@ export interface DataWindowRow {
 }
 
 export interface DataWindowProps {
-  locale: string
+  lang: string
+  localeKey?: number
   visible: boolean
   onToggle: () => void
   data: DataWindowRow[]
 }
 
 const DataWindow: Component<DataWindowProps> = (props) => {
+  void props.localeKey
   return (
     <Show when={props.visible}>
       <div class="klinecharts-pro-data-window">
         <div class="klinecharts-pro-data-window-header">
           <span class="klinecharts-pro-data-window-title">
-            {t('data_window', props.locale)}
+            {t('data_window', props.lang)}
           </span>
           <span class="klinecharts-pro-data-window-close" onClick={props.onToggle}>
             <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">

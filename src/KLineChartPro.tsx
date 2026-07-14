@@ -18,6 +18,7 @@ import ChartProComponent from './ChartProComponent'
 import { normalizeToPercent } from './compare'
 import { findNearestIndex } from './core/findNearestIndex'
 import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
+import { load as loadLocale } from './i18n'
 import {
   type TradeRecord,
   getTradeVisHitTargets,
@@ -29,6 +30,11 @@ import { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 
 export default class KLineChartPro implements ChartPro {
+  /** Pre-load locale data before creating an instance (avoids initial flash of untranslated keys) */
+  static async preloadLocale(locale: string): Promise<void> {
+    await loadLocale(locale)
+  }
+
   constructor(options: ChartProOptions) {
     this._initContainer(options)
     this._initSolidRender(options)
@@ -66,7 +72,7 @@ export default class KLineChartPro implements ChartPro {
           styles={options.styles ?? {}}
           watermark={options.watermark ?? ''}
           theme={options.theme ?? 'light'}
-          locale={options.locale ?? 'zh-CN'}
+          lang={options.locale ?? 'zh-CN'}
           drawingBarVisible={options.drawingBarVisible ?? true}
           symbol={options.symbol}
           period={options.period}

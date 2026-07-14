@@ -22,7 +22,8 @@ import {
 } from '../../core/favorites'
 
 export interface DrawingBarProps {
-  locale: string
+  lang: string
+  localeKey?: number
   onDrawingItemClick: (overlay: OverlayCreate) => void
   onModeChange: (mode: string) => void
   onLockChange: (lock: boolean) => void
@@ -47,6 +48,7 @@ const INIT_ICON_MAP: Record<GroupKey, string> = {
 }
 
 const DrawingBar: Component<DrawingBarProps> = (props) => {
+  void props.localeKey
   const [iconMap, setIconMap] = createSignal<Record<GroupKey, string>>({ ...INIT_ICON_MAP })
   const setIcon = (key: GroupKey) => (v: string) => setIconMap({ ...iconMap(), [key]: v })
 
@@ -66,15 +68,15 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
   })
 
   const optionLists = createMemo(() => ({
-    singleLine: createSingleLineOptions(props.locale),
-    moreLine: createMoreLineOptions(props.locale),
-    polygon: createPolygonOptions(props.locale),
-    fibonacci: createFibonacciOptions(props.locale),
-    wave: createWaveOptions(props.locale),
-    measurement: createMeasurementOptions(props.locale),
-    channel: createChannelOptions(props.locale),
-    annotation: createAnnotationOptions(props.locale),
-    position: createPositionOptions(props.locale),
+    singleLine: createSingleLineOptions(props.lang),
+    moreLine: createMoreLineOptions(props.lang),
+    polygon: createPolygonOptions(props.lang),
+    fibonacci: createFibonacciOptions(props.lang),
+    wave: createWaveOptions(props.lang),
+    measurement: createMeasurementOptions(props.lang),
+    channel: createChannelOptions(props.lang),
+    annotation: createAnnotationOptions(props.lang),
+    position: createPositionOptions(props.lang),
   }))
 
   const overlays = createMemo(() => {
@@ -88,7 +90,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
     }))
   })
 
-  const modes = createMemo(() => createMagnetOptions(props.locale))
+  const modes = createMemo(() => createMagnetOptions(props.lang))
 
   return (
     <div class="klinecharts-pro-drawing-bar">
@@ -127,7 +129,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
         const currentLabel = () => String(item.list.find((d) => d.key === item.icon)?.text ?? '')
         return (
           <div
-            class="item"
+            class="item tool-item"
             title={currentLabel()}
             tabIndex={0}
             onBlur={() => {
@@ -201,7 +203,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
       }}</For>
       <span class="split-line" />
       <div
-        class="item"
+        class="item mode"
         tabIndex={0}
         onBlur={() => {
           setPopoverKey('')
@@ -266,7 +268,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
           </List>
         )}
       </div>
-      <div class="item">
+      <div class="item lock">
         <span
           style="width:32px;height:32px"
           onClick={() => {
@@ -278,7 +280,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
           {lock() ? <Icon name="lock" /> : <Icon name="unlock" />}
         </span>
       </div>
-      <div class="item">
+      <div class="item visible">
         <span
           style="width:32px;height:32px"
           onClick={() => {
@@ -291,7 +293,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
         </span>
       </div>
       <span class="split-line" />
-      <div class="item">
+      <div class="item remove">
         <span
           style="width:32px;height:32px"
           onClick={() => {

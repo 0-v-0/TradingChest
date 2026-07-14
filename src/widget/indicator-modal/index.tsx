@@ -11,7 +11,8 @@ import {
 type OnIndicatorChange = (params: { name: string; paneId: string; added: boolean }) => void
 
 export interface IndicatorModalProps {
-  locale: string
+  lang: string
+  localeKey?: number
   mainIndicators: string[]
   subIndicators: Record<string, string>
   onMainIndicatorChange: OnIndicatorChange
@@ -51,6 +52,7 @@ const SUB_INDICATORS = [
 const CATEGORY_KEYS = ['all', 'favorites', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
 
 const IndicatorModal: Component<IndicatorModalProps> = (props) => {
+  void props.localeKey
   const [searchText, setSearchText] = createSignal('')
   const [activeCategory, setActiveCategory] = createSignal<string>('all')
   const [favVersion, setFavVersion] = createSignal(0)
@@ -76,7 +78,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
       if (
         search &&
         !name.toLowerCase().includes(search) &&
-        !t(name.toLowerCase(), props.locale).toLowerCase().includes(search)
+        !t(name.toLowerCase(), props.lang).toLowerCase().includes(search)
       ) {
         return false
       }
@@ -91,10 +93,10 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
   const filteredSubIndicators = createMemo(() => filterIndicatorNames(SUB_INDICATORS))
 
   const getCategoryLabel = (key: string): string => {
-    if (key === 'all') return t('all_categories', props.locale)
-    if (key === 'favorites') return t('indicator_favorites', props.locale)
+    if (key === 'all') return t('all_categories', props.lang)
+    if (key === 'favorites') return t('indicator_favorites', props.lang)
     const cat = indicatorCategories[key]
-    return cat ? t(cat.labelKey, props.locale) : key
+    return cat ? t(cat.labelKey, props.lang) : key
   }
 
   const toggleFavorite = (name: string, e: MouseEvent) => {
@@ -123,7 +125,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
   }
 
   return (
-    <Modal title={t('indicator', props.locale)} width={480} onClose={props.onClose}>
+    <Modal title={t('indicator', props.lang)} width={480} onClose={props.onClose}>
       {/* 搜索栏 */}
       <div class="klinecharts-pro-indicator-modal-search">
         <Input
@@ -141,7 +143,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
               </span>
             </Show>
           }
-          placeholder={t('indicator_search', props.locale)}
+          placeholder={t('indicator_search', props.lang)}
           value={searchText()}
           onChange={(v) => setSearchText(v as string)}
         />
@@ -161,33 +163,35 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
       </div>
       <List class="klinecharts-pro-indicator-modal-list">
         <Show when={filteredMainIndicators().length > 0}>
-          <li class="title">{t('main_indicator', props.locale)}</li>
+          <li class="title">{t('main_indicator', props.lang)}</li>
         </Show>
         <For each={filteredMainIndicators()}>
           {(name) => {
             const checked = createMemo(() => props.mainIndicators.includes(name))
             return (
               <li
-                class="row"
+                class="row main-indicator"
+                data-name={name}
                 onClick={() => {
                   props.onMainIndicatorChange({ name, paneId: 'candle_pane', added: !checked() })
                 }}
               >
-                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name} />
+                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.lang) || name} />
                 <StarIcon name={name} />
               </li>
             )
           }}
         </For>
         <Show when={filteredSubIndicators().length > 0}>
-          <li class="title">{t('sub_indicator', props.locale)}</li>
+          <li class="title">{t('sub_indicator', props.lang)}</li>
         </Show>
         <For each={filteredSubIndicators()}>
           {(name) => {
             const checked = createMemo(() => name in props.subIndicators)
             return (
               <li
-                class="row"
+                class="row sub-indicator"
+                data-name={name}
                 onClick={() => {
                   props.onSubIndicatorChange({
                     name,
@@ -196,7 +200,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
                   })
                 }}
               >
-                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.locale) || name} />
+                <Checkbox checked={checked()} label={t(name.toLowerCase(), props.lang) || name} />
                 <StarIcon name={name} />
               </li>
             )
@@ -204,7 +208,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         </For>
         <Show when={filteredMainIndicators().length === 0 && filteredSubIndicators().length === 0}>
           <li class="klinecharts-pro-indicator-modal-empty">
-            {t('no_indicators_found', props.locale)}
+            {t('no_indicators_found', props.lang)}
           </li>
         </Show>
       </List>

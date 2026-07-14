@@ -12,13 +12,15 @@ type IndicatorSettingConfig = {
 }
 
 export interface IndicatorSettingModalProps {
-  locale: string
+  lang: string
+  localeKey?: number
   params: { indicatorName: string; paneId: string; calcParams: number[] }
   onClose: () => void
   onConfirm: (calcParams: number[]) => void
 }
 
 const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => {
+  void props.localeKey
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
 
   const getConfig: (name: string) => IndicatorSettingConfig[] = (name: string) => {
@@ -32,7 +34,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => 
       buttons={[
         {
           type: 'confirm',
-          children: t('confirm', props.locale),
+          children: t('confirm', props.lang),
           onClick: () => {
             const config = getConfig(props.params.indicatorName)
             const params: number[] = []
@@ -56,7 +58,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => 
         {getConfig(props.params.indicatorName).map((d, i) => {
           return (
             <>
-              <span>{t(d.paramNameKey, props.locale)}</span>
+              <span>{t(d.paramNameKey, props.lang)}</span>
               <Input
                 style={{ width: '200px' }}
                 value={calcParams()[i] ?? ''}

@@ -4,7 +4,8 @@ import t from '../../i18n'
 import './index.css'
 
 export interface ReplayControlBarProps {
-  locale: string
+  lang: string
+  localeKey?: number
   state: ReplayState
   onPlay: () => void
   onPause: () => void
@@ -18,6 +19,7 @@ export interface ReplayControlBarProps {
 const SPEEDS: ReplaySpeed[] = [1, 2, 4, 8, 16]
 
 const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
+  void props.localeKey
   const nextSpeed = () => {
     const idx = SPEEDS.indexOf(props.state.speed)
     return SPEEDS[(idx + 1) % SPEEDS.length]
@@ -27,16 +29,16 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
     <Show when={props.state.active}>
       <div class="klinecharts-pro-replay-bar">
         <div
-          class="replay-btn"
+          class="replay-btn step-backward"
           onClick={props.onStepBackward}
-          title={t('replay_back', props.locale)}
+          title={t('replay_back', props.lang)}
         >
           <svg viewBox="0 0 24 24">
             <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" transform="scale(-1,1) translate(-24,0)" />
           </svg>
         </div>
         <div
-          class="replay-btn"
+          class="replay-btn play-pause"
           onClick={() => (props.state.playing ? props.onPause() : props.onPlay())}
         >
           {props.state.playing ? (
@@ -50,9 +52,9 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
           )}
         </div>
         <div
-          class="replay-btn"
+          class="replay-btn step-forward"
           onClick={props.onStepForward}
-          title={t('replay_forward', props.locale)}
+          title={t('replay_forward', props.lang)}
         >
           <svg viewBox="0 0 24 24">
             <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
@@ -61,7 +63,7 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
         <span
           class="replay-speed"
           onClick={() => props.onSpeedChange(nextSpeed())}
-          title={t('replay_speed', props.locale)}
+          title={t('replay_speed', props.lang)}
         >
           {props.state.speed}x
         </span>
@@ -69,6 +71,7 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
           <span>{props.state.position}</span>
           <input
             type="range"
+            class="replay-progress-slider"
             min={1}
             max={props.state.totalBars}
             value={props.state.position}
@@ -80,7 +83,7 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
           <span>{props.state.totalBars}</span>
         </div>
         <span class="replay-exit" onClick={props.onStop}>
-          {t('replay_exit', props.locale)}
+          {t('replay_exit', props.lang)}
         </span>
       </div>
     </Show>

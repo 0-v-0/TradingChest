@@ -3,20 +3,22 @@ import { Modal } from '../../component'
 import t from '../../i18n'
 
 export interface ScreenshotModalProps {
-  locale: string
+  lang: string
+  localeKey?: number
   url: string
   onClose: () => void
 }
 
 const ScreenshotModal: Component<ScreenshotModalProps> = (props) => {
+  void props.localeKey
   return (
     <Modal
-      title={t('screenshot', props.locale)}
+      title={t('screenshot', props.lang)}
       width={540}
       buttons={[
         {
           type: 'confirm',
-          children: t('save', props.locale),
+          children: t('save', props.lang),
           onClick: () => {
             try {
               const a = document.createElement('a')
