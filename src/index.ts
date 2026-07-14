@@ -68,8 +68,10 @@ export type { ReplayState, ReplaySpeed } from './replay/types'
 export {
   getTradeVisHitTargets,
   cleanupTradeVisInstance,
+  defaultTradeVisColors,
+  darkTradeVisColors,
 } from './indicator/trade/tradeVisualization'
-export type { TradeRecord, TradeVisExtendData } from './indicator/trade/tradeVisualization'
+export type { TradeRecord, TradeVisExtendData, TradeVisColors } from './indicator/trade/tradeVisualization'
 export type { ConnectionState } from './DefaultDatafeed'
 export { LiveSharpeChart, type LiveSharpeChartProps } from './widget/LiveSharpeChart'
 export { DrawdownAreaChart, type DrawdownAreaChartProps } from './widget/DrawdownAreaChart'
