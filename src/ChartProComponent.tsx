@@ -80,6 +80,23 @@ interface PrevSymbolPeriod {
   period: Period
 }
 
+/** Internal klinecharts store shape — unstable, isolated here for upgrade safety */
+interface KlcInternalStore {
+  _crosshair?: { kLineData?: KLineData; paneId?: string; dataIndex?: number; x?: number; y?: number }
+}
+
+function readInternalCrosshair(chart: Chart): Crosshair | undefined {
+  try {
+    const store = (chart as unknown as { _chartStore?: KlcInternalStore })._chartStore
+    if (store?._crosshair) {
+      return store._crosshair as Crosshair
+    }
+  } catch {
+    // klinecharts internal API changed — gracefully degrade
+  }
+  return undefined
+}
+
 const FORMAT_TABLE: Readonly<Record<string, { xAxis: string; default: string }>> = {
   ms: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
   second: { xAxis: 'HH:mm:ss', default: 'YYYY-MM-DD HH:mm:ss' },
@@ -188,8 +205,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let widgetRef: HTMLDivElement | undefined
   let widget: Nullable<Chart> = null
   let disposed = false
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- klinecharts internal store, no public type
-  let chartStore: any = null
 
   let priceUnitDom: HTMLElement
 
@@ -652,11 +667,6 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       },
     })
 
-    // Cache the internal chart store reference once to avoid traversing (widget as any) on every crosshair event
-    if (widget) {
-      chartStore = (widget as unknown as Record<string, unknown>)?._chartStore ?? null
-    }
-
     if (widget) {
       const watermarkContainer = widget.getDom('candle_pane', 'main')
       if (watermarkContainer) {
@@ -798,10 +808,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         let crosshair = data as Crosshair | undefined
         // klinecharts v10 bug: subscribeAction callback receives the raw input {x, y, paneId}
         // without kLineData. Read the full internal crosshair state as a fallback.
-        if (crosshair && !crosshair.kLineData) {
-          if (chartStore?._crosshair) {
-            crosshair = chartStore._crosshair as Crosshair
-          }
+        if (crosshair && !crosshair.kLineData && widget) {
+          crosshair = readInternalCrosshair(widget) ?? crosshair
         }
         if (!crosshair || !crosshair.kLineData) {
           setDataWindowData([])
