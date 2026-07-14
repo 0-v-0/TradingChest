@@ -463,15 +463,16 @@ export default class KLineChartPro implements ChartPro {
     if (compData.length === 0) return
 
     const compPercent = normalizeToPercent(compData)
+    const compTimestamps: number[] = new Array(compData.length)
     const compMap = new Map<number, number>()
     compData.forEach((d, i) => {
       compMap.set(d.timestamp, compPercent[i])
+      compTimestamps[i] = d.timestamp
     })
 
     // Pre-build a lookup from mainData timestamps to comp percent values,
     // including nearest-timestamp resolution within 60s tolerance.
     // This avoids O(n²) binary search inside calc().
-    const compTimestamps = compData.map((d) => d.timestamp)
     const mainLookup = new Map<number, number | undefined>()
     for (const d of mainData) {
       let pct = compMap.get(d.timestamp)

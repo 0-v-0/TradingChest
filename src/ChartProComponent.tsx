@@ -806,6 +806,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       if (widget) {
         const allIndicators = widget.getIndicators()
         if (allIndicators && allIndicators.length > 0) {
+          const dataIndex = d.dataIndex as number | undefined
           const paneGroups: Record<string, Indicator[]> = {}
           for (const ind of allIndicators) {
             if (!paneGroups[ind.paneId]) paneGroups[ind.paneId] = []
@@ -818,10 +819,12 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             for (const ind of indicators) {
               const vals = ind.result as Record<string, unknown>[] | undefined
               if (vals && vals.length > 0) {
-                const last = vals[vals.length - 1]
-                for (const k in last) {
+                const row = (dataIndex != null && dataIndex >= 0 && dataIndex < vals.length)
+                  ? vals[dataIndex]
+                  : vals[vals.length - 1]
+                for (const k in row) {
                   if (k !== 'timestamp' && k !== 'dataIndex') {
-                    addRow(`${ind.name}.${k}`, last[k])
+                    addRow(`${ind.name}.${k}`, row[k])
                   }
                 }
               }

@@ -9,6 +9,7 @@ export class AlertManager {
   onTrigger: ((event: AlertEvent) => void) | null = null
 
   addAlert(config: AlertConfig): void {
+    if (!Number.isFinite(config.price)) return
     this._alerts.set(config.id, { ...config, triggered: false })
   }
 

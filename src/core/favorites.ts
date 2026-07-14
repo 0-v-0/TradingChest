@@ -40,22 +40,26 @@ function invalidate(): void {
   cache = null
 }
 
-function persist(): boolean {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(load()))
-    return true
-  } catch (e) {
-    if (e instanceof Error && e.name !== 'QuotaExceededError') {
-      console.warn('[TradingChest] save favorites failed:', e)
+let _persistTimer: ReturnType<typeof setTimeout> | null = null
+
+function schedulePersist(): void {
+  if (_persistTimer !== null) return
+  _persistTimer = setTimeout(() => {
+    _persistTimer = null
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(load()))
+    } catch (e) {
+      if (e instanceof Error && e.name !== 'QuotaExceededError') {
+        console.warn('[TradingChest] save favorites failed:', e)
+      }
     }
-    return false
-  }
+  }, 300)
 }
 
 function withList(kind: 'indicators' | 'tools', mutator: (arr: string[]) => string[]): void {
   const f = load()
   f[kind] = mutator(f[kind].slice())
-  persist()
+  schedulePersist()
 }
 
 export function getFavoriteIndicators(): string[] {
@@ -92,4 +96,8 @@ export function isFavoriteTool(name: string): boolean {
 
 export function _resetFavoritesCacheForTesting(): void {
   invalidate()
+  if (_persistTimer !== null) {
+    clearTimeout(_persistTimer)
+    _persistTimer = null
+  }
 }

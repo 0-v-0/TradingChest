@@ -1,5 +1,5 @@
 import type { OverlayCreate, OverlayMode } from 'klinecharts'
-import { createMemo, createSignal, Show, For, type Component } from 'solid-js'
+import { createMemo, createSignal, Show, For, onCleanup, onMount, type Component } from 'solid-js'
 import { List } from '../../component'
 import {
   createSingleLineOptions,
@@ -92,8 +92,19 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
 
   const modes = createMemo(() => createMagnetOptions(props.lang))
 
+  let barRef!: HTMLDivElement
+  onMount(() => {
+    const handleOutside = (e: PointerEvent) => {
+      if (popoverKey() && !barRef?.contains(e.target as Node)) {
+        setPopoverKey('')
+      }
+    }
+    document.addEventListener('pointerdown', handleOutside)
+    onCleanup(() => document.removeEventListener('pointerdown', handleOutside))
+  })
+
   return (
-    <div class="klinecharts-pro-drawing-bar">
+    <div ref={barRef} class="klinecharts-pro-drawing-bar">
       <Show when={favoriteTools().length > 0}>
         <div class="favorites-group">
           <For each={favoriteTools()}>{(toolName) => (

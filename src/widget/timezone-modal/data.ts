@@ -1,50 +1,35 @@
 import type { SelectDataSourceItem } from '../../component'
 import t from '../../i18n'
 
+const TIMEZONE_ENTRIES = [
+  { tz: 'Etc/UTC', i18nKey: 'utc' },
+  { tz: 'Pacific/Honolulu', i18nKey: 'honolulu' },
+  { tz: 'America/Juneau', i18nKey: 'juneau' },
+  { tz: 'America/Los_Angeles', i18nKey: 'los_angeles' },
+  { tz: 'America/Chicago', i18nKey: 'chicago' },
+  { tz: 'America/Toronto', i18nKey: 'toronto' },
+  { tz: 'America/Sao_Paulo', i18nKey: 'sao_paulo' },
+  { tz: 'Europe/London', i18nKey: 'london' },
+  { tz: 'Europe/Berlin', i18nKey: 'berlin' },
+  { tz: 'Asia/Bahrain', i18nKey: 'bahrain' },
+  { tz: 'Asia/Dubai', i18nKey: 'dubai' },
+  { tz: 'Asia/Ashkhabad', i18nKey: 'ashkhabad' },
+  { tz: 'Asia/Almaty', i18nKey: 'almaty' },
+  { tz: 'Asia/Bangkok', i18nKey: 'bangkok' },
+  { tz: 'Asia/Shanghai', i18nKey: 'shanghai' },
+  { tz: 'Asia/Tokyo', i18nKey: 'tokyo' },
+  { tz: 'Australia/Sydney', i18nKey: 'sydney' },
+  { tz: 'Pacific/Norfolk', i18nKey: 'norfolk' },
+] as const
+
 // oxfmt-ignore
 export function translateTimezone(timezone: string, locale: string): string {
-  switch (timezone) {
-    case 'Etc/UTC': return t('utc', locale)
-    case 'Pacific/Honolulu': return t('honolulu', locale)
-    case 'America/Juneau': return t('juneau', locale)
-    case 'America/Los_Angeles': return t('los_angeles', locale)
-    case 'America/Chicago': return t('chicago', locale)
-    case 'America/Toronto': return t('toronto', locale)
-    case 'America/Sao_Paulo': return t('sao_paulo', locale)
-    case 'Europe/London': return t('london', locale)
-    case 'Europe/Berlin': return t('berlin', locale)
-    case 'Asia/Bahrain': return t('bahrain', locale)
-    case 'Asia/Dubai': return t('dubai', locale)
-    case 'Asia/Ashkhabad': return t('ashkhabad', locale)
-    case 'Asia/Almaty': return t('almaty', locale)
-    case 'Asia/Bangkok': return t('bangkok', locale)
-    case 'Asia/Shanghai': return t('shanghai', locale)
-    case 'Asia/Tokyo': return t('tokyo', locale)
-    case 'Australia/Sydney': return t('sydney', locale)
-    case 'Pacific/Norfolk': return t('norfolk', locale)
+  for (const entry of TIMEZONE_ENTRIES) {
+    if (entry.tz === timezone) return t(entry.i18nKey, locale)
   }
   return timezone
 }
 
 export function createTimezoneSelectOptions(locale: string): SelectDataSourceItem[] {
-  return [
-    { key: 'Etc/UTC', text: t('utc', locale) },
-    { key: 'Pacific/Honolulu', text: t('honolulu', locale) },
-    { key: 'America/Juneau', text: t('juneau', locale) },
-    { key: 'America/Los_Angeles', text: t('los_angeles', locale) },
-    { key: 'America/Chicago', text: t('chicago', locale) },
-    { key: 'America/Toronto', text: t('toronto', locale) },
-    { key: 'America/Sao_Paulo', text: t('sao_paulo', locale) },
-    { key: 'Europe/London', text: t('london', locale) },
-    { key: 'Europe/Berlin', text: t('berlin', locale) },
-    { key: 'Asia/Bahrain', text: t('bahrain', locale) },
-    { key: 'Asia/Dubai', text: t('dubai', locale) },
-    { key: 'Asia/Ashkhabad', text: t('ashkhabad', locale) },
-    { key: 'Asia/Almaty', text: t('almaty', locale) },
-    { key: 'Asia/Bangkok', text: t('bangkok', locale) },
-    { key: 'Asia/Shanghai', text: t('shanghai', locale) },
-    { key: 'Asia/Tokyo', text: t('tokyo', locale) },
-    { key: 'Australia/Sydney', text: t('sydney', locale) },
-    { key: 'Pacific/Norfolk', text: t('norfolk', locale) },
-  ]
+  return TIMEZONE_ENTRIES.map(({ tz, i18nKey }) => ({ key: tz, text: t(i18nKey, locale) }))
 }

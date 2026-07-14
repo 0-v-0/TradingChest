@@ -1,5 +1,11 @@
 import type { Period } from '../types'
 
+const MS_PER_SECOND = 1000
+const MS_PER_MINUTE = 60 * MS_PER_SECOND
+const MS_PER_HOUR = 60 * MS_PER_MINUTE
+const MS_PER_DAY = 24 * MS_PER_HOUR
+const MS_PER_WEEK = 7 * MS_PER_DAY
+
 /**
  * Calculates an aligned [from, to] timestamp pair for a given period and bar count.
  *
@@ -16,35 +22,35 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
   let from = to
   switch (period.timespan) {
     case 'ms':
-      to = to - to % 1000
+      to = to - to % MS_PER_SECOND
       from = to - count * period.multiplier
       break
     case 'second':
-      to = to - to % 1000
-      from = to - count * period.multiplier * 1000
+      to = to - to % MS_PER_SECOND
+      from = to - count * period.multiplier * MS_PER_SECOND
       break
     case 'minute':
-      to = to - to % (60 * 1000)
-      from = to - count * period.multiplier * 60 * 1000
+      to = to - to % MS_PER_MINUTE
+      from = to - count * period.multiplier * MS_PER_MINUTE
       break
     case 'hour':
-      to = to - to % (60 * 60 * 1000)
-      from = to - count * period.multiplier * 60 * 60 * 1000
+      to = to - to % MS_PER_HOUR
+      from = to - count * period.multiplier * MS_PER_HOUR
       break
     case 'day': {
       const date = new Date(to)
       to = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-      from = to - count * period.multiplier * 24 * 60 * 60 * 1000
+      from = to - count * period.multiplier * MS_PER_DAY
       break
     }
     case 'week': {
       const date = new Date(to)
       const day = date.getUTCDay()
       const dif = day === 0 ? 6 : day - 1
-      to = to - dif * 24 * 60 * 60 * 1000
+      to = to - dif * MS_PER_DAY
       const d = new Date(to)
       to = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
-      from = to - count * period.multiplier * 7 * 24 * 60 * 60 * 1000
+      from = to - count * period.multiplier * MS_PER_WEEK
       break
     }
     case 'month': {

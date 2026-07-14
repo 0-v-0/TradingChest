@@ -16,10 +16,11 @@ const dateAndPriceRange: OverlayTemplate = {
     const precision = chart.getSymbol()?.pricePrecision ?? 2
     if (coordinates.length > 1) {
       const points = overlay.points
-      const price1 = points[0].value!
-      const price2 = points[1].value!
-      const ts1 = points[0].timestamp!
-      const ts2 = points[1].timestamp!
+      const price1 = points[0].value
+      const price2 = points[1].value
+      const ts1 = points[0].timestamp
+      const ts2 = points[1].timestamp
+      if (price1 == null || price2 == null || ts1 == null || ts2 == null) return []
 
       // 计算价格差和涨跌幅
       const priceDiff = price2 - price1

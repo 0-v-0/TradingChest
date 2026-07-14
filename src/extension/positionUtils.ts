@@ -22,8 +22,9 @@ function createPositionFigures(
     }
 
     const points = overlay.points
-    const entryPrice = points[0].value!
-    const stopLossPrice = points[1].value!
+    const entryPrice = points[0].value
+    const stopLossPrice = points[1].value
+    if (entryPrice == null || stopLossPrice == null) return []
 
     const entryY = coordinates[0].y
     const stopLossY = coordinates[1].y
@@ -87,7 +88,8 @@ function createPositionFigures(
     })
 
     if (coordinates.length > 2) {
-      const takeProfitPrice = points[2].value!
+      const takeProfitPrice = points[2].value
+      if (takeProfitPrice == null) return figures
       const takeProfitY = coordinates[2].y
 
       figures.push({
