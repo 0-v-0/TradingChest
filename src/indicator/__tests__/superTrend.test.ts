@@ -25,17 +25,17 @@ describe('SuperTrend indicator', () => {
     expect(result).toHaveLength(klines.length)
   })
 
-  it('前 period 个值为 NaN', () => {
+  it('前 period-1 个值为 NaN', () => {
     const result = superTrend.calc!(klines, indicator)
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 9; i++) {
       expect(result[i].up).toBeNaN()
       expect(result[i].down).toBeNaN()
     }
   })
 
-  it('period 之后每行恰好有 up 或 down 之一', () => {
+  it('period-1 之后每行恰好有 up 或 down 之一', () => {
     const result = superTrend.calc!(klines, indicator)
-    for (let i = 10; i < result.length; i++) {
+    for (let i = 9; i < result.length; i++) {
       const hasUp = !isNaN(result[i].up)
       const hasDown = !isNaN(result[i].down)
       expect(hasUp || hasDown).toBe(true)
@@ -45,7 +45,7 @@ describe('SuperTrend indicator', () => {
 
   it('上升趋势 up 值应在 close 下方', () => {
     const result = superTrend.calc!(klines, indicator)
-    for (let i = 10; i < result.length; i++) {
+    for (let i = 9; i < result.length; i++) {
       if (!isNaN(result[i].up)) {
         expect(result[i].up).toBeLessThan(klines[i].high)
       }
@@ -71,7 +71,7 @@ describe('SuperTrend indicator', () => {
     // After the drop, some bars should have down values
     const hasDown = result.some((r) => !isNaN(r.down))
     expect(hasDown).toBe(true)
-    for (let i = 12; i < result.length; i++) {
+    for (let i = 11; i < result.length; i++) {
       if (!isNaN(result[i].down)) {
         expect(result[i].down).toBeGreaterThan(descending[i].low)
       }

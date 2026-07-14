@@ -33,10 +33,10 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
           Math.abs(kline.low - prevClose),
         )
       }
-      if (i < period) {
+      if (i < period - 1) {
         rma += tr
         atrValues[i] = NaN
-      } else if (i === period) {
+      } else if (i === period - 1) {
         rma = (rma + tr) / period
         atrValues[i] = rma
       } else {
@@ -53,7 +53,7 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
       let up = NaN
       let down = NaN
 
-      if (i >= period) {
+      if (i >= period - 1) {
         const kline = dataList[i]
         const atrVal = atrValues[i]
         const hl2 = (kline.high + kline.low) / 2
@@ -61,7 +61,7 @@ const superTrend: IndicatorTemplate<SuperTrendResult, number> = {
         let upperBand = hl2 + multiplier * atrVal
         let lowerBand = hl2 - multiplier * atrVal
 
-        if (i > period) {
+        if (i > period - 1) {
           if (lowerBand <= prevLowerBand && dataList[i - 1].close >= prevLowerBand) {
             lowerBand = prevLowerBand
           }

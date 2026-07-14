@@ -197,7 +197,6 @@ export default class DefaultDatafeed implements Datafeed {
   }
 
   unsubscribe(symbol: SymbolInfo, _period: Period): void {
-    this._callback = undefined
     if (this._ws && this._currentTicker === symbol.ticker) {
       try {
         this._ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${symbol.ticker}` }))
@@ -211,6 +210,7 @@ export default class DefaultDatafeed implements Datafeed {
         this._currentTicker = undefined
       }
     }
+    this._callback = undefined
   }
 
   dispose(): void {

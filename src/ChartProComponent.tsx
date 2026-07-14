@@ -498,9 +498,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   }
 
   props.ref({
-    createOverlay: (value) => widget!.createOverlay(value),
-    getOverlays: (filter) => widget!.getOverlays(filter),
-    removeOverlay: (value) => widget!.removeOverlay(value),
+    createOverlay: (value) => widget?.createOverlay(value) ?? '',
+    getOverlays: (filter) => widget?.getOverlays(filter) ?? [],
+    removeOverlay: (value) => widget?.removeOverlay(value) ?? false,
     registerOverlay: (value) => registerOverlay(value),
     setTheme,
     getTheme: () => theme(),
@@ -815,13 +815,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     // Capture signal values immediately — after Solid unmount these may be stale
     const currentSymbol = symbol()
     const currentPeriod = period()
+    // 先取消实时数据订阅，防止组件卸载后幽灵回调
+    props.datafeed.unsubscribe(currentSymbol, currentPeriod)
     window.removeEventListener('resize', documentResize)
     if (widgetRef) {
       widgetRef.removeEventListener('keydown', handleKeyDown)
       dispose(widgetRef)
     }
-    // 取消实时数据订阅，防止组件卸载后幽灵回调
-    props.datafeed.unsubscribe(currentSymbol, currentPeriod)
     if (replayEngine) {
       replayEngine.stop()
       replayEngine.dispose()
