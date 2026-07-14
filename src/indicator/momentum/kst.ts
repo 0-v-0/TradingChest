@@ -13,33 +13,9 @@
  *   信号线周期: 9
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcSMA_NaNAware } from '../utils'
 
 type KstResult = { kst: number; signal: number }
-
-/**
- * NaN 感知的滑动窗口 SMA：跳过 NaN，只在连续有效值上计算。
- * 避免创建 validValues/validIndices 中间数组。
- */
-function calcSparseSMA(source: number[], period: number): number[] {
-  const len = source.length
-  const result: number[] = Array(len).fill(NaN)
-  const buf = new Array<number>(len)
-  let bufLen = 0
-  let sum = 0
-  for (let i = 0; i < len; i++) {
-    if (isNaN(source[i])) continue
-    buf[bufLen] = source[i]
-    bufLen++
-    sum += source[i]
-    if (bufLen > period) {
-      sum -= buf[bufLen - period - 1]
-    }
-    if (bufLen >= period) {
-      result[i] = sum / period
-    }
-  }
-  return result
-}
 
 const kst: IndicatorTemplate<KstResult, number> = {
   name: 'KST',
@@ -68,7 +44,7 @@ const kst: IndicatorTemplate<KstResult, number> = {
         }
       }
       // 直接对含 NaN 的 roc 做稀疏 SMA，无需提取 validValues/validIndices
-      smoothedRocs.push(calcSparseSMA(roc, smaPeriods[r]))
+      smoothedRocs.push(calcSMA_NaNAware(roc, smaPeriods[r]))
     }
     // rocs 数组可 GC——不再引用
 
@@ -91,7 +67,7 @@ const kst: IndicatorTemplate<KstResult, number> = {
     }
 
     // ---- 计算 Signal = SMA(KST, signalPeriod) ----
-    const signalLine = calcSparseSMA(kstLine, signalPeriod)
+    const signalLine = calcSMA_NaNAware(kstLine, signalPeriod)
 
     // ---- 组装输出 ----
     const result: KstResult[] = new Array(len)

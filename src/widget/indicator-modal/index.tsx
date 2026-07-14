@@ -1,4 +1,4 @@
-import { createSignal, createMemo, For, Show, type Component } from 'solid-js'
+import { createSignal, createMemo, For, Show, type Component, type Accessor } from 'solid-js'
 import { Modal, List, Checkbox, Input } from '../../component'
 import t from '../../i18n'
 import { indicatorCategories } from '../../indicator'
@@ -50,6 +50,23 @@ const SUB_INDICATORS = [
 
 // 分类 Tab 列表
 const CATEGORY_KEYS = ['all', 'favorites', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
+
+const StarIcon: Component<{ name: string; favVersion: Accessor<number>; onToggle: (name: string, e: MouseEvent) => void }> = (props) => {
+  const fav = createMemo(() => {
+    props.favVersion()
+    return isFavoriteIndicator(props.name)
+  })
+  return (
+    <span
+      class="klinecharts-pro-indicator-modal-star"
+      onClick={(e) => props.onToggle(props.name, e)}
+    >
+      <svg viewBox="0 0 20 20" width="14" height="14" fill={fav() ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+        <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.49L10 14.27 5.06 16.7 6 11.21l-4-3.9 5.53-.8z" />
+      </svg>
+    </span>
+  )
+}
 
 const IndicatorModal: Component<IndicatorModalProps> = (props) => {
   void props.localeKey
@@ -109,21 +126,6 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
     setFavVersion((v) => v + 1)
   }
 
-  const StarIcon = ({ name }: { name: string }) => {
-    favVersion()
-    const fav = isFavoriteIndicator(name)
-    return (
-      <span
-        class="klinecharts-pro-indicator-modal-star"
-        onClick={(e) => toggleFavorite(name, e)}
-      >
-        <svg viewBox="0 0 20 20" width="14" height="14" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
-          <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.49L10 14.27 5.06 16.7 6 11.21l-4-3.9 5.53-.8z" />
-        </svg>
-      </span>
-    )
-  }
-
   return (
     <Modal title={t('indicator', props.lang)} width={480} onClose={props.onClose}>
       {/* 搜索栏 */}
@@ -177,7 +179,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
                 }}
               >
                 <Checkbox checked={checked()} label={t(name.toLowerCase(), props.lang) || name} />
-                <StarIcon name={name} />
+                <StarIcon name={name} favVersion={favVersion} onToggle={toggleFavorite} />
               </li>
             )
           }}
@@ -201,7 +203,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
                 }}
               >
                 <Checkbox checked={checked()} label={t(name.toLowerCase(), props.lang) || name} />
-                <StarIcon name={name} />
+                <StarIcon name={name} favVersion={favVersion} onToggle={toggleFavorite} />
               </li>
             )
           }}

@@ -65,26 +65,23 @@ const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
         : NaN
     }
 
-    // 组装结果，先行带需要前移 displacement 个周期，迟行带需要后移 displacement 个周期
-    const totalLength = n + displacement
-    const result: IchimokuResult[] = new Array(totalLength)
+    // 组装结果，长度与 dataList 一致
+    const result: IchimokuResult[] = new Array(n)
 
-    for (let i = 0; i < totalLength; i++) {
+    for (let i = 0; i < n; i++) {
       const item: Partial<IchimokuResult> = {}
 
-      if (i < n) {
-        item.tenkanSen = tenkanArr[i]
-        item.kijunSen = kijunArr[i]
-      }
+      item.tenkanSen = tenkanArr[i]
+      item.kijunSen = kijunArr[i]
 
-      // 先行带：当前位置的值来自 displacement 个周期之前
+      // 先行带：当前位置的值来自 displacement 个周期之前（前移显示）
       const spanSrcIdx = i - displacement
       if (spanSrcIdx >= 0 && spanSrcIdx < n) {
         item.senkouSpanA = spanAArr[spanSrcIdx]
         item.senkouSpanB = spanBArr[spanSrcIdx]
       }
 
-      // 迟行带：将当前收盘价显示在 displacement 个周期之前
+      // 迟行带：将当前收盘价显示在 displacement 个周期之前（后移显示）
       const chikouSrcIdx = i + displacement
       if (chikouSrcIdx < n) {
         item.chikouSpan = dataList[chikouSrcIdx].close

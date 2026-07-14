@@ -409,6 +409,29 @@ export function calcLoss(data: number[]): number[] {
 }
 
 /**
+ * 多层 EMA（Multi-Layer EMA）
+ * 对数据做 chains 层链式 EMA：每层 EMA-smooth 前一层的输出
+ * 首个值使用数据本身作为种子（非 SMA 种子），适用于 DEMA/TEMA/T3 等
+ * 返回 number[][]，外层长度 = layers，内层长度 = data.length
+ */
+export function calcMultiLayerEMA(data: number[], period: number, layers: number): number[][] {
+  const n = data.length
+  const k = 2 / (period + 1)
+  const emas: number[][] = Array.from({ length: layers }, () => new Array<number>(n))
+  for (let i = 0; i < n; i++) {
+    for (let l = 0; l < layers; l++) {
+      const input = l === 0 ? data[i] : emas[l - 1][i]
+      if (i === 0) {
+        emas[l][i] = input
+      } else {
+        emas[l][i] = input * k + emas[l][i - 1] * (1 - k)
+      }
+    }
+  }
+  return emas
+}
+
+/**
  * 最小二乘线性回归（Least-Squares Linear Regression，滑动窗口）
  *
  * 对于等距 x=0..period-1 的窗口，sumX 与 sumX2 是常量：

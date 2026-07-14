@@ -1,5 +1,5 @@
-import { utils, type OverlayTemplate } from 'klinecharts'
-import { getDistance, getRotateCoordinate, getRayLine } from './utils'
+import type { OverlayTemplate } from 'klinecharts'
+import { getDistance, getRotateCoordinate, getRayLines, getLineAngle } from './utils'
 
 const fibonacciSpiral: OverlayTemplate = {
   name: 'fibonacciSpiral',
@@ -10,18 +10,7 @@ const fibonacciSpiral: OverlayTemplate = {
   createPointFigures: ({ coordinates, bounding }) => {
     if (coordinates.length > 1) {
       const startRadius = getDistance(coordinates[0], coordinates[1]) / Math.sqrt(24)
-      const flag = coordinates[1].x > coordinates[0].x ? 0 : 1
-      const kb = utils.getLinearSlopeIntercept(coordinates[0], coordinates[1])
-      let offsetAngle
-      if (kb) {
-        offsetAngle = Math.atan(kb[0]) + Math.PI * flag
-      } else {
-        if (coordinates[1].y > coordinates[0].y) {
-          offsetAngle = Math.PI / 2
-        } else {
-          offsetAngle = (Math.PI / 2) * 3
-        }
-      }
+      const offsetAngle = getLineAngle(coordinates[0], coordinates[1])
       const rotateCoordinate1 = getRotateCoordinate(
         { x: coordinates[0].x - startRadius, y: coordinates[0].y },
         coordinates[0],
@@ -70,7 +59,7 @@ const fibonacciSpiral: OverlayTemplate = {
         },
         {
           type: 'line',
-          attrs: getRayLine(coordinates, bounding),
+          attrs: getRayLines(coordinates, bounding),
         },
       ]
     }

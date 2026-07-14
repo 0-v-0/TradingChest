@@ -12,7 +12,7 @@ export function deepSet(obj: Record<string, unknown>, path: string, value: unkno
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i]
     if (UNSAFE_KEYS.has(key)) return false
-    if (current[key] === undefined || current[key] === null || typeof current[key] !== 'object') {
+    if (!(key in current) || current[key] === null || typeof current[key] !== 'object') {
       current[key] = {}
     }
     current = current[key] as Record<string, unknown>

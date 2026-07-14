@@ -49,19 +49,19 @@ const schiffPitchfork: OverlayTemplate = {
     const dy = midPoint.y - pivot.y
 
     // 中线射线
-    const medianRay = getRayLine([pivot, midPoint], bounding) as LineAttrs
+    const medianRay = getRayLine([pivot, midPoint], bounding)
 
     // 上外线：过 swing1，平行于中线
     const upperRay = getRayLine(
       [swing1, { x: swing1.x + dx, y: swing1.y + dy }],
       bounding,
-    ) as LineAttrs
+    )
 
     // 下外线：过 swing2，平行于中线
     const lowerRay = getRayLine(
       [swing2, { x: swing2.x + dx, y: swing2.y + dy }],
       bounding,
-    ) as LineAttrs
+    )
 
     // 50% 内线
     const innerUpperStart = {
@@ -71,7 +71,7 @@ const schiffPitchfork: OverlayTemplate = {
     const innerUpperRay = getRayLine(
       [innerUpperStart, { x: innerUpperStart.x + dx, y: innerUpperStart.y + dy }],
       bounding,
-    ) as LineAttrs
+    )
 
     const innerLowerStart = {
       x: (midPoint.x + swing2.x) / 2,
@@ -80,17 +80,17 @@ const schiffPitchfork: OverlayTemplate = {
     const innerLowerRay = getRayLine(
       [innerLowerStart, { x: innerLowerStart.x + dx, y: innerLowerStart.y + dy }],
       bounding,
-    ) as LineAttrs
+    )
 
     // 收集主线
     const mainLines: LineAttrs[] = []
-    if (medianRay && 'coordinates' in medianRay) {
+    if (medianRay) {
       mainLines.push(medianRay)
     }
-    if (upperRay && 'coordinates' in upperRay) {
+    if (upperRay) {
       mainLines.push(upperRay)
     }
-    if (lowerRay && 'coordinates' in lowerRay) {
+    if (lowerRay) {
       mainLines.push(lowerRay)
     }
 
@@ -102,10 +102,10 @@ const schiffPitchfork: OverlayTemplate = {
 
     // 内线（50%，虚线）
     const innerLines: LineAttrs[] = []
-    if (innerUpperRay && 'coordinates' in innerUpperRay) {
+    if (innerUpperRay) {
       innerLines.push(innerUpperRay)
     }
-    if (innerLowerRay && 'coordinates' in innerLowerRay) {
+    if (innerLowerRay) {
       innerLines.push(innerLowerRay)
     }
 

@@ -37,6 +37,8 @@ const fisherTransform: IndicatorTemplate<FisherTransformResult, number> = {
     // 单调队列：O(n) 滚动窗口内的最高/最低 midPrice
     const maxDeque: number[] = []
     const minDeque: number[] = []
+    let maxDequeHead = 0
+    let minDequeHead = 0
 
     for (let i = 0; i < len; i++) {
       let fisher = NaN
@@ -44,21 +46,21 @@ const fisherTransform: IndicatorTemplate<FisherTransformResult, number> = {
 
       if (i >= period - 1) {
         // 维护单调递减队列：队首为窗口最大 midPrice
-        while (maxDeque.length > 0 && maxDeque[0] <= i - period) maxDeque.shift()
-        while (maxDeque.length > 1 && midPrices[maxDeque[maxDeque.length - 1]] <= midPrices[i]) {
+        while (maxDequeHead < maxDeque.length && maxDeque[maxDequeHead] <= i - period) maxDequeHead++
+        while (maxDeque.length > maxDequeHead + 1 && midPrices[maxDeque[maxDeque.length - 1]] <= midPrices[i]) {
           maxDeque.pop()
         }
         maxDeque.push(i)
 
         // 维护单调递增队列：队首为窗口最小 midPrice
-        while (minDeque.length > 0 && minDeque[0] <= i - period) minDeque.shift()
-        while (minDeque.length > 1 && midPrices[minDeque[minDeque.length - 1]] >= midPrices[i]) {
+        while (minDequeHead < minDeque.length && minDeque[minDequeHead] <= i - period) minDequeHead++
+        while (minDeque.length > minDequeHead + 1 && midPrices[minDeque[minDeque.length - 1]] >= midPrices[i]) {
           minDeque.pop()
         }
         minDeque.push(i)
 
-        const highest = midPrices[maxDeque[0]]
-        const lowest = midPrices[minDeque[0]]
+        const highest = midPrices[maxDeque[maxDequeHead]]
+        const lowest = midPrices[minDeque[minDequeHead]]
 
         // 归一化到 [-1, 1]
         let norm: number

@@ -1,5 +1,5 @@
-import { utils, type OverlayTemplate } from 'klinecharts'
-import { getRotateCoordinate } from './utils'
+import type { OverlayTemplate } from 'klinecharts'
+import { getRotateCoordinate, getLineAngle } from './utils'
 
 const arrow: OverlayTemplate = {
   name: 'arrow',
@@ -9,18 +9,7 @@ const arrow: OverlayTemplate = {
   needDefaultYAxisFigure: true,
   createPointFigures: ({ coordinates }) => {
     if (coordinates.length > 1) {
-      const flag = coordinates[1].x > coordinates[0].x ? 0 : 1
-      const kb = utils.getLinearSlopeIntercept(coordinates[0], coordinates[1])
-      let offsetAngle
-      if (kb) {
-        offsetAngle = Math.atan(kb[0]) + Math.PI * flag
-      } else {
-        if (coordinates[1].y > coordinates[0].y) {
-          offsetAngle = Math.PI / 2
-        } else {
-          offsetAngle = (Math.PI / 2) * 3
-        }
-      }
+      const offsetAngle = getLineAngle(coordinates[0], coordinates[1])
       const rotateCoordinate1 = getRotateCoordinate(
         { x: coordinates[1].x - 8, y: coordinates[1].y + 4 },
         coordinates[1],

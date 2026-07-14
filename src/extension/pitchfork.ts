@@ -44,18 +44,18 @@ const pitchfork: OverlayTemplate = {
     const dy = midPoint.y - pivot.y
 
     // 中线：从枢轴点出发，经过中点，延伸至图表边界
-    const medianRay = getRayLine([pivot, midPoint], bounding) as LineAttrs
+    const medianRay = getRayLine([pivot, midPoint], bounding)
 
     // 平行线通过各摆动点，方向与中线相同
     // swing1 的平行线终点
     const upper1 = { x: swing1.x, y: swing1.y }
     const upper2 = { x: swing1.x + dx, y: swing1.y + dy }
-    const upperRay = getRayLine([upper1, upper2], bounding) as LineAttrs
+    const upperRay = getRayLine([upper1, upper2], bounding)
 
     // swing2 的平行线终点
     const lower1 = { x: swing2.x, y: swing2.y }
     const lower2 = { x: swing2.x + dx, y: swing2.y + dy }
-    const lowerRay = getRayLine([lower1, lower2], bounding) as LineAttrs
+    const lowerRay = getRayLine([lower1, lower2], bounding)
 
     // 50% 内线：中线与外线之间的中间平行线
     // 内上线的起点取中线起点与上外线起点的中点方向
@@ -67,7 +67,7 @@ const pitchfork: OverlayTemplate = {
       x: innerUpperStart.x + dx,
       y: innerUpperStart.y + dy,
     }
-    const innerUpperRay = getRayLine([innerUpperStart, innerUpperEnd], bounding) as LineAttrs
+    const innerUpperRay = getRayLine([innerUpperStart, innerUpperEnd], bounding)
 
     const innerLowerStart = {
       x: (midPoint.x + swing2.x) / 2,
@@ -77,20 +77,20 @@ const pitchfork: OverlayTemplate = {
       x: innerLowerStart.x + dx,
       y: innerLowerStart.y + dy,
     }
-    const innerLowerRay = getRayLine([innerLowerStart, innerLowerEnd], bounding) as LineAttrs
+    const innerLowerRay = getRayLine([innerLowerStart, innerLowerEnd], bounding)
 
     const lines: LineAttrs[] = []
 
     // 中线
-    if (medianRay && 'coordinates' in medianRay) {
+    if (medianRay) {
       lines.push(medianRay)
     }
     // 上外线
-    if (upperRay && 'coordinates' in upperRay) {
+    if (upperRay) {
       lines.push(upperRay)
     }
     // 下外线
-    if (lowerRay && 'coordinates' in lowerRay) {
+    if (lowerRay) {
       lines.push(lowerRay)
     }
 
@@ -102,10 +102,10 @@ const pitchfork: OverlayTemplate = {
 
     // 内线（50% 线，虚线风格）
     const innerLines: LineAttrs[] = []
-    if (innerUpperRay && 'coordinates' in innerUpperRay) {
+    if (innerUpperRay) {
       innerLines.push(innerUpperRay)
     }
-    if (innerLowerRay && 'coordinates' in innerLowerRay) {
+    if (innerLowerRay) {
       innerLines.push(innerLowerRay)
     }
 

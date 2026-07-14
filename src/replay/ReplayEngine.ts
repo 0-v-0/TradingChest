@@ -17,7 +17,7 @@ export class ReplayEngine {
   }
 
   start(data: KLineData[], startPosition: number): void {
-    this._fullData = data
+    this._fullData = data.slice()
     this._position = data.length === 0 ? 0 : Math.max(1, Math.min(startPosition, data.length))
     this._active = data.length > 0
     this._playing = false
@@ -92,11 +92,11 @@ export class ReplayEngine {
     this._fullData = []
     this._active = false
     this._playing = false
-    this._callbacks = { onDataChange: () => {}, onBarUpdate: () => {}, onStateChange: () => {} }
+    this._callbacks = { onDataChange: () => {}, onBarUpdate: () => {}, onStateChange: () => {} } as ReplayCallbacks
   }
 
   private _schedule(): void {
-    if (!this._playing) return
+    if (!this._playing || this._speed <= 0) return
     const interval = BASE_INTERVAL / this._speed
     this._timer = setTimeout(() => {
       this._timer = null

@@ -4,6 +4,7 @@
  * 各线有不同的周期和前移偏移量
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcRMA } from '../utils'
 
 type AlligatorResult = {
   jaw: number
@@ -23,61 +24,35 @@ const alligator: IndicatorTemplate<AlligatorResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [jawPeriod, teethPeriod, lipsPeriod] }) => {
     const n = dataList.length
 
-    // 偏移量
     const jawOffset = 8
     const teethOffset = 5
     const lipsOffset = 3
 
-    /**
-     * 计算 SMMA（平滑移动平均线）
-     * SMMA(i) = (SMMA(i-1) * (period - 1) + close(i)) / period
-     * 使用 (high + low) / 2 作为数据源（Median Price）
-     */
-    function calcSmma(period: number): number[] {
-      const values = new Array<number>(n)
-      let smma = 0
-      for (let i = 0; i < n; i++) {
-        const median = (dataList[i].high + dataList[i].low) / 2
-        if (i < period) {
-          smma += median
-          if (i === period - 1) {
-            smma = smma / period
-            values[i] = smma
-          } else {
-            values[i] = NaN
-          }
-        } else {
-          smma = (smma * (period - 1) + median) / period
-          values[i] = smma
-        }
-      }
-      return values
+    const median = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      median[i] = (dataList[i].high + dataList[i].low) / 2
     }
 
-    const jawSmma = calcSmma(jawPeriod)
-    const teethSmma = calcSmma(teethPeriod)
-    const lipsSmma = calcSmma(lipsPeriod)
+    const jawSmma = calcRMA(median, jawPeriod)
+    const teethSmma = calcRMA(median, teethPeriod)
+    const lipsSmma = calcRMA(median, lipsPeriod)
 
-    // 应用偏移后组装结果
     const totalLength = n + Math.max(jawOffset, teethOffset, lipsOffset)
     const result: AlligatorResult[] = new Array(totalLength)
 
     for (let i = 0; i < totalLength; i++) {
       const item: Partial<AlligatorResult> = {}
 
-      // 颚线：前移 jawOffset
       const jawSrcIdx = i - jawOffset
       if (jawSrcIdx >= 0 && jawSrcIdx < n) {
         item.jaw = jawSmma[jawSrcIdx]
       }
 
-      // 齿线：前移 teethOffset
       const teethSrcIdx = i - teethOffset
       if (teethSrcIdx >= 0 && teethSrcIdx < n) {
         item.teeth = teethSmma[teethSrcIdx]
       }
 
-      // 唇线：前移 lipsOffset
       const lipsSrcIdx = i - lipsOffset
       if (lipsSrcIdx >= 0 && lipsSrcIdx < n) {
         item.lips = lipsSmma[lipsSrcIdx]

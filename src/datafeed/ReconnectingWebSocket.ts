@@ -40,6 +40,17 @@ export class ReconnectingWebSocket {
 
   private _connect(): void {
     if (this._disposed) return
+    // Close any existing socket before creating a new one to prevent leaks
+    if (this._ws) {
+      this._ws.onopen = null
+      this._ws.onmessage = null
+      this._ws.onerror = null
+      this._ws.onclose = null
+      if (this._ws.readyState === WebSocket.OPEN || this._ws.readyState === WebSocket.CONNECTING) {
+        this._ws.close()
+      }
+      this._ws = null
+    }
     this._ws = new WebSocket(this._url)
 
     this._ws.onopen = (ev) => {
@@ -69,7 +80,7 @@ export class ReconnectingWebSocket {
     if (this._retryTimer || this._disposed) return
     if (this._retryCount >= this._maxRetries) return
     const base = Math.min(this._baseDelay * Math.pow(2, this._retryCount), this._maxDelay)
-    const jitter = base * (0.5 + Math.random())
+    const jitter = base * (0.5 + Math.random() * 0.5)
     this._retryCount++
     this.onreconnect?.(this._retryCount)
     this._retryTimer = setTimeout(() => {

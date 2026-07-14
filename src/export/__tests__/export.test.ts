@@ -42,6 +42,9 @@ beforeEach(() => {
     if (tag === 'a') clickedLink = el
     return el
   })
+  // Mock body append/remove so fake elements don't hit real DOM
+  vi.spyOn(document.body, 'appendChild').mockImplementation((node: Node) => node)
+  vi.spyOn(document.body, 'removeChild').mockImplementation((node: Node) => node)
 })
 
 /* ========== exportToCSV ========== */

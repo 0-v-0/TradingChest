@@ -188,6 +188,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let widgetRef: HTMLDivElement | undefined
   let widget: Nullable<Chart> = null
   let disposed = false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- klinecharts internal store, no public type
+  let chartStore: any = null
 
   let priceUnitDom: HTMLElement
 
@@ -595,8 +597,14 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     },
   })
 
+  let resizeRaf = 0
+  let crosshairRaf = 0
   const documentResize = () => {
-    widget?.resize()
+    if (resizeRaf) return
+    resizeRaf = requestAnimationFrame(() => {
+      resizeRaf = 0
+      widget?.resize()
+    })
   }
 
   // Backspace/Delete 删除选中的绘图
@@ -643,6 +651,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         },
       },
     })
+
+    // Cache the internal chart store reference once to avoid traversing (widget as any) on every crosshair event
+    if (widget) {
+      chartStore = (widget as unknown as Record<string, unknown>)?._chartStore ?? null
+    }
 
     if (widget) {
       const watermarkContainer = widget.getDom('candle_pane', 'main')
@@ -777,62 +790,65 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     widget?.subscribeAction('onCandleBarClick', () => {
       setSelectedOverlay(null)
     })
-    // 十字光标变化时更新数据窗口
+    // 十字光标变化时更新数据窗口（节流到 ~16ms）
     widget?.subscribeAction('onCrosshairChange', (data: unknown) => {
-      let crosshair = data as Crosshair | undefined
-      // klinecharts v10 bug: subscribeAction callback receives the raw input {x, y, paneId}
-      // without kLineData. Read the full internal crosshair state as a fallback.
-      if (crosshair && !crosshair.kLineData) {
-        const store = (widget as any)?._chartStore
-        if (store?._crosshair) {
-          crosshair = store._crosshair as Crosshair
-        }
-      }
-      if (!crosshair || !crosshair.kLineData) {
-        setDataWindowData([])
-        return
-      }
-      const d = crosshair.kLineData as Record<string, unknown>
-      const rows: DataWindowRow[] = []
-      const addRow = (label: string, val: unknown, color?: string) => {
-        rows.push({ label, value: val != null && !isNaN(+val) ? String(val) : '--', color })
-      }
-      addRow('O', d.open)
-      addRow('H', d.high)
-      addRow('L', d.low)
-      addRow('C', d.close)
-      if (d.volume != null) addRow('V', d.volume)
-      // Extract indicator values from all panes (main + sub)
-      if (widget) {
-        const allIndicators = widget.getIndicators()
-        if (allIndicators && allIndicators.length > 0) {
-          const dataIndex = d.dataIndex as number | undefined
-          const paneGroups: Record<string, Indicator[]> = {}
-          for (const ind of allIndicators) {
-            if (!paneGroups[ind.paneId]) paneGroups[ind.paneId] = []
-            paneGroups[ind.paneId].push(ind)
+      if (crosshairRaf) return
+      crosshairRaf = requestAnimationFrame(() => {
+        crosshairRaf = 0
+        let crosshair = data as Crosshair | undefined
+        // klinecharts v10 bug: subscribeAction callback receives the raw input {x, y, paneId}
+        // without kLineData. Read the full internal crosshair state as a fallback.
+        if (crosshair && !crosshair.kLineData) {
+          if (chartStore?._crosshair) {
+            crosshair = chartStore._crosshair as Crosshair
           }
-          for (const [paneId, indicators] of Object.entries(paneGroups)) {
-            if (paneId !== 'candle_pane') {
-              rows.push({ label: `[${paneId}]`, value: '', color: '#888' })
+        }
+        if (!crosshair || !crosshair.kLineData) {
+          setDataWindowData([])
+          return
+        }
+        const d = crosshair.kLineData as Record<string, unknown>
+        const rows: DataWindowRow[] = []
+        const addRow = (label: string, val: unknown, color?: string) => {
+          rows.push({ label, value: val != null && !isNaN(+val) ? String(val) : '--', color })
+        }
+        addRow('O', d.open)
+        addRow('H', d.high)
+        addRow('L', d.low)
+        addRow('C', d.close)
+        if (d.volume != null) addRow('V', d.volume)
+        // Extract indicator values from all panes (main + sub)
+        if (widget) {
+          const allIndicators = widget.getIndicators()
+          if (allIndicators && allIndicators.length > 0) {
+            const dataIndex = d.dataIndex as number | undefined
+            const paneGroups: Record<string, Indicator[]> = {}
+            for (const ind of allIndicators) {
+              if (!paneGroups[ind.paneId]) paneGroups[ind.paneId] = []
+              paneGroups[ind.paneId].push(ind)
             }
-            for (const ind of indicators) {
-              const vals = ind.result as Record<string, unknown>[] | undefined
-              if (vals && vals.length > 0) {
-                const row = (dataIndex != null && dataIndex >= 0 && dataIndex < vals.length)
-                  ? vals[dataIndex]
-                  : vals[vals.length - 1]
-                for (const k in row) {
-                  if (k !== 'timestamp' && k !== 'dataIndex') {
-                    addRow(`${ind.name}.${k}`, row[k])
+            for (const [paneId, indicators] of Object.entries(paneGroups)) {
+              if (paneId !== 'candle_pane') {
+                rows.push({ label: `[${paneId}]`, value: '', color: '#888' })
+              }
+              for (const ind of indicators) {
+                const vals = ind.result as Record<string, unknown>[] | undefined
+                if (vals && vals.length > 0) {
+                  const row = (dataIndex != null && dataIndex >= 0 && dataIndex < vals.length)
+                    ? vals[dataIndex]
+                    : vals[vals.length - 1]
+                  for (const k in row) {
+                    if (k !== 'timestamp' && k !== 'dataIndex') {
+                      addRow(`${ind.name}.${k}`, row[k])
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-      setDataWindowData(rows)
+        setDataWindowData(rows)
+      })
     })
   })
 
@@ -845,6 +861,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     // 先取消实时数据订阅，防止组件卸载后幽灵回调
     props.datafeed.unsubscribe(currentSymbol, currentPeriod)
     window.removeEventListener('resize', documentResize)
+    if (resizeRaf) cancelAnimationFrame(resizeRaf)
+    if (crosshairRaf) cancelAnimationFrame(crosshairRaf)
+    subscribeBarCallback = null
     if (widgetRef) {
       widgetRef.removeEventListener('keydown', handleKeyDown)
       dispose(widgetRef)

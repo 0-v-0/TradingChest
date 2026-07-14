@@ -64,7 +64,7 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
       cached = fullCalc(dataList, indicator)
       prevLen = len
       prevSecondLastTs = /* c8 ignore next */ len >= 2 ? dataList[len - 2].timestamp : 0
-      return cached.slice()
+      return cached
     }
 
     // Incremental path: recalculate only the trailing `lookback` candles.
@@ -77,9 +77,6 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
     cached.push(...tailResult)
     prevLen = len
     prevSecondLastTs = len >= 2 ? dataList[len - 2].timestamp : 0
-    // Return a defensive copy so external callers cannot mutate / observe
-    // mutations of the cached array across calls (klinecharts diffs previous
-    // results; without this the cached array would silently mutate).
-    return cached.slice()
+    return cached
   }
 }

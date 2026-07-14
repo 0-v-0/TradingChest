@@ -52,24 +52,24 @@ const regressionChannel: OverlayTemplate = {
     const lowerEnd = { x: end.x - nx * channelOffset, y: end.y - ny * channelOffset }
 
     // 中线射线
-    const centerRay = getRayLine([start, end], bounding) as LineAttrs
+    const centerRay = getRayLine([start, end], bounding)
     // 上通道射线
-    const upperRay = getRayLine([upperStart, upperEnd], bounding) as LineAttrs
+    const upperRay = getRayLine([upperStart, upperEnd], bounding)
     // 下通道射线
-    const lowerRay = getRayLine([lowerStart, lowerEnd], bounding) as LineAttrs
+    const lowerRay = getRayLine([lowerStart, lowerEnd], bounding)
 
     // 中线（实线）
     const centerLines: LineAttrs[] = []
-    if (centerRay && 'coordinates' in centerRay) {
+    if (centerRay) {
       centerLines.push(centerRay)
     }
 
     // 上下通道线（虚线）
     const channelLines: LineAttrs[] = []
-    if (upperRay && 'coordinates' in upperRay) {
+    if (upperRay) {
       channelLines.push(upperRay)
     }
-    if (lowerRay && 'coordinates' in lowerRay) {
+    if (lowerRay) {
       channelLines.push(lowerRay)
     }
 

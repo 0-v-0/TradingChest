@@ -34,8 +34,8 @@ const fibonacciSpeedResistanceFan: OverlayTemplate = {
         })
         const ray1 = getRayLine([coordinates[0], { x, y: coordinates[1].y }], bounding)
         const ray2 = getRayLine([coordinates[0], { x: coordinates[1].x, y }], bounding)
-        if (Array.isArray(ray1)) lines2.push(...ray1); else if (ray1) lines2.push(ray1)
-        if (Array.isArray(ray2)) lines2.push(...ray2); else if (ray2) lines2.push(ray2)
+        if (ray1) lines2.push(ray1)
+        if (ray2) lines2.push(ray2)
         texts.unshift({
           x: coordinates[0].x + xOffset,
           y: y + 10,

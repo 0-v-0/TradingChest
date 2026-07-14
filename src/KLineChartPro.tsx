@@ -29,6 +29,19 @@ import KeyboardShortcutManager from './shortcut'
 import { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 
+const DEFAULT_PERIODS: readonly Period[] = [
+  { multiplier: 1, timespan: 'minute' as const, text: '1m' },
+  { multiplier: 5, timespan: 'minute' as const, text: '5m' },
+  { multiplier: 15, timespan: 'minute' as const, text: '15m' },
+  { multiplier: 1, timespan: 'hour' as const, text: '1H' },
+  { multiplier: 2, timespan: 'hour' as const, text: '2H' },
+  { multiplier: 4, timespan: 'hour' as const, text: '4H' },
+  { multiplier: 1, timespan: 'day' as const, text: 'D' },
+  { multiplier: 1, timespan: 'week' as const, text: 'W' },
+  { multiplier: 1, timespan: 'month' as const, text: 'M' },
+  { multiplier: 1, timespan: 'year' as const, text: 'Y' },
+]
+
 export default class KLineChartPro implements ChartPro {
   /** Pre-load locale data before creating an instance (avoids initial flash of untranslated keys) */
   static async preloadLocale(locale: string): Promise<void> {
@@ -77,18 +90,7 @@ export default class KLineChartPro implements ChartPro {
           symbol={options.symbol}
           period={options.period}
           periods={
-            options.periods ?? [
-              { multiplier: 1, timespan: 'minute', text: '1m' },
-              { multiplier: 5, timespan: 'minute', text: '5m' },
-              { multiplier: 15, timespan: 'minute', text: '15m' },
-              { multiplier: 1, timespan: 'hour', text: '1H' },
-              { multiplier: 2, timespan: 'hour', text: '2H' },
-              { multiplier: 4, timespan: 'hour', text: '4H' },
-              { multiplier: 1, timespan: 'day', text: 'D' },
-              { multiplier: 1, timespan: 'week', text: 'W' },
-              { multiplier: 1, timespan: 'month', text: 'M' },
-              { multiplier: 1, timespan: 'year', text: 'Y' },
-            ]
+            options.periods ?? DEFAULT_PERIODS as Period[]
           }
           timezone={options.timezone ?? 'Asia/Shanghai'}
           mainIndicators={options.mainIndicators ?? ['MA']}
@@ -167,14 +169,14 @@ export default class KLineChartPro implements ChartPro {
         const chart = this.getChart()
         if (chart) {
           const size = chart.getSize()
-          chart.zoomAtCoordinate(1.2, { x: size?.width ? size.width / 2 : 400, y: 0 })
+          chart.zoomAtCoordinate(1.2, { x: size?.width ? size.width / 2 : 400, y: size?.height ? size.height / 2 : 300 })
         }
       },
       'nav:zoomOut': () => {
         const chart = this.getChart()
         if (chart) {
           const size = chart.getSize()
-          chart.zoomAtCoordinate(0.8, { x: size?.width ? size.width / 2 : 400, y: 0 })
+          chart.zoomAtCoordinate(0.8, { x: size?.width ? size.width / 2 : 400, y: size?.height ? size.height / 2 : 300 })
         }
       },
       // 图表操作
@@ -279,19 +281,19 @@ export default class KLineChartPro implements ChartPro {
   }
 
   createOverlay(value: string | OverlayCreate | Array<string | OverlayCreate>) {
-    return this._chartApi!.createOverlay(value)
+    return this._api().createOverlay(value)
   }
 
   getOverlays(id?: OverlayFilter): Overlay[] {
-    return this._chartApi!.getOverlays(id)
+    return this._api().getOverlays(id)
   }
 
   removeOverlay(value?: OverlayFilter): boolean {
-    return this._chartApi!.removeOverlay(value)
+    return this._api().removeOverlay(value)
   }
 
   registerOverlay(template: OverlayTemplate): void {
-    return this._chartApi!.registerOverlay(template)
+    return this._api().registerOverlay(template)
   }
 
   setTheme(theme: string): void {
@@ -368,7 +370,6 @@ export default class KLineChartPro implements ChartPro {
   }
 
   createTradeVisualization(trades: TradeRecord[], paneOptions?: Record<string, unknown>): void {
-    this._assertNotDisposed()
     const chart = this.getChart()
     if (!chart) return
     chart.createIndicator(

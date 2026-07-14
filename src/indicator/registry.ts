@@ -69,14 +69,16 @@ function wrapCalcParamsValidation(template: IndicatorTemplate): IndicatorTemplat
 
   const figures = Array.isArray(template.figures) ? template.figures : []
   const nanTemplate = createNaNTemplate(figures)
-  const hasKeys = Object.keys(nanTemplate).length > 0
-  const frozenTemplate = hasKeys ? Object.freeze(nanTemplate) : null
+  const frozenTemplate = Object.keys(nanTemplate).length > 0 ? Object.freeze(nanTemplate) : null
+  const hasKeys = frozenTemplate !== null
   const wrappedCalc = (dataList: KLineData[], indicator: Indicator) => {
     const params = indicator.calcParams
     if (params.some(p => typeof p === 'number' && p < 1)) {
       const n = dataList.length
       const result: Record<string, unknown>[] = new Array(n)
-      result.fill(frozenTemplate ?? {})
+      if (hasKeys) {
+        result.fill(frozenTemplate!)
+      }
       return result
     }
     return originalCalc(dataList, indicator)

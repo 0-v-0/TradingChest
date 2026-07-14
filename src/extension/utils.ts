@@ -16,41 +16,45 @@ export function getRotateCoordinate(
   return { x, y }
 }
 
-export function getRayLine(coordinates: Coordinate[], bounding: Bounding): LineAttrs | LineAttrs[] {
-  if (coordinates.length > 1) {
-    let coordinate: Coordinate
-    if (coordinates[0].x === coordinates[1].x && coordinates[0].y !== coordinates[1].y) {
-      if (coordinates[0].y < coordinates[1].y) {
-        coordinate = {
-          x: coordinates[0].x,
-          y: bounding.height,
-        }
-      } else {
-        coordinate = {
-          x: coordinates[0].x,
-          y: 0,
-        }
-      }
-    } else if (coordinates[0].x > coordinates[1].x) {
+export function getRayLine(coordinates: Coordinate[], bounding: Bounding): LineAttrs | null {
+  if (coordinates.length < 2) return null
+
+  let coordinate: Coordinate
+  if (coordinates[0].x === coordinates[1].x && coordinates[0].y !== coordinates[1].y) {
+    if (coordinates[0].y < coordinates[1].y) {
       coordinate = {
-        x: 0,
-        y: utils.getLinearYFromCoordinates(coordinates[0], coordinates[1], {
-          x: 0,
-          y: coordinates[0].y,
-        }),
+        x: coordinates[0].x,
+        y: bounding.height,
       }
     } else {
       coordinate = {
-        x: bounding.width,
-        y: utils.getLinearYFromCoordinates(coordinates[0], coordinates[1], {
-          x: bounding.width,
-          y: coordinates[0].y,
-        }),
+        x: coordinates[0].x,
+        y: 0,
       }
     }
-    return { coordinates: [coordinates[0], coordinate] }
+  } else if (coordinates[0].x > coordinates[1].x) {
+    coordinate = {
+      x: 0,
+      y: utils.getLinearYFromCoordinates(coordinates[0], coordinates[1], {
+        x: 0,
+        y: coordinates[0].y,
+      }),
+    }
+  } else {
+    coordinate = {
+      x: bounding.width,
+      y: utils.getLinearYFromCoordinates(coordinates[0], coordinates[1], {
+        x: bounding.width,
+        y: coordinates[0].y,
+      }),
+    }
   }
-  return []
+  return { coordinates: [coordinates[0], coordinate] }
+}
+
+export function getRayLines(coordinates: Coordinate[], bounding: Bounding): LineAttrs[] {
+  const line = getRayLine(coordinates, bounding)
+  return line ? [line] : []
 }
 
 export function getDistance(coordinate1: Coordinate, coordinate2: Coordinate): number {
@@ -175,5 +179,116 @@ export function createWaveOverlay(name: string, totalStep: number): OverlayTempl
         },
       ]
     },
+  }
+}
+
+/**
+ * From two diagonal corner coordinates, produce the 4 corners of a rectangle.
+ */
+export function createRectCoordinates(c0: Coordinate, c1: Coordinate): Coordinate[] {
+  return [
+    c0,
+    { x: c1.x, y: c0.y },
+    c1,
+    { x: c0.x, y: c1.y },
+  ]
+}
+
+/**
+ * From two diagonal corners, produce 4 border line segments of a rectangle.
+ */
+export function createRectBorderLines(c0: Coordinate, c1: Coordinate): LineAttrs[] {
+  return [
+    { coordinates: [c0, { x: c1.x, y: c0.y }] },
+    { coordinates: [{ x: c1.x, y: c0.y }, c1] },
+    { coordinates: [c1, { x: c0.x, y: c1.y }] },
+    { coordinates: [{ x: c0.x, y: c1.y }, c0] },
+  ]
+}
+
+/**
+ * Compute the angle of a line from c0 to c1, handling vertical lines.
+ * Returns the angle in radians, oriented for use with getRotateCoordinate.
+ */
+export function getLineAngle(c0: Coordinate, c1: Coordinate): number {
+  const flag = c1.x > c0.x ? 0 : 1
+  const kb = utils.getLinearSlopeIntercept(c0, c1)
+  if (kb) {
+    return Math.atan(kb[0]) + Math.PI * flag
+  }
+  return c1.y > c0.y ? Math.PI / 2 : (Math.PI / 2) * 3
+}
+
+/**
+ * Style configuration for text editing overlays (note, textAnnotation, callout, etc.).
+ */
+export interface TextStyle {
+  color: string
+  backgroundColor: string
+  borderColor: string
+  borderRadius: number
+}
+
+/**
+ * Factory for text-editing overlays (note, textAnnotation, etc.).
+ * Provides shared onDrawEnd (prompt dialog), onRightClick, and common defaults.
+ */
+export function createTextEditingOverlay(
+  name: string,
+  totalStep: number,
+  style: TextStyle,
+  textDefaults: { baseline: string; align: string },
+  defaultText: string,
+  promptMsg: string,
+  extraFigures?: (coordinates: Coordinate[], overlay: { extendData: unknown }) => ReturnType<NonNullable<OverlayTemplate['createPointFigures']>>,
+): OverlayTemplate {
+  return {
+    name,
+    totalStep,
+    needDefaultPointFigure: true,
+    needDefaultXAxisFigure: true,
+    needDefaultYAxisFigure: true,
+    createPointFigures: ({ coordinates, overlay }) => {
+      if (coordinates.length > 0) {
+        const text = (overlay.extendData as string) || defaultText
+        const rawExtras = extraFigures?.(coordinates, overlay)
+        const extras = rawExtras == null ? [] : Array.isArray(rawExtras) ? rawExtras : [rawExtras]
+        return [
+          ...extras,
+          {
+            type: 'rectText',
+            attrs: {
+              x: coordinates[0].x,
+              y: coordinates[0].y,
+              text,
+              baseline: textDefaults.baseline,
+              align: textDefaults.align,
+            },
+            styles: {
+              style: 'stroke_fill',
+              ...style,
+              borderSize: 1,
+              paddingLeft: 8,
+              paddingRight: 8,
+              paddingTop: 6,
+              paddingBottom: 6,
+              size: 12,
+            },
+          },
+        ]
+      }
+      return []
+    },
+    onDrawEnd: ({ overlay }) => {
+      const input = window.prompt(
+        promptMsg,
+        (overlay.extendData as string) || defaultText,
+      )
+      if (input !== null && input.trim() !== '') {
+        overlay.extendData = input.trim()
+      }
+      return true
+    },
+    onRightClick: () => false,
   }
 }

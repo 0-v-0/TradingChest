@@ -1,4 +1,5 @@
 import type { OverlayTemplate } from 'klinecharts'
+import { createRectCoordinates, createRectBorderLines } from './utils'
 
 const gannBox: OverlayTemplate = {
   name: 'gannBox',
@@ -76,23 +77,13 @@ const gannBox: OverlayTemplate = {
       return [
         {
           type: 'line',
-          attrs: [
-            { coordinates: [coordinates[0], { x: coordinates[1].x, y: coordinates[0].y }] },
-            { coordinates: [{ x: coordinates[1].x, y: coordinates[0].y }, coordinates[1]] },
-            { coordinates: [coordinates[1], { x: coordinates[0].x, y: coordinates[1].y }] },
-            { coordinates: [{ x: coordinates[0].x, y: coordinates[1].y }, coordinates[0]] },
-          ],
+          attrs: createRectBorderLines(coordinates[0], coordinates[1]),
         },
         {
           type: 'polygon',
           ignoreEvent: true,
           attrs: {
-            coordinates: [
-              coordinates[0],
-              { x: coordinates[1].x, y: coordinates[0].y },
-              coordinates[1],
-              { x: coordinates[0].x, y: coordinates[1].y },
-            ],
+            coordinates: createRectCoordinates(coordinates[0], coordinates[1]),
           },
           styles: { style: 'fill' },
         },

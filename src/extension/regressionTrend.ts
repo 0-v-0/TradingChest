@@ -22,10 +22,10 @@ const regressionTrend: OverlayTemplate = {
     const end = coordinates[1]
 
     // 回归线（两点连线）向右延伸为射线
-    const rayLine = getRayLine([start, end], bounding) as LineAttrs
+    const rayLine = getRayLine([start, end], bounding)
 
     const lines: LineAttrs[] = []
-    if (rayLine && 'coordinates' in rayLine) {
+    if (rayLine) {
       lines.push(rayLine)
     }
 

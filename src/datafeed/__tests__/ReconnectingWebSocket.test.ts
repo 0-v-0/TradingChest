@@ -163,14 +163,14 @@ describe('ReconnectingWebSocket', () => {
       instances[0].onclose?.(new CloseEvent('close'))
       expect(onreconnect).not.toHaveBeenCalled() // callback not set yet
 
-      vi.advanceTimersByTime(200)
+      vi.advanceTimersByTime(500)
       // Close second → attempt 2
       instances[1].onclose?.(new CloseEvent('close'))
-      vi.advanceTimersByTime(200)
+      vi.advanceTimersByTime(500)
 
       // Close third → attempt 3, but maxRetries=2, so no more
       instances[2].onclose?.(new CloseEvent('close'))
-      vi.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(5000)
       expect(instances).toHaveLength(3) // no 4th WebSocket
     })
 

@@ -5,6 +5,9 @@ import type { AlertConfig, AlertEvent } from './alert/types'
 /** 交易方向 */
 export type Direction = 'long' | 'short'
 
+/** 支持的时间周期 */
+export type TimespanUnit = 'ms' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+
 export interface SymbolInfo {
   ticker: string
   name?: string
@@ -20,7 +23,7 @@ export interface SymbolInfo {
 
 export interface Period {
   multiplier: number
-  timespan: string
+  timespan: TimespanUnit
   text: string
 }
 
