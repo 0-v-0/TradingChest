@@ -47,7 +47,7 @@ describe('volumeProfile', () => {
     ]
     const result = calcVolumeProfile(data, 10)
     expect(result.totalVolume).toBeGreaterThan(0)
-    expect(result.totalVolume).toBeCloseTo(3000, -1)
+    expect(result.totalVolume).toBe(3000)
   })
 
   it('should have value area within bounds', () => {

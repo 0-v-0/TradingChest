@@ -5,7 +5,7 @@
  *
  * 测试 utils.ts 核心函数和完整指标 calc 函数在不同数据规模下的执行耗时。
  */
-import { describe, it } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import {
   calcSMA,
   calcEMA,
@@ -28,19 +28,31 @@ import type { KLineData } from 'klinecharts'
 // 数据生成
 // ---------------------------------------------------------------------------
 
+/** 确定性伪随机数生成器（xorshift32） */
+function seededRandom(seed = 42): () => number {
+  let s = seed
+  return () => {
+    s ^= s << 13
+    s ^= s >> 17
+    s ^= s << 5
+    return ((s >>> 0) / 0x100000000)
+  }
+}
+
 /** 生成模拟 K 线数据 */
 function generateKLineData(count: number): KLineData[] {
   const data: KLineData[] = []
   let price = 100
   const baseTs = 1700000000000
+  const rand = seededRandom(42)
 
   for (let i = 0; i < count; i++) {
-    const change = (Math.random() - 0.48) * 2
+    const change = (rand() - 0.48) * 2
     const open = price
     const close = price + change
-    const high = Math.max(open, close) + Math.random() * 1.5
-    const low = Math.min(open, close) - Math.random() * 1.5
-    const volume = 1000 + Math.random() * 9000
+    const high = Math.max(open, close) + rand() * 1.5
+    const low = Math.min(open, close) - rand() * 1.5
+    const volume = 1000 + rand() * 9000
 
     data.push({
       timestamp: baseTs + i * 60_000,
@@ -121,71 +133,86 @@ describe('Utils performance benchmark', () => {
       it(`calcSMA(14) — ${size} pts`, () => {
         const r = bench(() => calcSMA(closes, 14))
         console.log(fmtResult('calcSMA(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
+        expect(r.min).toBeLessThanOrEqual(r.median)
       })
 
       it(`calcEMA(14) — ${size} pts`, () => {
         const r = bench(() => calcEMA(closes, 14))
         console.log(fmtResult('calcEMA(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcWMA(14) — ${size} pts`, () => {
         const r = bench(() => calcWMA(closes, 14))
         console.log(fmtResult('calcWMA(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcRMA(14) — ${size} pts`, () => {
         const r = bench(() => calcRMA(closes, 14))
         console.log(fmtResult('calcRMA(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcRMA_NaNAware(14) — ${size} pts`, () => {
         const r = bench(() => calcRMA_NaNAware(closes, 14))
         console.log(fmtResult('calcRMA_NaNAware(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcTR — ${size} pts`, () => {
         const r = bench(() => calcTR(highs, lows, closes))
         console.log(fmtResult('calcTR', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcStdDev(20) — ${size} pts`, () => {
         const r = bench(() => calcStdDev(closes, 20))
         console.log(fmtResult('calcStdDev(20)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcHighest(14) — ${size} pts`, () => {
         const r = bench(() => calcHighest(closes, 14))
         console.log(fmtResult('calcHighest(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcLowest(14) — ${size} pts`, () => {
         const r = bench(() => calcLowest(closes, 14))
         console.log(fmtResult('calcLowest(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcSum(14) — ${size} pts`, () => {
         const r = bench(() => calcSum(closes, 14))
         console.log(fmtResult('calcSum(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcChange — ${size} pts`, () => {
         const r = bench(() => calcChange(closes))
         console.log(fmtResult('calcChange', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcGain — ${size} pts`, () => {
         const r = bench(() => calcGain(closes))
         console.log(fmtResult('calcGain', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcLoss — ${size} pts`, () => {
         const r = bench(() => calcLoss(closes))
         console.log(fmtResult('calcLoss', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       it(`calcLinReg(20) — ${size} pts`, () => {
         const r = bench(() => calcLinReg(closes, 20))
         console.log(fmtResult('calcLinReg(20)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
     })
   }
@@ -237,6 +264,7 @@ describe('Full indicator calc performance benchmark', () => {
         }
         const r = bench(() => atrCalc(klines))
         console.log(fmtResult('ATR(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       // DEMA — 双层 EMA（预分配 number[]）
@@ -267,6 +295,7 @@ describe('Full indicator calc performance benchmark', () => {
         }
         const r = bench(() => demaCalc(klines))
         console.log(fmtResult('DEMA(21)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       // BBW — 使用 calcSMA + calcStdDev（预分配 number[]）
@@ -290,6 +319,7 @@ describe('Full indicator calc performance benchmark', () => {
         }
         const r = bench(() => bbwCalc(klines))
         console.log(fmtResult('BBW(20,2)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       // SuperTrend — ATR + 方向判断（预分配 number[]）
@@ -366,6 +396,7 @@ describe('Full indicator calc performance benchmark', () => {
         }
         const r = bench(() => stCalc(klines))
         console.log(fmtResult('SuperTrend(10,3)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
 
       // ADX — 三重 RMA + 方向运动（预分配 number[]）
@@ -447,6 +478,7 @@ describe('Full indicator calc performance benchmark', () => {
         }
         const r = bench(() => adxCalc(klines))
         console.log(fmtResult('ADX(14)', r, size))
+        expect(r.avg).toBeGreaterThan(0)
       })
     })
   }

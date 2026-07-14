@@ -47,7 +47,6 @@ describe('IndicatorRegistry', () => {
   })
 
   it('loader rejection 后清除 _pending 允许重试', async () => {
-    const registry = new IndicatorRegistry()
     registry.setRegisterFn(() => {})
     let callCount = 0
     registry.setLoader('FAIL_THEN_OK', async () => {

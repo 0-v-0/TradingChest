@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { AlertManager } from '../../alert'
+import { AlertManager } from '../../alert/index'
 
 describe('Alert Price Stream Integration', () => {
   it('simulated tick stream triggers crossing alert exactly once', () => {

@@ -507,9 +507,10 @@ describe('KeyboardShortcutManager', () => {
     })
 
     it('unbind 后 dispatch 事件不触发 handler', () => {
-      const mgr = new KeyboardShortcutManager()
+      const mgr = new KeyboardShortcutManager([])
       const handler = vi.fn()
       mgr.registerAction('chart:cancelDraw', handler)
+      mgr.addBinding({ combo: 'escape', action: 'chart:cancelDraw', descriptionKey: 'test' })
 
       const el = document.createElement('div')
       mgr.bindTo(el)
