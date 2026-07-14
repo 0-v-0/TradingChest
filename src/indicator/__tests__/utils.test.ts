@@ -12,6 +12,8 @@ import {
   calcLoss,
   calcHighest,
   calcLowest,
+  calcHighestIdx,
+  calcLowestIdx,
 } from '../utils'
 
 // ---------------------------------------------------------------------------
@@ -423,5 +425,47 @@ describe('calcLowest', () => {
 
   it('empty array returns empty array', () => {
     expect(calcLowest([], 3)).toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// calcHighestIdx
+// ---------------------------------------------------------------------------
+describe('calcHighestIdx', () => {
+  it('returns index of rolling max correctly', () => {
+    expectArrayClose(calcHighestIdx([3, 1, 4, 1, 5, 9, 2, 6], 3), [NaN, NaN, 2, 2, 4, 5, 5, 5])
+  })
+  it('period 1 returns every index', () => {
+    expectArrayClose(calcHighestIdx([7, 3, 5], 1), [0, 1, 2])
+  })
+  it('ties resolve to later index', () => {
+    expectArrayClose(calcHighestIdx([5, 5, 5], 3), [NaN, NaN, 2])
+  })
+  it('period larger than data returns all NaNs', () => {
+    expect(calcHighestIdx([1, 2], 5)).toEqual([NaN, NaN])
+  })
+  it('empty array returns empty array', () => {
+    expect(calcHighestIdx([], 3)).toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// calcLowestIdx
+// ---------------------------------------------------------------------------
+describe('calcLowestIdx', () => {
+  it('returns index of rolling min correctly', () => {
+    expectArrayClose(calcLowestIdx([3, 1, 4, 1, 5, 9, 2, 6], 3), [NaN, NaN, 1, 3, 3, 3, 6, 6])
+  })
+  it('period 1 returns every index', () => {
+    expectArrayClose(calcLowestIdx([7, 3, 5], 1), [0, 1, 2])
+  })
+  it('ties resolve to later index', () => {
+    expectArrayClose(calcLowestIdx([5, 5, 5], 3), [NaN, NaN, 2])
+  })
+  it('period larger than data returns all NaNs', () => {
+    expect(calcLowestIdx([1, 2], 5)).toEqual([NaN, NaN])
+  })
+  it('empty array returns empty array', () => {
+    expect(calcLowestIdx([], 3)).toEqual([])
   })
 })

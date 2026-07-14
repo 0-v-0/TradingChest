@@ -174,29 +174,48 @@ export function calcStdDev(data: number[], period: number): number[] {
   return result
 }
 
+interface SlidingWindowOptions {
+  /** '<='/'<' 保留较大值 (highest), '>='/'>' 保留较小值 (lowest) */
+  compare: '<=' | '<' | '>=' | '>'
+  /** true 返回索引, false 返回值 */
+  returnIndex: boolean
+}
+
+function slidingWindow(data: number[], period: number, opts: SlidingWindowOptions): number[] {
+  const n = data.length
+  const result: number[] = new Array(n).fill(NaN)
+  if (period <= 0) return result
+  const deque: number[] = []
+  let head = 0
+  const shouldPop = (dequeTail: number, current: number): boolean =>
+    opts.compare === '<=' ? data[dequeTail] <= data[current] :
+    opts.compare === '<' ? data[dequeTail] < data[current] :
+    opts.compare === '>=' ? data[dequeTail] >= data[current] :
+    data[dequeTail] > data[current]
+  for (let i = 0; i < n; i++) {
+    while (deque.length > head && shouldPop(deque[deque.length - 1], i)) {
+      deque.pop()
+    }
+    deque.push(i)
+    if (deque[head] <= i - period) head++
+    if (i >= period - 1) {
+      result[i] = opts.returnIndex ? deque[head] : data[deque[head]]
+    }
+  }
+  return result
+}
+
+
 /**
  * 区间最高值（Highest value in period）
  * 返回过去 period 根 K 线内的最大值
  * 使用单调双端队列实现 O(n) 滑动窗口最大值
  */
 export function calcHighest(data: number[], period: number): number[] {
-  const n = data.length
-  const result: number[] = new Array(n).fill(NaN)
   console.assert(period > 0, 'calcHighest: period must be > 0')
-  const deque: number[] = []
-  let head = 0
-  for (let i = 0; i < n; i++) {
-    while (deque.length > head && data[deque[deque.length - 1]] <= data[i]) {
-      deque.pop()
-    }
-    deque.push(i)
-    if (deque[head] <= i - period) head++
-    if (i >= period - 1) {
-      result[i] = data[deque[head]]
-    }
-  }
-  return result
+  return slidingWindow(data, period, { compare: '<=', returnIndex: false })
 }
+
 
 /**
  * 区间最低值（Lowest value in period）
@@ -204,23 +223,11 @@ export function calcHighest(data: number[], period: number): number[] {
  * 使用单调双端队列实现 O(n) 滑动窗口最小值
  */
 export function calcLowest(data: number[], period: number): number[] {
-  const n = data.length
-  const result: number[] = new Array(n).fill(NaN)
   console.assert(period > 0, 'calcLowest: period must be > 0')
-  const deque: number[] = []
-  let head = 0
-  for (let i = 0; i < n; i++) {
-    while (deque.length > head && data[deque[deque.length - 1]] >= data[i]) {
-      deque.pop()
-    }
-    deque.push(i)
-    if (deque[head] <= i - period) head++
-    if (i >= period - 1) {
-      result[i] = data[deque[head]]
-    }
-  }
-  return result
+  return slidingWindow(data, period, { compare: '>=', returnIndex: false })
 }
+
+
 
 /**
  * 区间最高值索引（Index of Highest value in period）
@@ -229,23 +236,10 @@ export function calcLowest(data: number[], period: number): number[] {
  * 值相同时取最近的索引（与 calcHighest 一致）
  */
 export function calcHighestIdx(data: number[], period: number): number[] {
-  const n = data.length
-  const result: number[] = new Array(n).fill(NaN)
   console.assert(period > 0, 'calcHighestIdx: period must be > 0')
-  const deque: number[] = []
-  let head = 0
-  for (let i = 0; i < n; i++) {
-    while (deque.length > head && data[deque[deque.length - 1]] <= data[i]) {
-      deque.pop()
-    }
-    deque.push(i)
-    if (deque[head] <= i - period) head++
-    if (i >= period - 1) {
-      result[i] = deque[head]
-    }
-  }
-  return result
+  return slidingWindow(data, period, { compare: '<=', returnIndex: true })
 }
+
 
 /**
  * 区间最低值索引（Index of Lowest value in period）
@@ -254,22 +248,8 @@ export function calcHighestIdx(data: number[], period: number): number[] {
  * 值相同时取最近的索引（与 calcLowest 一致）
  */
 export function calcLowestIdx(data: number[], period: number): number[] {
-  const n = data.length
-  const result: number[] = new Array(n).fill(NaN)
   console.assert(period > 0, 'calcLowestIdx: period must be > 0')
-  const deque: number[] = []
-  let head = 0
-  for (let i = 0; i < n; i++) {
-    while (deque.length > head && data[deque[deque.length - 1]] >= data[i]) {
-      deque.pop()
-    }
-    deque.push(i)
-    if (deque[head] <= i - period) head++
-    if (i >= period - 1) {
-      result[i] = deque[head]
-    }
-  }
-  return result
+  return slidingWindow(data, period, { compare: '>=', returnIndex: true })
 }
 
 /**
