@@ -29,11 +29,53 @@ interface BarTradeInfo {
   }>
 }
 
+/** 主题感知的交易可视化颜色配置 */
+export interface TradeVisColors {
+  /** 盈利区间背景色 */
+  profitBg: string
+  /** 亏损区间背景色 */
+  lossBg: string
+  /** 盈利区间边框色 */
+  profitBorder: string
+  /** 亏损区间边框色 */
+  lossBorder: string
+  /** 做多入场/做空出场标记色 */
+  longColor: string
+  /** 做空入场/做多出场标记色 */
+  shortColor: string
+  /** 标签文字颜色 */
+  labelTextColor: string
+}
+
+/** 默认颜色（light 主题） */
+export const defaultTradeVisColors: TradeVisColors = {
+  profitBg: 'rgba(38, 166, 154, 0.12)',
+  lossBg: 'rgba(239, 83, 80, 0.12)',
+  profitBorder: 'rgba(38, 166, 154, 0.4)',
+  lossBorder: 'rgba(239, 83, 80, 0.4)',
+  longColor: 'rgba(38, 166, 154, 0.9)',
+  shortColor: 'rgba(239, 83, 80, 0.9)',
+  labelTextColor: '#fff',
+}
+
+/** Dark 主题颜色 */
+export const darkTradeVisColors: TradeVisColors = {
+  profitBg: 'rgba(38, 166, 154, 0.15)',
+  lossBg: 'rgba(239, 83, 80, 0.15)',
+  profitBorder: 'rgba(38, 166, 154, 0.5)',
+  lossBorder: 'rgba(239, 83, 80, 0.5)',
+  longColor: 'rgba(38, 166, 154, 0.95)',
+  shortColor: 'rgba(239, 83, 80, 0.95)',
+  labelTextColor: '#fff',
+}
+
 /** extendData shape for TradeVis indicator */
 export interface TradeVisExtendData {
   trades: TradeRecord[]
   /** 实例 ID，用于多图表隔离点击检测数据 */
   _instanceId?: string
+  /** 可选：主题感知颜色配置，未提供时使用 defaultTradeVisColors */
+  colors?: Partial<TradeVisColors>
 }
 
 type HitTarget = { x: number; y: number; trade: TradeRecord; type: 'entry' | 'exit' }
@@ -164,6 +206,7 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
 
     const ext = indicator.extendData as TradeVisExtendData | TradeRecord[] | undefined
     const instanceId = (!Array.isArray(ext) && ext?._instanceId) || '_default'
+    const c: TradeVisColors = { ...defaultTradeVisColors, ...((!Array.isArray(ext) && ext?.colors) ?? {}) }
 
     ctx.save()
 
@@ -171,8 +214,8 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
     const tradeBarIndices = _tradeBarIndicesMap.get(instanceId) ?? []
     for (const { trade: t, entryIdx, exitIdx } of tradeBarIndices) {
       const isProfit = t.pnl >= 0
-      const bgColor = isProfit ? 'rgba(38, 166, 154, 0.12)' : 'rgba(239, 83, 80, 0.12)'
-      const borderColor = isProfit ? 'rgba(38, 166, 154, 0.4)' : 'rgba(239, 83, 80, 0.4)'
+      const bgColor = isProfit ? c.profitBg : c.lossBg
+      const borderColor = isProfit ? c.profitBorder : c.lossBorder
 
       const x1 = xAxis.convertToPixel(entryIdx)
       const x2 = xAxis.convertToPixel(exitIdx)
@@ -208,9 +251,9 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
       if (info.entry) {
         const y = yAxis.convertToPixel(info.entry.price)
         const isLong = info.entry.direction === 'long'
-        const color = isLong ? 'rgba(38, 166, 154, 0.9)' : 'rgba(239, 83, 80, 0.9)'
+        const color = isLong ? c.longColor : c.shortColor
         const label = isLong ? 'B' : 'S'
-        drawLabel(ctx, barX, y, label, color)
+        drawLabel(ctx, barX, y, label, color, c.labelTextColor)
         // trade reference is pre-stored in calc phase — no trades.find() needed
         hitTargets.push({ x: barX, y: y - 35 - 9, trade: info.entry.trade, type: 'entry' })
       }
@@ -218,10 +261,10 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
       if (info.exit) {
         const y = yAxis.convertToPixel(info.exit.price)
         const isLong = info.exit.direction === 'long'
-        const color = isLong ? 'rgba(239, 83, 80, 0.9)' : 'rgba(38, 166, 154, 0.9)'
+        const color = isLong ? c.shortColor : c.longColor
         const label = isLong ? 'S' : 'B'
         const pnlStr = `${label} ${info.exit.pnl >= 0 ? '+' : ''}${info.exit.pnl.toFixed(0)}`
-        drawLabel(ctx, barX, y, pnlStr, color)
+        drawLabel(ctx, barX, y, pnlStr, color, c.labelTextColor)
         hitTargets.push({ x: barX, y: y - 35 - 9, trade: info.exit.trade, type: 'exit' })
       }
     }
@@ -240,6 +283,7 @@ function drawLabel(
   y: number,
   text: string,
   color: string,
+  textColor = '#fff',
 ) {
   const offset = 35
 
@@ -274,7 +318,7 @@ function drawLabel(
   ctx.closePath()
   ctx.fill()
 
-  ctx.fillStyle = '#fff'
+  ctx.fillStyle = textColor
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(text, x, ly + h / 2)
