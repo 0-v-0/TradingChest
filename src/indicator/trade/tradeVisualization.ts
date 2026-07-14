@@ -3,6 +3,7 @@
  * calc 中将交易数据映射到每根 K 线，draw 中直接用数据索引绘制
  */
 import type { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
+import type { Direction } from '../../types'
 
 export interface TradeRecord {
   entryTs: number
@@ -10,14 +11,14 @@ export interface TradeRecord {
   entryPrice: number
   exitPrice: number
   pnl: number
-  direction: 'long' | 'short'
+  direction: Direction
 }
 
 interface BarTradeInfo {
   // 该 K 线是入场点
-  entry?: { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
+  entry?: { price: number; direction: Direction; pnl: number; trade: TradeRecord }
   // 该 K 线是出场点
-  exit?: { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
+  exit?: { price: number; direction: Direction; pnl: number; trade: TradeRecord }
   // 该 K 线所在的交易区间列表（用于画矩形）
   ranges?: Array<{
     entryPrice: number
@@ -98,11 +99,11 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
 
     const entryMap = new Map<
       number,
-      { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
+      { price: number; direction: Direction; pnl: number; trade: TradeRecord }
     >()
     const exitMap = new Map<
       number,
-      { price: number; direction: 'long' | 'short'; pnl: number; trade: TradeRecord }
+      { price: number; direction: Direction; pnl: number; trade: TradeRecord }
     >()
     const rangeSet = new Map<
       number,

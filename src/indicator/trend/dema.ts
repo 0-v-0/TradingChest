@@ -37,11 +37,7 @@ const dema: IndicatorTemplate<DemaResult, number> = {
 
     const result: DemaResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (i < period - 1) {
-        result[i] = { dema: NaN }
-      } else {
-        result[i] = { dema: 2 * ema1[i] - ema2[i] }
-      }
+      result[i] = i < period - 1 ? { dema: NaN } : { dema: 2 * ema1[i] - ema2[i] }
     }
     return result
   },

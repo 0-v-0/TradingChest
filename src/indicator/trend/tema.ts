@@ -39,11 +39,7 @@ const tema: IndicatorTemplate<TemaResult, number> = {
 
     const result: TemaResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (i < period - 1) {
-        result[i] = { tema: NaN }
-      } else {
-        result[i] = { tema: 3 * ema1[i] - 3 * ema2[i] + ema3[i] }
-      }
+      result[i] = i < period - 1 ? { tema: NaN } : { tema: 3 * ema1[i] - 3 * ema2[i] + ema3[i] }
     }
     return result
   },

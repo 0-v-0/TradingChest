@@ -22,9 +22,9 @@ const bollingerBandWidth: IndicatorTemplate<BollingerBandWidthResult, number> = 
     for (let i = 0; i < n; i++) {
       const sma = smas[i]
       const stddev = stddevs[i]
-      if (Number.isNaN(sma) || Number.isNaN(stddev)) { result[i] = { bbw: NaN }; continue }
-      const bbw = sma === 0 ? 0 : ((2 * stddevMultiplier * stddev) / sma) * 100
-      result[i] = { bbw }
+      result[i] = (isNaN(sma) || isNaN(stddev))
+        ? { bbw: NaN }
+        : { bbw: sma === 0 ? 0 : ((2 * stddevMultiplier * stddev) / sma) * 100 }
     }
     return result
   },

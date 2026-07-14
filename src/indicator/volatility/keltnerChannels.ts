@@ -39,16 +39,9 @@ const keltnerChannels: IndicatorTemplate<KeltnerChannelsResult, number> = {
     const result: KeltnerChannelsResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
       const mid = emaArr[i]
-      if (Number.isNaN(mid)) {
-        result[i] = { middle: NaN, upper: NaN, lower: NaN }
-      } else {
-        const atr = atrArr[i]
-        result[i] = {
-          middle: mid,
-          upper: mid + atrMultiplier * atr,
-          lower: mid - atrMultiplier * atr,
-        }
-      }
+      result[i] = isNaN(mid)
+        ? { middle: NaN, upper: NaN, lower: NaN }
+        : { middle: mid, upper: mid + atrMultiplier * atrArr[i], lower: mid - atrMultiplier * atrArr[i] }
     }
     return result
   },

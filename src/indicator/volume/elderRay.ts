@@ -34,8 +34,8 @@ const elderRay: IndicatorTemplate<ElderRayResult, number> = {
       const kline = dataList[i]
       const emaVal = ema[i]
       result[i] = {
-        bullPower: !Number.isNaN(emaVal) ? kline.high - emaVal : NaN,
-        bearPower: !Number.isNaN(emaVal) ? kline.low - emaVal : NaN,
+        bullPower: !isNaN(emaVal) ? kline.high - emaVal : NaN,
+        bearPower: !isNaN(emaVal) ? kline.low - emaVal : NaN,
       }
     }
     return result

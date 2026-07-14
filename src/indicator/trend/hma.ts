@@ -27,18 +27,16 @@ const hma: IndicatorTemplate<HmaResult, number> = {
     // 中间序列：2 * WMA(n/2) - WMA(n)
     const diffSeries = new Array<number>(n)
     for (let i = 0; i < n; i++) {
-      if (!Number.isNaN(wmaHalf[i]) && !Number.isNaN(wmaFull[i])) {
-        diffSeries[i] = 2 * wmaHalf[i] - wmaFull[i]
-      } else {
-        diffSeries[i] = NaN
-      }
+      diffSeries[i] = (!isNaN(wmaHalf[i]) && !isNaN(wmaFull[i]))
+        ? 2 * wmaHalf[i] - wmaFull[i]
+        : NaN
     }
 
     // 对中间序列再做 WMA(sqrt(n))
     // diffSeries 的 NaN 仅出现在前缀，找到第一个有效值后使用 calcWMA
     let firstValid = -1
     for (let k = 0; k < n; k++) {
-      if (!Number.isNaN(diffSeries[k])) {
+      if (!isNaN(diffSeries[k])) {
         firstValid = k
         break
       }

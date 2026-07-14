@@ -57,16 +57,8 @@ const adx: IndicatorTemplate<AdxResult, number> = {
         const upMove = high - prevHigh
         const downMove = prevLow - low
 
-        if (upMove > downMove && upMove > 0) {
-          plusDmRaw[i] = upMove
-        } else {
-          plusDmRaw[i] = 0
-        }
-        if (downMove > upMove && downMove > 0) {
-          minusDmRaw[i] = downMove
-        } else {
-          minusDmRaw[i] = 0
-        }
+        plusDmRaw[i] = (upMove > downMove && upMove > 0) ? upMove : 0
+        minusDmRaw[i] = (downMove > upMove && downMove > 0) ? downMove : 0
       }
     }
 

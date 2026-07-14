@@ -33,14 +33,13 @@ const vwma: IndicatorTemplate<VwmaResult, number> = {
 
     const result: VwmaResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (Number.isNaN(cvSums[i])) {
-        result[i] = { vwma: NaN }
-      } else if (vSums[i] === 0) {
-        // 无成交量时退化为简单均线
-        result[i] = { vwma: closeSums[i] / period }
-      } else {
-        result[i] = { vwma: cvSums[i] / vSums[i] }
-      }
+      result[i] = isNaN(cvSums[i])
+        ? { vwma: NaN }
+        : {
+          vwma: vSums[i] === 0 ?
+            // 无成交量时退化为简单均线
+            closeSums[i] / period : cvSums[i] / vSums[i]
+        }
     }
     return result
   },

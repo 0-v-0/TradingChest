@@ -65,12 +65,9 @@ const ehlersLeadingIndicator: IndicatorTemplate<EhlersLeadingResult, number> = {
     for (let i = 0; i < n; i++) {
       const s = smooth[i]
       const d = derivative[i]
-      if (isNaN(s)) {
-        result[i] = { lead: NaN, signal: NaN }
-      } else {
-        const lead = !isNaN(d) ? s + k * d : s
-        result[i] = { lead, signal: s }
-      }
+      result[i] = isNaN(s)
+        ? { lead: NaN, signal: NaN }
+        : { lead: !isNaN(d) ? s + k * d : s, signal: s }
     }
 
     return result

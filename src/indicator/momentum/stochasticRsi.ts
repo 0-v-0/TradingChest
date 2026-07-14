@@ -41,20 +41,12 @@ const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
         // 首个 RSI：用 SMA 作为种子
         avgGain = (avgGain + gain) / rsiPeriod
         avgLoss = (avgLoss + loss) / rsiPeriod
-        if (avgLoss === 0) {
-          rsi[i] = 100
-        } else {
-          rsi[i] = 100 - 100 / (1 + avgGain / avgLoss)
-        }
+        rsi[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss)
       } else {
         // Wilder 递归平滑
         avgGain = (avgGain * (rsiPeriod - 1) + gain) / rsiPeriod
         avgLoss = (avgLoss * (rsiPeriod - 1) + loss) / rsiPeriod
-        if (avgLoss === 0) {
-          rsi[i] = 100
-        } else {
-          rsi[i] = 100 - 100 / (1 + avgGain / avgLoss)
-        }
+        rsi[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss)
       }
     }
 

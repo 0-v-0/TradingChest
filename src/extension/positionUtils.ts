@@ -1,6 +1,5 @@
 import type { OverlayTemplate, OverlayFigure } from 'klinecharts'
-
-type PositionSide = 'long' | 'short'
+import type { Direction } from '../types'
 
 // 交易视觉颜色常量
 const STOP_LOSS_FILL = 'rgba(239, 83, 80, 0.15)'
@@ -14,7 +13,7 @@ const RR_BG = 'rgba(22, 119, 255, 0.1)'
 const RR_BORDER = 'rgba(22, 119, 255, 0.4)'
 
 function createPositionFigures(
-  side: PositionSide,
+  side: Direction,
 ): NonNullable<OverlayTemplate['createPointFigures']> {
   return ({ coordinates, overlay, chart }) => {
     const precision = chart.getSymbol()?.pricePrecision ?? 2
@@ -171,7 +170,7 @@ function createPositionFigures(
   }
 }
 
-export function createPositionOverlay(name: string, side: PositionSide): OverlayTemplate {
+export function createPositionOverlay(name: string, side: Direction): OverlayTemplate {
   return {
     name,
     totalStep: 4,

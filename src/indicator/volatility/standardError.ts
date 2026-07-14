@@ -22,11 +22,9 @@ const standardError: IndicatorTemplate<StandardErrorResult, number> = {
     const { stdResid } = calcLinReg(closes, period)
     const result: StandardErrorResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (Number.isNaN(stdResid[i]) || period <= 2) {
-        result[i] = { se: NaN }
-      } else {
-        result[i] = { se: stdResid[i] * Math.sqrt(period / (period - 2)) }
-      }
+      result[i] = (isNaN(stdResid[i]) || period <= 2)
+        ? { se: NaN }
+        : { se: stdResid[i] * Math.sqrt(period / (period - 2)) }
     }
     return result
   },

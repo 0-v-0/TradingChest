@@ -68,14 +68,9 @@ const chandeKrollStop: IndicatorTemplate<ChandeKrollStopResult, number> = {
     const result: ChandeKrollStopResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
       // 需要 ATR 和 highest/lowest 都有效才输出
-      if (isNaN(highest[i]) || isNaN(lowest[i]) || isNaN(atr[i])) {
-        result[i] = { longStop: NaN, shortStop: NaN }
-      } else {
-        result[i] = {
-          longStop: smoothedLong[i],
-          shortStop: smoothedShort[i],
-        }
-      }
+      result[i] = (isNaN(highest[i]) || isNaN(lowest[i]) || isNaN(atr[i]))
+        ? { longStop: NaN, shortStop: NaN }
+        : { longStop: smoothedLong[i], shortStop: smoothedShort[i] }
     }
 
     return result

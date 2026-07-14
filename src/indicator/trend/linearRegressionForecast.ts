@@ -27,14 +27,9 @@ const linearRegressionForecast: IndicatorTemplate<LinearRegressionForecastResult
     const { slope, intercept } = calcLinReg(closes, period)
     const result: LinearRegressionForecastResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (Number.isNaN(slope[i])) {
-        result[i] = { forecast: NaN, slope: NaN }
-      } else {
-        result[i] = {
-          forecast: intercept[i] + slope[i] * (period - 1),
-          slope: slope[i],
-        }
-      }
+      result[i] = isNaN(slope[i])
+        ? { forecast: NaN, slope: NaN }
+        : { forecast: intercept[i] + slope[i] * (period - 1), slope: slope[i] }
     }
     return result
   },

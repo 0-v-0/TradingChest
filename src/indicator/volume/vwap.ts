@@ -26,12 +26,8 @@ const vwap: IndicatorTemplate<VwapResult, number> = {
       cumTpv += typicalPrice * (kline.volume ?? 0)
       cumVol += kline.volume ?? 0
 
-      let vwap = NaN
       // 累计成交量为零时无法计算 VWAP
-      if (cumVol !== 0) {
-        vwap = cumTpv / cumVol
-      }
-      result[i] = { vwap }
+      result[i] = { vwap: cumVol ? cumTpv / cumVol : NaN }
     }
     return result
   },

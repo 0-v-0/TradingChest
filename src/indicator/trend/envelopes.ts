@@ -26,16 +26,9 @@ const envelopes: IndicatorTemplate<EnvelopesResult, number> = {
     const result: EnvelopesResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
       const sma = smaValues[i]
-      if (isNaN(sma)) {
-        result[i] = { middle: NaN, upper: NaN, lower: NaN }
-      } else {
-        const offset = sma * percentage / 100
-        result[i] = {
-          middle: sma,
-          upper: sma + offset,
-          lower: sma - offset,
-        }
-      }
+      result[i] = isNaN(sma)
+        ? { middle: NaN, upper: NaN, lower: NaN }
+        : { middle: sma, upper: sma + sma * percentage / 100, lower: sma - sma * percentage / 100 }
     }
     return result
   },

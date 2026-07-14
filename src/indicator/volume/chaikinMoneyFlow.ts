@@ -28,14 +28,11 @@ const chaikinMoneyFlow: IndicatorTemplate<ChaikinMoneyFlowResult, number> = {
     for (let i = 0; i < n; i++) {
       const kline = dataList[i]
       const hl = kline.high - kline.low
-      if (hl === 0) {
+      mfVolumes[i] = hl === 0 ?
         // 最高价等于最低价，无法判断资金方向，乘数为 0
-        mfVolumes[i] = 0
-      } else {
+        0 :
         // 资金流量乘数：衡量收盘价在当日波幅中的相对位置
-        const mfMultiplier = (kline.close - kline.low - (kline.high - kline.close)) / hl
-        mfVolumes[i] = mfMultiplier * (kline.volume ?? 0)
-      }
+        ((kline.close - kline.low - (kline.high - kline.close)) / hl) * (kline.volume ?? 0)
     }
 
     // 使用滑动窗口计算 CMF

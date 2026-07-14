@@ -37,11 +37,7 @@ const dpo: IndicatorTemplate<DpoResult, number> = {
     // DPO[i] = close[i] - SMA[i - shift]
     for (let i = 0; i < len; i++) {
       const smaIdx = i - shift
-      let dpo = NaN
-      if (smaIdx >= 0 && !isNaN(sma[smaIdx])) {
-        dpo = dataList[i].close - sma[smaIdx]
-      }
-      result[i] = { dpo }
+      result[i] = { dpo: (smaIdx >= 0 && !isNaN(sma[smaIdx])) ? dataList[i].close - sma[smaIdx] : NaN }
     }
 
     return result

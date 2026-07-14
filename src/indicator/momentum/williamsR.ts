@@ -34,11 +34,9 @@ const williamsR: IndicatorTemplate<WilliamsRResult, number> = {
     for (let i = 0; i < n; i++) {
       const hh = highest[i]
       const ll = lowest[i]
-      if (isNaN(hh) || isNaN(ll) || hh === ll) {
-        result[i] = { wr: NaN }
-      } else {
-        result[i] = { wr: ((hh - close[i]) / (hh - ll)) * -100 }
-      }
+      result[i] = (isNaN(hh) || isNaN(ll) || hh === ll)
+        ? { wr: NaN }
+        : { wr: ((hh - close[i]) / (hh - ll)) * -100 }
     }
     return result
   },

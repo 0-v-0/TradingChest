@@ -26,11 +26,7 @@ const volumeOscillator: IndicatorTemplate<VolumeOscillatorResult, number> = {
     for (let i = 0; i < n; i++) {
       const fast = fastEma[i]
       const slow = slowEma[i]
-      if (isNaN(fast) || isNaN(slow)) {
-        result[i] = { vo: NaN }
-      } else {
-        result[i] = { vo: fast - slow }
-      }
+      result[i] = (isNaN(fast) || isNaN(slow)) ? { vo: NaN } : { vo: fast - slow }
     }
     return result
   },

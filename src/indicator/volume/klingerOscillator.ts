@@ -60,12 +60,7 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
         }
 
         // 计算成交量力度
-        if (cm === 0) {
-          vf[i] = 0
-        } else {
-          const vol = kline.volume ?? 0
-          vf[i] = vol * Math.abs(2 * (dm / cm) - 1) * trend * 100
-        }
+        vf[i] = cm === 0 ? 0 : (kline.volume ?? 0) * Math.abs(2 * (dm / cm) - 1) * trend * 100
 
         prevTrend = trend
         prevDm = dm
@@ -80,11 +75,7 @@ const klingerOscillator: IndicatorTemplate<KlingerOscillatorResult, number> = {
     // 在快慢 EMA 都未成熟之前，输出 NaN 而非 0，避免污染下游信号线。
     const kvoValues = new Array<number>(n)
     for (let i = 0; i < n; i++) {
-      if (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) {
-        kvoValues[i] = fastEma[i] - slowEma[i]
-      } else {
-        kvoValues[i] = NaN
-      }
+      kvoValues[i] = (!isNaN(fastEma[i]) && !isNaN(slowEma[i])) ? fastEma[i] - slowEma[i] : NaN
     }
 
     // 信号线：对 KVO 值做 EMA（同样要求快慢 EMA 都已成熟）

@@ -24,17 +24,10 @@ const linearRegression: IndicatorTemplate<LinearRegressionResult, number> = {
     const { slope, intercept, stdResid } = calcLinReg(closes, period)
     const result: LinearRegressionResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (Number.isNaN(slope[i])) {
-        result[i] = { value: NaN, upper: NaN, lower: NaN }
-      } else {
-        const regValue = intercept[i] + slope[i] * (period - 1)
-        const band = 2 * stdResid[i]
-        result[i] = {
-          value: regValue,
-          upper: regValue + band,
-          lower: regValue - band,
-        }
-      }
+      const v = intercept[i] + slope[i] * (period - 1)
+      result[i] = isNaN(slope[i])
+        ? { value: NaN, upper: NaN, lower: NaN }
+        : { value: v, upper: v + 2 * stdResid[i], lower: v - 2 * stdResid[i] }
     }
     return result
   },

@@ -78,15 +78,7 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
     // 比值序列
     const ratios = new Array<number>(n)
     for (let i = 0; i < n; i++) {
-      if (i < ratioStartIdx) {
-        // 未成熟：使用 NaN，避免污染后续 rolling sum
-        ratios[i] = NaN
-      } else if (doubleEma[i] === 0) {
-        // 二次 EMA 为 0，无有效比值
-        ratios[i] = NaN
-      } else {
-        ratios[i] = singleEma[i] / doubleEma[i]
-      }
+      ratios[i] = (i < ratioStartIdx || doubleEma[i] === 0) ? NaN : singleEma[i] / doubleEma[i]
     }
 
     // 第四步：对比值序列求 sumPeriod 的滚动和（O(n) 滑动窗口）
@@ -96,13 +88,13 @@ const massIndex: IndicatorTemplate<MassIndexResult, number> = {
 
     for (let i = 0; i < n; i++) {
       const r = ratios[i]
-      if (!Number.isNaN(r)) {
+      if (!isNaN(r)) {
         sum += r
         validInWindow++
       }
       if (i >= sumPeriod) {
         const oldR = ratios[i - sumPeriod]
-        if (!Number.isNaN(oldR)) {
+        if (!isNaN(oldR)) {
           sum -= oldR
           validInWindow--
         }

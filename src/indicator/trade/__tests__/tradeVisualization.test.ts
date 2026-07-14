@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import type { Direction } from '../../../types'
 import {
   type TradeRecord,
   findClosestBar,
@@ -6,6 +7,8 @@ import {
   cleanupTradeVisInstance,
 } from '../tradeVisualization'
 import tradeVisualization from '../tradeVisualization'
+
+type BarTradeInfo = NonNullable<Awaited<ReturnType<NonNullable<typeof tradeVisualization.calc>>>[number]>
 
 // Helper: make KLineData-like objects with just the fields calc needs
 function makeBar(timestamp: number, close = 100) {
@@ -72,7 +75,7 @@ describe('tradeVisualization.calc', () => {
       entryPrice: number
       exitPrice: number
       pnl: number
-      direction: 'long' | 'short'
+      direction: Direction
     }>
   ): TradeRecord[] {
     return entries
@@ -82,7 +85,7 @@ describe('tradeVisualization.calc', () => {
     const bars = [makeBar(100), makeBar(200), makeBar(300)]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades: [] } } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[]
     expect(result).toHaveLength(3)
     expect(result[0]).toEqual({})
     expect(result[1]).toEqual({})
@@ -93,7 +96,7 @@ describe('tradeVisualization.calc', () => {
     const bars = [makeBar(100)]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: undefined } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[]
     expect(result).toHaveLength(1)
     expect(result[0]).toEqual({})
   })
@@ -110,7 +113,7 @@ describe('tradeVisualization.calc', () => {
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[] as BarTradeInfo[]
 
     // Bar 1 (ts=200) should have entry
     expect(result[1].entry).toBeDefined()
@@ -146,7 +149,7 @@ describe('tradeVisualization.calc', () => {
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[]
 
     expect(result[1].entry).toBeDefined()
     expect(result[1].exit).toBeDefined()
@@ -163,7 +166,7 @@ describe('tradeVisualization.calc', () => {
     )
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[]
 
     // Bar 2 (ts=300) has ranges from both trades
     expect(result[2].ranges).toHaveLength(2)
@@ -176,7 +179,7 @@ describe('tradeVisualization.calc', () => {
     ]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: trades } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[]
 
     expect(result[0].entry).toBeDefined()
     expect(result[1].exit).toBeDefined()
@@ -195,7 +198,7 @@ describe('tradeVisualization.calc', () => {
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicator = { extendData: { trades } } as any
-    const result = calc(bars, indicator)
+    const result = calc(bars, indicator) as BarTradeInfo[]
 
     expect(result[1].entry).toBeDefined() // 190 → bar[1] (200)
     expect(result[2].exit).toBeDefined() // 310 → bar[2] (300)

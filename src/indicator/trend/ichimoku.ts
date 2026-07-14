@@ -57,11 +57,7 @@ const ichimoku: IndicatorTemplate<IchimokuResult, number> = {
       kijunArr[i] = kijun
 
       // 先行带 A = (转换线 + 基准线) / 2
-      if (!isNaN(tenkan) && !isNaN(kijun)) {
-        spanAArr[i] = (tenkan + kijun) / 2
-      } else {
-        spanAArr[i] = NaN
-      }
+      spanAArr[i] = (!isNaN(tenkan) && !isNaN(kijun)) ? (tenkan + kijun) / 2 : NaN
 
       // 先行带 B = (senkouBPeriod 周期内最高价 + 最低价) / 2
       spanBArr[i] = !isNaN(senkouBHigh[i]) && !isNaN(senkouBLow[i])

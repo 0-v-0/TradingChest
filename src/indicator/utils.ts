@@ -42,7 +42,7 @@ export function calcSMA_NaNAware(data: number[], period: number): number[] {
   let bufLen = 0
   let sum = 0
   for (let i = 0; i < len; i++) {
-    if (Number.isNaN(data[i])) continue
+    if (isNaN(data[i])) continue
     buf[bufLen] = data[i]
     bufLen++
     sum += data[i]
@@ -113,11 +113,7 @@ export function calcWMA(data: number[], period: number): number[] {
       weightedSum += data[i] * (i + 1)
     }
 
-    if (i >= period - 1) {
-      result[i] = weightedSum / weightSum
-    } else {
-      result[i] = NaN
-    }
+    result[i] = i >= period - 1 ? weightedSum / weightSum : NaN
   }
   return result
 }
@@ -320,7 +316,7 @@ export function calcRMA_NaNAware(data: number[], period: number): number[] {
 
   for (let i = 0; i < n; i++) {
     const v = data[i]
-    if (Number.isNaN(v)) {
+    if (isNaN(v)) {
       result[i] = NaN
       continue
     }

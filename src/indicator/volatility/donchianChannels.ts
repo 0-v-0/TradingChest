@@ -31,8 +31,9 @@ const donchianChannels: IndicatorTemplate<DonchianChannelsResult, number> = {
     for (let i = 0; i < n; i++) {
       const upper = uppers[i]
       const lower = lowers[i]
-      if (Number.isNaN(upper) || Number.isNaN(lower)) { result[i] = { upper: NaN, lower: NaN, middle: NaN }; continue }
-      result[i] = { upper, lower, middle: (upper + lower) / 2 }
+      result[i] = (isNaN(upper) || isNaN(lower))
+        ? { upper: NaN, lower: NaN, middle: NaN }
+        : { upper, lower, middle: (upper + lower) / 2 }
     }
     return result
   },

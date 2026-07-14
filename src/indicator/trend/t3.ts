@@ -66,11 +66,7 @@ const t3: IndicatorTemplate<T3Result, number> = {
 
     const result: T3Result[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      if (i < minBars) {
-        result[i] = { t3: NaN }
-      } else {
-        result[i] = { t3: c1 * e6[i] + c2 * e5[i] + c3 * e4[i] + c4 * e3[i] }
-      }
+      result[i] = i < minBars ? { t3: NaN } : { t3: c1 * e6[i] + c2 * e5[i] + c3 * e4[i] + c4 * e3[i] }
     }
     return result
   },

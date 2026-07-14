@@ -2,6 +2,9 @@ import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate, N
 import type KeyboardShortcutManager from './shortcut'
 import type { AlertConfig, AlertEvent } from './alert/types'
 
+/** 交易方向 */
+export type Direction = 'long' | 'short'
+
 export interface SymbolInfo {
   ticker: string
   name?: string
