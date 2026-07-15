@@ -206,6 +206,13 @@ function snapshotOverlay(overlay: Overlay): OverlayLifecycleEvent['overlay'] {
   }
 }
 
+/** Get the text content for a text/note overlay, falling back to a default label */
+function getTextOverlayContent(overlay: Overlay): string {
+  return typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
+    ? overlay.extendData
+    : overlay.name === 'note' ? 'Note' : 'Text'
+}
+
 const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let widgetRef: HTMLDivElement | undefined
   let widget: Nullable<Chart> = null
@@ -239,6 +246,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [indicatorModalVisible, setIndicatorModalVisible] = createSignal(false)
   const [mainIndicators, setMainIndicators] = createSignal([...props.mainIndicators!])
   const [subIndicators, setSubIndicators] = createSignal<Record<string, string>>({})
+  const invalidateIndicatorCache = () => { cachedIndicatorGroups = null }
 
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
   const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
@@ -248,6 +256,12 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   const [settingModalVisible, setSettingModalVisible] = createSignal(false)
   const [widgetDefaultStyles, setWidgetDefaultStyles] = createSignal<Styles>()
+  // Snapshot styles only when the setting modal opens (avoids deep clone on every render)
+  const settingModalStyles = createMemo((prev: Styles | null): Styles | null => {
+    if (!settingModalVisible()) return null
+    if (prev !== null) return prev // modal still open, keep snapshot
+    return widget ? utils.clone(widget.getStyles()) : null
+  }, null)
 
   const [screenshotUrl, setScreenshotUrl] = createSignal('')
 
@@ -306,11 +320,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   const promptTextOverlay = (overlay: Overlay) => {
     if (overlay.name !== 'textAnnotation' && overlay.name !== 'note') return
-    const fallback = overlay.name === 'note' ? 'Note' : 'Text'
-    const current =
-      typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
-        ? overlay.extendData
-        : fallback
+    const current = getTextOverlayContent(overlay)
     const label =
       overlay.name === 'note' ? '输入便签内容 / Enter note:' : '输入标注文字 / Enter text:'
     const input = window.prompt(label, current)
@@ -373,30 +383,14 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     const mgr = props.undoRedoManager
     if (mgr && widget && overlay.id) {
       const o = widget.getOverlays({ id: overlay.id })[0] ?? overlay
-      mgr.push(new OverlayCreateCommand(widget, {
-        id: o.id,
-        name: o.name,
-        points: o.points,
-        extendData: o.extendData,
-        styles: o.styles,
-        lock: o.lock,
-        visible: o.visible,
-      }))
+      mgr.push(new OverlayCreateCommand(widget, snapshotOverlay(o)))
     }
   }
 
   const pushOverlayRemoveCmd = (overlay: Overlay) => {
     const mgr = props.undoRedoManager
     if (mgr && widget && overlay.id) {
-      mgr.push(new OverlayRemoveCommand(widget, {
-        id: overlay.id,
-        name: overlay.name,
-        points: overlay.points,
-        extendData: overlay.extendData,
-        styles: overlay.styles,
-        lock: overlay.lock,
-        visible: overlay.visible,
-      }))
+      mgr.push(new OverlayRemoveCommand(widget, snapshotOverlay(overlay)))
     }
   }
 
@@ -428,12 +422,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       items.push({
          label: tr('menu_edit'),
          onClick: () => {
-           const current =
-            typeof overlay.extendData === 'string' && overlay.extendData.trim().length > 0
-              ? overlay.extendData
-              : overlay.name === 'note'
-                ? 'Note'
-                : 'Text'
+           const current = getTextOverlayContent(overlay)
           const input = window.prompt(tr('menu_edit'), current)
           if (input !== null && input.trim() !== '' && overlay.id) {
             widget?.overrideOverlay({ id: overlay.id, extendData: input.trim() })
@@ -619,6 +608,12 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   let resizeRaf = 0
   let crosshairRaf = 0
+  /** Cached indicator grouping for crosshair data window — invalidated on indicator add/remove */
+  let cachedIndicatorGroups: Record<string, Indicator[]> | null = null
+  /** Action callback references for cleanup */
+  let onTooltipClick: ((data: unknown) => void) | null = null
+  let onBarClick: (() => void) | null = null
+  let onCrosshair: ((data: unknown) => void) | null = null
   const documentResize = () => {
     if (resizeRaf) return
     resizeRaf = requestAnimationFrame(() => {
@@ -712,6 +707,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       await Promise.all(subPromises)
       if (!disposed) {
         setSubIndicators(subIndicatorMap)
+        invalidateIndicatorCache()
       }
     })().catch((e) => {
       props.onError?.({ type: 'indicator-init', message: 'indicator init failed', raw: e })
@@ -762,7 +758,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         props.datafeed.unsubscribe(symbol(), period())
       },
     })
-    widget?.subscribeAction('onIndicatorTooltipFeatureClick', (data: unknown) => {
+    onTooltipClick = (data: unknown) => {
       const d = data as { indicatorName?: string; iconId?: string; paneId?: string }
       if (d.indicatorName) {
         switch (d.iconId) {
@@ -792,22 +788,24 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               widget?.removeIndicator({ paneId: 'candle_pane', name: d.indicatorName })
               newMainIndicators.splice(newMainIndicators.indexOf(d.indicatorName), 1)
               setMainIndicators(newMainIndicators)
+              invalidateIndicatorCache()
             } else {
               const newIndicators: Record<string, string> = { ...subIndicators() }
               widget?.removeIndicator({ paneId: d.paneId, name: d.indicatorName })
               delete newIndicators[d.indicatorName]
               setSubIndicators(newIndicators)
+              invalidateIndicatorCache()
             }
             break
         }
       }
-    })
+    }
+    widget?.subscribeAction('onIndicatorTooltipFeatureClick', onTooltipClick)
     // 点击蜡烛区域时清除 overlay 选中状态
-    widget?.subscribeAction('onCandleBarClick', () => {
-      setSelectedOverlay(null)
-    })
+    onBarClick = () => { setSelectedOverlay(null) }
+    widget?.subscribeAction('onCandleBarClick', onBarClick)
     // 十字光标变化时更新数据窗口（节流到 ~16ms）
-    widget?.subscribeAction('onCrosshairChange', (data: unknown) => {
+    onCrosshair = (data: unknown) => {
       if (crosshairRaf) return
       crosshairRaf = requestAnimationFrame(() => {
         crosshairRaf = 0
@@ -833,14 +831,20 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         if (d.volume != null) addRow('V', d.volume)
         // Extract indicator values from all panes (main + sub)
         if (widget) {
-          const allIndicators = widget.getIndicators()
-          if (allIndicators && allIndicators.length > 0) {
-            const dataIndex = d.dataIndex as number | undefined
-            const paneGroups: Record<string, Indicator[]> = {}
-            for (const ind of allIndicators) {
-              if (!paneGroups[ind.paneId]) paneGroups[ind.paneId] = []
-              paneGroups[ind.paneId].push(ind)
+          if (!cachedIndicatorGroups) {
+            const allIndicators = widget.getIndicators()
+            const groups: Record<string, Indicator[]> = {}
+            if (allIndicators && allIndicators.length > 0) {
+              for (const ind of allIndicators) {
+                if (!groups[ind.paneId]) groups[ind.paneId] = []
+                groups[ind.paneId].push(ind)
+              }
             }
+            cachedIndicatorGroups = groups
+          }
+          const paneGroups = cachedIndicatorGroups
+          if (Object.keys(paneGroups).length > 0) {
+            const dataIndex = d.dataIndex as number | undefined
             for (const [paneId, indicators] of Object.entries(paneGroups)) {
               if (paneId !== 'candle_pane') {
                 rows.push({ label: `[${paneId}]`, value: '', color: '#888' })
@@ -863,7 +867,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         }
         setDataWindowData(rows)
       })
-    })
+    }
+    widget?.subscribeAction('onCrosshairChange', onCrosshair)
   })
 
   onCleanup(() => {
@@ -878,6 +883,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (resizeRaf) cancelAnimationFrame(resizeRaf)
     if (crosshairRaf) cancelAnimationFrame(crosshairRaf)
     subscribeBarCallback = null
+    cachedIndicatorGroups = null
+    // Unsubscribe klinecharts actions to prevent stale callbacks
+    if (widget) {
+      if (onTooltipClick) widget.unsubscribeAction('onIndicatorTooltipFeatureClick', onTooltipClick!)
+      if (onBarClick) widget.unsubscribeAction('onCandleBarClick', onBarClick!)
+      if (onCrosshair) widget.unsubscribeAction('onCrosshairChange', onCrosshair!)
+    }
     if (widgetRef) {
       widgetRef.removeEventListener('keydown', handleKeyDown)
       dispose(widgetRef)
@@ -976,6 +988,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               newMainIndicators.splice(newMainIndicators.indexOf(data.name), 1)
             }
             setMainIndicators(newMainIndicators)
+            invalidateIndicatorCache()
           }}
           onSubIndicatorChange={async (data) => {
             const newSubIndicators: Record<string, string> = { ...subIndicators() }
@@ -991,6 +1004,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               }
             }
             setSubIndicators(newSubIndicators)
+            invalidateIndicatorCache()
           }}
         />
       </Show>
@@ -1007,7 +1021,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       <Show when={settingModalVisible()}>
         <SettingModal
           lang={locale()} localeKey={localeVersion()}
-          currentStyles={utils.clone(widget!.getStyles())}
+          currentStyles={settingModalStyles()!}
           onClose={() => {
             setSettingModalVisible(false)
           }}

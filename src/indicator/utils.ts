@@ -187,13 +187,14 @@ function slidingWindow(data: number[], period: number, opts: SlidingWindowOption
   if (period <= 0) return result
   const deque: number[] = []
   let head = 0
-  const shouldPop = (dequeTail: number, current: number): boolean =>
-    opts.compare === '<=' ? data[dequeTail] <= data[current] :
-    opts.compare === '<' ? data[dequeTail] < data[current] :
-    opts.compare === '>=' ? data[dequeTail] >= data[current] :
-    data[dequeTail] > data[current]
+  // Hoist comparison function selection outside the loop
+  const shouldPop: (dequeTailVal: number, currentVal: number) => boolean =
+    opts.compare === '<=' ? (a, b) => a <= b :
+    opts.compare === '<'  ? (a, b) => a < b :
+    opts.compare === '>=' ? (a, b) => a >= b :
+                            (a, b) => a > b
   for (let i = 0; i < n; i++) {
-    while (deque.length > head && shouldPop(deque[deque.length - 1], i)) {
+    while (deque.length > head && shouldPop(data[deque[deque.length - 1]], data[i])) {
       deque.pop()
     }
     deque.push(i)

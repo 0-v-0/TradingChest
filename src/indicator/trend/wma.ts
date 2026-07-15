@@ -14,9 +14,12 @@ const wma: IndicatorTemplate<WmaResult, number> = {
   calcParams: [9],
   figures: [{ key: 'wma', title: 'WMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
+    const n = dataList.length
     const closes = dataList.map(d => d.close)
     const wmaValues = calcWMA(closes, period)
-    return wmaValues.map(v => ({ wma: v }))
+    const result: WmaResult[] = new Array(n)
+    for (let i = 0; i < n; i++) result[i] = { wma: wmaValues[i] }
+    return result
   },
 }
 

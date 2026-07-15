@@ -1,7 +1,7 @@
 /**
  * HMA - Hull 移动平均线
  * HMA = WMA(2 * WMA(n/2) - WMA(n), sqrt(n))
- * 同时保持平滑度和减少滞后
+ * 同时保持平滑度减少滞后
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 import { calcWMA } from '../utils'

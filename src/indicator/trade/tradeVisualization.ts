@@ -144,6 +144,7 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
       return dataList.map(() => ({}))
     }
 
+    const n = dataList.length
     const entryMap = new Map<
       number,
       { price: number; direction: Direction; pnl: number; trade: TradeRecord }
@@ -151,10 +152,6 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
     const exitMap = new Map<
       number,
       { price: number; direction: Direction; pnl: number; trade: TradeRecord }
-    >()
-    const rangeSet = new Map<
-      number,
-      Array<{ entryPrice: number; exitPrice: number; pnl: number }>
     >()
     const barIndices: Array<{ trade: TradeRecord; entryIdx: number; exitIdx: number }> = []
 
@@ -174,15 +171,63 @@ const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {
       if (exitIdx >= 0) {
         exitMap.set(exitIdx, { price: t.exitPrice, direction: t.direction, pnl: t.pnl, trade: t })
       }
-      // 区间：标记 entryIdx 到 exitIdx 之间的所有 K 线
       if (entryIdx >= 0 && exitIdx >= 0) {
         barIndices.push({ trade: t, entryIdx, exitIdx })
-        const lo = Math.min(entryIdx, exitIdx)
-        const hi = Math.max(entryIdx, exitIdx)
-        for (let i = lo; i <= hi; i++) {
-          if (!rangeSet.has(i)) rangeSet.set(i, [])
-          rangeSet.get(i)!.push({ entryPrice: t.entryPrice, exitPrice: t.exitPrice, pnl: t.pnl })
+      }
+    }
+
+    // Sweep-line (difference array) for range population: O(n + trades)
+    // For each trade, mark +1 at lo and -1 after hi; prefix sum gives active count per bar.
+    // Then in a second pass, assign trade ranges to bars where count > 0.
+    const diff = new Int32Array(n)
+    // Group trades by their range start (lo) for the sweep pass
+    const tradesStartingAt: TradeRecord[][] = new Array(n)
+    for (const { trade: t, entryIdx, exitIdx } of barIndices) {
+      const lo = Math.min(entryIdx, exitIdx)
+      const hi = Math.max(entryIdx, exitIdx)
+      diff[lo]++
+      if (hi + 1 < n) diff[hi + 1]--
+      if (!tradesStartingAt[lo]) tradesStartingAt[lo] = []
+      tradesStartingAt[lo].push(t)
+    }
+
+    const rangeSet = new Map<
+      number,
+      Array<{ entryPrice: number; exitPrice: number; pnl: number }>
+    >()
+    const activeTrades: TradeRecord[] = []
+    // Track each trade's hi boundary for removal
+    const tradeHi = new Map<TradeRecord, number>()
+    for (const { trade: t, entryIdx, exitIdx } of barIndices) {
+      tradeHi.set(t, Math.max(entryIdx, exitIdx))
+    }
+
+    let sweepCount = 0
+    for (let i = 0; i < n; i++) {
+      // Add trades starting at this bar
+      const starting = tradesStartingAt[i]
+      if (starting) {
+        for (const t of starting) activeTrades.push(t)
+      }
+      sweepCount += diff[i]
+      // Remove trades whose range ended before this bar (hi < i)
+      if (activeTrades.length > 0) {
+        let w = 0
+        for (let j = 0; j < activeTrades.length; j++) {
+          const t = activeTrades[j]
+          if (tradeHi.get(t)! >= i) {
+            activeTrades[w++] = t
+          }
         }
+        activeTrades.length = w
+      }
+      if (sweepCount > 0 && activeTrades.length > 0) {
+        const ranges: Array<{ entryPrice: number; exitPrice: number; pnl: number }> = []
+        for (let j = 0; j < activeTrades.length; j++) {
+          const t = activeTrades[j]
+          ranges.push({ entryPrice: t.entryPrice, exitPrice: t.exitPrice, pnl: t.pnl })
+        }
+        rangeSet.set(i, ranges)
       }
     }
 

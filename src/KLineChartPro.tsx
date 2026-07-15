@@ -169,18 +169,10 @@ export default class KLineChartPro implements ChartPro {
         this.getChart()?.scrollToDataIndex(0)
       },
       'nav:zoomIn': () => {
-        const chart = this.getChart()
-        if (chart) {
-          const size = chart.getSize()
-          chart.zoomAtCoordinate(1.2, { x: size?.width ? size.width / 2 : 400, y: size?.height ? size.height / 2 : 300 })
-        }
+        this._zoom(1.2)
       },
       'nav:zoomOut': () => {
-        const chart = this.getChart()
-        if (chart) {
-          const size = chart.getSize()
-          chart.zoomAtCoordinate(0.8, { x: size?.width ? size.width / 2 : 400, y: size?.height ? size.height / 2 : 300 })
-        }
+        this._zoom(0.8)
       },
       // 图表操作
       'chart:screenshot': () => {
@@ -280,6 +272,15 @@ export default class KLineChartPro implements ChartPro {
       throw new Error(
         '[TradingChest] Instance has been disposed. Create a new instance to continue.',
       )
+    }
+  }
+
+  /** Zoom the chart by factor, centering on the viewport midpoint */
+  private _zoom(factor: number): void {
+    const chart = this.getChart()
+    if (chart) {
+      const size = chart.getSize()
+      chart.zoomAtCoordinate(factor, { x: size?.width ? size.width / 2 : 400, y: size?.height ? size.height / 2 : 300 })
     }
   }
 

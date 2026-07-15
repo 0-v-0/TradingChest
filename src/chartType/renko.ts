@@ -37,6 +37,16 @@ export function calcRenkoBricks(dataList: KLineData[], brickSize: number): Renko
   return bricks
 }
 
+/** Cache key for Renko bricks: data length + last timestamp + period */
+interface RenkoCacheKey {
+  dataLen: number
+  lastTs: number
+  period: number
+}
+
+let _renkoCacheKey: RenkoCacheKey | null = null
+let _renkoCacheBricks: RenkoBrick[] = []
+
 const renko: IndicatorTemplate<object, number> = {
   name: 'Renko',
   shortName: 'RN',
@@ -54,7 +64,23 @@ const renko: IndicatorTemplate<object, number> = {
     const brickSize = Math.max(atrVal, 0.01)
     if (brickSize <= 0) return false
 
-    const bricks = calcRenkoBricks(dataList, brickSize)
+    // Cache bricks: only recalculate when data or period changes
+    const cacheKey: RenkoCacheKey = {
+      dataLen: dataList.length,
+      lastTs: dataList[dataList.length - 1].timestamp,
+      period: adjustedPeriod,
+    }
+    if (
+      !_renkoCacheKey ||
+      _renkoCacheKey.dataLen !== cacheKey.dataLen ||
+      _renkoCacheKey.lastTs !== cacheKey.lastTs ||
+      _renkoCacheKey.period !== cacheKey.period
+    ) {
+      _renkoCacheBricks = calcRenkoBricks(dataList, brickSize)
+      _renkoCacheKey = cacheKey
+    }
+
+    const bricks = _renkoCacheBricks
     if (bricks.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()

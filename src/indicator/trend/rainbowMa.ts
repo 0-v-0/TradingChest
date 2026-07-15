@@ -38,7 +38,11 @@ const rainbowMa: IndicatorTemplate<RainbowMaResult, number> = {
     for (let level = 0; level < depth; level++) {
       const sma = calcSMA(current, period)
       levels[level] = sma
-      current = sma.map(v => isNaN(v) ? 0 : v)
+      // Replace NaN with 0 in-place for next recursion level (avoids allocating a new array)
+      current = sma
+      for (let i = 0; i < n; i++) {
+        if (isNaN(current[i])) current[i] = 0
+      }
     }
 
     // 填充不足 depth 的层

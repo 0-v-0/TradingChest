@@ -1,18 +1,11 @@
-import type { Chart, Overlay } from 'klinecharts'
+import type { Chart } from 'klinecharts'
 import type { Command } from './undoRedo'
+import type { OverlaySnapshot } from '../types'
 
 export class OverlayCreateCommand implements Command {
   constructor(
     private chart: Chart,
-    private overlayData: {
-      id: string
-      name: string
-      points: Overlay['points']
-      extendData: Overlay['extendData']
-      styles: Overlay['styles']
-      lock: Overlay['lock']
-      visible: Overlay['visible']
-    },
+    private overlayData: OverlaySnapshot,
   ) {}
 
   undo(): void {
@@ -34,15 +27,7 @@ export class OverlayCreateCommand implements Command {
 export class OverlayRemoveCommand implements Command {
   constructor(
     private chart: Chart,
-    private overlayData: {
-      id: string
-      name: string
-      points: Overlay['points']
-      extendData: Overlay['extendData']
-      styles: Overlay['styles']
-      lock: Overlay['lock']
-      visible: Overlay['visible']
-    },
+    private overlayData: OverlaySnapshot,
   ) {}
 
   undo(): void {

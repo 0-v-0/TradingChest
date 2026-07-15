@@ -125,9 +125,11 @@ export function exportScreenshot(
     link.download =
       filename ??
       `chart-screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${format}`
+    document.body.appendChild(link)
     link.click()
+    document.body.removeChild(link)
     if (url.startsWith('blob:')) {
-      setTimeout(() => URL.revokeObjectURL(url), 5000)
+      URL.revokeObjectURL(url)
     }
     return true
   } catch {
