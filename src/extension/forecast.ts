@@ -1,4 +1,5 @@
 import type { OverlayTemplate } from 'klinecharts'
+import { COLOR_FORECAST } from '../types'
 
 const forecast: OverlayTemplate = {
   name: 'forecast',
@@ -25,7 +26,7 @@ const forecast: OverlayTemplate = {
         {
           type: 'line',
           attrs: { coordinates: [c0, c2] },
-          styles: { color: '#3498db', size: 1.5 },
+          styles: { color: COLOR_FORECAST, size: 1.5 },
         },
         {
           type: 'polygon',
@@ -47,7 +48,7 @@ const forecast: OverlayTemplate = {
           type: 'text',
           ignoreEvent: true,
           attrs: { x: c2.x, y: c2.y - 12, text: 'Forecast', baseline: 'bottom' },
-          styles: { color: '#3498db', size: 11 },
+          styles: { color: COLOR_FORECAST, size: 11 },
         },
       ]
     }

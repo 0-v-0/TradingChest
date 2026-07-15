@@ -8,7 +8,7 @@
  * 参数: period
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcLinReg } from '../utils'
+import { calcLinReg, extractField } from '../utils'
 
 type LinearRegressionForecastResult = { forecast: number; slope: number }
 
@@ -22,8 +22,7 @@ const linearRegressionForecast: IndicatorTemplate<LinearRegressionForecastResult
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
-    const closes: number[] = new Array(n)
-    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
     const { slope, intercept } = calcLinReg(closes, period)
     const result: LinearRegressionForecastResult[] = new Array(n)
     for (let i = 0; i < n; i++) {

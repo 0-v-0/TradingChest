@@ -33,6 +33,9 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
   let prevLen = 0
   let prevSecondLastTs = 0
   let cached: Array<Record<string, unknown>> = []
+  // Pre-allocated tail buffer to avoid slice() allocation on every tick
+  let tailBuf: KLineData[] = []
+  let tailBufCap = 0
 
   return (dataList: KLineData[], indicator: Indicator): Array<Record<string, unknown>> => {
     const len = dataList.length
@@ -69,8 +72,17 @@ export function wrapWithIncrementalCalc(fullCalc: CalcFn, lookback: number): Cal
 
     // Incremental path: recalculate only the trailing `lookback` candles.
     const startIdx = Math.max(0, len - lookback)
-    const tailData = dataList.slice(startIdx)
-    const tailResult = fullCalc(tailData, indicator)
+    const needed = len - startIdx
+
+    // Reuse tail buffer if already large enough; otherwise grow it once
+    if (tailBufCap < needed) {
+      tailBuf = new Array<KLineData>(needed)
+      tailBufCap = needed
+    }
+    for (let i = 0; i < needed; i++) {
+      tailBuf[i] = dataList[startIdx + i]
+    }
+    const tailResult = fullCalc(tailBuf as KLineData[], indicator)
 
     // Merge preserved head with freshly computed tail.
     cached.length = startIdx

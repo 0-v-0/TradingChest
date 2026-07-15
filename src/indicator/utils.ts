@@ -9,12 +9,77 @@ import type { KLineData } from 'klinecharts'
  */
 
 /**
+ * RSI (Relative Strength Index) using Wilder smoothing (RMA)
+ * Returns the RSI values array; indices before the seed are NaN.
+ * Uses calcRMA internally for gains and losses.
+ */
+export function calcRSI(closes: number[], period: number): number[] {
+  const n = closes.length
+  const result = new Array<number>(n)
+  if (n < 2) {
+    result[0] = NaN
+    return result
+  }
+
+  const gains = new Array<number>(n)
+  const losses = new Array<number>(n)
+  gains[0] = 0
+  losses[0] = 0
+  for (let i = 1; i < n; i++) {
+    const diff = closes[i] - closes[i - 1]
+    gains[i] = diff > 0 ? diff : 0
+    losses[i] = diff < 0 ? -diff : 0
+  }
+
+  const avgGain = calcRMA(gains, period)
+  const avgLoss = calcRMA(losses, period)
+
+  for (let i = 0; i < n; i++) {
+    if (isNaN(avgGain[i]) || isNaN(avgLoss[i])) {
+      result[i] = NaN
+    } else {
+      const rs = avgLoss[i] !== 0 ? avgGain[i] / avgLoss[i] : 0
+      result[i] = 100 - 100 / (1 + rs)
+    }
+  }
+  return result
+}
+
+/**
+ * Binary search: find leftmost insertion point for val in sorted array.
+ * Returns the index where val should be inserted to keep array sorted.
+ */
+export function bisectLeft(arr: readonly number[], val: number): number {
+  let lo = 0, hi = arr.length
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1
+    if (arr[mid] < val) lo = mid + 1
+    else hi = mid
+  }
+  return lo
+}
+
+/**
+ * Binary search: find rightmost insertion point for val in sorted array.
+ * Returns the index after the last element equal to val.
+ */
+export function bisectRight(arr: readonly number[], val: number): number {
+  let lo = 0, hi = arr.length
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1
+    if (arr[mid] <= val) lo = mid + 1
+    else hi = mid
+  }
+  return lo
+}
+
+/**
  * 从 KLineData 数组中提取单个字段为预分配的 number[]
  * 避免逐次 .map() 产生中间数组，统一预分配模式
  */
 export function extractField<T extends KLineData>(
   dataList: readonly T[],
-  field: keyof T & string,
+  field: keyof T,
 ): number[] {
   const n = dataList.length
   const result = new Array<number>(n)
@@ -233,6 +298,39 @@ export function calcHighest(data: number[], period: number): number[] {
   return slidingWindow(data, period, { compare: '<=', returnIndex: false })
 }
 
+
+/**
+ * 区间最高值 + 最低值（Combined Highest & Lowest in one pass）
+ * 同时维护两个单调双端队列，仅遍历数据一次
+ * 比 calcHighest + calcLowest 各跑一次少一半迭代
+ */
+export function calcHighestLowest(data: number[], period: number): { highest: number[], lowest: number[] } {
+  const n = data.length
+  const highest: number[] = new Array(n).fill(NaN)
+  const lowest: number[] = new Array(n).fill(NaN)
+  if (period <= 0) return { highest, lowest }
+  const maxDeque: number[] = [] // monotonic decreasing (front = max)
+  const minDeque: number[] = [] // monotonic increasing (front = min)
+  let maxHead = 0
+  let minHead = 0
+  for (let i = 0; i < n; i++) {
+    // Maintain max deque (pop smaller-or-equal values)
+    while (maxDeque.length > maxHead && data[maxDeque[maxDeque.length - 1]] <= data[i]) maxDeque.pop()
+    maxDeque.push(i)
+    if (maxDeque[maxHead] <= i - period) maxHead++
+
+    // Maintain min deque (pop larger-or-equal values)
+    while (minDeque.length > minHead && data[minDeque[minDeque.length - 1]] >= data[i]) minDeque.pop()
+    minDeque.push(i)
+    if (minDeque[minHead] <= i - period) minHead++
+
+    if (i >= period - 1) {
+      highest[i] = data[maxDeque[maxHead]]
+      lowest[i] = data[minDeque[minHead]]
+    }
+  }
+  return { highest, lowest }
+}
 
 /**
  * 区间最低值（Lowest value in period）

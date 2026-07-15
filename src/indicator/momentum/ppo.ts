@@ -6,7 +6,7 @@
  * Signal = EMA(PPO, signalPeriod)
  * Histogram = PPO - Signal
  */
-import { calcEMA } from '../utils'
+import { calcEMA, extractField } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type PpoResult = {
@@ -29,8 +29,7 @@ const ppo: IndicatorTemplate<PpoResult, number> = {
     const result: PpoResult[] = new Array(len)
 
     // ---- 提取收盘价序列 ----
-    const closes = new Array<number>(len)
-    for (let i = 0; i < len; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
 
     // ---- 计算快速 EMA ----
     const emaFast = calcEMA(closes, fastPeriod)
@@ -47,26 +46,19 @@ const ppo: IndicatorTemplate<PpoResult, number> = {
     }
 
     // ---- 计算 Signal 线（对 PPO 做 EMA） ----
+    // Slice the valid portion (after slow EMA matures) and use calcEMA
+    const slowStart = slowPeriod - 1
+    const validLen = len - slowStart
+    const validPpo = new Array<number>(validLen)
+    for (let i = 0; i < validLen; i++) {
+      validPpo[i] = ppoLine[i + slowStart]
+    }
+    const signalEma = calcEMA(validPpo, signalPeriod)
+
     const signalLine: number[] = Array(len).fill(NaN)
-    const kSignal = 2 / (signalPeriod + 1)
-    let prevSignal = NaN
-    let signalSeedCount = 0
-    let signalSeedSum = 0
-
-    for (let i = 0; i < len; i++) {
-      if (isNaN(ppoLine[i])) continue
-
-      if (isNaN(prevSignal)) {
-        signalSeedCount++
-        signalSeedSum += ppoLine[i]
-        if (signalSeedCount === signalPeriod) {
-          prevSignal = signalSeedSum / signalPeriod
-          signalLine[i] = prevSignal
-        }
-      } else {
-        prevSignal = ppoLine[i] * kSignal + prevSignal * (1 - kSignal)
-        signalLine[i] = prevSignal
-      }
+    for (let i = slowStart; i < len; i++) {
+      const si = i - slowStart
+      signalLine[i] = si < signalEma.length ? signalEma[si] : NaN
     }
 
     // ---- 组装输出 ----

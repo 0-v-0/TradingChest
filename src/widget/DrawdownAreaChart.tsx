@@ -21,33 +21,41 @@ export const DrawdownAreaChart: Component<DrawdownAreaChartProps> = (props) => {
   const height = props.height ?? DEFAULT_HEIGHT
   const usableWidth = WIDTH - PAD_X * 2
   const usableHeight = height - PAD_Y * 2
-  const values = props.series.map((point) => point.drawdown_pct).filter(finite)
+  // Single pass: extract values, find min/max, build points
   let minValue = -0.01
   let maxValue = 0
-  for (const v of values) {
-    if (v < minValue) minValue = v
-    if (v > maxValue) maxValue = v
+  const points: [number, number][] = []
+  let latest: number | undefined
+  const len = props.series.length
+  for (let i = 0; i < len; i++) {
+    const value = props.series[i].drawdown_pct
+    if (finite(value)) {
+      if (value < minValue) minValue = value
+      if (value > maxValue) maxValue = value
+      points.push([
+        len <= 1 ? PAD_X + usableWidth / 2 : PAD_X + (i / (len - 1)) * usableWidth,
+        0, // placeholder, will compute yFor after range is known
+      ])
+      latest = value
+    }
   }
   const range = Math.max(maxValue - minValue, 0.01)
   const yFor = (value: number) => PAD_Y + ((maxValue - value) / range) * usableHeight
-  const xFor = (index: number) => {
-    if (props.series.length <= 1) {
-      return PAD_X + usableWidth / 2
+  // Fill in y-coordinates now that range is known
+  let pi = 0
+  for (let i = 0; i < len; i++) {
+    const value = props.series[i].drawdown_pct
+    if (finite(value)) {
+      points[pi][1] = yFor(value)
+      pi++
     }
-    return PAD_X + (index / (props.series.length - 1)) * usableWidth
   }
-  const points = props.series
-    .map((point, index): [number, number] | null =>
-      finite(point.drawdown_pct) ? [xFor(index), yFor(point.drawdown_pct)] : null,
-    )
-    .filter((point): point is [number, number] => point !== null)
   const zeroY = yFor(0)
   const linePath = points.length > 0 ? pathFromPoints(points) : ''
   const areaPath =
     points.length > 0
       ? `${linePath} L ${points[points.length - 1][0].toFixed(2)} ${zeroY.toFixed(2)} L ${points[0][0].toFixed(2)} ${zeroY.toFixed(2)} Z`
       : ''
-  const latest = values.at(-1)
 
   return (
     <div

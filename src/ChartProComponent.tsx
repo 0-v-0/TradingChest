@@ -40,6 +40,7 @@ import { ReplayEngine } from './replay/ReplayEngine'
 import { OverlayCreateCommand, OverlayRemoveCommand } from './shortcut/overlayCommands'
 import type { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
+import { MAIN_PANE_ID, COLOR_PRIMARY } from './types'
 import {
   PeriodBar,
   DrawingBar,
@@ -337,7 +338,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       if (points.length > 0 && widget) {
         const pixel = widget.convertToPixel(
           { timestamp: points[0].timestamp, value: points[0].value },
-          { paneId: 'candle_pane' },
+          { paneId: MAIN_PANE_ID },
         ) as Partial<Coordinate>
         x = (pixel?.x ?? 200) + OVERLAY_BAR_OFFSET_X
         y = (pixel?.y ?? 100) - OVERLAY_BAR_OFFSET_Y
@@ -347,7 +348,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         id: overlay.id,
         x: Math.max(100, x),
         y: Math.max(10, y),
-        color: '#1677ff',
+        color: COLOR_PRIMARY,
         fillColor: hasFill ? 'rgba(22, 119, 255, 0.15)' : undefined,
         lineWidth: 1,
         lineStyle: 'solid',
@@ -668,7 +669,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     })
 
     if (widget) {
-      const watermarkContainer = widget.getDom('candle_pane', 'main')
+      const watermarkContainer = widget.getDom(MAIN_PANE_ID, 'main')
       if (watermarkContainer) {
         const watermark = document.createElement('div')
         watermark.className = 'klinecharts-pro-watermark'
@@ -680,7 +681,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         watermarkContainer.appendChild(watermark)
       }
 
-      const priceUnitContainer = widget.getDom('candle_pane', 'yAxis')
+      const priceUnitContainer = widget.getDom(MAIN_PANE_ID, 'yAxis')
       priceUnitDom = document.createElement('span')
       priceUnitDom.className = 'klinecharts-pro-price-unit'
       priceUnitContainer?.appendChild(priceUnitDom)
@@ -693,7 +694,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     ;(async () => {
       const mainPromises = mainIndicators().map(
-        (indicator) => createIndicator(widget, indicator, true, 'candle_pane'),
+        (indicator) => createIndicator(widget, indicator, true, MAIN_PANE_ID),
       )
       await Promise.all(mainPromises)
       if (disposed) return
@@ -783,9 +784,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
             }
             break
           case 'close':
-            if (d.paneId === 'candle_pane') {
+            if (d.paneId === MAIN_PANE_ID) {
               const newMainIndicators = [...mainIndicators()]
-              widget?.removeIndicator({ paneId: 'candle_pane', name: d.indicatorName })
+              widget?.removeIndicator({ paneId: MAIN_PANE_ID, name: d.indicatorName })
               newMainIndicators.splice(newMainIndicators.indexOf(d.indicatorName), 1)
               setMainIndicators(newMainIndicators)
               invalidateIndicatorCache()
@@ -846,7 +847,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           if (Object.keys(paneGroups).length > 0) {
             const dataIndex = d.dataIndex as number | undefined
             for (const [paneId, indicators] of Object.entries(paneGroups)) {
-              if (paneId !== 'candle_pane') {
+              if (paneId !== MAIN_PANE_ID) {
                 rows.push({ label: `[${paneId}]`, value: '', color: '#888' })
               }
               for (const ind of indicators) {
@@ -981,10 +982,10 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           onMainIndicatorChange={async (data) => {
             const newMainIndicators = [...mainIndicators()]
             if (data.added) {
-              await createIndicator(widget, data.name, true, 'candle_pane')
+              await createIndicator(widget, data.name, true, MAIN_PANE_ID)
               newMainIndicators.push(data.name)
             } else {
-              widget?.removeIndicator({ paneId: 'candle_pane', name: data.name })
+              widget?.removeIndicator({ paneId: MAIN_PANE_ID, name: data.name })
               newMainIndicators.splice(newMainIndicators.indexOf(data.name), 1)
             }
             setMainIndicators(newMainIndicators)
@@ -1208,7 +1209,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           visible={selectedOverlay() !== null}
           position={{ x: selectedOverlay()?.x ?? 0, y: selectedOverlay()?.y ?? 0 }}
           overlayId={selectedOverlay()?.id ?? ''}
-          currentColor={selectedOverlay()?.color ?? '#1677ff'}
+          currentColor={selectedOverlay()?.color ?? COLOR_PRIMARY}
           currentFillColor={selectedOverlay()?.fillColor}
           currentLineWidth={selectedOverlay()?.lineWidth ?? 1}
           currentLineStyle={selectedOverlay()?.lineStyle ?? 'solid'}

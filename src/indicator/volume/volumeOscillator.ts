@@ -4,7 +4,7 @@
  * 正值表示短期成交量均值高于长期，成交量放大
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcEMA } from '../utils'
+import { calcEMA, extractField } from '../utils'
 
 type VolumeOscillatorResult = { vo: number }
 
@@ -19,7 +19,7 @@ const volumeOscillator: IndicatorTemplate<VolumeOscillatorResult, number> = {
     const n = dataList.length
     const result: VolumeOscillatorResult[] = new Array(n)
 
-    const volume = dataList.map(k => k.volume ?? 0)
+    const volume = extractField(dataList, 'volume')
     const fastEma = calcEMA(volume, fastPeriod)
     const slowEma = calcEMA(volume, slowPeriod)
 

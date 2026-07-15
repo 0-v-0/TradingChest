@@ -4,7 +4,7 @@
  * 通道宽度基于残差总体标准差
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcLinReg } from '../utils'
+import { calcLinReg, extractField } from '../utils'
 
 type LinearRegressionResult = { value: number; upper: number; lower: number }
 
@@ -19,8 +19,7 @@ const linearRegression: IndicatorTemplate<LinearRegressionResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
-    const closes: number[] = new Array(n)
-    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
     const { slope, intercept, stdResid } = calcLinReg(closes, period)
     const result: LinearRegressionResult[] = new Array(n)
     for (let i = 0; i < n; i++) {

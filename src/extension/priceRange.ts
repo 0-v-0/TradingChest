@@ -1,5 +1,5 @@
 import type { OverlayTemplate } from 'klinecharts'
-import { createRectCoordinates, createRectBorderLines } from './utils'
+import { createRectCoordinates, createRectBorderLines, computePriceRangeFigures } from './utils'
 
 /**
  * 价格区间测量工具
@@ -20,20 +20,10 @@ const priceRange: OverlayTemplate = {
       const price2 = points[1].value
       if (price1 == null || price2 == null) return []
 
-      // 计算价格差和涨跌幅
-      const priceDiff = price2 - price1
-      const percentChange = (priceDiff / price1) * 100
-      const isUp = priceDiff >= 0
+      const { priceDiff, percentChange, fillColor, borderColor, sign, bars } = computePriceRangeFigures(
+        price1, price2, coordinates[0].x, coordinates[1].x,
+      )
 
-      // 根据 x 坐标近似估算 K 线根数
-      const bars = Math.abs(Math.round((coordinates[1].x - coordinates[0].x) / 10))
-
-      // 上涨绿色，下跌红色
-      const fillColor = isUp ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)'
-      const borderColor = isUp ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'
-
-      // 格式化显示文本
-      const sign = priceDiff >= 0 ? '+' : ''
       const displayText = `${sign}${priceDiff.toFixed(precision)}  (${sign}${percentChange.toFixed(2)}%)  ${bars} 根`
 
       // 文本位置：矩形中间

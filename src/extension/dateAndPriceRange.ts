@@ -1,5 +1,5 @@
 import type { OverlayTemplate } from 'klinecharts'
-import { formatDuration, createRectCoordinates, createRectBorderLines } from './utils'
+import { formatDuration, createRectCoordinates, createRectBorderLines, computePriceRangeFigures } from './utils'
 
 /**
  * 综合测量工具（类似 TradingView 的日期和价格区间测量）
@@ -22,24 +22,14 @@ const dateAndPriceRange: OverlayTemplate = {
       const ts2 = points[1].timestamp
       if (price1 == null || price2 == null || ts1 == null || ts2 == null) return []
 
-      // 计算价格差和涨跌幅
-      const priceDiff = price2 - price1
-      const percentChange = (priceDiff / price1) * 100
-      const isUp = priceDiff >= 0
-
-      // 根据 x 坐标近似估算 K 线根数
-      const bars = Math.abs(Math.round((coordinates[1].x - coordinates[0].x) / 10))
+      const { priceDiff, percentChange, fillColor, borderColor, sign, bars } = computePriceRangeFigures(
+        price1, price2, coordinates[0].x, coordinates[1].x,
+      )
 
       // 计算时间跨度
       const timeDiffMs = Math.abs(ts2 - ts1)
       const durationText = formatDuration(timeDiffMs)
 
-      // 上涨绿色，下跌红色
-      const fillColor = isUp ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)'
-      const borderColor = isUp ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'
-
-      // 格式化显示文本：价格差 / 涨跌幅 / K 线数 / 时间
-      const sign = priceDiff >= 0 ? '+' : ''
       const line1 = `${sign}${priceDiff.toFixed(precision)}  (${sign}${percentChange.toFixed(2)}%)`
       const line2 = `${bars} 根  |  ${durationText}`
 

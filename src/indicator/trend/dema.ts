@@ -4,7 +4,7 @@
  * 比普通 EMA 更贴近价格，滞后更小
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcMultiLayerEMA } from '../utils'
+import { calcMultiLayerEMA, extractField } from '../utils'
 
 type DemaResult = { dema: number }
 
@@ -15,8 +15,7 @@ const dema: IndicatorTemplate<DemaResult, number> = {
   figures: [{ key: 'dema', title: 'DEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
-    const closes = new Array<number>(n)
-    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
 
     const [ema1, ema2] = calcMultiLayerEMA(closes, period, 2)
 

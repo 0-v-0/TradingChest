@@ -1,5 +1,6 @@
 import type { OverlayTemplate, DeepPartial, OverlayStyle } from 'klinecharts'
 import { DASH_DASHED } from '../core/buildStyles'
+import { COLOR_ALERT } from '../types'
 
 const alertLine: OverlayTemplate = {
   name: 'alertLine',
@@ -8,7 +9,7 @@ const alertLine: OverlayTemplate = {
   needDefaultXAxisFigure: false,
   needDefaultYAxisFigure: true,
   createPointFigures: ({ coordinates, overlay, bounding }) => {
-    const color = (overlay.styles as DeepPartial<OverlayStyle>)?.line?.color ?? '#ff9800'
+    const color = (overlay.styles as DeepPartial<OverlayStyle>)?.line?.color ?? COLOR_ALERT
     if (coordinates.length < 1) return []
     const y = coordinates[0].y
     return [

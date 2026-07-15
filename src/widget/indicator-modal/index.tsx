@@ -2,6 +2,7 @@ import { createSignal, createMemo, For, Show, type Component, type Accessor } fr
 import { Modal, List, Checkbox, Input } from '../../component'
 import t from '../../i18n'
 import { indicatorCategories } from '../../indicator'
+import { MAIN_PANE_ID } from '../../types'
 import {
   addFavoriteIndicator,
   removeFavoriteIndicator,
@@ -175,7 +176,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
                 class="row main-indicator"
                 data-name={name}
                 onClick={() => {
-                  props.onMainIndicatorChange({ name, paneId: 'candle_pane', added: !checked() })
+                  props.onMainIndicatorChange({ name, paneId: MAIN_PANE_ID, added: !checked() })
                 }}
               >
                 <Checkbox checked={checked()} label={t(name.toLowerCase(), props.lang) || name} />

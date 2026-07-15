@@ -4,7 +4,7 @@
  * 进一步减少滞后，比 DEMA 响应更快
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcMultiLayerEMA } from '../utils'
+import { calcMultiLayerEMA, extractField } from '../utils'
 
 type TemaResult = { tema: number }
 
@@ -15,8 +15,7 @@ const tema: IndicatorTemplate<TemaResult, number> = {
   figures: [{ key: 'tema', title: 'TEMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
-    const closes = new Array<number>(n)
-    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
 
     const [ema1, ema2, ema3] = calcMultiLayerEMA(closes, period, 3)
 

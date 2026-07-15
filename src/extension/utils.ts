@@ -154,6 +154,36 @@ export function formatDuration(ms: number): string {
   return `${seconds}秒`
 }
 
+/** Approximate pixel width per bar for estimating bar count from x-distance */
+export const BAR_WIDTH_APPROX = 10
+
+/** Computed price range figures shared by priceRange and dateAndPriceRange overlays */
+export interface PriceRangeFigures {
+  priceDiff: number
+  percentChange: number
+  isUp: boolean
+  fillColor: string
+  borderColor: string
+  sign: string
+  bars: number
+}
+
+export function computePriceRangeFigures(
+  price1: number,
+  price2: number,
+  x1: number,
+  x2: number,
+): PriceRangeFigures {
+  const priceDiff = price2 - price1
+  const percentChange = (priceDiff / price1) * 100
+  const isUp = priceDiff >= 0
+  const bars = Math.abs(Math.round((x2 - x1) / BAR_WIDTH_APPROX))
+  const fillColor = isUp ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)'
+  const borderColor = isUp ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'
+  const sign = priceDiff >= 0 ? '+' : ''
+  return { priceDiff, percentChange, isUp, fillColor, borderColor, sign, bars }
+}
+
 export function createWaveOverlay(name: string, totalStep: number): OverlayTemplate {
   return {
     name,

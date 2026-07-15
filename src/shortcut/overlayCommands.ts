@@ -20,6 +20,8 @@ export class OverlayCreateCommand implements Command {
       extendData: this.overlayData.extendData,
       styles: this.overlayData.styles,
       lock: this.overlayData.lock,
+      groupId: this.overlayData.groupId,
+      visible: this.overlayData.visible,
     })
   }
 }
@@ -38,6 +40,8 @@ export class OverlayRemoveCommand implements Command {
       extendData: this.overlayData.extendData,
       styles: this.overlayData.styles,
       lock: this.overlayData.lock,
+      groupId: this.overlayData.groupId,
+      visible: this.overlayData.visible,
     })
   }
 

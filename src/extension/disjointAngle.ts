@@ -1,4 +1,5 @@
 import { type OverlayTemplate } from 'klinecharts'
+import { COLOR_FORECAST } from '../types'
 
 const disjointAngle: OverlayTemplate = {
   name: 'disjointAngle',
@@ -34,7 +35,7 @@ const disjointAngle: OverlayTemplate = {
             y: coordinates[1].y - 10,
             text: angleText,
           },
-          styles: { color: '#3498db', size: 12 },
+          styles: { color: COLOR_FORECAST, size: 12 },
         },
       ]
     }

@@ -1,5 +1,5 @@
 import type { OverlayTemplate } from 'klinecharts'
-import { formatDuration } from './utils'
+import { formatDuration, BAR_WIDTH_APPROX } from './utils'
 
 /**
  * 时间区间测量工具
@@ -21,7 +21,7 @@ const dateRange: OverlayTemplate = {
       const timeDiffMs = Math.abs(ts2 - ts1)
 
       // 根据 x 坐标近似估算 K 线根数
-      const bars = Math.abs(Math.round((coordinates[1].x - coordinates[0].x) / 10))
+      const bars = Math.abs(Math.round((coordinates[1].x - coordinates[0].x) / BAR_WIDTH_APPROX))
 
       // 格式化时间跨度为可读文本
       const durationText = formatDuration(timeDiffMs)

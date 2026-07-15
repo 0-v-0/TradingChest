@@ -1,4 +1,5 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { COLOR_UP, COLOR_DOWN } from '../types'
 
 export interface PnFBox {
   priceLevel: number
@@ -103,6 +104,17 @@ export function calcPointAndFigure(dataList: KLineData[], boxSize: number, rever
   return columns
 }
 
+/** Cache key for PnF columns: data length + last timestamp + params */
+interface PnFCacheKey {
+  dataLen: number
+  lastTs: number
+  boxSize: number
+  reversal: number
+}
+
+let _pnfCacheKey: PnFCacheKey | null = null
+let _pnfCacheColumns: PnFColumn[] = []
+
 const pointAndFigure: IndicatorTemplate<object, number> = {
   name: 'PointAndFigure',
   shortName: 'PF',
@@ -118,7 +130,25 @@ const pointAndFigure: IndicatorTemplate<object, number> = {
     const adjustedBoxSize = Math.max(boxSize, 0.01)
     const adjustedReversal = Math.max(reversal, 1)
 
-    const columns = calcPointAndFigure(dataList, adjustedBoxSize, adjustedReversal)
+    // Cache columns: only recalculate when data or params change
+    const cacheKey: PnFCacheKey = {
+      dataLen: dataList.length,
+      lastTs: dataList[dataList.length - 1].timestamp,
+      boxSize: adjustedBoxSize,
+      reversal: adjustedReversal,
+    }
+    if (
+      !_pnfCacheKey ||
+      _pnfCacheKey.dataLen !== cacheKey.dataLen ||
+      _pnfCacheKey.lastTs !== cacheKey.lastTs ||
+      _pnfCacheKey.boxSize !== cacheKey.boxSize ||
+      _pnfCacheKey.reversal !== cacheKey.reversal
+    ) {
+      _pnfCacheColumns = calcPointAndFigure(dataList, adjustedBoxSize, adjustedReversal)
+      _pnfCacheKey = cacheKey
+    }
+
+    const columns = _pnfCacheColumns
     if (columns.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()
@@ -145,13 +175,13 @@ const pointAndFigure: IndicatorTemplate<object, number> = {
         const boxHeight = yBottom - yTop
 
         if (col.trend > 0) {
-          ctx.fillStyle = '#26a69a'
-          ctx.strokeStyle = '#26a69a'
+          ctx.fillStyle = COLOR_UP
+          ctx.strokeStyle = COLOR_UP
           ctx.fillRect(x - colWidth / 4, yTop, colWidth / 2, boxHeight)
           ctx.strokeRect(x - colWidth / 4, yTop, colWidth / 2, boxHeight)
         } else {
-          ctx.fillStyle = '#ef5350'
-          ctx.strokeStyle = '#ef5350'
+          ctx.fillStyle = COLOR_DOWN
+          ctx.strokeStyle = COLOR_DOWN
           ctx.beginPath()
           ctx.arc(x, yCenter, Math.min(colWidth / 4, boxHeight / 2.5), 0, Math.PI * 2)
           ctx.fill()

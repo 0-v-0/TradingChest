@@ -8,7 +8,7 @@
  * 输出范围 0-1（部分平台显示为 0-100，此处使用 0-1）
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcHighest, calcLowest, calcSMA_NaNAware } from '../utils'
+import { calcHighest, calcLowest, calcSMA_NaNAware, calcRSI, extractField } from '../utils'
 
 type StochasticRsiResult = { k: number; d: number }
 
@@ -23,32 +23,9 @@ const stochasticRsi: IndicatorTemplate<StochasticRsiResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [rsiPeriod, stochPeriod, kSmooth, dSmooth] }) => {
     const len = dataList.length
 
-    // ---- 第一步：计算 RSI（Wilder 平滑法） ----
-    const rsi: number[] = Array(len).fill(NaN)
-    let avgGain = 0
-    let avgLoss = 0
-
-    for (let i = 1; i < len; i++) {
-      const diff = dataList[i].close - dataList[i - 1].close
-      const gain = diff > 0 ? diff : 0
-      const loss = diff < 0 ? -diff : 0
-
-      if (i < rsiPeriod) {
-        // 累积阶段
-        avgGain += gain
-        avgLoss += loss
-      } else if (i === rsiPeriod) {
-        // 首个 RSI：用 SMA 作为种子
-        avgGain = (avgGain + gain) / rsiPeriod
-        avgLoss = (avgLoss + loss) / rsiPeriod
-        rsi[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss)
-      } else {
-        // Wilder 递归平滑
-        avgGain = (avgGain * (rsiPeriod - 1) + gain) / rsiPeriod
-        avgLoss = (avgLoss * (rsiPeriod - 1) + loss) / rsiPeriod
-        rsi[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss)
-      }
-    }
+    // ---- 第一步：计算 RSI ----
+    const closes = extractField(dataList, 'close')
+    const rsi = calcRSI(closes, rsiPeriod)
 
     // ---- 第二步：用滑动窗口 O(n) 计算 StochRSI ----
     // RSI 从 rsiPeriod 起连续有效，提取有效段后用 calcHighest/Lowest

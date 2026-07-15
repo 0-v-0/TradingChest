@@ -1,4 +1,22 @@
 import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate, Nullable } from 'klinecharts'
+
+// ─── Project-wide constants ───────────────────────────────────────────
+
+/** klinecharts 主图 pane ID */
+export const MAIN_PANE_ID = 'candle_pane'
+
+/** Trend / up color (green) */
+export const COLOR_UP = '#26a69a'
+/** Trend / down color (red) */
+export const COLOR_DOWN = '#ef5350'
+/** Primary accent (blue) */
+export const COLOR_PRIMARY = '#1677ff'
+/** Alert / warning accent (orange) */
+export const COLOR_ALERT = '#ff9800'
+/** Forecast / secondary blue */
+export const COLOR_FORECAST = '#3498db'
+/** Neutral gray (kagi flat segments) */
+export const COLOR_NEUTRAL = '#999999'
 import type KeyboardShortcutManager from './shortcut'
 import type { AlertConfig, AlertEvent } from './alert/types'
 

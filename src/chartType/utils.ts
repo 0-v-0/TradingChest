@@ -2,6 +2,7 @@
  * 图表类型共享工具函数
  */
 import type { KLineData } from 'klinecharts'
+import { COLOR_UP, COLOR_DOWN } from '../types'
 
 /**
  * 平均真实波幅（Average True Range）
@@ -46,7 +47,7 @@ export function drawBricks<T>(
     const yBottom = yAxis.convertToPixel(getLow(brick))
     const height = Math.max(yBottom - yTop, 1)
 
-    const color = getTrend(brick) > 0 ? '#26a69a' : '#ef5350'
+    const color = getTrend(brick) > 0 ? COLOR_UP : COLOR_DOWN
     ctx.fillStyle = color
     ctx.fillRect(x + gap, yTop, brickWidth - gap * 2, height)
     ctx.strokeStyle = color

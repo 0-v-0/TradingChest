@@ -6,6 +6,7 @@
  * 其中 ROC(x, n) = (x / x[n周期前] - 1) * 100
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { calcWMA } from '../utils'
 
 type CoppockCurveResult = { coppock: number }
 
@@ -22,11 +23,8 @@ const coppockCurve: IndicatorTemplate<CoppockCurveResult, number> = {
     const maxRocPeriod = Math.max(roc1Period, roc2Period)
 
     // 计算两条 ROC 之和
-    const rocSum: number[] = Array(len).fill(NaN)
-    for (let i = 0; i < len; i++) {
-      if (i < maxRocPeriod) {
-        continue
-      }
+    const rocSum: number[] = new Array<number>(len).fill(NaN)
+    for (let i = maxRocPeriod; i < len; i++) {
       const closeNow = dataList[i].close
       const close1 = dataList[i - roc1Period].close
       const close2 = dataList[i - roc2Period].close
@@ -40,34 +38,10 @@ const coppockCurve: IndicatorTemplate<CoppockCurveResult, number> = {
     }
 
     // 对 rocSum 做 WMA
-    // WMA 权重：1, 2, 3, ..., wmaPeriod
-    const weightSum = (wmaPeriod * (wmaPeriod + 1)) / 2
+    const wmaResult = calcWMA(rocSum, wmaPeriod)
 
     for (let i = 0; i < len; i++) {
-      // 需要从 rocSum 中取连续 wmaPeriod 个有效值
-      if (i < maxRocPeriod + wmaPeriod - 1) {
-        result[i] = { coppock: NaN }
-        continue
-      }
-
-      // 检查窗口内是否所有 rocSum 值都有效
-      let valid = true
-      let weighted = 0
-      for (let j = 0; j < wmaPeriod; j++) {
-        const idx = i - wmaPeriod + 1 + j
-        if (isNaN(rocSum[idx])) {
-          valid = false
-          break
-        }
-        // 权重从 1（最旧）到 wmaPeriod（最新）
-        weighted += rocSum[idx] * (j + 1)
-      }
-
-      let coppock = NaN
-      if (valid) {
-        coppock = weighted / weightSum
-      }
-      result[i] = { coppock }
+      result[i] = { coppock: wmaResult[i] }
     }
 
     return result

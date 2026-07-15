@@ -9,7 +9,7 @@
  *    其中系数由 volume factor (vf) 决定
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcMultiLayerEMA } from '../utils'
+import { calcMultiLayerEMA, extractField } from '../utils'
 
 type T3Result = { t3: number }
 
@@ -26,8 +26,7 @@ const t3: IndicatorTemplate<T3Result, number> = {
     const c3 = -6 * vf * vf - 3 * vf - 3 * vf * vf * vf
     const c4 = 1 + 3 * vf + vf * vf * vf + 3 * vf * vf
 
-    const closes = new Array<number>(n)
-    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
 
     const [, , e3, e4, e5, e6] = calcMultiLayerEMA(closes, period, 6)
 

@@ -10,7 +10,7 @@
  * 参数: rsiPeriod, streakRsiPeriod, rankPeriod
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcRMA } from '../utils'
+import { calcRMA, calcRSI, extractField, bisectLeft, bisectRight } from '../utils'
 
 type ConnorsRsiResult = { crsi: number }
 
@@ -25,21 +25,8 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
     const n = dataList.length
 
     // 1. 计算标准 RSI
-    const gains = new Array<number>(n)
-    const losses = new Array<number>(n)
-    for (let i = 0; i < n; i++) {
-      if (i === 0) {
-        gains[0] = 0
-        losses[0] = 0
-      } else {
-        const diff = dataList[i].close - dataList[i - 1].close
-        gains[i] = diff > 0 ? diff : 0
-        losses[i] = diff < 0 ? -diff : 0
-      }
-    }
-
-    const avgGain = calcRMA(gains, rsiPeriod)
-    const avgLoss = calcRMA(losses, rsiPeriod)
+    const closes = extractField(dataList, 'close')
+    const rsiValues = calcRSI(closes, rsiPeriod)
 
     // 2. 计算 Streak（连续涨跌天数）
     const streaks = new Array<number>(n)
@@ -88,24 +75,6 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
     }
     // 有序窗口：维护窗口内 change 值的排序副本，支持 O(log n) 插入/删除/排名
     const sortedWindow: number[] = []
-    function bisectLeft(arr: number[], val: number): number {
-      let lo = 0, hi = arr.length
-      while (lo < hi) {
-        const mid = (lo + hi) >> 1
-        if (arr[mid] < val) lo = mid + 1
-        else hi = mid
-      }
-      return lo
-    }
-    function bisectRight(arr: number[], val: number): number {
-      let lo = 0, hi = arr.length
-      while (lo < hi) {
-        const mid = (lo + hi) >> 1
-        if (arr[mid] <= val) lo = mid + 1
-        else hi = mid
-      }
-      return lo
-    }
     for (let i = 0; i < n; i++) {
       if (i === 0) {
         percentRanks[0] = NaN
@@ -139,16 +108,8 @@ const connorsRsi: IndicatorTemplate<ConnorsRsiResult, number> = {
     // 汇总
     const result: ConnorsRsiResult[] = new Array(n)
     for (let i = 0; i < n; i++) {
-      const ag = avgGain[i]
-      const al = avgLoss[i]
-      if (isNaN(ag) || isNaN(al)) {
-        result[i] = { crsi: NaN }
-        continue
-      }
-
-      // RSI
-      const rs = al !== 0 ? ag / al : 0
-      const rsi = 100 - 100 / (1 + rs)
+      // RSI (from calcRSI)
+      const rsi = rsiValues[i]
 
       // Streak RSI
       const sag = streakAvgGain[i]

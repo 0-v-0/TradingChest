@@ -28,6 +28,7 @@ import { ReplayEngine } from './replay/ReplayEngine'
 import KeyboardShortcutManager from './shortcut'
 import { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
+import { MAIN_PANE_ID, COLOR_ALERT } from './types'
 
 const DEFAULT_PERIODS: readonly Period[] = [
   { multiplier: 1, timespan: 'minute' as const, text: '1m' },
@@ -380,7 +381,7 @@ export default class KLineChartPro implements ChartPro {
       {
         name: 'TradeVis',
         extendData: { trades, _instanceId: this._instanceId },
-        paneId: (paneOptions as { id?: string })?.id ?? 'candle_pane',
+        paneId: (paneOptions as { id?: string })?.id ?? MAIN_PANE_ID,
       } as unknown as IndicatorCreate,
       true,
     )
@@ -395,7 +396,7 @@ export default class KLineChartPro implements ChartPro {
         name: 'alertLine',
         id: `alert_${config.id}`,
         points: [{ value: config.price }],
-        styles: { line: { color: config.color ?? '#ff9800' } },
+        styles: { line: { color: config.color ?? COLOR_ALERT } },
         lock: true,
       })
     }
@@ -414,7 +415,7 @@ export default class KLineChartPro implements ChartPro {
             name: 'alertLine',
             id: `alert_${id}`,
             points: [{ value: alert.price }],
-            styles: { line: { color: updates.color ?? alert.color ?? '#ff9800' } },
+            styles: { line: { color: updates.color ?? alert.color ?? COLOR_ALERT } },
             lock: true,
           })
         }
@@ -437,7 +438,7 @@ export default class KLineChartPro implements ChartPro {
   private _clearComparisons(): void {
     for (const [, indicatorName] of this._comparisons) {
       try {
-        this.getChart()?.removeIndicator({ paneId: 'candle_pane', name: indicatorName })
+        this.getChart()?.removeIndicator({ paneId: MAIN_PANE_ID, name: indicatorName })
       } catch {
         /* already disposing */
       }
@@ -502,7 +503,7 @@ export default class KLineChartPro implements ChartPro {
       },
     })
 
-    chart.createIndicator({ name: indicatorName, paneId: 'candle_pane' }, true)
+    chart.createIndicator({ name: indicatorName, paneId: MAIN_PANE_ID }, true)
     this._comparisons.set(symbol.ticker, indicatorName)
   }
 
@@ -510,7 +511,7 @@ export default class KLineChartPro implements ChartPro {
     this._assertNotDisposed()
     const indicatorName = this._comparisons.get(ticker)
     if (indicatorName) {
-      this.getChart()?.removeIndicator({ paneId: 'candle_pane', name: indicatorName })
+      this.getChart()?.removeIndicator({ paneId: MAIN_PANE_ID, name: indicatorName })
       this._comparisons.delete(ticker)
     }
   }

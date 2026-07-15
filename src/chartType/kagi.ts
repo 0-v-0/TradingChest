@@ -1,4 +1,5 @@
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
+import { COLOR_UP, COLOR_DOWN, COLOR_NEUTRAL } from '../types'
 
 export interface KagiSegment {
   kagiOpen: number
@@ -99,6 +100,16 @@ export function calcKagi(dataList: KLineData[], reversal: number): KagiSegment[]
   return segments
 }
 
+/** Cache key for Kagi segments: data length + last timestamp + reversal */
+interface KagiCacheKey {
+  dataLen: number
+  lastTs: number
+  reversal: number
+}
+
+let _kagiCacheKey: KagiCacheKey | null = null
+let _kagiCacheSegments: KagiSegment[] = []
+
 const kagi: IndicatorTemplate<object, number> = {
   name: 'Kagi',
   shortName: 'KG',
@@ -111,8 +122,25 @@ const kagi: IndicatorTemplate<object, number> = {
     const dataList = chart.getDataList()
     if (!dataList || dataList.length < 2) return false
 
-    reversal = Math.max(1, reversal)
-    const segments = calcKagi(dataList, reversal)
+    const adjustedReversal = Math.max(1, reversal)
+
+    // Cache segments: only recalculate when data or reversal changes
+    const cacheKey: KagiCacheKey = {
+      dataLen: dataList.length,
+      lastTs: dataList[dataList.length - 1].timestamp,
+      reversal: adjustedReversal,
+    }
+    if (
+      !_kagiCacheKey ||
+      _kagiCacheKey.dataLen !== cacheKey.dataLen ||
+      _kagiCacheKey.lastTs !== cacheKey.lastTs ||
+      _kagiCacheKey.reversal !== cacheKey.reversal
+    ) {
+      _kagiCacheSegments = calcKagi(dataList, adjustedReversal)
+      _kagiCacheKey = cacheKey
+    }
+
+    const segments = _kagiCacheSegments
     if (segments.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()
@@ -128,7 +156,7 @@ const kagi: IndicatorTemplate<object, number> = {
 
       if (seg.trend === 0) {
         const y = yAxis.convertToPixel(seg.kagiOpen)
-        ctx.strokeStyle = '#999999'
+        ctx.strokeStyle = COLOR_NEUTRAL
         ctx.lineWidth = 1.5
         ctx.beginPath()
         ctx.moveTo(x - segWidth / 4, y)
@@ -137,7 +165,7 @@ const kagi: IndicatorTemplate<object, number> = {
       } else if (seg.trend > 0) {
         const yTop = yAxis.convertToPixel(seg.kagiHigh)
         const yBottom = yAxis.convertToPixel(seg.kagiLow)
-        ctx.strokeStyle = '#26a69a'
+        ctx.strokeStyle = COLOR_UP
         ctx.lineWidth = 3
         ctx.beginPath()
         ctx.moveTo(x, yTop)
@@ -146,7 +174,7 @@ const kagi: IndicatorTemplate<object, number> = {
       } else {
         const yTop = yAxis.convertToPixel(seg.kagiHigh)
         const yBottom = yAxis.convertToPixel(seg.kagiLow)
-        ctx.strokeStyle = '#ef5350'
+        ctx.strokeStyle = COLOR_DOWN
         ctx.lineWidth = 1
         ctx.beginPath()
         ctx.moveTo(x, yTop)

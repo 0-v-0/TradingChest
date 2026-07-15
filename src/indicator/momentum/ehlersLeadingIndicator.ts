@@ -11,7 +11,7 @@
  * 参数: period, K(导数增益系数)
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcEMA } from '../utils'
+import { calcEMA, extractField } from '../utils'
 
 type EhlersLeadingResult = {
   lead: number
@@ -28,7 +28,7 @@ const ehlersLeadingIndicator: IndicatorTemplate<EhlersLeadingResult, number> = {
   ],
   calc: (dataList: KLineData[], { calcParams: [period, k] }) => {
     const n = dataList.length
-    const close = dataList.map(d => d.close)
+    const close = extractField(dataList, 'close')
 
     // 2-pole Butterworth 高通滤波
     // 角频率

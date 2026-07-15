@@ -10,7 +10,7 @@
  * 牛力 > 0 表示多方控制，熊力 < 0 表示空方控制
  * EMA 权重因子 k = 2 / (n + 1)，首个有效值使用 SMA 种子
  */
-import { calcEMA } from '../utils'
+import { calcEMA, extractField } from '../utils'
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
 
 type ElderRayResult = { bullPower: number; bearPower: number }
@@ -26,8 +26,7 @@ const elderRay: IndicatorTemplate<ElderRayResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
     const result: ElderRayResult[] = new Array(n)
-    const closes = new Array<number>(n)
-    for (let i = 0; i < n; i++) closes[i] = dataList[i].close
+    const closes = extractField(dataList, 'close')
     const ema = calcEMA(closes, period)
 
     for (let i = 0; i < n; i++) {
