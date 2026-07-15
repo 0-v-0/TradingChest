@@ -11,11 +11,14 @@ export interface SymbolSearchModalProps {
   onClose: () => void
 }
 
+const SEARCH_DEBOUNCE_MS = 300
+
 const SymbolSearchModal: Component<SymbolSearchModalProps> = (props) => {
   void props.localeKey
   const [value, setValue] = createSignal('')
-
-  const [symbolList] = createResource(value, props.datafeed.searchSymbols.bind(props.datafeed))
+  const [debouncedValue, setDebouncedValue] = createSignal('')
+  const [symbolList] = createResource(debouncedValue, props.datafeed.searchSymbols.bind(props.datafeed))
+  let searchTimer: ReturnType<typeof setTimeout> | undefined
 
   return (
     <Modal title={t('symbol_search', props.lang)} width={600} onClose={props.onClose}>
@@ -31,6 +34,8 @@ const SymbolSearchModal: Component<SymbolSearchModalProps> = (props) => {
         onChange={(v) => {
           const va = `${v}`
           setValue(va)
+          clearTimeout(searchTimer)
+          searchTimer = setTimeout(() => setDebouncedValue(va), SEARCH_DEBOUNCE_MS)
         }}
       />
       <List

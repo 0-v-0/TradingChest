@@ -22,9 +22,9 @@ const SettingModal: Component<SettingModalProps> = (props) => {
   const update = (option: SettingOption, newValue: unknown) => {
     const style = {} as Record<string, unknown>
     deepSet(style, option.key, newValue)
-    const ss = utils.clone(styles())
-    deepSet(ss as unknown as Record<string, unknown>, option.key, newValue)
-    setStyles(ss)
+    const current = styles() as unknown as Record<string, unknown>
+    deepSet(current, option.key, newValue)
+    setStyles({ ...current } as unknown as Styles)
     props.onChange(style)
   }
 

@@ -109,10 +109,9 @@ const zigzag: IndicatorTemplate<ZigzagResult, number> = {
     }
 
     // 第二步：在相邻转折点之间做线性插值，生成连续折线
-    const result: ZigzagResult[] = Array(dataList.length)
-    for (let i = 0; i < dataList.length; i++) {
-      result[i] = { zigzag: NaN }
-    }
+    const NAN_RESULT = { zigzag: NaN }
+    const result: ZigzagResult[] = new Array(dataList.length)
+    result.fill(NAN_RESULT)
 
     if (pivots.length < 2) {
       // 转折点不足两个，无法绘制折线

@@ -71,7 +71,8 @@ export function loadLayout(key: string): ChartLayout | null {
     if (!Array.isArray(data.overlayData)) return null
     const migrated = migrateLayout(data as unknown as ChartLayout)
     return migrated
-  } catch {
+  } catch (e) {
+    console.warn('[TradingChest] load layout failed:', e)
     return null
   }
 }

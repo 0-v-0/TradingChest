@@ -2,9 +2,11 @@ import { registerOverlay, registerIndicator } from 'klinecharts'
 import chartTypes from './chartType'
 import DefaultDatafeed from './DefaultDatafeed'
 import overlays from './extension'
+import { overlayLoaders } from './extension/loaders'
 import { load } from './i18n'
 import tradeVisualization from './indicator/trade/tradeVisualization'
 import KLineChartPro from './KLineChartPro'
+import { chartTypeLoaders } from './chartType/loaders'
 import './index.css'
 import type {
   Datafeed,
@@ -52,6 +54,8 @@ export {
   indicatorCategories,
   // 懒加载注册表
   indicatorRegistry,
+  overlayLoaders,
+  chartTypeLoaders,
 }
 
 export type { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, ChartProOptions, ChartPro }

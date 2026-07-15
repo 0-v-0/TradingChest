@@ -71,13 +71,18 @@ function wrapCalcParamsValidation(template: IndicatorTemplate): IndicatorTemplat
   const nanTemplate = createNaNTemplate(figures)
   const frozenTemplate = Object.keys(nanTemplate).length > 0 ? Object.freeze(nanTemplate) : null
   const hasKeys = frozenTemplate !== null
+  let cachedNanResult: Record<string, unknown>[] | null = null
+  let cachedNanLen = 0
   const wrappedCalc = (dataList: KLineData[], indicator: Indicator) => {
     const params = indicator.calcParams
     if (params.some(p => typeof p === 'number' && p < 1)) {
       const n = dataList.length
+      if (hasKeys && cachedNanResult && n === cachedNanLen) return cachedNanResult
       const result: Record<string, unknown>[] = new Array(n)
       if (hasKeys) {
         result.fill(frozenTemplate!)
+        cachedNanResult = result
+        cachedNanLen = n
       }
       return result
     }

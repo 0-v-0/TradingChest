@@ -17,6 +17,29 @@ export const COLOR_ALERT = '#ff9800'
 export const COLOR_FORECAST = '#3498db'
 /** Neutral gray (kagi flat segments) */
 export const COLOR_NEUTRAL = '#999999'
+
+/** Up color with alpha variants */
+export const COLOR_UP_ALPHA_12 = 'rgba(38, 166, 154, 0.12)'
+export const COLOR_UP_ALPHA_15 = 'rgba(38, 166, 154, 0.15)'
+export const COLOR_UP_ALPHA_40 = 'rgba(38, 166, 154, 0.4)'
+export const COLOR_UP_ALPHA_50 = 'rgba(38, 166, 154, 0.5)'
+export const COLOR_UP_ALPHA_60 = 'rgba(38, 166, 154, 0.6)'
+export const COLOR_UP_ALPHA_80 = 'rgba(38, 166, 154, 0.8)'
+export const COLOR_UP_ALPHA_90 = 'rgba(38, 166, 154, 0.9)'
+export const COLOR_UP_ALPHA_95 = 'rgba(38, 166, 154, 0.95)'
+
+/** Down color with alpha variants */
+export const COLOR_DOWN_ALPHA_12 = 'rgba(239, 83, 80, 0.12)'
+export const COLOR_DOWN_ALPHA_15 = 'rgba(239, 83, 80, 0.15)'
+export const COLOR_DOWN_ALPHA_40 = 'rgba(239, 83, 80, 0.4)'
+export const COLOR_DOWN_ALPHA_50 = 'rgba(239, 83, 80, 0.5)'
+export const COLOR_DOWN_ALPHA_60 = 'rgba(239, 83, 80, 0.6)'
+export const COLOR_DOWN_ALPHA_80 = 'rgba(239, 83, 80, 0.8)'
+export const COLOR_DOWN_ALPHA_90 = 'rgba(239, 83, 80, 0.9)'
+export const COLOR_DOWN_ALPHA_95 = 'rgba(239, 83, 80, 0.95)'
+
+/** Primary color with alpha variants */
+export const COLOR_PRIMARY_ALPHA_15 = 'rgba(22, 119, 255, 0.15)'
 import type KeyboardShortcutManager from './shortcut'
 import type { AlertConfig, AlertEvent } from './alert/types'
 

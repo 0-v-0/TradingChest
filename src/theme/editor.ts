@@ -31,7 +31,8 @@ export function importTheme(json: string): DeepPartial<Styles> | null {
       return data.styles as DeepPartial<Styles>
     }
     return null
-  } catch {
+  } catch (e) {
+    console.warn('[TradingChest] import theme failed:', e)
     return null
   }
 }

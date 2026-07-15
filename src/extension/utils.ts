@@ -280,7 +280,7 @@ export function createTextEditingOverlay(
     needDefaultYAxisFigure: true,
     createPointFigures: ({ coordinates, overlay }) => {
       if (coordinates.length > 0) {
-        const text = (overlay.extendData as string) || defaultText
+        const text = typeof overlay.extendData === 'string' ? overlay.extendData : defaultText
         const rawExtras = extraFigures?.(coordinates, overlay)
         const extras = rawExtras == null ? [] : Array.isArray(rawExtras) ? rawExtras : [rawExtras]
         return [
@@ -312,9 +312,9 @@ export function createTextEditingOverlay(
     onDrawEnd: ({ overlay }) => {
       const input = window.prompt(
         promptMsg,
-        (overlay.extendData as string) || defaultText,
+        typeof overlay.extendData === 'string' ? overlay.extendData : defaultText,
       )
-      if (input !== null && input.trim() !== '') {
+      if (input !== null && input.trim()) {
         overlay.extendData = input.trim()
       }
       return true

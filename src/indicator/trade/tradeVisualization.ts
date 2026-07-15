@@ -3,7 +3,8 @@
  * calc 中将交易数据映射到每根 K 线，draw 中直接用数据索引绘制
  */
 import type { Indicator, IndicatorTemplate, KLineData } from 'klinecharts'
-import type { Direction } from '../../types'
+import { type Direction, COLOR_UP_ALPHA_12, COLOR_UP_ALPHA_15, COLOR_UP_ALPHA_40, COLOR_UP_ALPHA_50, COLOR_UP_ALPHA_90, COLOR_UP_ALPHA_95, COLOR_DOWN_ALPHA_12, COLOR_DOWN_ALPHA_15, COLOR_DOWN_ALPHA_40, COLOR_DOWN_ALPHA_50, COLOR_DOWN_ALPHA_90, COLOR_DOWN_ALPHA_95 } from '../../types'
+import { findNearestIndex } from '../../core/findNearestIndex'
 
 /** Label connector line length (px) */
 const LABEL_OFFSET = 35
@@ -54,23 +55,23 @@ export interface TradeVisColors {
 
 /** 默认颜色（light 主题） */
 export const defaultTradeVisColors: TradeVisColors = {
-  profitBg: 'rgba(38, 166, 154, 0.12)',
-  lossBg: 'rgba(239, 83, 80, 0.12)',
-  profitBorder: 'rgba(38, 166, 154, 0.4)',
-  lossBorder: 'rgba(239, 83, 80, 0.4)',
-  longColor: 'rgba(38, 166, 154, 0.9)',
-  shortColor: 'rgba(239, 83, 80, 0.9)',
+  profitBg: COLOR_UP_ALPHA_12,
+  lossBg: COLOR_DOWN_ALPHA_12,
+  profitBorder: COLOR_UP_ALPHA_40,
+  lossBorder: COLOR_DOWN_ALPHA_40,
+  longColor: COLOR_UP_ALPHA_90,
+  shortColor: COLOR_DOWN_ALPHA_90,
   labelTextColor: '#fff',
 }
 
 /** Dark 主题颜色 */
 export const darkTradeVisColors: TradeVisColors = {
-  profitBg: 'rgba(38, 166, 154, 0.15)',
-  lossBg: 'rgba(239, 83, 80, 0.15)',
-  profitBorder: 'rgba(38, 166, 154, 0.5)',
-  lossBorder: 'rgba(239, 83, 80, 0.5)',
-  longColor: 'rgba(38, 166, 154, 0.95)',
-  shortColor: 'rgba(239, 83, 80, 0.95)',
+  profitBg: COLOR_UP_ALPHA_15,
+  lossBg: COLOR_DOWN_ALPHA_15,
+  profitBorder: COLOR_UP_ALPHA_50,
+  lossBorder: COLOR_DOWN_ALPHA_50,
+  longColor: COLOR_UP_ALPHA_95,
+  shortColor: COLOR_DOWN_ALPHA_95,
   labelTextColor: '#fff',
 }
 
@@ -109,25 +110,7 @@ export function cleanupTradeVisInstance(instanceId: string): void {
  * Exported for testing.
  */
 export function findClosestBar(dataList: Pick<KLineData, 'timestamp'>[], targetTs: number): number {
-  const n = dataList.length
-  if (n === 0) return -1
-
-  let lo = 0,
-    hi = n - 1
-  // Find first bar where timestamp >= targetTs
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1
-    if (dataList[mid].timestamp < targetTs) lo = mid + 1
-    else hi = mid
-  }
-  // Compare lo and lo-1 to find closest
-  if (
-    lo > 0 &&
-    Math.abs(dataList[lo - 1].timestamp - targetTs) <= Math.abs(dataList[lo].timestamp - targetTs)
-  ) {
-    return lo - 1
-  }
-  return lo
+  return findNearestIndex(dataList, targetTs, Infinity, d => d.timestamp)
 }
 
 const tradeVisualization: IndicatorTemplate<BarTradeInfo, number> = {

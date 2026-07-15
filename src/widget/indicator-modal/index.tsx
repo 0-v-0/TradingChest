@@ -51,6 +51,7 @@ const SUB_INDICATORS = [
 
 // 分类 Tab 列表
 const CATEGORY_KEYS = ['all', 'favorites', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
+const CATEGORY_KEYS_LIST = [...CATEGORY_KEYS]
 
 const StarIcon: Component<{ name: string; favVersion: Accessor<number>; onToggle: (name: string, e: MouseEvent) => void }> = (props) => {
   const fav = createMemo(() => {
@@ -153,7 +154,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
       </div>
       {/* 分类 Tab */}
       <div class="klinecharts-pro-indicator-modal-tabs">
-        <For each={[...CATEGORY_KEYS]}>
+        <For each={CATEGORY_KEYS_LIST}>
           {(key) => (
             <span
               class={`klinecharts-pro-indicator-modal-tab${activeCategory() === key ? ' active' : ''}`}

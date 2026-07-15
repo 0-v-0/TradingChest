@@ -1,5 +1,6 @@
 import type { Component } from 'solid-js'
 import { Modal } from '../../component'
+import { downloadUrl } from '../../core/download'
 import t from '../../i18n'
 
 export interface ScreenshotModalProps {
@@ -21,14 +22,9 @@ const ScreenshotModal: Component<ScreenshotModalProps> = (props) => {
           children: t('save', props.lang),
           onClick: () => {
             try {
-              const a = document.createElement('a')
-              a.download = 'screenshot'
-              a.href = props.url
-              document.body.appendChild(a)
-              a.click()
-              a.remove()
+              downloadUrl(props.url, 'screenshot')
             } catch {
-              console.warn('Screenshot download failed')
+              console.warn('[TradingChest] Screenshot download failed')
             }
           },
         },

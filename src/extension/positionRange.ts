@@ -5,6 +5,7 @@
  */
 
 import type { OverlayTemplate, OverlayFigure } from 'klinecharts'
+import { COLOR_UP_ALPHA_15, COLOR_UP_ALPHA_60, COLOR_UP_ALPHA_80 } from '../types'
 
 const positionRange: OverlayTemplate = {
   name: 'positionRange',
@@ -40,7 +41,7 @@ const positionRange: OverlayTemplate = {
       },
       styles: {
         style: 'fill',
-        color: overlay.styles?.polygon?.color ?? 'rgba(38, 166, 154, 0.15)',
+        color: overlay.styles?.polygon?.color ?? COLOR_UP_ALPHA_15,
       },
     })
 
@@ -57,14 +58,14 @@ const positionRange: OverlayTemplate = {
       },
       styles: {
         style: 'stroke',
-        borderColor: overlay.styles?.polygon?.borderColor ?? 'rgba(38, 166, 154, 0.6)',
+        borderColor: overlay.styles?.polygon?.borderColor ?? COLOR_UP_ALPHA_60,
         borderSize: overlay.styles?.polygon?.borderSize ?? 1,
         borderStyle: 'dashed',
       },
     })
 
     // 中间 PnL 标签
-    const text = overlay.extendData as string
+    const text = typeof overlay.extendData === 'string' ? overlay.extendData : ''
     if (text) {
       figures.push({
         type: 'rectText',
@@ -79,7 +80,7 @@ const positionRange: OverlayTemplate = {
         styles: {
           style: 'stroke_fill',
           color: '#fff',
-          backgroundColor: overlay.styles?.polygon?.borderColor ?? 'rgba(38, 166, 154, 0.8)',
+          backgroundColor: overlay.styles?.polygon?.borderColor ?? COLOR_UP_ALPHA_80,
           borderColor: 'transparent',
           borderSize: 0,
           borderRadius: 3,

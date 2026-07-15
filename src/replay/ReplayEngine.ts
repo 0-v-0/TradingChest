@@ -5,6 +5,7 @@ const BASE_INTERVAL = 1000
 
 export class ReplayEngine {
   private _fullData: KLineData[] = []
+  private _viewData: KLineData[] = []
   private _position = 0
   private _playing = false
   private _speed: ReplaySpeed = 1
@@ -19,11 +20,12 @@ export class ReplayEngine {
   start(data: KLineData[], startPosition: number): void {
     this._fullData = data.slice()
     this._position = data.length === 0 ? 0 : Math.max(1, Math.min(startPosition, data.length))
+    this._viewData = this._fullData.slice(0, this._position)
     this._active = data.length > 0
     this._playing = false
     this._speed = 1
     this._stopTimer()
-    this._callbacks.onDataChange(this._fullData.slice(0, this._position))
+    this._callbacks.onDataChange(this._viewData)
     this._emitState()
   }
 
@@ -44,7 +46,8 @@ export class ReplayEngine {
   stepBackward(): void {
     if (!this._active || this._position <= 1) return
     this._position--
-    this._callbacks.onDataChange(this._fullData.slice(0, this._position))
+    this._viewData.length = this._position
+    this._callbacks.onDataChange(this._viewData)
     this._emitState()
   }
 
@@ -73,7 +76,8 @@ export class ReplayEngine {
   goToPosition(position: number): void {
     if (!this._active) return
     this._position = Math.max(1, Math.min(position, this._fullData.length))
-    this._callbacks.onDataChange(this._fullData.slice(0, this._position))
+    this._viewData = this._fullData.slice(0, this._position)
+    this._callbacks.onDataChange(this._viewData)
     this._emitState()
   }
 
@@ -90,6 +94,7 @@ export class ReplayEngine {
   dispose(): void {
     this._stopTimer()
     this._fullData = []
+    this._viewData = []
     this._active = false
     this._playing = false
     this._callbacks = { onDataChange: () => {}, onBarUpdate: () => {}, onStateChange: () => {} } as ReplayCallbacks

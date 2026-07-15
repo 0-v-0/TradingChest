@@ -1,16 +1,18 @@
+import { lazy } from 'solid-js'
 import ContextMenu from './context-menu'
 import DataWindow from './data-window'
 import DrawingBar from './drawing-bar'
-import IndicatorModal from './indicator-modal'
-import IndicatorSettingModal from './indicator-setting-modal'
 import OverlayPropertyBar from './overlay-property-bar'
 import PeriodBar from './period-bar'
 import ReplayControlBar from './replay-bar'
-import ScreenshotModal from './screenshot-modal'
-import SettingModal from './setting-modal'
-import SymbolSearchModal from './symbol-search-modal'
-import ThemeEditor from './theme-editor'
-import TimezoneModal from './timezone-modal'
+
+const IndicatorModal = lazy(() => import('./indicator-modal'))
+const IndicatorSettingModal = lazy(() => import('./indicator-setting-modal'))
+const ScreenshotModal = lazy(() => import('./screenshot-modal'))
+const SettingModal = lazy(() => import('./setting-modal'))
+const SymbolSearchModal = lazy(() => import('./symbol-search-modal'))
+const ThemeEditor = lazy(() => import('./theme-editor'))
+const TimezoneModal = lazy(() => import('./timezone-modal'))
 
 // oxfmt-ignore
 export {

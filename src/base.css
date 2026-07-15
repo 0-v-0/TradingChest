@@ -15,7 +15,6 @@
   --klinecharts-pro-border-color: #ebedf1;
   --klinecharts-pro-selected-color: rgba(22, 119, 255, 0.15);
   --klinecharts-pro-card-bg: rgba(255, 255, 255, 0.95);
-  --klinecharts-pro-text-secondary: #76808f;
 
   &[data-theme=dark] {
     --klinecharts-pro-hover-background-color: rgba(22, 119, 255, 0.15);
@@ -25,7 +24,6 @@
     --klinecharts-pro-text-second-color: #929aa5;
     --klinecharts-pro-border-color: #292929;
     --klinecharts-pro-card-bg: rgba(22, 22, 25, 0.95);
-    --klinecharts-pro-text-secondary: #929aa5;
   }
 }
 

@@ -3,6 +3,7 @@ import { type Component, createSignal } from 'solid-js'
 import { Modal, ColorInput } from '../../component'
 import { exportTheme, importTheme, themeEditorFields } from '../../theme/editor'
 import { deepSet } from '../../core/deepSet'
+import { downloadUrl } from '../../core/download'
 import t from '../../i18n'
 
 export interface ThemeEditorProps {
@@ -33,10 +34,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
     const json = exportTheme(props.currentStyles)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'theme.json'
-    a.click()
+    downloadUrl(url, 'theme.json')
     URL.revokeObjectURL(url)
   }
 
@@ -54,6 +52,9 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
           setLocalStyles(toRecord(utils.clone(props.currentStyles)))
           props.onApply(styles)
         }
+      }
+      reader.onerror = () => {
+        console.warn('[TradingChest] Theme import: failed to read file')
       }
       reader.readAsText(file)
     }

@@ -23,6 +23,7 @@ import {
   createMemo,
   onMount,
   Show,
+  Suspense,
   onCleanup,
   startTransition,
   ErrorBoundary,
@@ -40,7 +41,7 @@ import { ReplayEngine } from './replay/ReplayEngine'
 import { OverlayCreateCommand, OverlayRemoveCommand } from './shortcut/overlayCommands'
 import type { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
-import { MAIN_PANE_ID, COLOR_PRIMARY } from './types'
+import { MAIN_PANE_ID, COLOR_PRIMARY, COLOR_PRIMARY_ALPHA_15 } from './types'
 import {
   PeriodBar,
   DrawingBar,
@@ -141,7 +142,7 @@ function tooltipFeatures(theme: string) {
     color,
     activeColor: color,
     backgroundColor: 'transparent',
-    activeBackgroundColor: 'rgba(22, 119, 255, 0.15)',
+    activeBackgroundColor: COLOR_PRIMARY_ALPHA_15,
     borderRadius: 0,
     content: { family: 'icomoon', code: '' },
   }
@@ -349,7 +350,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         x: Math.max(100, x),
         y: Math.max(10, y),
         color: COLOR_PRIMARY,
-        fillColor: hasFill ? 'rgba(22, 119, 255, 0.15)' : undefined,
+        fillColor: hasFill ? COLOR_PRIMARY_ALPHA_15 : undefined,
         lineWidth: 1,
         lineStyle: 'solid',
         locked: overlay.lock ?? false,
@@ -421,9 +422,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
     if (textOverlays.includes(overlay.name ?? '')) {
       items.push({
-         label: tr('menu_edit'),
-         onClick: () => {
-           const current = getTextOverlayContent(overlay)
+        label: tr('menu_edit'),
+        onClick: () => {
+          const current = getTextOverlayContent(overlay)
           const input = window.prompt(tr('menu_edit'), current)
           if (input !== null && input.trim() !== '' && overlay.id) {
             widget?.overrideOverlay({ id: overlay.id, extendData: input.trim() })
@@ -692,7 +693,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       setWidgetDefaultStyles(structuredClone(widget.getStyles()))
     }
 
-    ;(async () => {
+    ; (async () => {
       const mainPromises = mainIndicators().map(
         (indicator) => createIndicator(widget, indicator, true, MAIN_PANE_ID),
       )
@@ -856,10 +857,9 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
                   const row = (dataIndex != null && dataIndex >= 0 && dataIndex < vals.length)
                     ? vals[dataIndex]
                     : vals[vals.length - 1]
-                  for (const k in row) {
-                    if (k !== 'timestamp' && k !== 'dataIndex') {
-                      addRow(`${ind.name}.${k}`, row[k])
-                    }
+                  const figureKeys = Array.isArray(ind.figures) ? ind.figures.map(f => f.key) : Object.keys(row)
+                  for (const k of figureKeys) {
+                    addRow(`${ind.name}.${k}`, row[k])
                   }
                 }
               }
@@ -959,123 +959,125 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       )}
     >
       <i class="icon-close klinecharts-pro-load-icon" />
-      <Show when={symbolSearchModalVisible()}>
-        <SymbolSearchModal
-          lang={locale()} localeKey={localeVersion()}
-          datafeed={props.datafeed}
-          onSymbolSelected={(symbol) => {
-            setSymbol(symbol)
-          }}
-          onClose={() => {
-            setSymbolSearchModalVisible(false)
-          }}
-        />
-      </Show>
-      <Show when={indicatorModalVisible()}>
-        <IndicatorModal
-          lang={locale()} localeKey={localeVersion()}
-          mainIndicators={mainIndicators()}
-          subIndicators={subIndicators()}
-          onClose={() => {
-            setIndicatorModalVisible(false)
-          }}
-          onMainIndicatorChange={async (data) => {
-            const newMainIndicators = [...mainIndicators()]
-            if (data.added) {
-              await createIndicator(widget, data.name, true, MAIN_PANE_ID)
-              newMainIndicators.push(data.name)
-            } else {
-              widget?.removeIndicator({ paneId: MAIN_PANE_ID, name: data.name })
-              newMainIndicators.splice(newMainIndicators.indexOf(data.name), 1)
-            }
-            setMainIndicators(newMainIndicators)
-            invalidateIndicatorCache()
-          }}
-          onSubIndicatorChange={async (data) => {
-            const newSubIndicators: Record<string, string> = { ...subIndicators() }
-            if (data.added) {
-              const paneId = await createIndicator(widget, data.name)
-              if (paneId) {
-                newSubIndicators[data.name] = paneId
+      <Suspense>
+        <Show when={symbolSearchModalVisible()}>
+          <SymbolSearchModal
+            lang={locale()} localeKey={localeVersion()}
+            datafeed={props.datafeed}
+            onSymbolSelected={(symbol) => {
+              setSymbol(symbol)
+            }}
+            onClose={() => {
+              setSymbolSearchModalVisible(false)
+            }}
+          />
+        </Show>
+        <Show when={indicatorModalVisible()}>
+          <IndicatorModal
+            lang={locale()} localeKey={localeVersion()}
+            mainIndicators={mainIndicators()}
+            subIndicators={subIndicators()}
+            onClose={() => {
+              setIndicatorModalVisible(false)
+            }}
+            onMainIndicatorChange={async (data) => {
+              const newMainIndicators = [...mainIndicators()]
+              if (data.added) {
+                await createIndicator(widget, data.name, true, MAIN_PANE_ID)
+                newMainIndicators.push(data.name)
+              } else {
+                widget?.removeIndicator({ paneId: MAIN_PANE_ID, name: data.name })
+                newMainIndicators.splice(newMainIndicators.indexOf(data.name), 1)
               }
-            } else {
-              if (data.paneId) {
-                widget?.removeIndicator({ paneId: data.paneId, name: data.name })
-                delete newSubIndicators[data.name]
+              setMainIndicators(newMainIndicators)
+              invalidateIndicatorCache()
+            }}
+            onSubIndicatorChange={async (data) => {
+              const newSubIndicators: Record<string, string> = { ...subIndicators() }
+              if (data.added) {
+                const paneId = await createIndicator(widget, data.name)
+                if (paneId) {
+                  newSubIndicators[data.name] = paneId
+                }
+              } else {
+                if (data.paneId) {
+                  widget?.removeIndicator({ paneId: data.paneId, name: data.name })
+                  delete newSubIndicators[data.name]
+                }
               }
-            }
-            setSubIndicators(newSubIndicators)
-            invalidateIndicatorCache()
-          }}
-        />
-      </Show>
-      <Show when={timezoneModalVisible()}>
-        <TimezoneModal
-          lang={locale()} localeKey={localeVersion()}
-          timezone={timezone()}
-          onClose={() => {
-            setTimezoneModalVisible(false)
-          }}
-          onConfirm={setTimezone}
-        />
-      </Show>
-      <Show when={settingModalVisible()}>
-        <SettingModal
-          lang={locale()} localeKey={localeVersion()}
-          currentStyles={settingModalStyles()!}
-          onClose={() => {
-            setSettingModalVisible(false)
-          }}
-          onChange={(style) => {
-            widget?.setStyles(style)
-          }}
-          onRestoreDefault={(options: SelectDataSourceItem[]) => {
-            const style = {}
-            options.forEach((option) => {
-              const key = option.key
-              deepSet(style, key, utils.formatValue(widgetDefaultStyles() ?? {}, key))
-            })
-            widget?.setStyles(style)
-          }}
-        />
-      </Show>
-      <Show when={screenshotUrl().length > 0}>
-        <ScreenshotModal
-          lang={locale()} localeKey={localeVersion()}
-          url={screenshotUrl()}
-          onClose={() => {
-            setScreenshotUrl('')
-          }}
-        />
-      </Show>
-      <Show when={themeEditorVisible()}>
-        <ThemeEditor
-          lang={locale()} localeKey={localeVersion()}
-          currentStyles={widget!.getStyles()}
-          onClose={() => setThemeEditorVisible(false)}
-          onApply={(style) => widget?.setStyles(style)}
-        />
-      </Show>
-      <Show when={indicatorSettingModalParams().visible}>
-        <IndicatorSettingModal
-          lang={locale()} localeKey={localeVersion()}
-          params={indicatorSettingModalParams()}
-          onClose={() => {
-            setIndicatorSettingModalParams({
-              visible: false,
-              indicatorName: '',
-              paneId: '',
-              calcParams: [],
-            })
-          }}
-          onConfirm={(params) => {
-            const modalParams = indicatorSettingModalParams()
-            widget?.overrideIndicator(
-              { name: modalParams.indicatorName, calcParams: params },
-            )
-          }}
-        />
-      </Show>
+              setSubIndicators(newSubIndicators)
+              invalidateIndicatorCache()
+            }}
+          />
+        </Show>
+        <Show when={timezoneModalVisible()}>
+          <TimezoneModal
+            lang={locale()} localeKey={localeVersion()}
+            timezone={timezone()}
+            onClose={() => {
+              setTimezoneModalVisible(false)
+            }}
+            onConfirm={setTimezone}
+          />
+        </Show>
+        <Show when={settingModalVisible()}>
+          <SettingModal
+            lang={locale()} localeKey={localeVersion()}
+            currentStyles={settingModalStyles()!}
+            onClose={() => {
+              setSettingModalVisible(false)
+            }}
+            onChange={(style) => {
+              widget?.setStyles(style)
+            }}
+            onRestoreDefault={(options: SelectDataSourceItem[]) => {
+              const style = {}
+              options.forEach((option) => {
+                const key = option.key
+                deepSet(style, key, utils.formatValue(widgetDefaultStyles() ?? {}, key))
+              })
+              widget?.setStyles(style)
+            }}
+          />
+        </Show>
+        <Show when={screenshotUrl().length > 0}>
+          <ScreenshotModal
+            lang={locale()} localeKey={localeVersion()}
+            url={screenshotUrl()}
+            onClose={() => {
+              setScreenshotUrl('')
+            }}
+          />
+        </Show>
+        <Show when={themeEditorVisible()}>
+          <ThemeEditor
+            lang={locale()} localeKey={localeVersion()}
+            currentStyles={widget!.getStyles()}
+            onClose={() => setThemeEditorVisible(false)}
+            onApply={(style) => widget?.setStyles(style)}
+          />
+        </Show>
+        <Show when={indicatorSettingModalParams().visible}>
+          <IndicatorSettingModal
+            lang={locale()} localeKey={localeVersion()}
+            params={indicatorSettingModalParams()}
+            onClose={() => {
+              setIndicatorSettingModalParams({
+                visible: false,
+                indicatorName: '',
+                paneId: '',
+                calcParams: [],
+              })
+            }}
+            onConfirm={(params) => {
+              const modalParams = indicatorSettingModalParams()
+              widget?.overrideIndicator(
+                { name: modalParams.indicatorName, calcParams: params },
+              )
+            }}
+          />
+        </Show>
+      </Suspense>
       <PeriodBar
         lang={locale()} localeKey={localeVersion()}
         symbol={symbol()}
@@ -1125,7 +1127,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         dataWindowActive={dataWindowVisible()}
         onDataWindowClick={() => {
           setDataWindowVisible((v) => !v)
-          setTimeout(() => widget?.resize(), 0)
+          requestAnimationFrame(() => widget?.resize())
         }}
       />
       <div class="klinecharts-pro-content">

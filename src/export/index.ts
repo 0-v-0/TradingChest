@@ -1,4 +1,5 @@
 import type { Chart, Nullable } from 'klinecharts'
+import { downloadUrl } from '../core/download'
 
 /**
  * 数据导出工具
@@ -40,12 +41,7 @@ function downloadCsv(csv: string, filename: string): void {
   const BOM = '﻿'
   const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  downloadUrl(url, filename)
   URL.revokeObjectURL(url)
 }
 
@@ -120,14 +116,11 @@ export function exportScreenshot(
 
     const url = chart.getConvertPictureUrl(includeOverlay, format, backgroundColor)
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download =
+    downloadUrl(
+      url,
       filename ??
-      `chart-screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${format}`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+        `chart-screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${format}`,
+    )
     if (url.startsWith('blob:')) {
       URL.revokeObjectURL(url)
     }

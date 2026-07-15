@@ -17,7 +17,7 @@ export interface OverlayStyleInput {
   lineStyle: LineStyle
 }
 
-export const DASH_SOLID: readonly number[] = Object.freeze([0])
+const DASH_SOLID: readonly number[] = Object.freeze([0])
 export const DASH_DASHED: readonly number[] = Object.freeze([6, 4])
 export const DASH_DOTTED: readonly number[] = Object.freeze([1, 3])
 
