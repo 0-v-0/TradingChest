@@ -1,3 +1,5 @@
+import type { KLineData } from 'klinecharts'
+
 /**
  * 技术指标计算工具函数集
  *
@@ -5,6 +7,20 @@
  * 数据不足的位置填充 NaN，确保输出数组长度与输入一致。
  * 本模块用于金融交易系统，数值精度至关重要。
  */
+
+/**
+ * 从 KLineData 数组中提取单个字段为预分配的 number[]
+ * 避免逐次 .map() 产生中间数组，统一预分配模式
+ */
+export function extractField<T extends KLineData>(
+  dataList: readonly T[],
+  field: keyof T & string,
+): number[] {
+  const n = dataList.length
+  const result = new Array<number>(n)
+  for (let i = 0; i < n; i++) result[i] = dataList[i][field] as number
+  return result
+}
 
 /**
  * 简单移动平均（Simple Moving Average）

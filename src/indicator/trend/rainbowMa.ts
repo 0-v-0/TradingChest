@@ -8,7 +8,7 @@
  * 参数: depth(递归层数), period(SMA周期)
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcSMA } from '../utils'
+import { calcSMA, extractField } from '../utils'
 
 type RainbowMaResult = { ma1: number; ma2: number; ma3: number; ma4: number; ma5: number; ma6: number }
 
@@ -30,7 +30,7 @@ const rainbowMa: IndicatorTemplate<RainbowMaResult, number> = {
     const n = dataList.length
     const depth = Math.min(depthParam, MAX_LEVELS)
 
-    const close = dataList.map(k => k.close)
+    const close = extractField(dataList, 'close')
 
     // 递归 SMA 堆叠
     const levels: number[][] = new Array(depth)
@@ -38,7 +38,7 @@ const rainbowMa: IndicatorTemplate<RainbowMaResult, number> = {
     for (let level = 0; level < depth; level++) {
       const sma = calcSMA(current, period)
       levels[level] = sma
-      // Replace NaN with 0 in-place for next recursion level (avoids allocating a new array)
+      // Replace NaN with 0 in-place for next recursion level
       current = sma
       for (let i = 0; i < n; i++) {
         if (isNaN(current[i])) current[i] = 0

@@ -4,7 +4,7 @@
  * 用于识别超买超卖区域和趋势方向
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcSMA } from '../utils'
+import { calcSMA, extractField } from '../utils'
 
 type EnvelopesResult = { middle: number; upper: number; lower: number }
 
@@ -20,7 +20,7 @@ const envelopes: IndicatorTemplate<EnvelopesResult, number> = {
   calc: (dataList: KLineData[], { calcParams: [period, percentage] }) => {
     const n = dataList.length
 
-    const closes = dataList.map((d) => d.close)
+    const closes = extractField(dataList, 'close')
     const smaValues = calcSMA(closes, period)
 
     const result: EnvelopesResult[] = new Array(n)

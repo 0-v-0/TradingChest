@@ -4,7 +4,7 @@
  * WMA = Σ(close_i * weight_i) / Σ(weight_i)
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcWMA } from '../utils'
+import { calcWMA, extractField } from '../utils'
 
 type WmaResult = { wma: number }
 
@@ -15,7 +15,7 @@ const wma: IndicatorTemplate<WmaResult, number> = {
   figures: [{ key: 'wma', title: 'WMA: ', type: 'line' }],
   calc: (dataList: KLineData[], { calcParams: [period] }) => {
     const n = dataList.length
-    const closes = dataList.map(d => d.close)
+    const closes = extractField(dataList, 'close')
     const wmaValues = calcWMA(closes, period)
     const result: WmaResult[] = new Array(n)
     for (let i = 0; i < n; i++) result[i] = { wma: wmaValues[i] }

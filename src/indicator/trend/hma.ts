@@ -4,7 +4,7 @@
  * 同时保持平滑度减少滞后
  */
 import type { IndicatorTemplate, KLineData } from 'klinecharts'
-import { calcWMA } from '../utils'
+import { calcWMA, extractField } from '../utils'
 
 type HmaResult = { hma: number }
 
@@ -18,7 +18,7 @@ const hma: IndicatorTemplate<HmaResult, number> = {
     const halfPeriod = Math.floor(period / 2)
     const sqrtPeriod = Math.round(Math.sqrt(period))
 
-    const closes = dataList.map(k => k.close)
+    const closes = extractField(dataList, 'close')
 
     // WMA(n/2) 和 WMA(n)
     const wmaHalf = calcWMA(closes, halfPeriod)
@@ -33,7 +33,6 @@ const hma: IndicatorTemplate<HmaResult, number> = {
     }
 
     // 对中间序列再做 WMA(sqrt(n))
-    // diffSeries 的 NaN 仅出现在前缀，找到第一个有效值后使用 calcWMA
     let firstValid = -1
     for (let k = 0; k < n; k++) {
       if (!isNaN(diffSeries[k])) {
