@@ -13,10 +13,14 @@ export interface ThemeEditorProps {
   onApply: (styles: DeepPartial<Styles>) => void
 }
 
+function toRecord(value: Styles): Record<string, unknown> {
+  return value as unknown as Record<string, unknown>
+}
+
 const ThemeEditor: Component<ThemeEditorProps> = (props) => {
   void props.localeKey
   const [localStyles, setLocalStyles] = createSignal<Record<string, unknown>>(
-    utils.clone(props.currentStyles) as unknown as Record<string, unknown>
+    toRecord(utils.clone(props.currentStyles))
   )
 
   const handleColorChange = (key: string, color: string) => {
@@ -47,7 +51,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
       reader.onload = () => {
         const styles = importTheme(reader.result as string)
         if (styles) {
-          setLocalStyles(utils.clone(props.currentStyles) as unknown as Record<string, unknown>)
+          setLocalStyles(toRecord(utils.clone(props.currentStyles)))
           props.onApply(styles)
         }
       }

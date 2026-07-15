@@ -1,4 +1,11 @@
-import { createSignal, Show, For, onCleanup, type Component } from 'solid-js'
+import { createSignal, Show, For, onCleanup, type Component, type Accessor } from 'solid-js'
+
+function usePopup(): [Accessor<boolean>, () => void, () => void] {
+  const [visible, setVisible] = createSignal(false)
+  const toggle = () => setVisible(v => !v)
+  const close = () => setVisible(false)
+  return [visible, toggle, close]
+}
 import t from '../../i18n'
 
 export interface OverlayPropertyBarProps {
@@ -54,10 +61,10 @@ const LINE_STYLES: { key: string; labelKey: string }[] = [
 
 const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
   void props.localeKey
-  const [showColorPalette, setShowColorPalette] = createSignal(false)
-  const [showFillPalette, setShowFillPalette] = createSignal(false)
-  const [showWidthPicker, setShowWidthPicker] = createSignal(false)
-  const [showStylePicker, setShowStylePicker] = createSignal(false)
+  const [showColorPalette, toggleColorPalette, closeColorPalette] = usePopup()
+  const [showFillPalette, toggleFillPalette, closeFillPalette] = usePopup()
+  const [showWidthPicker, toggleWidthPicker, closeWidthPicker] = usePopup()
+  const [showStylePicker, toggleStylePicker, closeStylePicker] = usePopup()
   const [deleting, setDeleting] = createSignal(false)
   let deleteTimer: ReturnType<typeof setTimeout> | null = null
   onCleanup(() => {
@@ -68,10 +75,10 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
   })
 
   const closeAllPopups = () => {
-    setShowColorPalette(false)
-    setShowFillPalette(false)
-    setShowWidthPicker(false)
-    setShowStylePicker(false)
+    closeColorPalette()
+    closeFillPalette()
+    closeWidthPicker()
+    closeStylePicker()
   }
 
   return (
@@ -87,9 +94,8 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
         <div
           class="klinecharts-pro-overlay-property-bar-item"
           onClick={() => {
-            const next = !showColorPalette()
             closeAllPopups()
-            setShowColorPalette(next)
+            toggleColorPalette()
           }}
         >
           <div
@@ -105,7 +111,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                   onClick={(e) => {
                     e.stopPropagation()
                     props.onColorChange(color)
-                    setShowColorPalette(false)
+                    closeColorPalette()
                   }}
                 />
               )}</For>
@@ -118,9 +124,8 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
           <div
             class="klinecharts-pro-overlay-property-bar-item"
             onClick={() => {
-              const next = !showFillPalette()
               closeAllPopups()
-              setShowFillPalette(next)
+              toggleFillPalette()
             }}
           >
             <div
@@ -149,7 +154,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                   onClick={(e) => {
                     e.stopPropagation()
                     props.onFillColorChange?.('transparent')
-                    setShowFillPalette(false)
+                    closeFillPalette()
                   }}
                 />
                 <For each={PALETTE_COLORS}>{(color) => (
@@ -159,7 +164,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                     onClick={(e) => {
                       e.stopPropagation()
                       props.onFillColorChange?.(color + '40')
-                      setShowFillPalette(false)
+                      closeFillPalette()
                     }}
                   />
                 )}</For>
@@ -174,9 +179,8 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
         <div
           class="klinecharts-pro-overlay-property-bar-item"
           onClick={() => {
-            const next = !showWidthPicker()
             closeAllPopups()
-            setShowWidthPicker(next)
+            toggleWidthPicker()
           }}
         >
           <svg width="20" height="14" viewBox="0 0 20 14">
@@ -198,7 +202,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                   onClick={(e) => {
                     e.stopPropagation()
                     props.onLineWidthChange(w)
-                    setShowWidthPicker(false)
+                    closeWidthPicker()
                   }}
                 >
                   <svg width="40" height="14" viewBox="0 0 40 14">
@@ -217,9 +221,8 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
         <div
           class="klinecharts-pro-overlay-property-bar-item"
           onClick={() => {
-            const next = !showStylePicker()
             closeAllPopups()
-            setShowStylePicker(next)
+            toggleStylePicker()
           }}
         >
           <svg width="20" height="14" viewBox="0 0 20 14">
@@ -247,7 +250,7 @@ const OverlayPropertyBar: Component<OverlayPropertyBarProps> = (props) => {
                   onClick={(e) => {
                     e.stopPropagation()
                     props.onLineStyleChange(s.key)
-                    setShowStylePicker(false)
+                    closeStylePicker()
                   }}
                 >
                   <svg width="40" height="14" viewBox="0 0 40 14">

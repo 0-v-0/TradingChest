@@ -22,8 +22,12 @@ export const DrawdownAreaChart: Component<DrawdownAreaChartProps> = (props) => {
   const usableWidth = WIDTH - PAD_X * 2
   const usableHeight = height - PAD_Y * 2
   const values = props.series.map((point) => point.drawdown_pct).filter(finite)
-  const minValue = values.reduce((min, v) => Math.min(min, v), -0.01)
-  const maxValue = values.reduce((max, v) => Math.max(max, v), 0)
+  let minValue = -0.01
+  let maxValue = 0
+  for (const v of values) {
+    if (v < minValue) minValue = v
+    if (v > maxValue) maxValue = v
+  }
   const range = Math.max(maxValue - minValue, 0.01)
   const yFor = (value: number) => PAD_Y + ((maxValue - value) / range) * usableHeight
   const xFor = (index: number) => {

@@ -185,7 +185,7 @@ async function createIndicator(
             const f = defaultFeatures[i]
             return f ? [f] : []
           })
-          return { name: indicator.name, calcParams: '', features, legends: [] }
+          return { name: indicator.name, calcParamsText: '', features, legends: [] }
         },
       } as unknown as IndicatorCreate,
       isStack,
@@ -697,18 +697,19 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     }
 
     ;(async () => {
-      for (const indicator of mainIndicators()) {
-        if (disposed) return
-        await createIndicator(widget, indicator, true, 'candle_pane')
-      }
+      const mainPromises = mainIndicators().map(
+        (indicator) => createIndicator(widget, indicator, true, 'candle_pane'),
+      )
+      await Promise.all(mainPromises)
+      if (disposed) return
       const subIndicatorMap: Record<string, string> = {}
-      for (const indicator of props.subIndicators!) {
-        if (disposed) return
+      const subPromises = props.subIndicators!.map(async (indicator) => {
         const paneId = await createIndicator(widget, indicator, true)
         if (paneId) {
           subIndicatorMap[indicator] = paneId
         }
-      }
+      })
+      await Promise.all(subPromises)
       if (!disposed) {
         setSubIndicators(subIndicatorMap)
       }
