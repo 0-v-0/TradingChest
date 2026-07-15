@@ -21,32 +21,29 @@ export interface IndicatorModalProps {
   onClose: () => void
 }
 
-// oxfmt-ignore
 // 主图指标（叠加在蜡烛图上）
 // 名称必须与 IndicatorTemplate.name 完全一致
-const MAIN_INDICATORS = [
+const MAIN_INDICATORS: readonly string[] = [
   'MA', 'EMA', 'SMA', 'BOLL', 'SAR', 'BBI',
   'DEMA', 'TEMA', 'WMA', 'HMA', 'KAMA', 'VWMA',
   'ZLEMA', 'MCGINLEY', 'ENVELOPES', 'T3',
   'ICHIMOKU', 'ALLIGATOR', 'LINEARREGRESSION',
-  'KC', 'DC', 'PIVOTPOINTS'
+  'KC', 'DC', 'PIVOTPOINTS',
 ]
 
-// oxfmt-ignore
-// 副图指标（独立面板）
-const SUB_INDICATORS = [
-  'MA', 'EMA', 'VOL', 'MACD', 'BOLL', 'KDJ',
-  'RSI', 'BIAS', 'BRAR', 'CCI', 'DMI',
-  'CR', 'PSY', 'DMA', 'TRIX', 'OBV',
-  'VR', 'WR', 'MTM', 'EMV', 'SAR',
-  'SMA', 'ROC', 'PVT', 'BBI', 'AO',
-  // 新增指标
-  'ATR', 'SUPERTREND',
-  'HV', 'STDDEV', 'CV', 'MI', 'UI', 'BBW',
-  'VWAP', 'MFI', 'CMF', 'AD', 'VROC', 'KVO', 'FI', 'ELDER_RAY',
-  'StochRSI', 'ADX', 'AROON', 'UO', 'FISHER',
-  'COPPOCK', 'PPO', 'DPO', 'KST', 'TMF',
-  'ZIGZAG'
+// Built-in klinecharts indicators not in indicatorCategories
+const BUILTIN_SUB_INDICATORS = [
+  'VOL', 'MACD', 'KDJ', 'RSI', 'BIAS', 'BRAR', 'CCI', 'DMI',
+  'CR', 'PSY', 'DMA', 'TRIX', 'OBV', 'VR', 'WR', 'MTM', 'EMV',
+  'ROC', 'PVT', 'AO',
+]
+
+// 副图指标（独立面板）: all category names + builtins, deduplicated
+const SUB_INDICATORS: readonly string[] = [
+  ...new Set([
+    ...BUILTIN_SUB_INDICATORS,
+    ...Object.values(indicatorCategories).flatMap(c => c.names),
+  ]),
 ]
 
 // 分类 Tab 列表

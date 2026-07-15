@@ -1,4 +1,27 @@
-export default {
+export interface IndicatorParamConfig {
+  /** i18n key or literal label for the parameter */
+  paramNameKey: string
+  /** Decimal precision for the input */
+  precision?: number
+  /** Minimum allowed value */
+  min?: number
+  /** Maximum allowed value */
+  max?: number
+  /** Override default value (if different from calcParams) */
+  default?: number
+  /** Style key path for color binding (e.g., 'lines[0].color') */
+  styleKey?: string
+}
+
+/**
+ * Custom parameter overrides for indicators that need non-default
+ * precision, min/max, style bindings, or custom labels.
+ * Indicators not listed here will get auto-generated params from their calcParams.
+ *
+ * IMPORTANT: When adding a new indicator with custom UI params, add an entry here.
+ * Indicators without an entry will fall back to auto-generated params from calcParams.
+ */
+const PARAM_OVERRIDES: Record<string, IndicatorParamConfig[]> = {
   AO: [
     { paramNameKey: 'params_1', precision: 0, min: 1, default: 5 },
     { paramNameKey: 'params_2', precision: 0, min: 1, default: 34 },
@@ -159,3 +182,29 @@ export default {
     { paramNameKey: 'pivot_type', precision: 0, min: 0, max: 2, default: 0 },
   ],
 }
+
+/**
+ * Get parameter configuration for an indicator.
+ * For indicators with custom overrides in PARAM_OVERRIDES, returns those.
+ * Otherwise, auto-generates params from the provided calcParams array.
+ */
+export function getIndicatorParams(
+  indicatorName: string,
+  calcParams?: number[],
+): IndicatorParamConfig[] {
+  // Check for explicit overrides first
+  const overrides = PARAM_OVERRIDES[indicatorName]
+  if (overrides) return overrides
+
+  // Auto-generate from calcParams for indicators not in PARAM_OVERRIDES
+  if (!calcParams || calcParams.length === 0) return []
+
+  return calcParams.map((val, i) => ({
+    paramNameKey: `params_${i + 1}`,
+    precision: 0,
+    min: 1,
+    default: val,
+  }))
+}
+
+export default PARAM_OVERRIDES

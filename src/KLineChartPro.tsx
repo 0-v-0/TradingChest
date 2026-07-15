@@ -12,6 +12,11 @@ import {
   type Overlay,
 } from 'klinecharts'
 import { render } from 'solid-js/web'
+
+/** Extended IndicatorCreate that supports extendData for custom indicator data */
+interface ChartIndicatorCreate extends IndicatorCreate {
+  extendData?: unknown
+}
 import type { AlertConfig } from './alert/types'
 import { AlertManager } from './alert'
 import ChartProComponent from './ChartProComponent'
@@ -30,7 +35,7 @@ import { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 import { MAIN_PANE_ID, COLOR_ALERT } from './types'
 
-const DEFAULT_PERIODS: readonly Period[] = [
+const DEFAULT_PERIODS: Period[] = [
   { multiplier: 1, timespan: 'minute' as const, text: '1m' },
   { multiplier: 5, timespan: 'minute' as const, text: '5m' },
   { multiplier: 15, timespan: 'minute' as const, text: '15m' },
@@ -93,9 +98,7 @@ export default class KLineChartPro implements ChartPro {
           drawingBarVisible={options.drawingBarVisible ?? true}
           symbol={options.symbol}
           period={options.period}
-          periods={
-            options.periods ?? DEFAULT_PERIODS as Period[]
-          }
+          periods={options.periods ?? DEFAULT_PERIODS}
           timezone={options.timezone ?? 'Asia/Shanghai'}
           mainIndicators={options.mainIndicators ?? ['MA']}
           subIndicators={options.subIndicators ?? ['VOL']}
@@ -382,7 +385,7 @@ export default class KLineChartPro implements ChartPro {
         name: 'TradeVis',
         extendData: { trades, _instanceId: this._instanceId },
         paneId: (paneOptions as { id?: string })?.id ?? MAIN_PANE_ID,
-      } as unknown as IndicatorCreate,
+      } as ChartIndicatorCreate,
       true,
     )
   }

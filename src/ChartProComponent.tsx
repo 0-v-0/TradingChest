@@ -17,6 +17,12 @@ import {
   type Crosshair,
   registerOverlay,
 } from 'klinecharts'
+
+/** Extended IndicatorCreate that supports custom tooltip data source and extendData */
+interface ChartIndicatorCreate extends IndicatorCreate {
+  createTooltipDataSource?: IndicatorCreate['createTooltipDataSource']
+  extendData?: unknown
+}
 import {
   createSignal,
   createEffect,
@@ -189,7 +195,7 @@ async function createIndicator(
           })
           return { name: indicator.name, calcParamsText: '', features, legends: [] }
         },
-      } as unknown as IndicatorCreate,
+      } as ChartIndicatorCreate,
       isStack,
     ) ?? null
   )
@@ -324,7 +330,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (overlay.name !== 'textAnnotation' && overlay.name !== 'note') return
     const current = getTextOverlayContent(overlay)
     const label =
-      overlay.name === 'note' ? '输入便签内容 / Enter note:' : '输入标注文字 / Enter text:'
+      overlay.name === 'note' ? tr('prompt_note') : tr('prompt_text')
     const input = window.prompt(label, current)
     if (input !== null && input.trim() !== '') {
       overlay.extendData = input.trim()

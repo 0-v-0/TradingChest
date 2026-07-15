@@ -15,6 +15,7 @@ export default class DefaultDatafeed implements Datafeed {
         detail?: { attempt?: number; error?: unknown },
       ) => void
       fetchTimeout?: number
+      onError?: (error: { type: string; message: string; raw?: unknown }) => void
     },
   ) {
     if (import.meta.env?.PROD) {
@@ -27,6 +28,7 @@ export default class DefaultDatafeed implements Datafeed {
     this._apiKey = apiKey
     this._onConnectionStateChange = options?.onConnectionStateChange ?? null
     this._fetchTimeout = options?.fetchTimeout ?? 15000
+    this._onError = options?.onError
   }
 
   private _apiKey: string
@@ -34,6 +36,7 @@ export default class DefaultDatafeed implements Datafeed {
     | ((state: ConnectionState, detail?: { attempt?: number; error?: unknown }) => void)
     | null
   private _fetchTimeout: number
+  private _onError?: (error: { type: string; message: string; raw?: unknown }) => void
 
   private _prevSymbolMarket?: string
   private _prevTicker?: string
@@ -53,7 +56,9 @@ export default class DefaultDatafeed implements Datafeed {
         },
       )
       if (!response.ok) {
-        console.warn(`searchSymbols failed: ${response.status} ${response.statusText}`)
+        const msg = `searchSymbols failed: ${response.status} ${response.statusText}`
+        console.warn(msg)
+        this._onError?.({ type: 'search', message: msg })
         return []
       }
       const result = await response.json()
@@ -69,6 +74,7 @@ export default class DefaultDatafeed implements Datafeed {
       }))
     } catch (e) {
       console.warn('searchSymbols error:', e)
+      this._onError?.({ type: 'search', message: 'Symbol search failed', raw: e })
       return []
     }
   }
@@ -88,7 +94,9 @@ export default class DefaultDatafeed implements Datafeed {
         },
       )
       if (!response.ok) {
-        console.warn(`getHistoryKLineData failed: ${response.status} ${response.statusText}`)
+        const msg = `getHistoryKLineData failed: ${response.status} ${response.statusText}`
+        console.warn(msg)
+        this._onError?.({ type: 'history', message: msg })
         return []
       }
       const result = await response.json()
@@ -103,6 +111,7 @@ export default class DefaultDatafeed implements Datafeed {
       }))
     } catch (e) {
       console.warn('getHistoryKLineData error:', e)
+      this._onError?.({ type: 'history', message: 'History data fetch failed', raw: e })
       return []
     }
   }

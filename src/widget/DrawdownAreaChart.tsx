@@ -1,5 +1,6 @@
 import { type Component, For, createMemo } from 'solid-js'
 import { finite, pathFromPoints } from './svg-utils'
+import t from '../i18n'
 
 export interface DrawdownPoint {
   timestamp: string
@@ -10,6 +11,7 @@ export interface DrawdownAreaChartProps {
   series: ReadonlyArray<DrawdownPoint>
   height?: number
   className?: string
+  lang?: string
 }
 
 const WIDTH = 720
@@ -83,9 +85,9 @@ export const DrawdownAreaChart: Component<DrawdownAreaChartProps> = (props) => {
           'margin-bottom': '8px',
         }}
       >
-        <strong style={{ 'font-size': '14px', color: '#172033' }}>Drawdown Trajectory</strong>
+        <strong style={{ 'font-size': '14px', color: '#172033' }}>{t('drawdown_chart_title', props.lang ?? 'en-US')}</strong>
         <span style={{ 'font-size': '12px', color: '#b42318' }}>
-          {chartData().latest !== undefined ? `当前 ${(chartData().latest! * 100).toFixed(2)}%` : '暂无数据'}
+          {chartData().latest !== undefined ? `${t('label_current', props.lang ?? 'en-US')} ${(chartData().latest! * 100).toFixed(2)}%` : t('label_no_data', props.lang ?? 'en-US')}
         </span>
       </div>
       <svg
@@ -124,7 +126,7 @@ export const DrawdownAreaChart: Component<DrawdownAreaChartProps> = (props) => {
           />
         ) : (
           <text x={WIDTH / 2} y={chartData().height / 2} text-anchor="middle" fill="#667085" font-size="13">
-            暂无 drawdown 数据
+            {t('no_drawdown_data', props.lang ?? 'en-US')}
           </text>
         )}
         <For each={chartData().points}>{([x, y]) => <circle cx={x} cy={y} r="3.5" fill="#d92d20" />}</For>

@@ -5,8 +5,14 @@ import type { KLineData } from 'klinecharts'
 import { COLOR_UP, COLOR_DOWN } from '../types'
 
 /**
- * 平均真实波幅（Average True Range）
- * 用于 Renko / RangeBars 等图表类型确定砖块/柱大小
+ * Average True Range (simplified ATR)
+ * Computes the mean TR over the first `period` bars for Renko / RangeBars brick sizing.
+ *
+ * NOTE: This intentionally uses inline TR instead of the shared `calcTR` from
+ * `indicator/utils` because: (1) we only need a scalar average, not a full array;
+ * (2) we only iterate up to `min(period, n-1)` bars rather than the entire dataset;
+ * (3) using calcTR would allocate 3 arrays (highs, lows, closes) + a result array
+ * only to sum a few values — unnecessary overhead for this narrow use case.
  */
 export function calcATR(dataList: KLineData[], period: number): number {
   if (dataList.length < 2) return 0

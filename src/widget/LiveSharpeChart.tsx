@@ -1,5 +1,6 @@
 import { type Component, For, createMemo } from 'solid-js'
 import { finite, pathFromPoints } from './svg-utils'
+import t from '../i18n'
 
 export interface LiveSharpePoint {
   timestamp: string
@@ -14,6 +15,7 @@ export interface LiveSharpeChartProps {
   threshold?: number
   height?: number
   className?: string
+  lang?: string
 }
 
 const WIDTH = 720
@@ -89,7 +91,7 @@ export const LiveSharpeChart: Component<LiveSharpeChartProps> = (props) => {
         }}
       >
         <strong style={{ 'font-size': '14px', color: '#172033' }}>
-          Rolling 60D Sharpe / Ratio
+          {t('sharpe_chart_title', props.lang ?? 'en-US')}
         </strong>
         <span
           style={{
@@ -98,8 +100,8 @@ export const LiveSharpeChart: Component<LiveSharpeChartProps> = (props) => {
           }}
         >
           {chartData().latest !== undefined
-            ? `当前 ${formatValue(chartData().latest!)} / 阈值 ${formatValue(threshold())}`
-            : '暂无数据'}
+            ? `${t('label_current', props.lang ?? 'en-US')} ${formatValue(chartData().latest!)} / ${t('label_threshold', props.lang ?? 'en-US')} ${formatValue(threshold())}`
+            : t('label_no_data', props.lang ?? 'en-US')}
         </span>
       </div>
       <svg
@@ -147,7 +149,7 @@ export const LiveSharpeChart: Component<LiveSharpeChartProps> = (props) => {
           />
         ) : (
           <text x={WIDTH / 2} y={chartData().height / 2} text-anchor="middle" fill="#667085" font-size="13">
-            暂无 LIVE 观察数据
+            {t('no_live_data', props.lang ?? 'en-US')}
           </text>
         )}
         <For each={chartData().points}>{([x, y]) => <circle cx={x} cy={y} r="3.5" fill="#2563eb" />}</For>
