@@ -254,7 +254,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [indicatorModalVisible, setIndicatorModalVisible] = createSignal(false)
   const [mainIndicators, setMainIndicators] = createSignal([...props.mainIndicators!])
   const [subIndicators, setSubIndicators] = createSignal<Record<string, string>>({})
-  const invalidateIndicatorCache = () => { cachedIndicatorGroups = null }
+  const invalidateIndicatorCache = () => { cachedIndicatorGroups = undefined }
 
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
   const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
@@ -265,11 +265,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [settingModalVisible, setSettingModalVisible] = createSignal(false)
   const [widgetDefaultStyles, setWidgetDefaultStyles] = createSignal<Styles>()
   // Snapshot styles only when the setting modal opens (avoids deep clone on every render)
-  const settingModalStyles = createMemo((prev: Styles | null): Styles | null => {
-    if (!settingModalVisible()) return null
-    if (prev !== null) return prev // modal still open, keep snapshot
-    return widget ? utils.clone(widget.getStyles()) : null
-  }, null)
+  const settingModalStyles = createMemo((prev?: Styles): Styles | undefined => {
+    if (!settingModalVisible()) return undefined
+    if (prev !== undefined) return prev // modal still open, keep snapshot
+    return widget ? utils.clone(widget.getStyles()) : undefined
+  }, undefined)
 
   const [screenshotUrl, setScreenshotUrl] = createSignal('')
 
@@ -499,7 +499,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [replayState, setReplayState] = createSignal<ReplayState>(defaultReplayState)
   let replayEngine: ReplayEngine | null = null
   let replayDataList: KLineData[] = []
-  let subscribeBarCallback: ((data: KLineData) => void) | null = null
+  let subscribeBarCallback: ((data: KLineData) => void) | undefined
 
   const setChartPeriod = (nextPeriod: Period) => {
     if (replayEngine) return
@@ -617,11 +617,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let resizeRaf = 0
   let crosshairRaf = 0
   /** Cached indicator grouping for crosshair data window — invalidated on indicator add/remove */
-  let cachedIndicatorGroups: Record<string, Indicator[]> | null = null
+  let cachedIndicatorGroups: Record<string, Indicator[]> | undefined
   /** Action callback references for cleanup */
-  let onTooltipClick: ((data: unknown) => void) | null = null
-  let onBarClick: (() => void) | null = null
-  let onCrosshair: ((data: unknown) => void) | null = null
+  let onTooltipClick: ((data: unknown) => void) | undefined
+  let onBarClick: (() => void) | undefined
+  let onCrosshair: ((data: unknown) => void) | undefined
   const documentResize = () => {
     if (resizeRaf) return
     resizeRaf = requestAnimationFrame(() => {
@@ -889,8 +889,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     window.removeEventListener('resize', documentResize)
     if (resizeRaf) cancelAnimationFrame(resizeRaf)
     if (crosshairRaf) cancelAnimationFrame(crosshairRaf)
-    subscribeBarCallback = null
-    cachedIndicatorGroups = null
+    subscribeBarCallback = undefined
+    cachedIndicatorGroups = undefined
     // Unsubscribe klinecharts actions to prevent stale callbacks
     if (widget) {
       if (onTooltipClick) widget.unsubscribeAction('onIndicatorTooltipFeatureClick', onTooltipClick!)

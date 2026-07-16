@@ -6,7 +6,7 @@ import pluginPromise from 'eslint-plugin-promise'
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ['dist/**', 'node_modules/**', '.*/**', 'e2e/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

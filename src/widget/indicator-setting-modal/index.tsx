@@ -15,7 +15,7 @@ export interface IndicatorSettingModalProps {
 const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => {
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
   createEffect(() => {
-    props.params.calcParams
+    void props.params.calcParams
     setCalcParams(utils.clone(props.params.calcParams))
   })
 

@@ -108,7 +108,7 @@ const mockDatafeed: Datafeed = {
 // Pre-load locale data then create KLineChartPro instance
 const container = document.getElementById('root')!
 KLineChartPro.preloadLocale('en-US').then(() => {
-const chartInstance = new KLineChartPro({
+  const chartInstance = new KLineChartPro({
   container,
   symbol: mockSymbol,
   period: mockPeriods[0],
@@ -134,7 +134,7 @@ const chartInstance = new KLineChartPro({
   onOverlayDelete: (event) => {
     overlayEvents.push({ type: 'delete', ...event })
   },
-})
+  })
 
-globalThis.chartInstance = chartInstance
+  globalThis.chartInstance = chartInstance
 })
