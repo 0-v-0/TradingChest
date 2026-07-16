@@ -9,7 +9,6 @@ import {
   type TooltipFeaturePosition,
   type TooltipFeatureStyle,
   type Indicator,
-  type IndicatorCreate,
   type Coordinate,
   type PeriodType,
   type Overlay,
@@ -18,11 +17,7 @@ import {
   registerOverlay,
 } from 'klinecharts'
 
-/** Extended IndicatorCreate that supports custom tooltip data source and extendData */
-interface ChartIndicatorCreate extends IndicatorCreate {
-  createTooltipDataSource?: IndicatorCreate['createTooltipDataSource']
-  extendData?: unknown
-}
+import type { ChartIndicatorCreate } from './types'
 import {
   createSignal,
   createEffect,

@@ -1,4 +1,4 @@
-import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate, Nullable } from 'klinecharts'
+import type { Overlay, KLineData, Styles, DeepPartial, Chart, OverlayTemplate, Nullable, IndicatorCreate } from 'klinecharts'
 
 // ─── Project-wide constants ───────────────────────────────────────────
 
@@ -93,6 +93,11 @@ export interface IndicatorClickEvent {
   /** 点击像素坐标（相对于 widget） */
   x: number
   y: number
+}
+
+/** Extended IndicatorCreate that supports extendData for custom indicator data */
+export interface ChartIndicatorCreate extends IndicatorCreate {
+  extendData?: unknown
 }
 
 export type OverlayLifecycleSource = 'drawing-bar' | 'property-bar' | 'keyboard' | 'programmatic'

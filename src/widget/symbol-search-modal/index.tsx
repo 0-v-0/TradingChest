@@ -1,4 +1,4 @@
-import { createSignal, createResource, Show, type Component } from 'solid-js'
+import { createSignal, createResource, Show, onCleanup, type Component } from 'solid-js'
 import { Modal, List, Input } from '../../component'
 import t from '../../i18n'
 import type { SymbolInfo, Datafeed } from '../../types'
@@ -19,6 +19,7 @@ const SymbolSearchModal: Component<SymbolSearchModalProps> = (props) => {
   const [debouncedValue, setDebouncedValue] = createSignal('')
   const [symbolList] = createResource(debouncedValue, props.datafeed.searchSymbols.bind(props.datafeed))
   let searchTimer: ReturnType<typeof setTimeout> | undefined
+  onCleanup(() => clearTimeout(searchTimer))
 
   return (
     <Modal title={t('symbol_search', props.lang)} width={600} onClose={props.onClose}>

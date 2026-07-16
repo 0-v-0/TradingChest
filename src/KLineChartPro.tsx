@@ -5,7 +5,6 @@ import {
   type Nullable,
   type DeepPartial,
   type Styles,
-  type IndicatorCreate,
   type KLineData,
   type OverlayCreate,
   type OverlayTemplate,
@@ -14,10 +13,7 @@ import {
 } from 'klinecharts'
 import { render } from 'solid-js/web'
 
-/** Extended IndicatorCreate that supports extendData for custom indicator data */
-interface ChartIndicatorCreate extends IndicatorCreate {
-  extendData?: unknown
-}
+import type { ChartIndicatorCreate } from './types'
 import type { AlertConfig } from './alert/types'
 import { AlertManager } from './alert'
 import ChartProComponent from './ChartProComponent'

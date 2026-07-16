@@ -41,6 +41,7 @@ export default class DefaultDatafeed implements Datafeed {
   #prevSymbolMarket?: string
   #prevTicker?: string
   #currentTicker?: string
+  #authed = false
 
   #ws?: ReconnectingWebSocket
 
@@ -137,12 +138,14 @@ export default class DefaultDatafeed implements Datafeed {
         maxDelay: 30000,
       })
       this.#ws.onopen = () => {
+        this.#authed = false
         this.#ws?.send(JSON.stringify({ action: 'auth', params: this.#apiKey }))
       }
       this.#ws.onerror = () => {
         this.#onConnectionStateChange?.('disconnected', { error: 'WebSocket error' })
       }
       this.#ws.onclose = () => {
+        this.#authed = false
         this.#onConnectionStateChange?.('disconnected')
       }
       this.#ws.onreconnect = (attempt) => {
@@ -159,6 +162,7 @@ export default class DefaultDatafeed implements Datafeed {
         if (!Array.isArray(result) || result.length === 0) return
         if (result[0].ev === 'status') {
           if (result[0].status === 'auth_success') {
+            this.#authed = true
             this.#onConnectionStateChange?.('connected')
             if (this.#currentTicker) {
               this.#ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${this.#currentTicker}` }))
@@ -198,7 +202,9 @@ export default class DefaultDatafeed implements Datafeed {
       }
       if (this.#currentTicker !== ticker) {
         this.#currentTicker = ticker
-        this.#ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${ticker}` }))
+        if (this.#authed) {
+          this.#ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${ticker}` }))
+        }
       }
     }
     this.#prevSymbolMarket = symbol.market
@@ -212,11 +218,9 @@ export default class DefaultDatafeed implements Datafeed {
       } catch {
         // WebSocket may already be closed
       }
+      this.#currentTicker = undefined
       if (this.#prevTicker === symbol.ticker) {
         this.#prevTicker = undefined
-        this.#currentTicker = undefined
-      } else {
-        this.#currentTicker = undefined
       }
     }
     this.#callback = undefined
@@ -225,6 +229,7 @@ export default class DefaultDatafeed implements Datafeed {
   dispose(): void {
     this.#prevTicker = undefined
     this.#currentTicker = undefined
+    this.#authed = false
     if (this.#ws) {
       this.#ws.close()
       this.#ws = undefined

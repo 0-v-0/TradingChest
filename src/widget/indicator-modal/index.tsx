@@ -7,6 +7,7 @@ import {
   addFavoriteIndicator,
   removeFavoriteIndicator,
   isFavoriteIndicator,
+  getFavoriteIndicators,
 } from '../../core/favorites'
 
 type OnIndicatorChange = (params: { name: string; paneId: string; added: boolean }) => void
@@ -48,7 +49,6 @@ const SUB_INDICATORS: readonly string[] = [
 
 // 分类 Tab 列表
 const CATEGORY_KEYS = ['all', 'favorites', 'trend', 'volatility', 'volume', 'momentum', 'other'] as const
-const CATEGORY_KEYS_LIST = [...CATEGORY_KEYS]
 
 const StarIcon: Component<{ name: string; favVersion: Accessor<number>; onToggle: (name: string, e: MouseEvent) => void }> = (props) => {
   const fav = createMemo(() => {
@@ -90,6 +90,12 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
     favVersion()
     const search = searchText().toLowerCase()
     const cat = activeCategory()
+    let catNameSet: Set<string> | undefined
+    if (cat !== 'all' && cat !== 'favorites') {
+      const category = indicatorCategories[cat]
+      if (category) catNameSet = new Set(category.names)
+    }
+    const favSet = cat === 'favorites' ? new Set(getFavoriteIndicators()) : undefined
     return source.filter((name) => {
       if (
         search &&
@@ -99,9 +105,8 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         return false
       }
       if (cat === 'all') return true
-      if (cat === 'favorites') return isFavoriteIndicator(name)
-      const category = indicatorCategories[cat]
-      return category?.names.includes(name) ?? false
+      if (cat === 'favorites') return favSet!.has(name)
+      return catNameSet?.has(name) ?? false
     })
   }
 
@@ -151,7 +156,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
       </div>
       {/* 分类 Tab */}
       <div class="klinecharts-pro-indicator-modal-tabs">
-        <For each={CATEGORY_KEYS_LIST}>
+        <For each={CATEGORY_KEYS}>
           {(key) => (
             <span
               class={`klinecharts-pro-indicator-modal-tab${activeCategory() === key ? ' active' : ''}`}

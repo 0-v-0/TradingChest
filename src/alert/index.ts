@@ -66,7 +66,8 @@ export class AlertManager {
       }
 
       if (triggered) {
-        alert.triggered = true
+        const updated = { ...alert, triggered: true }
+        this.#alerts.set(alert.id, updated)
         try {
           this.onTrigger?.({
             alert,
@@ -86,8 +87,10 @@ export class AlertManager {
   }
 
   resetAll(): void {
-    for (const alert of this.#alerts.values()) {
-      alert.triggered = false
+    for (const [id, alert] of this.#alerts) {
+      if (alert.triggered) {
+        this.#alerts.set(id, { ...alert, triggered: false })
+      }
     }
   }
 }

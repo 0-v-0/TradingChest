@@ -1,5 +1,5 @@
 import { utils } from 'klinecharts'
-import { createSignal, createEffect, type Component } from 'solid-js'
+import { createSignal, createEffect, on, type Component } from 'solid-js'
 import { Modal, Input } from '../../component'
 import t from '../../i18n'
 import { getIndicatorParams, type IndicatorParamConfig } from './data'
@@ -14,10 +14,10 @@ export interface IndicatorSettingModalProps {
 
 const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => {
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
-  createEffect(() => {
-    void props.params.calcParams
-    setCalcParams(utils.clone(props.params.calcParams))
-  })
+  createEffect(on(
+    () => props.params.calcParams,
+    (params) => setCalcParams(utils.clone(params)),
+  ))
 
   const getConfig: (name: string) => IndicatorParamConfig[] = (name: string) => {
     return getIndicatorParams(name, props.params.calcParams)
@@ -34,7 +34,7 @@ const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => 
           onClick: () => {
             const config = getConfig(props.params.indicatorName)
             const params: number[] = []
-            utils.clone(calcParams()).forEach((param: number, i: number) => {
+            calcParams().forEach((param: number, i: number) => {
               if (!utils.isValid(param)) {
                 if ('default' in config[i]) {
                   params.push(config[i]['default'] as number)
