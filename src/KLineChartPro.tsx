@@ -32,6 +32,7 @@ import {
 } from './indicator/trade/tradeVisualization'
 import { ReplayEngine } from './replay/ReplayEngine'
 import KeyboardShortcutManager from './shortcut'
+import { createDefaultActions, type ShortcutActionContext } from './shortcut/actions'
 import { UndoRedoManager } from './shortcut/undoRedo'
 import type { SymbolInfo, Period, ChartPro, ChartProOptions } from './types'
 import { MAIN_PANE_ID, COLOR_ALERT } from './types'
@@ -184,73 +185,14 @@ export default class KLineChartPro implements ChartPro {
   /** 4. 初始化快捷键管理器 */
   #initShortcutManager(): void {
     this.#shortcutManager = new KeyboardShortcutManager()
-    this.#shortcutManager.registerActions({
-      'nav:scrollToEnd': () => {
-        this.getChart()?.scrollToRealTime()
-      },
-      'nav:scrollToStart': () => {
-        this.getChart()?.scrollToDataIndex(0)
-      },
-      'nav:zoomIn': () => {
-        this.#zoom(1.2)
-      },
-      'nav:zoomOut': () => {
-        this.#zoom(0.8)
-      },
-      // 图表操作
-      'chart:screenshot': () => {
-        this.exportScreenshot()
-      },
-      'chart:undo': () => {
-        this.#undoRedoManager.undo()
-      },
-      'chart:redo': () => {
-        this.#undoRedoManager.redo()
-      },
-      'chart:cancelDraw': () => {
-        this.getChart()?.removeOverlay()
-      },
-      'chart:deleteSelected': () => {
-        this.getChart()?.removeOverlay()
-      },
-      // 绘图工具
-      'draw:straightLine': () => {
-        this.getChart()?.createOverlay('straightLine')
-      },
-      'draw:horizontalStraightLine': () => {
-        this.getChart()?.createOverlay('horizontalStraightLine')
-      },
-      'draw:verticalStraightLine': () => {
-        this.getChart()?.createOverlay('verticalStraightLine')
-      },
-      'draw:fibonacciLine': () => {
-        this.getChart()?.createOverlay('fibonacciLine')
-      },
-      'draw:rect': () => {
-        this.getChart()?.createOverlay('rect')
-      },
-      'draw:brush': () => {
-        this.getChart()?.createOverlay('simpleAnnotation')
-      },
-      'draw:dateAndPriceRange': () => {
-        this.getChart()?.createOverlay('dateAndPriceRange')
-      },
-      // 显示切换
-      'toggle:crosshair': () => {
-        const chart = this.getChart()
-        if (!chart) return
-        const s = chart.getStyles()
-        const show = s.crosshair?.show !== false
-        chart.setStyles({ crosshair: { show: !show } })
-      },
-      'toggle:grid': () => {
-        const chart = this.getChart()
-        if (!chart) return
-        const s = chart.getStyles()
-        const show = s.grid?.show !== false
-        chart.setStyles({ grid: { show: !show } })
-      },
-    })
+    const ctx: ShortcutActionContext = {
+      getChart: () => this.getChart(),
+      zoom: (f) => this.#zoom(f),
+      undo: () => this.#undoRedoManager.undo(),
+      redo: () => this.#undoRedoManager.redo(),
+      exportScreenshot: (o) => this.exportScreenshot(o),
+    }
+    this.#shortcutManager.registerActions(createDefaultActions(ctx))
     this.#shortcutManager.bindTo(this.#container!)
   }
 

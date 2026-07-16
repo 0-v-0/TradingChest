@@ -23,9 +23,8 @@ const Select: Component<SelectProps> = (props) => {
         typeof data === 'string'
           ? { key: data, text: data }
           : data as SelectDataSourceItem
-      const v: JSX.Element =
-        (d as unknown as Record<string, JSX.Element>)[props.valueKey ?? 'text'] ??
-        d.text
+      const valueKey = props.valueKey ?? 'text'
+      const v: JSX.Element = valueKey === 'text' ? d.text : (d as unknown as Record<string, JSX.Element>)[valueKey] ?? d.text
       const isSelected = props.value === v
       return { data, v, isSelected }
     }) ?? [],

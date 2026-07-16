@@ -14,18 +14,14 @@ export interface ThemeEditorProps {
   onApply: (styles: DeepPartial<Styles>) => void
 }
 
-function toRecord(value: Styles): Record<string, unknown> {
-  return value as unknown as Record<string, unknown>
-}
-
 const ThemeEditor: Component<ThemeEditorProps> = (props) => {
   void props.localeKey
-  const [localStyles, setLocalStyles] = createSignal<Record<string, unknown>>(
-    toRecord(utils.clone(props.currentStyles))
+  const [localStyles, setLocalStyles] = createSignal<object>(
+    utils.clone(props.currentStyles)
   )
 
   const handleColorChange = (key: string, color: string) => {
-    const next = utils.clone(localStyles()) as Record<string, unknown>
+    const next = utils.clone(localStyles())
     deepSet(next, key, color)
     setLocalStyles(next)
   }
@@ -49,7 +45,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
       reader.onload = () => {
         const styles = importTheme(reader.result as string)
         if (styles) {
-          setLocalStyles(toRecord(utils.clone(props.currentStyles)))
+          setLocalStyles(utils.clone(props.currentStyles))
           props.onApply(styles)
         }
       }
@@ -62,7 +58,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
   }
 
   const handleApply = () => {
-    props.onApply(localStyles() as unknown as DeepPartial<Styles>)
+    props.onApply(localStyles() as DeepPartial<Styles>)
   }
 
   return (
@@ -79,7 +75,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
       <div class="klinecharts-pro-theme-editor">
         {themeEditorFields.map((field) => {
           const value = utils.formatValue(
-            localStyles() as unknown as Styles,
+            localStyles() as Styles,
             field.key,
           ) as string | undefined
           return (

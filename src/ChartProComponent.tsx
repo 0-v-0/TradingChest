@@ -93,9 +93,14 @@ interface KlcInternalStore {
   _crosshair?: { kLineData?: KLineData; paneId?: string; dataIndex?: number; x?: number; y?: number }
 }
 
+/** klinecharts Chart with internal _chartStore (not on public type, accessed via unknown) */
+interface ChartWithInternalStore extends Chart {
+  _chartStore?: KlcInternalStore
+}
+
 function readInternalCrosshair(chart: Chart): Crosshair | undefined {
   try {
-    const store = (chart as unknown as { _chartStore?: KlcInternalStore })._chartStore
+    const store = (chart as unknown as ChartWithInternalStore)._chartStore
     if (store?._crosshair) {
       return store._crosshair as Crosshair
     }
@@ -758,7 +763,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         const s = symbol()
         const p = period()
         props.datafeed.subscribe(s, p, (data) => {
-          params.callback(data as unknown as KLineData)
+          params.callback(data)
           props.onPriceUpdate?.(data.close)
         })
       },

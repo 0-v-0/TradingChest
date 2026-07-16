@@ -69,7 +69,7 @@ export function loadLayout(key: string): ChartLayout | null {
     if (!Array.isArray(data.subIndicators) || !data.subIndicators.every((v: unknown) => typeof v === 'string')) return null
     if (data.styles !== null && typeof data.styles !== 'object') return null
     if (!Array.isArray(data.overlayData)) return null
-    const migrated = migrateLayout(data as unknown as ChartLayout)
+    const migrated = migrateLayout(data)
     return migrated
   } catch (e) {
     console.warn('[TradingChest] load layout failed:', e)
@@ -112,12 +112,17 @@ export function listLayouts(): Array<{ key: string; timestamp: number }> {
  * Returns null if the payload cannot be migrated.
  * Plug new migration steps here when CURRENT_VERSION is bumped.
  */
-function migrateLayout(data: ChartLayout): ChartLayout | null {
-  if (data.version > CURRENT_VERSION) {
-    console.warn(`[TradingChest] layout version ${data.version} is newer than supported (${CURRENT_VERSION}); ignoring`)
+function asChartLayout(data: Record<string, unknown>): ChartLayout {
+  return data as unknown as ChartLayout
+}
+
+function migrateLayout(data: Record<string, unknown>): ChartLayout | null {
+  const version = data.version as number
+  if (version > CURRENT_VERSION) {
+    console.warn(`[TradingChest] layout version ${version} is newer than supported (${CURRENT_VERSION}); ignoring`)
     return null
   }
-  if (data.version === CURRENT_VERSION) return data
+  if (version === CURRENT_VERSION) return asChartLayout(data)
   // No migrations yet; future versions chain here.
   return null
 }

@@ -5,10 +5,10 @@ const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
  * Rejects __proto__/constructor/prototype segments to prevent prototype pollution.
  * Returns true if the assignment was applied, false if the path was unsafe or empty.
  */
-export function deepSet(obj: Record<string, unknown>, path: string, value: unknown): boolean {
+export function deepSet(obj: object, path: string, value: unknown): boolean {
   if (!path) return false
   const keys = path.split('.')
-  let current: Record<string, unknown> = obj
+  let current: Record<string, unknown> = obj as Record<string, unknown>
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i]
     if (UNSAFE_KEYS.has(key)) return false

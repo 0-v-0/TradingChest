@@ -2,8 +2,9 @@ import type { IndicatorTemplate } from 'klinecharts'
 
 type ChartTypeLoader = () => Promise<IndicatorTemplate>
 
+/** Erase generic params — IndicatorTemplate<D,C> is assignable to IndicatorTemplate at runtime */
 const load = <D, C>(m: { default: IndicatorTemplate<D, C> }): IndicatorTemplate =>
-  m.default as unknown as IndicatorTemplate
+  m.default as IndicatorTemplate
 
 // oxfmt-ignore
 export const chartTypeLoaders: Record<string, ChartTypeLoader> = {

@@ -17,7 +17,7 @@ export function findNearestIndex<T>(
   const len = sorted.length
   if (len === 0) return -1
 
-  const get = accessor ?? ((item: T) => item as unknown as number)
+  const get = accessor ?? ((item: T) => item as number)
 
   let lo = 0
   let hi = len - 1
