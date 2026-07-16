@@ -2,7 +2,7 @@ import type { OverlayTemplate } from 'klinecharts'
 
 type OverlayLoader = () => Promise<OverlayTemplate>
 
-const load = <D, C>(m: { default: OverlayTemplate }): OverlayTemplate =>
+const load = (m: { default: OverlayTemplate }): OverlayTemplate =>
   m.default as unknown as OverlayTemplate
 
 // oxfmt-ignore

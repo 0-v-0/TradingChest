@@ -1,5 +1,5 @@
 import { utils } from 'klinecharts'
-import { createSignal, createMemo, type Component } from 'solid-js'
+import { createSignal, createEffect, type Component } from 'solid-js'
 import { Modal, Input } from '../../component'
 import t from '../../i18n'
 import { getIndicatorParams, type IndicatorParamConfig } from './data'
@@ -13,11 +13,9 @@ export interface IndicatorSettingModalProps {
 }
 
 const IndicatorSettingModal: Component<IndicatorSettingModalProps> = (props) => {
-  void props.localeKey
   const [calcParams, setCalcParams] = createSignal(utils.clone(props.params.calcParams))
-  const paramsKey = createMemo(() => props.params.calcParams)
-  createMemo(() => {
-    paramsKey()
+  createEffect(() => {
+    props.params.calcParams
     setCalcParams(utils.clone(props.params.calcParams))
   })
 

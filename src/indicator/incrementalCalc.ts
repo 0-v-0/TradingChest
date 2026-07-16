@@ -5,6 +5,7 @@ type CalcFn = (dataList: KLineData[], indicator: Indicator) => Array<Record<stri
 /**
  * Wraps a full-recalculation indicator `calc` function with an incremental
  * caching layer.
+ * @internal Only used by test code. Not part of the public API.
  *
  * On every KLineChart update the chart calls the indicator's `calc` with the
  * complete data list. This wrapper detects two cheap cases and avoids

@@ -92,10 +92,10 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
 
   const modes = createMemo(() => createMagnetOptions(props.lang))
 
-  let barRef!: HTMLDivElement
+  let barRef: HTMLDivElement | undefined
   onMount(() => {
     const handleOutside = (e: PointerEvent) => {
-      if (popoverKey() && !barRef?.contains(e.target as Node)) {
+      if (popoverKey() && barRef && !barRef.contains(e.target as Node)) {
         setPopoverKey('')
       }
     }
@@ -104,7 +104,7 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
   })
 
   return (
-    <div ref={barRef} class="klinecharts-pro-drawing-bar">
+    <div ref={(el) => { barRef = el }} class="klinecharts-pro-drawing-bar">
       <Show when={favoriteTools().length > 0}>
         <div class="favorites-group">
           <For each={favoriteTools()}>{(toolName) => (

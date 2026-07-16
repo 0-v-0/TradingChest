@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { normalizeToPercent } from '../index'
+import type { KLineData } from 'klinecharts'
 
 describe('normalizeToPercent', () => {
   it('将价格序列归一化为百分比变化', () => {
@@ -8,8 +9,7 @@ describe('normalizeToPercent', () => {
       { timestamp: 2, open: 105, high: 115, low: 95, close: 110, volume: 1000, turnover: 0 },
       { timestamp: 3, open: 95, high: 105, low: 85, close: 90, volume: 1000, turnover: 0 },
     ]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = normalizeToPercent(data as any)
+    const result = normalizeToPercent(data as unknown as KLineData[])
     expect(result[0]).toBeCloseTo(0)
     expect(result[1]).toBeCloseTo(10)
     expect(result[2]).toBeCloseTo(-10)
@@ -23,15 +23,13 @@ describe('normalizeToPercent', () => {
     const data = [
       { timestamp: 1, open: 0, high: 0, low: 0, close: 0, volume: 0 },
       { timestamp: 2, open: 1, high: 1, low: 1, close: 1, volume: 0 },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ] as any
+    ] as unknown as KLineData[]
     const result = normalizeToPercent(data)
     expect(result).toEqual([0, 0])
   })
 
   it('单元素数组返回 [0]', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = [{ timestamp: 1, open: 10, high: 10, low: 10, close: 10, volume: 0 }] as any
+    const data = [{ timestamp: 1, open: 10, high: 10, low: 10, close: 10, volume: 0 }] as unknown as KLineData[]
     const result = normalizeToPercent(data)
     expect(result).toEqual([0])
   })

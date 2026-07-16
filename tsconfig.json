@@ -12,6 +12,7 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": ["vite/client", "vitest/globals"],
+    "useUnknownInCatchVariables": true,
   },
   "include": ["src"],
   "exclude": ["src/**/__tests__/**"],

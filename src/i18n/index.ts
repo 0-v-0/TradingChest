@@ -32,24 +32,17 @@ function parseIni(content: string): Record<string, string> {
   return result
 }
 
+const localeImports: Record<string, () => Promise<{ default: string }>> = {
+  'zh-CN': () => import('./zh-CN.ini?raw'),
+  'en-US': () => import('./en-US.ini?raw'),
+  'ja': () => import('./ja.ini?raw'),
+  'ko': () => import('./ko.ini?raw'),
+}
+
 async function loadLocale(locale: string): Promise<void> {
-  let content: { default: string }
-  switch (locale) {
-    case 'zh-CN':
-      content = await import('./zh-CN.ini?raw')
-      break
-    case 'en-US':
-      content = await import('./en-US.ini?raw')
-      break
-    case 'ja':
-      content = await import('./ja.ini?raw')
-      break
-    case 'ko':
-      content = await import('./ko.ini?raw')
-      break
-    default:
-      return
-  }
+  const importFn = localeImports[locale]
+  if (!importFn) return
+  const content = await importFn()
   locales[locale] = parseIni(content.default)
   loadedLanguages.add(locale)
   notifyListeners()

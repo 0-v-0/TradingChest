@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { IndicatorRegistry } from '../registry'
+import type { IndicatorTemplate } from 'klinecharts'
 
 describe('IndicatorRegistry', () => {
   let registry: IndicatorRegistry
@@ -52,8 +53,7 @@ describe('IndicatorRegistry', () => {
     registry.setLoader('FAIL_THEN_OK', async () => {
       callCount++
       if (callCount === 1) throw new Error('network error')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return { name: 'FAIL_THEN_OK', calc: () => [] } as any
+      return { name: 'FAIL_THEN_OK', calc: () => [] } as unknown as IndicatorTemplate
     })
 
     // First call fails

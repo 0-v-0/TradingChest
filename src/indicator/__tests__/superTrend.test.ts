@@ -1,4 +1,4 @@
-import { KLineData } from 'klinecharts'
+import { KLineData, type Indicator } from 'klinecharts'
 import { describe, it, expect } from 'vitest'
 import superTrend from '../trend/superTrend'
 
@@ -17,9 +17,8 @@ function makeKlines(count: number): KLineData[] {
   }))
 }
 
-// calc 返回类型包含 Promise 联合，但实际同步执行；断言为具体数组类型
-function calc(dataList: KLineData[], indicator: { calcParams: number[] }): SuperTrendResult[] {
-  return superTrend.calc!(dataList, indicator as any) as SuperTrendResult[]
+function calc(dataList: KLineData[], indicator: Indicator<SuperTrendResult, number, unknown>): SuperTrendResult[] {
+  return superTrend.calc!(dataList, indicator) as SuperTrendResult[]
 }
 
 describe('SuperTrend indicator', () => {

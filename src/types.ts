@@ -34,7 +34,7 @@ export const COLOR_DOWN_ALPHA_15 = 'rgba(239, 83, 80, 0.15)'
 export const COLOR_DOWN_ALPHA_40 = 'rgba(239, 83, 80, 0.4)'
 export const COLOR_DOWN_ALPHA_50 = 'rgba(239, 83, 80, 0.5)'
 export const COLOR_DOWN_ALPHA_60 = 'rgba(239, 83, 80, 0.6)'
-export const COLOR_DOWN_ALPHA_80 = 'rgba(239, 83, 80, 0.8)'
+
 export const COLOR_DOWN_ALPHA_90 = 'rgba(239, 83, 80, 0.9)'
 export const COLOR_DOWN_ALPHA_95 = 'rgba(239, 83, 80, 0.95)'
 

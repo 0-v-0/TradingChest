@@ -1,10 +1,6 @@
-import { registerOverlay, registerIndicator } from 'klinecharts'
-import chartTypes from './chartType'
 import DefaultDatafeed from './DefaultDatafeed'
-import overlays from './extension'
 import { overlayLoaders } from './extension/loaders'
 import { load } from './i18n'
-import tradeVisualization from './indicator/trade/tradeVisualization'
 import KLineChartPro from './KLineChartPro'
 import { chartTypeLoaders } from './chartType/loaders'
 import './index.css'
@@ -16,14 +12,6 @@ import type {
   ChartProOptions,
   ChartPro,
 } from './types'
-
-overlays.forEach((o) => {
-  registerOverlay(o)
-})
-chartTypes.forEach((ct) => {
-  registerIndicator(ct)
-})
-registerIndicator(tradeVisualization)
 
 import { exportToCSV, exportAllToCSV, exportScreenshot } from './export'
 import { indicatorCategories, indicatorRegistry } from './indicator'

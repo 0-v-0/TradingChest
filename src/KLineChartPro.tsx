@@ -1,6 +1,7 @@
 import {
   utils,
   registerIndicator,
+  registerOverlay,
   type Nullable,
   type DeepPartial,
   type Styles,
@@ -48,6 +49,22 @@ const DEFAULT_PERIODS: Period[] = [
   { multiplier: 1, timespan: 'year' as const, text: 'Y' },
 ]
 
+/** Lazy eager-registration for built-in overlays, chart types, and trade visualization.
+ *  Called once on first KLineChartPro instantiation to avoid paying the cost at module load. */
+let _coreRegistered = false
+async function ensureCoreRegistered(): Promise<void> {
+  if (_coreRegistered) return
+  _coreRegistered = true
+  const [overlays, chartTypes, tradeVisualization] = await Promise.all([
+    import('./extension'),
+    import('./chartType'),
+    import('./indicator/trade/tradeVisualization'),
+  ])
+  overlays.default.forEach(registerOverlay)
+  chartTypes.default.forEach(registerIndicator)
+  registerIndicator(tradeVisualization.default)
+}
+
 /** Hit detection radius for trade visualization click (px) */
 const TRADE_HIT_RADIUS = 40
 
@@ -58,6 +75,8 @@ export default class KLineChartPro implements ChartPro {
   }
 
   constructor(options: ChartProOptions) {
+    // Fire-and-forget: eagerly register core overlays/chart types/tradeVis on first instantiation
+    ensureCoreRegistered()
     this._initContainer(options)
     this._initSolidRender(options)
     this._datafeed = options.datafeed

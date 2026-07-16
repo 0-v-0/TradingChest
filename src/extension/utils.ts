@@ -1,4 +1,5 @@
 import { utils, type Coordinate, type Bounding, type LineAttrs, type CircleAttrs, type TextAttrs, type OverlayTemplate } from 'klinecharts'
+import { COLOR_UP_ALPHA_15, COLOR_DOWN_ALPHA_15, COLOR_UP_ALPHA_60, COLOR_DOWN_ALPHA_60 } from '../types'
 
 export function getRotateCoordinate(
   coordinate: Coordinate,
@@ -178,8 +179,8 @@ export function computePriceRangeFigures(
   const percentChange = (priceDiff / price1) * 100
   const isUp = priceDiff >= 0
   const bars = Math.abs(Math.round((x2 - x1) / BAR_WIDTH_APPROX))
-  const fillColor = isUp ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)'
-  const borderColor = isUp ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'
+  const fillColor = isUp ? COLOR_UP_ALPHA_15 : COLOR_DOWN_ALPHA_15
+  const borderColor = isUp ? COLOR_UP_ALPHA_60 : COLOR_DOWN_ALPHA_60
   const sign = priceDiff >= 0 ? '+' : ''
   return { priceDiff, percentChange, isUp, fillColor, borderColor, sign, bars }
 }
