@@ -9,7 +9,6 @@ export interface SelectProps {
   class?: string
   style?: JSX.CSSProperties | string
   value?: JSX.Element
-  valueKey?: string
   dataSource?: SelectDataSourceItem[] | string[]
   onSelected?: (data: SelectDataSourceItem | string) => void
 }
@@ -23,8 +22,7 @@ const Select: Component<SelectProps> = (props) => {
         typeof data === 'string'
           ? { key: data, text: data }
           : data as SelectDataSourceItem
-      const valueKey = props.valueKey ?? 'text'
-      const v: JSX.Element = valueKey === 'text' ? d.text : (d as unknown as Record<string, JSX.Element>)[valueKey] ?? d.text
+      const v = d.text
       const isSelected = props.value === v
       return { data, v, isSelected }
     }) ?? [],

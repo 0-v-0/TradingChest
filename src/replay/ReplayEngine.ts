@@ -18,7 +18,7 @@ export class ReplayEngine {
   }
 
   start(data: KLineData[], startPosition: number): void {
-    this.#fullData = data.slice()
+    this.#fullData = data
     this.#position = data.length ? Math.max(1, Math.min(startPosition, data.length)) : 0
     this.#viewData = this.#fullData.slice(0, this.#position)
     this.#active = data.length > 0

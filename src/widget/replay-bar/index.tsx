@@ -1,12 +1,16 @@
 import { Show, type Component } from 'solid-js'
-import type { ReplayState, ReplaySpeed } from '../../replay/types'
+import type { ReplaySpeed } from '../../replay/types'
 import t from '../../i18n'
 import './index.css'
 
 export interface ReplayControlBarProps {
   lang: string
   localeKey?: number
-  state: ReplayState
+  active: boolean
+  playing: boolean
+  speed: ReplaySpeed
+  position: number
+  totalBars: number
   onPlay: () => void
   onPause: () => void
   onStepForward: () => void
@@ -21,12 +25,12 @@ const SPEEDS: ReplaySpeed[] = [1, 2, 4, 8, 16]
 const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
   void props.localeKey
   const nextSpeed = () => {
-    const idx = SPEEDS.indexOf(props.state.speed)
+    const idx = SPEEDS.indexOf(props.speed)
     return SPEEDS[(idx + 1) % SPEEDS.length]
   }
 
   return (
-    <Show when={props.state.active}>
+    <Show when={props.active}>
       <div class="klinecharts-pro-replay-bar">
         <div
           class="replay-btn step-backward"
@@ -39,9 +43,9 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
         </div>
         <div
           class="replay-btn play-pause"
-          onClick={() => (props.state.playing ? props.onPause() : props.onPlay())}
+          onClick={() => (props.playing ? props.onPause() : props.onPlay())}
         >
-          {props.state.playing ? (
+          {props.playing ? (
             <svg viewBox="0 0 24 24">
               <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
             </svg>
@@ -65,22 +69,22 @@ const ReplayControlBar: Component<ReplayControlBarProps> = (props) => {
           onClick={() => props.onSpeedChange(nextSpeed())}
           title={t('replay_speed', props.lang)}
         >
-          {props.state.speed}x
+          {props.speed}x
         </span>
         <div class="replay-progress">
-          <span>{props.state.position}</span>
+          <span>{props.position}</span>
           <input
             type="range"
             class="replay-progress-slider"
             min={1}
-            max={props.state.totalBars}
-            value={props.state.position}
+            max={props.totalBars}
+            value={props.position}
             onInput={(e) => {
               const n = parseInt((e.target as HTMLInputElement).value, 10)
               if (Number.isFinite(n)) props.onPositionChange(n)
             }}
           />
-          <span>{props.state.totalBars}</span>
+          <span>{props.totalBars}</span>
         </div>
         <span class="replay-exit" onClick={props.onStop}>
           {t('replay_exit', props.lang)}

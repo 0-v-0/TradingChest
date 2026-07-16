@@ -15,8 +15,8 @@ export class UndoRedoManager {
   push(command: Command): void {
     this.redoStack = []
     this.undoStack.push(command)
-    if (this.undoStack.length > this.maxHistory) {
-      this.undoStack.splice(0, this.undoStack.length - this.maxHistory)
+    while (this.undoStack.length > this.maxHistory) {
+      this.undoStack.shift()
     }
   }
 

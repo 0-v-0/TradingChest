@@ -50,7 +50,17 @@ const INIT_ICON_MAP: Record<GroupKey, string> = {
 const DrawingBar: Component<DrawingBarProps> = (props) => {
   void props.localeKey
   const [iconMap, setIconMap] = createSignal<Record<GroupKey, string>>({ ...INIT_ICON_MAP })
-  const setIcon = (key: GroupKey) => (v: string) => setIconMap({ ...iconMap(), [key]: v })
+
+  const overlays = createMemo(() => {
+    const lists = optionLists()
+    const icons = iconMap()
+    return (Object.keys(INIT_ICON_MAP) as GroupKey[]).map((key) => ({
+      key,
+      icon: icons[key],
+      list: lists[key],
+      setter: (v: string) => setIconMap({ ...iconMap(), [key]: v }),
+    }))
+  })
 
   const [modeIcon, setModeIcon] = createSignal('weak_magnet')
   const [mode, setMode] = createSignal('normal')
@@ -78,17 +88,6 @@ const DrawingBar: Component<DrawingBarProps> = (props) => {
     annotation: createAnnotationOptions(props.lang),
     position: createPositionOptions(props.lang),
   }))
-
-  const overlays = createMemo(() => {
-    const lists = optionLists()
-    const icons = iconMap()
-    return (Object.keys(INIT_ICON_MAP) as GroupKey[]).map((key) => ({
-      key,
-      icon: icons[key],
-      list: lists[key],
-      setter: setIcon(key),
-    }))
-  })
 
   const modes = createMemo(() => createMagnetOptions(props.lang))
 

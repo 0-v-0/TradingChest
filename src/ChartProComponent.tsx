@@ -226,7 +226,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let widget: Nullable<Chart> = null
   let disposed = false
 
-  let priceUnitDom: HTMLElement
+  let priceUnitDom!: HTMLElement
 
   let fetchSeq = 0 // 单调递增的请求序号，用于丢弃过期响应
 
@@ -1247,7 +1247,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
         />
         <ReplayControlBar
           lang={locale()} localeKey={localeVersion()}
-          state={replayState()}
+          active={replayState().active}
+          playing={replayState().playing}
+          speed={replayState().speed}
+          position={replayState().position}
+          totalBars={replayState().totalBars}
           onPlay={() => {
             replayEngine?.play()
           }}

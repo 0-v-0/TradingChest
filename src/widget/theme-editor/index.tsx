@@ -21,7 +21,7 @@ const ThemeEditor: Component<ThemeEditorProps> = (props) => {
   )
 
   const handleColorChange = (key: string, color: string) => {
-    const next = utils.clone(localStyles())
+    const next = { ...localStyles() } as object
     deepSet(next, key, color)
     setLocalStyles(next)
   }

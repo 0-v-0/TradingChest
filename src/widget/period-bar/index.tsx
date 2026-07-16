@@ -29,6 +29,14 @@ const PeriodBar: Component<PeriodBarProps> = (props) => {
 
   const [fullScreen, setFullScreen] = createSignal(false)
 
+  const toggleFullscreen = () => {
+    if (!fullScreen()) {
+      ref?.parentElement?.requestFullscreen()
+    } else {
+      document.exitFullscreen()
+    }
+  }
+
   const fullScreenChange = () => {
     setFullScreen((full) => !full)
   }
@@ -68,7 +76,7 @@ const PeriodBar: Component<PeriodBarProps> = (props) => {
         <span
           role="button"
           tabIndex={0}
-          class={`item period ${p.text === props.period.text ? 'selected' : ''}`}
+          class={`item period ${p.multiplier === props.period.multiplier && p.timespan === props.period.timespan ? 'selected' : ''}`}
           onClick={() => props.onPeriodChange(p)}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); props.onPeriodChange(p) }}}
         >
@@ -142,24 +150,11 @@ const PeriodBar: Component<PeriodBarProps> = (props) => {
         tabIndex={0}
         aria-label={fullScreen() ? t('exit_full_screen', props.lang) : t('full_screen', props.lang)}
         class="item tools"
-        onClick={() => {
-          if (!fullScreen()) {
-            const el = ref?.parentElement
-            if (el) {
-              el.requestFullscreen()
-            }
-          } else {
-            document.exitFullscreen()
-          }
-        }}
+        onClick={toggleFullscreen}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            if (!fullScreen()) {
-              ref?.parentElement?.requestFullscreen()
-            } else {
-              document.exitFullscreen()
-            }
+            toggleFullscreen()
           }
         }}
       >

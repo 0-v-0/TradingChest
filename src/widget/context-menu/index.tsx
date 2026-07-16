@@ -15,6 +15,8 @@ export interface ContextMenuProps {
   onClose: () => void
 }
 
+const MENU_WIDTH = 160
+
 const ContextMenu: Component<ContextMenuProps> = (props) => {
   const handleClickOutside = (_e: MouseEvent) => {
     props.onClose()
@@ -36,14 +38,17 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
     document.removeEventListener('keydown', handleKeyDown)
   })
 
-  // Clamp position to viewport
-  const menuWidth = 160
-  const menuHeight = props.items.length * 32 + 8
-  const x = Math.min(props.x, window.innerWidth - menuWidth - 8)
-  const y = Math.min(props.y, window.innerHeight - menuHeight - 8)
+  let menuRef: HTMLDivElement | undefined
+
+  // Clamp position after mount using actual rendered height
+  const clampedStyle = () => {
+    const x = Math.min(props.x, window.innerWidth - MENU_WIDTH - 8)
+    const y = Math.min(props.y, window.innerHeight - (menuRef?.offsetHeight ?? props.items.length * 32 + 8) - 8)
+    return { left: `${x}px`, top: `${y}px` }
+  }
 
   return (
-    <div class="klinecharts-pro-context-menu" style={{ left: `${x}px`, top: `${y}px` }}>
+    <div ref={(el) => { menuRef = el }} class="klinecharts-pro-context-menu" style={clampedStyle()}>
       <For each={props.items}>{(item) => (
         <div
           class={`klinecharts-pro-context-menu-item${item.danger ? ' danger' : ''}${item.disabled ? ' disabled' : ''}`}

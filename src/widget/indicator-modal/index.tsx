@@ -173,7 +173,8 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         </Show>
         <For each={filteredMainIndicators()}>
           {(name) => {
-            const checked = createMemo(() => props.mainIndicators.includes(name))
+            const mainSet = createMemo(() => new Set(props.mainIndicators))
+            const checked = createMemo(() => mainSet().has(name))
             return (
               <li
                 class="row main-indicator"
