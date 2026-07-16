@@ -25,40 +25,40 @@ export default class DefaultDatafeed implements Datafeed {
         'Proxy API calls through your backend instead.',
       )
     }
-    this._apiKey = apiKey
-    this._onConnectionStateChange = options?.onConnectionStateChange ?? null
-    this._fetchTimeout = options?.fetchTimeout ?? 15000
-    this._onError = options?.onError
+    this.#apiKey = apiKey
+    this.#onConnectionStateChange = options?.onConnectionStateChange
+    this.#fetchTimeout = options?.fetchTimeout ?? 15000
+    this.#onError = options?.onError
   }
 
-  private _apiKey: string
-  private _onConnectionStateChange:
-    | ((state: ConnectionState, detail?: { attempt?: number; error?: unknown }) => void)
-    | null
-  private _fetchTimeout: number
-  private _onError?: (error: { type: string; message: string; raw?: unknown }) => void
+  #apiKey: string
+  #onConnectionStateChange?: (state: ConnectionState,
+    detail?: { attempt?: number; error?: unknown }) => void
 
-  private _prevSymbolMarket?: string
-  private _prevTicker?: string
-  private _currentTicker?: string
+  #fetchTimeout: number
+  #onError?: (error: { type: string; message: string; raw?: unknown }) => void
 
-  private _ws?: ReconnectingWebSocket
+  #prevSymbolMarket?: string
+  #prevTicker?: string
+  #currentTicker?: string
 
-  private _callback?: DatafeedSubscribeCallback
+  #ws?: ReconnectingWebSocket
+
+  #callback?: DatafeedSubscribeCallback
 
   async searchSymbols(search?: string): Promise<SymbolInfo[]> {
     try {
       const response = await fetch(
         `https://api.polygon.io/v3/reference/tickers?active=true&search=${encodeURIComponent(search ?? '')}`,
         {
-          headers: { Authorization: `Bearer ${this._apiKey}` },
-          signal: AbortSignal.timeout(this._fetchTimeout),
+          headers: { Authorization: `Bearer ${this.#apiKey}` },
+          signal: AbortSignal.timeout(this.#fetchTimeout),
         },
       )
       if (!response.ok) {
         const msg = `searchSymbols failed: ${response.status} ${response.statusText}`
         console.warn(msg)
-        this._onError?.({ type: 'search', message: msg })
+        this.#onError?.({ type: 'search', message: msg })
         return []
       }
       const result = await response.json()
@@ -74,7 +74,7 @@ export default class DefaultDatafeed implements Datafeed {
       }))
     } catch (e) {
       console.warn('searchSymbols error:', e)
-      this._onError?.({ type: 'search', message: 'Symbol search failed', raw: e })
+      this.#onError?.({ type: 'search', message: 'Symbol search failed', raw: e })
       return []
     }
   }
@@ -89,14 +89,14 @@ export default class DefaultDatafeed implements Datafeed {
       const response = await fetch(
         `https://api.polygon.io/v2/aggs/ticker/${encodeURIComponent(symbol.ticker)}/range/${period.multiplier}/${period.timespan}/${from}/${to}`,
         {
-          headers: { Authorization: `Bearer ${this._apiKey}` },
-          signal: AbortSignal.timeout(this._fetchTimeout),
+          headers: { Authorization: `Bearer ${this.#apiKey}` },
+          signal: AbortSignal.timeout(this.#fetchTimeout),
         },
       )
       if (!response.ok) {
         const msg = `getHistoryKLineData failed: ${response.status} ${response.statusText}`
         console.warn(msg)
-        this._onError?.({ type: 'history', message: msg })
+        this.#onError?.({ type: 'history', message: msg })
         return []
       }
       const result = await response.json()
@@ -111,44 +111,44 @@ export default class DefaultDatafeed implements Datafeed {
       }))
     } catch (e) {
       console.warn('getHistoryKLineData error:', e)
-      this._onError?.({ type: 'history', message: 'History data fetch failed', raw: e })
+      this.#onError?.({ type: 'history', message: 'History data fetch failed', raw: e })
       return []
     }
   }
 
   subscribe(symbol: SymbolInfo, _period: Period, callback: DatafeedSubscribeCallback): void {
     // 始终更新回调引用，确保切换 ticker 后新回调生效
-    this._callback = callback
+    this.#callback = callback
     const ticker = symbol.ticker
-    if (this._prevSymbolMarket !== symbol.market) {
+    if (this.#prevSymbolMarket !== symbol.market) {
       // 跨 market 切换：先在旧 socket 上 unsubscribe 旧 ticker，Polygon 不会自我感知 ticker 切换
-      if (this._ws && this._prevTicker) {
+      if (this.#ws && this.#prevTicker) {
         try {
-          this._ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${this._prevTicker}` }))
+          this.#ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${this.#prevTicker}` }))
         } catch {
           /* ws may already be closed */
         }
       }
-      this._currentTicker = ticker
-      this._ws?.close()
-      this._ws = new ReconnectingWebSocket(`wss://delayed.polygon.io/${symbol.market}`, {
+      this.#currentTicker = ticker
+      this.#ws?.close()
+      this.#ws = new ReconnectingWebSocket(`wss://delayed.polygon.io/${symbol.market}`, {
         maxRetries: 5,
         baseDelay: 1000,
         maxDelay: 30000,
       })
-      this._ws.onopen = () => {
-        this._ws?.send(JSON.stringify({ action: 'auth', params: this._apiKey }))
+      this.#ws.onopen = () => {
+        this.#ws?.send(JSON.stringify({ action: 'auth', params: this.#apiKey }))
       }
-      this._ws.onerror = () => {
-        this._onConnectionStateChange?.('disconnected', { error: 'WebSocket error' })
+      this.#ws.onerror = () => {
+        this.#onConnectionStateChange?.('disconnected', { error: 'WebSocket error' })
       }
-      this._ws.onclose = () => {
-        this._onConnectionStateChange?.('disconnected')
+      this.#ws.onclose = () => {
+        this.#onConnectionStateChange?.('disconnected')
       }
-      this._ws.onreconnect = (attempt) => {
-        this._onConnectionStateChange?.('reconnecting', { attempt })
+      this.#ws.onreconnect = (attempt) => {
+        this.#onConnectionStateChange?.('reconnecting', { attempt })
       }
-      this._ws.onmessage = (event) => {
+      this.#ws.onmessage = (event) => {
         let result: Array<Record<string, unknown>>
         try {
           result = JSON.parse(event.data)
@@ -159,9 +159,9 @@ export default class DefaultDatafeed implements Datafeed {
         if (!Array.isArray(result) || result.length === 0) return
         if (result[0].ev === 'status') {
           if (result[0].status === 'auth_success') {
-            this._onConnectionStateChange?.('connected')
-            if (this._currentTicker) {
-              this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${this._currentTicker}` }))
+            this.#onConnectionStateChange?.('connected')
+            if (this.#currentTicker) {
+              this.#ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${this.#currentTicker}` }))
             }
           }
         } else {
@@ -174,7 +174,7 @@ export default class DefaultDatafeed implements Datafeed {
                 typeof d.h === 'number' && typeof d.l === 'number' &&
                 typeof d.c === 'number') {
               // 通过间接引用调用最新 callback，避免闭包捕获旧引用
-              this._callback?.({
+              this.#callback?.({
                 timestamp: d.s,
                 open: d.o,
                 high: d.h,
@@ -189,45 +189,45 @@ export default class DefaultDatafeed implements Datafeed {
       }
     } else {
       // 同市场换品种时，先 unsubscribe 旧 ticker
-      if (this._prevTicker && this._prevTicker !== ticker) {
+      if (this.#prevTicker && this.#prevTicker !== ticker) {
         try {
-          this._ws?.send(JSON.stringify({ action: 'unsubscribe', params: `T.${this._prevTicker}` }))
+          this.#ws?.send(JSON.stringify({ action: 'unsubscribe', params: `T.${this.#prevTicker}` }))
         } catch {
           /* ws may be closed */
         }
       }
-      if (this._currentTicker !== ticker) {
-        this._currentTicker = ticker
-        this._ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${ticker}` }))
+      if (this.#currentTicker !== ticker) {
+        this.#currentTicker = ticker
+        this.#ws?.send(JSON.stringify({ action: 'subscribe', params: `T.${ticker}` }))
       }
     }
-    this._prevSymbolMarket = symbol.market
-    this._prevTicker = ticker
+    this.#prevSymbolMarket = symbol.market
+    this.#prevTicker = ticker
   }
 
   unsubscribe(symbol: SymbolInfo, _period: Period): void {
-    if (this._ws && this._currentTicker === symbol.ticker) {
+    if (this.#ws && this.#currentTicker === symbol.ticker) {
       try {
-        this._ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${symbol.ticker}` }))
+        this.#ws.send(JSON.stringify({ action: 'unsubscribe', params: `T.${symbol.ticker}` }))
       } catch {
         // WebSocket may already be closed
       }
-      if (this._prevTicker === symbol.ticker) {
-        this._prevTicker = undefined
-        this._currentTicker = undefined
+      if (this.#prevTicker === symbol.ticker) {
+        this.#prevTicker = undefined
+        this.#currentTicker = undefined
       } else {
-        this._currentTicker = undefined
+        this.#currentTicker = undefined
       }
     }
-    this._callback = undefined
+    this.#callback = undefined
   }
 
   dispose(): void {
-    this._prevTicker = undefined
-    this._currentTicker = undefined
-    if (this._ws) {
-      this._ws.close()
-      this._ws = undefined
+    this.#prevTicker = undefined
+    this.#currentTicker = undefined
+    if (this.#ws) {
+      this.#ws.close()
+      this.#ws = undefined
     }
   }
 }

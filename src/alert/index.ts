@@ -3,51 +3,51 @@ import type { AlertConfig, AlertEvent } from './types'
 export type { AlertConfig, AlertEvent } from './types'
 
 export class AlertManager {
-  private _alerts = new Map<string, AlertConfig>()
-  private _prevPrice: number | null = null
+  #alerts = new Map<string, AlertConfig>()
+  #prevPrice?: number
 
-  onTrigger: ((event: AlertEvent) => void) | null = null
+  onTrigger?: (event: AlertEvent) => void
 
   addAlert(config: AlertConfig): void {
     if (!Number.isFinite(config.price)) return
-    this._alerts.set(config.id, { ...config, triggered: false })
+    this.#alerts.set(config.id, { ...config, triggered: false })
   }
 
   /** 更新报警配置，保留触发状态 */
   updateAlert(id: string, updates: Partial<Omit<AlertConfig, 'id'>>): boolean {
-    const existing = this._alerts.get(id)
+    const existing = this.#alerts.get(id)
     if (!existing) return false
-    this._alerts.set(id, { ...existing, ...updates, id })
+    this.#alerts.set(id, { ...existing, ...updates, id })
     return true
   }
 
   removeAlert(id: string): void {
-    this._alerts.delete(id)
+    this.#alerts.delete(id)
   }
 
   getAlert(id: string): AlertConfig | undefined {
-    return this._alerts.get(id)
+    return this.#alerts.get(id)
   }
 
   getAlerts(): AlertConfig[] {
-    return Array.from(this._alerts.values())
+    return Array.from(this.#alerts.values())
   }
 
   clearAll(): void {
-    this._alerts.clear()
+    this.#alerts.clear()
   }
 
   checkPrice(currentPrice: number, timestamp: number): void {
     if (!Number.isFinite(currentPrice)) return
-    if (this._prevPrice === null) {
-      this._prevPrice = currentPrice
+    if (this.#prevPrice === undefined) {
+      this.#prevPrice = currentPrice
       return
     }
 
-    const prevPrice = this._prevPrice
-    this._prevPrice = currentPrice
+    const prevPrice = this.#prevPrice
+    this.#prevPrice = currentPrice
 
-    for (const alert of this._alerts.values()) {
+    for (const alert of this.#alerts.values()) {
       if (alert.triggered) continue
 
       let triggered = false
@@ -82,11 +82,11 @@ export class AlertManager {
 
   /** 重置前价格记录（品种切换时调用，防止跨品种误触发） */
   resetPrevPrice(): void {
-    this._prevPrice = null
+    this.#prevPrice = undefined
   }
 
   resetAll(): void {
-    for (const alert of this._alerts.values()) {
+    for (const alert of this.#alerts.values()) {
       alert.triggered = false
     }
   }

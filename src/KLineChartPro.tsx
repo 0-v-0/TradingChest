@@ -77,38 +77,38 @@ export default class KLineChartPro implements ChartPro {
   constructor(options: ChartProOptions) {
     // Fire-and-forget: eagerly register core overlays/chart types/tradeVis on first instantiation
     ensureCoreRegistered()
-    this._initContainer(options)
-    this._initSolidRender(options)
-    this._datafeed = options.datafeed
-    this._initTradeVisClickHandler(options)
+    this.#initContainer(options)
+    this.#initSolidRender(options)
+    this.#datafeed = options.datafeed
+    this.#initTradeVisClickHandler(options)
     if (options.onAlertTrigger) {
-      this._alertManager.onTrigger = options.onAlertTrigger
+      this.#alertManager.onTrigger = options.onAlertTrigger
     }
-    this._undoRedoManager = new UndoRedoManager()
-    this._initShortcutManager()
+    this.#undoRedoManager = new UndoRedoManager()
+    this.#initShortcutManager()
   }
 
   /** 1. 解析并设置容器元素 */
-  private _initContainer(options: ChartProOptions): void {
+  #initContainer(options: ChartProOptions): void {
     if (utils.isString(options.container)) {
-      this._container = document.getElementById(options.container as string)
-      if (!this._container) {
+      this.#container = document.getElementById(options.container as string)
+      if (!this.#container) {
         throw new Error('Container is null')
       }
     } else {
-      this._container = options.container as HTMLElement
+      this.#container = options.container as HTMLElement
     }
-    this._container.classList.add('klinecharts-pro')
-    this._container.setAttribute('data-theme', options.theme ?? 'light')
+    this.#container.classList.add('klinecharts-pro')
+    this.#container.setAttribute('data-theme', options.theme ?? 'light')
   }
 
   /** 2. Solid.js 渲染 ChartProComponent */
-  private _initSolidRender(options: ChartProOptions): void {
-    this._solidDispose = render(
+  #initSolidRender(options: ChartProOptions): void {
+    this.#solidDispose = render(
       () => (
         <ChartProComponent
           ref={(chart: ChartPro) => {
-            this._chartApi = chart
+            this.#chartApi = chart
           }}
           styles={options.styles ?? {}}
           watermark={options.watermark ?? ''}
@@ -128,25 +128,25 @@ export default class KLineChartPro implements ChartPro {
           onOverlayUpdate={options.onOverlayUpdate ?? (() => {})}
           onOverlayDelete={options.onOverlayDelete ?? (() => {})}
           onPriceUpdate={(price: number) => {
-            this._alertManager.checkPrice(price, Date.now())
+            this.#alertManager.checkPrice(price, Date.now())
           }}
           onDataReset={() => {
-            this._alertManager.resetPrevPrice()
-            this._clearComparisons()
+            this.#alertManager.resetPrevPrice()
+            this.#clearComparisons()
           }}
           onError={options.onError}
-          undoRedoManager={this._undoRedoManager}
+          undoRedoManager={this.#undoRedoManager}
         />
       ),
-      this._container!,
+      this.#container!,
     ) as () => void
   }
 
   /** 3. TradeVis 交易标签点击检测 */
-  private _initTradeVisClickHandler(options: ChartProOptions): void {
+  #initTradeVisClickHandler(options: ChartProOptions): void {
     const onIndClick = options.onIndicatorClick
-    this._clickTarget = this._container!
-    this._clickHandler = (e: Event) => {
+    this.#clickTarget = this.#container!
+    this.#clickHandler = (e: Event) => {
       const me = e as MouseEvent
         // hitTargets 的 x/y 是 pane canvas 内部坐标（xAxis/yAxis.convertToPixel）
         // 用 event.target（canvas）的 rect 匹配坐标系
@@ -156,7 +156,7 @@ export default class KLineChartPro implements ChartPro {
       const clickY = me.clientY - rect.top
 
         // 从实例级 hitTargets 查找最近的交易标签
-      const hitTargets = getTradeVisHitTargets(this._instanceId)
+      const hitTargets = getTradeVisHitTargets(this.#instanceId)
       let closest: { x: number; y: number; trade: TradeRecord; type: string } | null = null
       let minDist = Infinity
       for (const ht of hitTargets) {
@@ -178,13 +178,13 @@ export default class KLineChartPro implements ChartPro {
         })
       }
     }
-    this._container!.addEventListener('click', this._clickHandler, true)
+    this.#container!.addEventListener('click', this.#clickHandler, true)
   }
 
   /** 4. 初始化快捷键管理器 */
-  private _initShortcutManager(): void {
-    this._shortcutManager = new KeyboardShortcutManager()
-    this._shortcutManager.registerActions({
+  #initShortcutManager(): void {
+    this.#shortcutManager = new KeyboardShortcutManager()
+    this.#shortcutManager.registerActions({
       'nav:scrollToEnd': () => {
         this.getChart()?.scrollToRealTime()
       },
@@ -192,20 +192,20 @@ export default class KLineChartPro implements ChartPro {
         this.getChart()?.scrollToDataIndex(0)
       },
       'nav:zoomIn': () => {
-        this._zoom(1.2)
+        this.#zoom(1.2)
       },
       'nav:zoomOut': () => {
-        this._zoom(0.8)
+        this.#zoom(0.8)
       },
       // 图表操作
       'chart:screenshot': () => {
         this.exportScreenshot()
       },
       'chart:undo': () => {
-        this._undoRedoManager.undo()
+        this.#undoRedoManager.undo()
       },
       'chart:redo': () => {
-        this._undoRedoManager.redo()
+        this.#undoRedoManager.redo()
       },
       'chart:cancelDraw': () => {
         this.getChart()?.removeOverlay()
@@ -251,47 +251,47 @@ export default class KLineChartPro implements ChartPro {
         chart.setStyles({ grid: { show: !show } })
       },
     })
-    this._shortcutManager.bindTo(this._container!)
+    this.#shortcutManager.bindTo(this.#container!)
   }
 
-  private _container!: Nullable<HTMLElement>
+  #container!: Nullable<HTMLElement>
 
-  private _chartApi: Nullable<ChartPro> = null
+  #chartApi: Nullable<ChartPro> = null
 
-  private _shortcutManager!: KeyboardShortcutManager
-  private _undoRedoManager!: UndoRedoManager
+  #shortcutManager!: KeyboardShortcutManager
+  #undoRedoManager!: UndoRedoManager
 
-  private _comparisons = new Map<string, string>() // ticker → indicatorName
+  #comparisons = new Map<string, string>() // ticker → indicatorName
 
-  private _datafeed: import('./types').Datafeed
+  #datafeed: import('./types').Datafeed
 
-  private _alertManager: AlertManager = new AlertManager()
+  #alertManager: AlertManager = new AlertManager()
 
-  private _instanceId = `tc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  #instanceId = `tc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 
-  private _disposed = false
-  private _solidDispose: (() => void) | null = null
-  private _clickHandler: ((e: Event) => void) | null = null
-  private _clickTarget: Element | null = null
+  #disposed = false
+  #solidDispose?: (() => void)
+  #clickHandler?: ((e: Event) => void)
+  #clickTarget?: Element
 
   /** Throws if called before Solid.js render completes or after dispose. */
-  private _api(): ChartPro {
-    if (this._disposed) {
+  #api(): ChartPro {
+    if (this.#disposed) {
       throw new Error(
         '[TradingChest] Instance has been disposed. Create a new instance to continue.',
       )
     }
-    if (!this._chartApi) {
+    if (!this.#chartApi) {
       throw new Error(
         '[TradingChest] Chart not initialized yet. Wait for render to complete before calling API methods.',
       )
     }
-    return this._chartApi
+    return this.#chartApi
   }
 
   /** Throws if instance is disposed. For methods that don't need _chartApi. */
-  private _assertNotDisposed(): void {
-    if (this._disposed) {
+  #assertNotDisposed(): void {
+    if (this.#disposed) {
       throw new Error(
         '[TradingChest] Instance has been disposed. Create a new instance to continue.',
       )
@@ -299,7 +299,7 @@ export default class KLineChartPro implements ChartPro {
   }
 
   /** Zoom the chart by factor, centering on the viewport midpoint */
-  private _zoom(factor: number): void {
+  #zoom(factor: number): void {
     const chart = this.getChart()
     if (chart) {
       const size = chart.getSize()
@@ -308,72 +308,72 @@ export default class KLineChartPro implements ChartPro {
   }
 
   createOverlay(value: string | OverlayCreate | Array<string | OverlayCreate>) {
-    return this._api().createOverlay(value)
+    return this.#api().createOverlay(value)
   }
 
   getOverlays(id?: OverlayFilter): Overlay[] {
-    return this._api().getOverlays(id)
+    return this.#api().getOverlays(id)
   }
 
   removeOverlay(value?: OverlayFilter): boolean {
-    return this._api().removeOverlay(value)
+    return this.#api().removeOverlay(value)
   }
 
   registerOverlay(template: OverlayTemplate): void {
-    return this._api().registerOverlay(template)
+    return this.#api().registerOverlay(template)
   }
 
   setTheme(theme: string): void {
-    this._container?.setAttribute('data-theme', theme)
-    this._api().setTheme(theme)
+    this.#container?.setAttribute('data-theme', theme)
+    this.#api().setTheme(theme)
   }
 
   getTheme(): string {
-    return this._api().getTheme()
+    return this.#api().getTheme()
   }
 
   setStyles(styles: DeepPartial<Styles>): void {
-    this._api().setStyles(styles)
+    this.#api().setStyles(styles)
   }
 
   getStyles(): Styles {
-    return this._api().getStyles()
+    return this.#api().getStyles()
   }
 
   setLocale(locale: string): void {
-    this._api().setLocale(locale)
+    this.#api().setLocale(locale)
   }
 
   getLocale(): string {
-    return this._api().getLocale()
+    return this.#api().getLocale()
   }
 
   setTimezone(timezone: string): void {
-    this._api().setTimezone(timezone)
+    this.#api().setTimezone(timezone)
   }
 
   getTimezone(): string {
-    return this._api().getTimezone()
+    return this.#api().getTimezone()
   }
 
   setSymbol(symbol: SymbolInfo): void {
-    this._api().setSymbol(symbol)
+    this.#api().setSymbol(symbol)
   }
 
   getSymbol(): SymbolInfo {
-    return this._api().getSymbol()
+    return this.#api().getSymbol()
   }
 
   setPeriod(period: Period): void {
-    this._api().setPeriod(period)
+    this.#api().setPeriod(period)
   }
 
   getPeriod(): Period {
-    return this._api().getPeriod()
+    return this.#api().getPeriod()
   }
 
   getChart() {
-    return this._api().getChart()
+    return this.#api().getChart()
   }
 
   exportCSV(filename?: string): void {
@@ -393,7 +393,7 @@ export default class KLineChartPro implements ChartPro {
   }
 
   getShortcutManager(): KeyboardShortcutManager {
-    return this._shortcutManager
+    return this.#shortcutManager
   }
 
   createTradeVisualization(trades: TradeRecord[], paneOptions?: Record<string, unknown>): void {
@@ -402,7 +402,7 @@ export default class KLineChartPro implements ChartPro {
     chart.createIndicator(
       {
         name: 'TradeVis',
-        extendData: { trades, _instanceId: this._instanceId },
+        extendData: { trades, _instanceId: this.#instanceId },
         paneId: (paneOptions as { id?: string })?.id ?? MAIN_PANE_ID,
       } as ChartIndicatorCreate,
       true,
@@ -410,8 +410,8 @@ export default class KLineChartPro implements ChartPro {
   }
 
   addAlert(config: AlertConfig): void {
-    this._assertNotDisposed()
-    this._alertManager.addAlert(config)
+    this.#assertNotDisposed()
+    this.#alertManager.addAlert(config)
     const chart = this.getChart()
     if (chart) {
       chart.createOverlay({
@@ -425,13 +425,13 @@ export default class KLineChartPro implements ChartPro {
   }
 
   updateAlert(id: string, updates: Partial<Omit<AlertConfig, 'id'>>): boolean {
-    this._assertNotDisposed()
-    const updated = this._alertManager.updateAlert(id, updates)
+    this.#assertNotDisposed()
+    const updated = this.#alertManager.updateAlert(id, updates)
     if (updated && updates.price !== undefined) {
       const chart = this.getChart()
       if (chart) {
         chart.removeOverlay({ id: `alert_${id}` })
-        const alert = this._alertManager.getAlert(id)
+        const alert = this.#alertManager.getAlert(id)
         if (alert) {
           chart.createOverlay({
             name: 'alertLine',
@@ -447,25 +447,25 @@ export default class KLineChartPro implements ChartPro {
   }
 
   removeAlert(id: string): void {
-    this._assertNotDisposed()
-    this._alertManager.removeAlert(id)
+    this.#assertNotDisposed()
+    this.#alertManager.removeAlert(id)
     this.getChart()?.removeOverlay({ id: `alert_${id}` })
   }
 
   getAlerts(): AlertConfig[] {
-    this._assertNotDisposed()
-    return this._alertManager.getAlerts()
+    this.#assertNotDisposed()
+    return this.#alertManager.getAlerts()
   }
 
-  private _clearComparisons(): void {
-    for (const [, indicatorName] of this._comparisons) {
+  #clearComparisons(): void {
+    for (const [, indicatorName] of this.#comparisons) {
       try {
         this.getChart()?.removeIndicator({ paneId: MAIN_PANE_ID, name: indicatorName })
       } catch {
         /* already disposing */
       }
     }
-    this._comparisons.clear()
+    this.#comparisons.clear()
   }
 
   /**
@@ -473,9 +473,9 @@ export default class KLineChartPro implements ChartPro {
    * Known limitation: comparison data is fetched once and not updated with new ticks.
    */
   async addComparison(symbol: SymbolInfo): Promise<void> {
-    this._assertNotDisposed()
+    this.#assertNotDisposed()
     // 防止重复添加同一品种（先移除旧的）
-    if (this._comparisons.has(symbol.ticker)) {
+    if (this.#comparisons.has(symbol.ticker)) {
       this.removeComparison(symbol.ticker)
     }
     const chart = this.getChart()
@@ -487,7 +487,7 @@ export default class KLineChartPro implements ChartPro {
 
     const from = mainData[0].timestamp
     const to = mainData[mainData.length - 1].timestamp
-    const compData = await this._datafeed.getHistoryKLineData(symbol, p, from, to)
+    const compData = await this.#datafeed.getHistoryKLineData(symbol, p, from, to)
     if (compData.length === 0) return
 
     const compPercent = normalizeToPercent(compData)
@@ -526,75 +526,75 @@ export default class KLineChartPro implements ChartPro {
     })
 
     chart.createIndicator({ name: indicatorName, paneId: MAIN_PANE_ID }, true)
-    this._comparisons.set(symbol.ticker, indicatorName)
+    this.#comparisons.set(symbol.ticker, indicatorName)
   }
 
   removeComparison(ticker: string): void {
-    this._assertNotDisposed()
-    const indicatorName = this._comparisons.get(ticker)
+    this.#assertNotDisposed()
+    const indicatorName = this.#comparisons.get(ticker)
     if (indicatorName) {
       this.getChart()?.removeIndicator({ paneId: MAIN_PANE_ID, name: indicatorName })
-      this._comparisons.delete(ticker)
+      this.#comparisons.delete(ticker)
     }
   }
 
   startReplay(startPosition?: number): void {
-    this._api().startReplay(startPosition)
+    this.#api().startReplay(startPosition)
   }
 
   stopReplay(): void {
-    this._api().stopReplay()
+    this.#api().stopReplay()
   }
 
   getReplayEngine(): ReplayEngine | null {
-    return this._api().getReplayEngine()
+    return this.#api().getReplayEngine()
   }
 
   feedPrice(price: number): void {
-    if (this._disposed) return // feedPrice 静默忽略，不抛异常
-    this._alertManager.checkPrice(price, Date.now())
+    if (this.#disposed) return // feedPrice 静默忽略，不抛异常
+    this.#alertManager.checkPrice(price, Date.now())
   }
 
   dispose(): void {
-    if (this._disposed) return // 幂等：重复调用安全
-    this._disposed = true
+    if (this.#disposed) return // 幂等：重复调用安全
+    this.#disposed = true
     // 1. Stop replay (safe — ChartProComponent.onCleanup also handles this)
-    if (this._chartApi) {
+    if (this.#chartApi) {
       try {
-        this._chartApi.stopReplay()
+        this.#chartApi.stopReplay()
       } catch {
         /* already disposing */
       }
     }
     // 2. Remove comparisons
-    this._clearComparisons()
+    this.#clearComparisons()
     // 3. Clear alerts & TradeVis instance data
-    this._alertManager.clearAll()
-    this._alertManager.onTrigger = null
-    cleanupTradeVisInstance(this._instanceId)
+    this.#alertManager.clearAll()
+    this.#alertManager.onTrigger = undefined
+    cleanupTradeVisInstance(this.#instanceId)
     // 4. Unbind shortcuts & clear undo/redo
-    this._shortcutManager.unbind()
-    this._undoRedoManager.clear()
+    this.#shortcutManager.unbind()
+    this.#undoRedoManager.clear()
     // 5. Remove click listener
-    if (this._clickHandler && this._clickTarget) {
-      this._clickTarget.removeEventListener('click', this._clickHandler, true)
-      this._clickHandler = null
-      this._clickTarget = null
+    if (this.#clickHandler && this.#clickTarget) {
+      this.#clickTarget.removeEventListener('click', this.#clickHandler, true)
+      this.#clickHandler = undefined
+      this.#clickTarget = undefined
     }
     // 6. Unmount Solid.js render tree (triggers onCleanup → unsubscribe datafeed)
-    if (this._solidDispose) {
-      this._solidDispose()
-      this._solidDispose = null
+    if (this.#solidDispose) {
+      this.#solidDispose()
+      this.#solidDispose = undefined
     }
     // 7. Release datafeed resources (WebSocket etc.) — wrap in try to avoid blocking cleanup
     try {
-      this._datafeed.dispose?.()
+      this.#datafeed.dispose?.()
     } catch {
       /* datafeed cleanup failure must not prevent container/chart release */
     }
     // 8. Clean container and reset refs — always executed
-    this._container?.classList.remove('klinecharts-pro')
-    this._container?.removeAttribute('data-theme')
-    this._chartApi = null
+    this.#container?.classList.remove('klinecharts-pro')
+    this.#container?.removeAttribute('data-theme')
+    this.#chartApi = null
   }
 }

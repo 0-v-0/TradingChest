@@ -44,7 +44,7 @@ interface RenkoCacheKey {
   period: number
 }
 
-let _renkoCacheKey: RenkoCacheKey | null = null
+let _renkoCacheKey: RenkoCacheKey | undefined
 let _renkoCacheBricks: RenkoBrick[] = []
 
 const renko: IndicatorTemplate<object, number> = {

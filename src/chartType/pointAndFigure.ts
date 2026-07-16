@@ -112,7 +112,7 @@ interface PnFCacheKey {
   reversal: number
 }
 
-let _pnfCacheKey: PnFCacheKey | null = null
+let _pnfCacheKey: PnFCacheKey | undefined
 let _pnfCacheColumns: PnFColumn[] = []
 
 const pointAndFigure: IndicatorTemplate<object, number> = {

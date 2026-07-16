@@ -4,56 +4,56 @@ type IndicatorLoader = () => Promise<IndicatorTemplate>
 type RegisterFn = (template: IndicatorTemplate) => void
 
 export class IndicatorRegistry {
-  private _registered = new Set<string>()
-  private _loaders = new Map<string, IndicatorLoader>()
-  private _pending = new Map<string, Promise<void>>()
-  private _registerFn: RegisterFn = () => {}
+  #registered = new Set<string>()
+  #loaders = new Map<string, IndicatorLoader>()
+  #pending = new Map<string, Promise<void>>()
+  #registerFn: RegisterFn = () => {}
 
   setRegisterFn(fn: RegisterFn): void {
-    this._registerFn = fn
+    this.#registerFn = fn
   }
 
   setLoader(name: string, loader: IndicatorLoader): void {
-    this._loaders.set(name, loader)
+    this.#loaders.set(name, loader)
   }
 
   setLoaders(loaders: Record<string, IndicatorLoader>): void {
     for (const [name, loader] of Object.entries(loaders)) {
-      this._loaders.set(name, loader)
+      this.#loaders.set(name, loader)
     }
   }
 
   isRegistered(name: string): boolean {
-    return this._registered.has(name)
+    return this.#registered.has(name)
   }
 
   markRegistered(name: string): void {
-    this._registered.add(name)
+    this.#registered.add(name)
   }
 
   async ensureRegistered(name: string): Promise<void> {
-    if (this._registered.has(name)) return
+    if (this.#registered.has(name)) return
 
-    if (this._pending.has(name)) {
-      return this._pending.get(name)!
+    if (this.#pending.has(name)) {
+      return this.#pending.get(name)!
     }
 
-    const loader = this._loaders.get(name)
+    const loader = this.#loaders.get(name)
     if (!loader) {
       // No loader registered — assume it was registered externally (e.g. by KLineChart built-ins)
       console.debug(`[TradingChest] No loader for indicator "${name}", assuming pre-registered`)
-      this._registered.add(name)
+      this.#registered.add(name)
       return
     }
 
     const promise = loader().then((template) => {
-      this._registerFn(wrapCalcParamsValidation(template))
-      this._registered.add(name)
+      this.#registerFn(wrapCalcParamsValidation(template))
+      this.#registered.add(name)
     }).finally(() => {
-      this._pending.delete(name)
+      this.#pending.delete(name)
     })
 
-    this._pending.set(name, promise)
+    this.#pending.set(name, promise)
     return promise
   }
 }
@@ -71,7 +71,7 @@ function wrapCalcParamsValidation(template: IndicatorTemplate): IndicatorTemplat
   const nanTemplate = createNaNTemplate(figures)
   const frozenTemplate = Object.keys(nanTemplate).length > 0 ? Object.freeze(nanTemplate) : null
   const hasKeys = frozenTemplate !== null
-  let cachedNanResult: Record<string, unknown>[] | null = null
+  let cachedNanResult: Record<string, unknown>[] | undefined
   let cachedNanLen = 0
   const wrappedCalc = (dataList: KLineData[], indicator: Indicator) => {
     const params = indicator.calcParams

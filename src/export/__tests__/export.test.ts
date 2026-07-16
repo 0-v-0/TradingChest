@@ -20,7 +20,7 @@ const sampleData = [
   { timestamp: 1700172800000, open: 12, high: 14, low: 11, close: 13, volume: 300 },
 ]
 
-let clickedLink: HTMLAnchorElement | null = null
+let clickedLink: HTMLAnchorElement | undefined
 
 // jsdom 不提供 URL.createObjectURL / revokeObjectURL，手动补充
 if (typeof URL.createObjectURL !== 'function') {
@@ -33,7 +33,7 @@ if (typeof URL.revokeObjectURL !== 'function') {
 }
 
 beforeEach(() => {
-  clickedLink = null
+  clickedLink = undefined
   vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url')
   vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
   vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {

@@ -13,11 +13,11 @@ class MockWS {
   static CLOSING = 2 as const
   static CLOSED = 3 as const
 
-  readyState = 0 as number
-  onopen: ((ev: Event) => void) | null = null
-  onmessage: ((ev: MessageEvent) => void) | null = null
-  onerror: ((ev: Event) => void) | null = null
-  onclose: ((ev: CloseEvent) => void) | null = null
+  readyState = 0
+  onopen?: (ev: Event) => void
+  onmessage?: (ev: MessageEvent) => void
+  onerror?: (ev: Event) => void
+  onclose?: (ev: CloseEvent) => void
   send = vi.fn()
   close = vi.fn()
 

@@ -27,7 +27,7 @@ function read(): Favorites {
   return emptyFavorites()
 }
 
-let cache: Favorites | null = null
+let cache: Favorites | undefined
 
 function load(): Favorites {
   if (cache) return cache
@@ -37,15 +37,15 @@ function load(): Favorites {
 }
 
 function invalidate(): void {
-  cache = null
+  cache = undefined
 }
 
-let _persistTimer: ReturnType<typeof setTimeout> | null = null
+let _persistTimer: ReturnType<typeof setTimeout> | undefined
 
 function schedulePersist(): void {
-  if (_persistTimer !== null) return
+  if (_persistTimer !== undefined) return
   _persistTimer = setTimeout(() => {
-    _persistTimer = null
+    _persistTimer = undefined
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(load()))
     } catch (e) {
@@ -96,8 +96,8 @@ export function isFavoriteTool(name: string): boolean {
 
 export function _resetFavoritesCacheForTesting(): void {
   invalidate()
-  if (_persistTimer !== null) {
+  if (_persistTimer !== undefined) {
     clearTimeout(_persistTimer)
-    _persistTimer = null
+    _persistTimer = undefined
   }
 }

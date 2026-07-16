@@ -107,7 +107,7 @@ interface KagiCacheKey {
   reversal: number
 }
 
-let _kagiCacheKey: KagiCacheKey | null = null
+let _kagiCacheKey: KagiCacheKey | undefined
 let _kagiCacheSegments: KagiSegment[] = []
 
 const kagi: IndicatorTemplate<object, number> = {

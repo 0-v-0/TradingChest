@@ -5,31 +5,31 @@ export interface ReconnectOptions {
 }
 
 export class ReconnectingWebSocket {
-  private _url: string
-  private _ws: WebSocket | null = null
-  private _retryCount = 0
-  private _maxRetries: number
-  private _baseDelay: number
-  private _maxDelay: number
-  private _disposed = false
-  private _retryTimer: ReturnType<typeof setTimeout> | null = null
+  #url: string
+  #ws?: WebSocket
+  #retryCount = 0
+  #maxRetries: number
+  #baseDelay: number
+  #maxDelay: number
+  #disposed = false
+  #retryTimer?: ReturnType<typeof setTimeout>
 
-  onopen: ((ev: Event) => void) | null = null
-  onmessage: ((ev: MessageEvent) => void) | null = null
-  onerror: ((ev: Event) => void) | null = null
-  onclose: ((ev: CloseEvent) => void) | null = null
-  onreconnect: ((attempt: number) => void) | null = null
+  onopen?: (ev: Event) => void
+  onmessage?: (ev: MessageEvent) => void
+  onerror?: (ev: Event) => void
+  onclose?: (ev: CloseEvent) => void
+  onreconnect?: (attempt: number) => void
 
   constructor(url: string, options?: ReconnectOptions) {
-    this._url = url
-    this._maxRetries = options?.maxRetries ?? 5
-    this._baseDelay = options?.baseDelay ?? 1000
-    this._maxDelay = options?.maxDelay ?? 30000
+    this.#url = url
+    this.#maxRetries = options?.maxRetries ?? 5
+    this.#baseDelay = options?.baseDelay ?? 1000
+    this.#maxDelay = options?.maxDelay ?? 30000
 
     try {
-      this._connect()
+      this.#connect()
     } catch (e) {
-      this._scheduleReconnect()
+      this.#scheduleReconnect()
       if (e instanceof Event) {
         this.onerror?.(e)
       } else {
@@ -38,57 +38,57 @@ export class ReconnectingWebSocket {
     }
   }
 
-  private _connect(): void {
-    if (this._disposed) return
+  #connect(): void {
+    if (this.#disposed) return
     // Close any existing socket before creating a new one to prevent leaks
-    if (this._ws) {
-      this._ws.onopen = null
-      this._ws.onmessage = null
-      this._ws.onerror = null
-      this._ws.onclose = null
-      if (this._ws.readyState === WebSocket.OPEN || this._ws.readyState === WebSocket.CONNECTING) {
-        this._ws.close()
+    if (this.#ws) {
+      this.#ws.onopen = null
+      this.#ws.onmessage = null
+      this.#ws.onerror = null
+      this.#ws.onclose = null
+      if (this.#ws.readyState === WebSocket.OPEN || this.#ws.readyState === WebSocket.CONNECTING) {
+        this.#ws.close()
       }
-      this._ws = null
+      this.#ws = undefined
     }
-    this._ws = new WebSocket(this._url)
+    this.#ws = new WebSocket(this.#url)
 
-    this._ws.onopen = (ev) => {
-      this._retryCount = 0
+    this.#ws.onopen = (ev) => {
+      this.#retryCount = 0
       this.onopen?.(ev)
     }
 
-    this._ws.onmessage = (ev) => {
+    this.#ws.onmessage = (ev) => {
       this.onmessage?.(ev)
     }
 
-    this._ws.onerror = (ev) => {
+    this.#ws.onerror = (ev) => {
       this.onerror?.(ev)
     }
 
-    this._ws.onclose = (ev) => {
-      if (this._disposed) {
+    this.#ws.onclose = (ev) => {
+      if (this.#disposed) {
         this.onclose?.(ev)
         return
       }
       this.onclose?.(ev)
-      this._scheduleReconnect()
+      this.#scheduleReconnect()
     }
   }
 
-  private _scheduleReconnect(): void {
-    if (this._retryTimer || this._disposed) return
-    if (this._retryCount >= this._maxRetries) return
-    const base = Math.min(this._baseDelay * Math.pow(2, this._retryCount), this._maxDelay)
+  #scheduleReconnect(): void {
+    if (this.#retryTimer || this.#disposed) return
+    if (this.#retryCount >= this.#maxRetries) return
+    const base = Math.min(this.#baseDelay * Math.pow(2, this.#retryCount), this.#maxDelay)
     const jitter = base * (0.5 + Math.random() * 0.5)
-    this._retryCount++
-    this.onreconnect?.(this._retryCount)
-    this._retryTimer = setTimeout(() => {
-      this._retryTimer = null
+    this.#retryCount++
+    this.onreconnect?.(this.#retryCount)
+    this.#retryTimer = setTimeout(() => {
+      this.#retryTimer = undefined
       try {
-        this._connect()
+        this.#connect()
       } catch (e) {
-        this._scheduleReconnect()
+        this.#scheduleReconnect()
         if (e instanceof Event) this.onerror?.(e)
         else throw e
       }
@@ -96,24 +96,24 @@ export class ReconnectingWebSocket {
   }
 
   send(data: BufferSource | Blob | string): void {
-    if (this._ws?.readyState === WebSocket.OPEN) {
-      this._ws.send(data)
+    if (this.#ws?.readyState === WebSocket.OPEN) {
+      this.#ws.send(data)
     }
   }
 
   close(): void {
-    if (this._disposed) return
-    this._disposed = true
-    if (this._retryTimer) {
-      clearTimeout(this._retryTimer)
-      this._retryTimer = null
+    if (this.#disposed) return
+    this.#disposed = true
+    if (this.#retryTimer) {
+      clearTimeout(this.#retryTimer)
+      this.#retryTimer = undefined
     }
-    this._ws?.close()
-    this._ws = null
+    this.#ws?.close()
+    this.#ws = undefined
   }
 
   get readyState(): number {
-    return this._ws?.readyState ?? WebSocket.CLOSED
+    return this.#ws?.readyState ?? WebSocket.CLOSED
   }
 
   get isOpen(): boolean {

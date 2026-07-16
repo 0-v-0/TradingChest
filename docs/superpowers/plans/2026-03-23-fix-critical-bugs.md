@@ -211,7 +211,7 @@ Expected: ALL PASS, no type errors
 
 - [x] **Step 1: Add validation to onmessage handler**
 
-In `src/DefaultDatafeed.ts`, replace the `this._ws.onmessage` block (lines 89-108):
+In `src/DefaultDatafeed.ts`, replace the `this.#ws.onmessage` block (lines 89-108):
 
 > 实现代码：[`src/DefaultDatafeed.ts`](src/DefaultDatafeed.ts) (1-189 行)
 

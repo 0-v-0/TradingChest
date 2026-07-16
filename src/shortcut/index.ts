@@ -24,13 +24,13 @@ export class KeyboardShortcutManager {
   private bindings: ShortcutBinding[]
   private boundElements: WeakMap<ShortcutTarget, (e: KeyboardEvent) => void> = new WeakMap()
   private lookup: Map<string, ShortcutBinding> = new Map()
-  private element: ShortcutTarget | null = null
+  private element?: ShortcutTarget
   private actionHandlers: Map<string, () => void> = new Map()
   private enabled: boolean = true
 
   constructor(customBindings?: ShortcutBinding[]) {
     this.bindings = customBindings ?? [...defaultBindings]
-    this._rebuildLookup()
+    this.#rebuildLookup()
   }
 
   /**
@@ -55,7 +55,7 @@ export class KeyboardShortcutManager {
   addBinding(binding: ShortcutBinding): void {
     this.bindings = this.bindings.filter((b) => b.combo !== binding.combo)
     this.bindings.push(binding)
-    this._rebuildLookup()
+    this.#rebuildLookup()
   }
 
   /**
@@ -63,7 +63,7 @@ export class KeyboardShortcutManager {
    */
   removeBinding(combo: string): void {
     this.bindings = this.bindings.filter((b) => b.combo !== combo)
-    this._rebuildLookup()
+    this.#rebuildLookup()
   }
 
   /**
@@ -134,7 +134,7 @@ export class KeyboardShortcutManager {
         this.boundElements.delete(this.element)
       }
     }
-    this.element = null
+    this.element = undefined
   }
 
   /**
@@ -151,7 +151,7 @@ export class KeyboardShortcutManager {
     return this.element ? this.boundElements.get(this.element) ?? null : null
   }
 
-  private _rebuildLookup(): void {
+  #rebuildLookup(): void {
     this.lookup.clear()
     for (const b of this.bindings) {
       this.lookup.set(b.combo, b)
