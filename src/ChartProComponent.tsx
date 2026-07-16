@@ -254,7 +254,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [indicatorModalVisible, setIndicatorModalVisible] = createSignal(false)
   const [mainIndicators, setMainIndicators] = createSignal([...props.mainIndicators!])
   const [subIndicators, setSubIndicators] = createSignal<Record<string, string>>({})
-  const invalidateIndicatorCache = () => { cachedIndicatorGroups = undefined }
+  const invalidateIndicatorCache = () => { cachedIndicatorGroups = undefined; cachedIndicatorPaneKeys = undefined; cachedIndicatorEntries = undefined }
 
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
   const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
@@ -618,6 +618,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let crosshairRaf = 0
   /** Cached indicator grouping for crosshair data window — invalidated on indicator add/remove */
   let cachedIndicatorGroups: Record<string, Indicator[]> | undefined
+  let cachedIndicatorPaneKeys: string[] | undefined
+  let cachedIndicatorEntries: [string, Indicator[]][] | undefined
   /** Action callback references for cleanup */
   let onTooltipClick: ((data: unknown) => void) | undefined
   let onBarClick: (() => void) | undefined
@@ -849,11 +851,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
               }
             }
             cachedIndicatorGroups = groups
+            cachedIndicatorPaneKeys = Object.keys(groups)
+            cachedIndicatorEntries = Object.entries(groups)
           }
-          const paneGroups = cachedIndicatorGroups
-          if (Object.keys(paneGroups).length > 0) {
+          const paneKeys = cachedIndicatorPaneKeys!
+          if (paneKeys.length > 0) {
             const dataIndex = d.dataIndex as number | undefined
-            for (const [paneId, indicators] of Object.entries(paneGroups)) {
+            for (const [paneId, indicators] of cachedIndicatorEntries!) {
               if (paneId !== MAIN_PANE_ID) {
                 rows.push({ label: `[${paneId}]`, value: '', color: '#888' })
               }
@@ -891,6 +895,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     if (crosshairRaf) cancelAnimationFrame(crosshairRaf)
     subscribeBarCallback = undefined
     cachedIndicatorGroups = undefined
+    cachedIndicatorPaneKeys = undefined
+    cachedIndicatorEntries = undefined
     // Unsubscribe klinecharts actions to prevent stale callbacks
     if (widget) {
       if (onTooltipClick) widget.unsubscribeAction('onIndicatorTooltipFeatureClick', onTooltipClick!)

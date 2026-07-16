@@ -20,6 +20,7 @@ const MS_PER_WEEK = 7 * MS_PER_DAY
 export function adjustFromTo(period: Period, toTimestamp: number, count: number): [number, number] {
   let to = toTimestamp
   let from = to
+  const date = new Date(to)
   switch (period.timespan) {
     case 'ms':
       to = to - to % MS_PER_SECOND
@@ -38,35 +39,31 @@ export function adjustFromTo(period: Period, toTimestamp: number, count: number)
       from = to - count * period.multiplier * MS_PER_HOUR
       break
     case 'day': {
-      const date = new Date(to)
       to = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
       from = to - count * period.multiplier * MS_PER_DAY
       break
     }
     case 'week': {
-      const date = new Date(to)
       const day = date.getUTCDay()
       const dif = day === 0 ? 6 : day - 1
       to = to - dif * MS_PER_DAY
-      const d = new Date(to)
-      to = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+      date.setTime(to)
+      to = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
       from = to - count * period.multiplier * MS_PER_WEEK
       break
     }
     case 'month': {
-      const date = new Date(to)
       to = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)
-      const fromDate = new Date(to)
-      fromDate.setUTCMonth(fromDate.getUTCMonth() - count * period.multiplier)
-      from = Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth(), 1)
+      date.setTime(to)
+      date.setUTCMonth(date.getUTCMonth() - count * period.multiplier)
+      from = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)
       break
     }
     case 'year': {
-      const date = new Date(to)
       to = Date.UTC(date.getUTCFullYear(), 0, 1)
-      const fromDate = new Date(to)
-      fromDate.setUTCFullYear(fromDate.getUTCFullYear() - count * period.multiplier)
-      from = Date.UTC(fromDate.getUTCFullYear(), 0, 1)
+      date.setTime(to)
+      date.setUTCFullYear(date.getUTCFullYear() - count * period.multiplier)
+      from = Date.UTC(date.getUTCFullYear(), 0, 1)
       break
     }
   }

@@ -15,8 +15,8 @@ export class ReconnectingWebSocket {
   #retryTimer?: ReturnType<typeof setTimeout>
 
   onopen?: (ev: Event) => void
-  onmessage?: (ev: MessageEvent) => void
-  onerror?: (ev: Event) => void
+  onmessage: ((this: WebSocket, ev: MessageEvent) => void) | null = null
+  onerror: ((this: WebSocket, ev: Event) => void) | null = null
   onclose?: (ev: CloseEvent) => void
   onreconnect?: (attempt: number) => void
 
@@ -31,9 +31,9 @@ export class ReconnectingWebSocket {
     } catch (e) {
       this.#scheduleReconnect()
       if (e instanceof Event) {
-        this.onerror?.(e)
+        this.#ws?.onerror?.(e)
       } else {
-        throw e
+        this.#ws?.onerror?.(new Event(String(e)))
       }
     }
   }
@@ -58,13 +58,9 @@ export class ReconnectingWebSocket {
       this.onopen?.(ev)
     }
 
-    this.#ws.onmessage = (ev) => {
-      this.onmessage?.(ev)
-    }
+    this.#ws.onmessage = this.onmessage
 
-    this.#ws.onerror = (ev) => {
-      this.onerror?.(ev)
-    }
+    this.#ws.onerror = this.onerror
 
     this.#ws.onclose = (ev) => {
       if (this.#disposed) {
@@ -89,8 +85,8 @@ export class ReconnectingWebSocket {
         this.#connect()
       } catch (e) {
         this.#scheduleReconnect()
-        if (e instanceof Event) this.onerror?.(e)
-        else throw e
+        if (e instanceof Event) this.#ws?.onerror?.(e)
+        else this.#ws?.onerror?.(new Event(String(e)))
       }
     }, jitter)
   }

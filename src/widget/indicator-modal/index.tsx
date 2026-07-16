@@ -110,6 +110,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
     })
   }
 
+  const mainIndicatorsSet = createMemo(() => new Set(props.mainIndicators))
   const filteredMainIndicators = createMemo(() => filterIndicatorNames(MAIN_INDICATORS))
   const filteredSubIndicators = createMemo(() => filterIndicatorNames(SUB_INDICATORS))
 
@@ -173,8 +174,7 @@ const IndicatorModal: Component<IndicatorModalProps> = (props) => {
         </Show>
         <For each={filteredMainIndicators()}>
           {(name) => {
-            const mainSet = createMemo(() => new Set(props.mainIndicators))
-            const checked = createMemo(() => mainSet().has(name))
+            const checked = createMemo(() => mainIndicatorsSet().has(name))
             return (
               <li
                 class="row main-indicator"

@@ -76,7 +76,11 @@ export class ReplayEngine {
   goToPosition(position: number): void {
     if (!this.#active) return
     this.#position = Math.max(1, Math.min(position, this.#fullData.length))
-    this.#viewData = this.#fullData.slice(0, this.#position)
+    // Truncate in-place instead of allocating a new array per frame
+    this.#viewData.length = this.#position
+    for (let i = this.#viewData.length; i < this.#position; i++) {
+      this.#viewData[i] = this.#fullData[i]
+    }
     this.#callbacks.onDataChange(this.#viewData)
     this.#emitState()
   }
