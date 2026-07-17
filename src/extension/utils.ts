@@ -185,6 +185,28 @@ export function computePriceRangeFigures(
   return { priceDiff, percentChange, isUp, fillColor, borderColor, sign, bars }
 }
 
+/**
+ * Lightweight base factory for the most common overlay pattern:
+ * 2-click overlays with all three default figures enabled.
+ * Eliminates the repeated `needDefault*Figure: true` boilerplate.
+ */
+export function createBaseOverlay(
+  name: string,
+  totalStep: number,
+  createPointFigures: OverlayTemplate['createPointFigures'],
+  extras?: Partial<Pick<OverlayTemplate, 'styles' | 'performEventPressedMove' | 'performEventMoveForDrawing'>>,
+): OverlayTemplate {
+  return {
+    name,
+    totalStep,
+    needDefaultPointFigure: true,
+    needDefaultXAxisFigure: true,
+    needDefaultYAxisFigure: true,
+    createPointFigures,
+    ...extras,
+  }
+}
+
 export function createWaveOverlay(name: string, totalStep: number): OverlayTemplate {
   return {
     name,

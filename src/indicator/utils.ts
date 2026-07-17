@@ -11,7 +11,8 @@ import type { KLineData } from 'klinecharts'
 /**
  * RSI (Relative Strength Index) using Wilder smoothing (RMA)
  * Returns the RSI values array; indices before the seed are NaN.
- * Uses calcRMA internally for gains and losses.
+ * Inlines the RMA computation for gains and losses to avoid
+ * allocating 4 intermediate arrays (gains, losses, avgGain, avgLoss).
  */
 export function calcRSI(closes: number[], period: number): number[] {
   const n = closes.length
@@ -21,27 +22,36 @@ export function calcRSI(closes: number[], period: number): number[] {
     return result
   }
 
-  const gains = new Array<number>(n)
-  const losses = new Array<number>(n)
-  gains[0] = 0
-  losses[0] = 0
+  // Compute gains/losses and Wilder-smoothed RMA in a single pass
+  let gainSum = 0
+  let lossSum = 0
+  let avgGain = NaN
+  let avgLoss = NaN
+
   for (let i = 1; i < n; i++) {
     const diff = closes[i] - closes[i - 1]
-    gains[i] = diff > 0 ? diff : 0
-    losses[i] = diff < 0 ? -diff : 0
-  }
+    const gain = diff > 0 ? diff : 0
+    const loss = diff < 0 ? -diff : 0
+    gainSum += gain
+    lossSum += loss
 
-  const avgGain = calcRMA(gains, period)
-  const avgLoss = calcRMA(losses, period)
-
-  for (let i = 0; i < n; i++) {
-    if (isNaN(avgGain[i]) || isNaN(avgLoss[i])) {
-      result[i] = NaN
-    } else {
-      const rs = avgLoss[i] !== 0 ? avgGain[i] / avgLoss[i] : 0
+    if (i === period) {
+      avgGain = gainSum / period
+      avgLoss = lossSum / period
+      const rs = avgLoss !== 0 ? avgGain / avgLoss : 0
       result[i] = 100 - 100 / (1 + rs)
+    } else if (i > period) {
+      avgGain = (avgGain * (period - 1) + gain) / period
+      avgLoss = (avgLoss * (period - 1) + loss) / period
+      const rs = avgLoss !== 0 ? avgGain / avgLoss : 0
+      result[i] = 100 - 100 / (1 + rs)
+    } else {
+      result[i] = NaN
     }
   }
+
+  // Fill first index as NaN (no previous close)
+  result[0] = NaN
   return result
 }
 

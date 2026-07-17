@@ -1,38 +1,29 @@
-import type { Chart, Nullable } from 'klinecharts'
+import type { Chart, KLineData, Nullable } from 'klinecharts'
 import { downloadUrl } from '../core/download'
 
 /**
  * 数据导出工具
  */
 
-interface CsvRow {
-  timestamp: number
-  open: number
-  high: number
-  low: number
-  close: number
-  volume?: number
-}
-
 function csvEscape(v: unknown): string {
   const s = v == null ? '' : String(v)
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 
-function generateCsv(rows: CsvRow[]): string {
-  const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
-  const lines: string[] = [headers.map(csvEscape).join(',')]
-  for (const d of rows) {
+function generateCsv(dataList: readonly KLineData[], from: number, to: number): string {
+  const lines = new Array<string>(to - from + 2)
+  lines[0] = 'Date,Open,High,Low,Close,Volume'
+  for (let i = from; i <= to; i++) {
+    const d = dataList[i]
     const date = Number.isFinite(d.timestamp) ? new Date(d.timestamp).toISOString() : ''
-    const cells = [
+    lines[i - from + 1] = [
       date,
       csvEscape(d.open),
       csvEscape(d.high),
       csvEscape(d.low),
       csvEscape(d.close),
       d.volume == null ? '' : csvEscape(d.volume),
-    ]
-    lines.push(cells.join(','))
+    ].join(',')
   }
   return lines.join('\n')
 }
@@ -53,20 +44,14 @@ export function exportToCSV(chart: Nullable<Chart>, filename?: string): boolean 
     if (!chart) return false
 
     const dataList = chart.getDataList()
-    const visibleRange = chart.getVisibleRange()
-
     if (!dataList || dataList.length === 0) return false
 
-    const startIdx = Math.max(0, visibleRange.from)
-    const endIdx = Math.min(dataList.length - 1, visibleRange.to)
-
-    const rows: CsvRow[] = []
-    for (let i = startIdx; i <= endIdx; i++) {
-      rows.push(dataList[i])
-    }
+    const visibleRange = chart.getVisibleRange()
+    const from = Math.max(0, visibleRange.from)
+    const to = Math.min(dataList.length - 1, visibleRange.to)
 
     downloadCsv(
-      generateCsv(rows),
+      generateCsv(dataList, from, to),
       filename ?? `chart-data-${new Date().toISOString().slice(0, 10)}.csv`,
     )
     return true
@@ -87,7 +72,7 @@ export function exportAllToCSV(chart: Nullable<Chart>, filename?: string): boole
     if (!dataList || dataList.length === 0) return false
 
     downloadCsv(
-      generateCsv(dataList),
+      generateCsv(dataList, 0, dataList.length - 1),
       filename ?? `chart-data-full-${new Date().toISOString().slice(0, 10)}.csv`,
     )
     return true

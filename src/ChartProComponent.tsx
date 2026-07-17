@@ -254,7 +254,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [indicatorModalVisible, setIndicatorModalVisible] = createSignal(false)
   const [mainIndicators, setMainIndicators] = createSignal([...props.mainIndicators!])
   const [subIndicators, setSubIndicators] = createSignal<Record<string, string>>({})
-  const invalidateIndicatorCache = () => { cachedIndicatorGroups = undefined; cachedIndicatorPaneKeys = undefined; cachedIndicatorEntries = undefined }
+  const invalidateIndicatorCache = () => { cachedIndicatorGroups = undefined; cachedIndicatorPaneKeys = undefined; cachedIndicatorEntries = undefined; cachedFigureKeys = undefined }
 
   const [timezoneModalVisible, setTimezoneModalVisible] = createSignal(false)
   const [timezone, setTimezone] = createSignal<SelectDataSourceItem>({
@@ -620,6 +620,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let cachedIndicatorGroups: Record<string, Indicator[]> | undefined
   let cachedIndicatorPaneKeys: string[] | undefined
   let cachedIndicatorEntries: [string, Indicator[]][] | undefined
+  /** Cached figure keys per indicator — rebuilt alongside indicator cache */
+  let cachedFigureKeys: Map<Indicator, string[]> | undefined
   /** Action callback references for cleanup */
   let onTooltipClick: ((data: unknown) => void) | undefined
   let onBarClick: (() => void) | undefined
@@ -844,15 +846,18 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           if (!cachedIndicatorGroups) {
             const allIndicators = widget.getIndicators()
             const groups: Record<string, Indicator[]> = {}
+            const figKeys = new Map<Indicator, string[]>()
             if (allIndicators && allIndicators.length > 0) {
               for (const ind of allIndicators) {
                 if (!groups[ind.paneId]) groups[ind.paneId] = []
                 groups[ind.paneId].push(ind)
+                figKeys.set(ind, Array.isArray(ind.figures) ? ind.figures.map(f => f.key) : [])
               }
             }
             cachedIndicatorGroups = groups
             cachedIndicatorPaneKeys = Object.keys(groups)
             cachedIndicatorEntries = Object.entries(groups)
+            cachedFigureKeys = figKeys
           }
           const paneKeys = cachedIndicatorPaneKeys!
           if (paneKeys.length > 0) {
@@ -867,7 +872,8 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
                   const row = (dataIndex != null && dataIndex >= 0 && dataIndex < vals.length)
                     ? vals[dataIndex]
                     : vals[vals.length - 1]
-                  const figureKeys = Array.isArray(ind.figures) ? ind.figures.map(f => f.key) : Object.keys(row)
+                  const figureKeys = cachedFigureKeys!.get(ind)
+                    ?? (Object.keys(row) as string[])
                   for (const k of figureKeys) {
                     addRow(`${ind.name}.${k}`, row[k])
                   }
@@ -897,6 +903,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     cachedIndicatorGroups = undefined
     cachedIndicatorPaneKeys = undefined
     cachedIndicatorEntries = undefined
+    cachedFigureKeys = undefined
     // Unsubscribe klinecharts actions to prevent stale callbacks
     if (widget) {
       if (onTooltipClick) widget.unsubscribeAction('onIndicatorTooltipFeatureClick', onTooltipClick!)

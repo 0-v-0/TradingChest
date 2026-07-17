@@ -18,28 +18,46 @@ export const COLOR_FORECAST = '#3498db'
 /** Neutral gray (kagi flat segments) */
 export const COLOR_NEUTRAL = '#999999'
 
+/**
+ * Convert a hex color and alpha (0–1) to an rgba() string.
+ * Cached via a simple lookup to avoid repeated string concatenation.
+ */
+const _rgbaCache = new Map<string, string>()
+function rgba(hex: string, alpha: number): string {
+  const key = `${hex}:${alpha}`
+  let v = _rgbaCache.get(key)
+  if (v === undefined) {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    v = `rgba(${r}, ${g}, ${b}, ${alpha})`
+    _rgbaCache.set(key, v)
+  }
+  return v
+}
+
 /** Up color with alpha variants */
-export const COLOR_UP_ALPHA_12 = 'rgba(38, 166, 154, 0.12)'
-export const COLOR_UP_ALPHA_15 = 'rgba(38, 166, 154, 0.15)'
-export const COLOR_UP_ALPHA_40 = 'rgba(38, 166, 154, 0.4)'
-export const COLOR_UP_ALPHA_50 = 'rgba(38, 166, 154, 0.5)'
-export const COLOR_UP_ALPHA_60 = 'rgba(38, 166, 154, 0.6)'
-export const COLOR_UP_ALPHA_80 = 'rgba(38, 166, 154, 0.8)'
-export const COLOR_UP_ALPHA_90 = 'rgba(38, 166, 154, 0.9)'
-export const COLOR_UP_ALPHA_95 = 'rgba(38, 166, 154, 0.95)'
+export const COLOR_UP_ALPHA_12 = rgba(COLOR_UP, 0.12)
+export const COLOR_UP_ALPHA_15 = rgba(COLOR_UP, 0.15)
+export const COLOR_UP_ALPHA_40 = rgba(COLOR_UP, 0.4)
+export const COLOR_UP_ALPHA_50 = rgba(COLOR_UP, 0.5)
+export const COLOR_UP_ALPHA_60 = rgba(COLOR_UP, 0.6)
+export const COLOR_UP_ALPHA_80 = rgba(COLOR_UP, 0.8)
+export const COLOR_UP_ALPHA_90 = rgba(COLOR_UP, 0.9)
+export const COLOR_UP_ALPHA_95 = rgba(COLOR_UP, 0.95)
 
 /** Down color with alpha variants */
-export const COLOR_DOWN_ALPHA_12 = 'rgba(239, 83, 80, 0.12)'
-export const COLOR_DOWN_ALPHA_15 = 'rgba(239, 83, 80, 0.15)'
-export const COLOR_DOWN_ALPHA_40 = 'rgba(239, 83, 80, 0.4)'
-export const COLOR_DOWN_ALPHA_50 = 'rgba(239, 83, 80, 0.5)'
-export const COLOR_DOWN_ALPHA_60 = 'rgba(239, 83, 80, 0.6)'
+export const COLOR_DOWN_ALPHA_12 = rgba(COLOR_DOWN, 0.12)
+export const COLOR_DOWN_ALPHA_15 = rgba(COLOR_DOWN, 0.15)
+export const COLOR_DOWN_ALPHA_40 = rgba(COLOR_DOWN, 0.4)
+export const COLOR_DOWN_ALPHA_50 = rgba(COLOR_DOWN, 0.5)
+export const COLOR_DOWN_ALPHA_60 = rgba(COLOR_DOWN, 0.6)
 
-export const COLOR_DOWN_ALPHA_90 = 'rgba(239, 83, 80, 0.9)'
-export const COLOR_DOWN_ALPHA_95 = 'rgba(239, 83, 80, 0.95)'
+export const COLOR_DOWN_ALPHA_90 = rgba(COLOR_DOWN, 0.9)
+export const COLOR_DOWN_ALPHA_95 = rgba(COLOR_DOWN, 0.95)
 
 /** Primary color with alpha variants */
-export const COLOR_PRIMARY_ALPHA_15 = 'rgba(22, 119, 255, 0.15)'
+export const COLOR_PRIMARY_ALPHA_15 = rgba(COLOR_PRIMARY, 0.15)
 import type KeyboardShortcutManager from './shortcut'
 import type { AlertConfig, AlertEvent } from './alert/types'
 

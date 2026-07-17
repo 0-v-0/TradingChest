@@ -1,25 +1,12 @@
-import type { OverlayTemplate } from 'klinecharts'
+import { createBaseOverlay } from './utils'
+import { COLOR_PRIMARY_ALPHA_15 } from '../types'
 
-const triangle: OverlayTemplate = {
-  name: 'triangle',
-  totalStep: 4,
-  needDefaultPointFigure: true,
-  needDefaultXAxisFigure: true,
-  needDefaultYAxisFigure: true,
-  styles: {
-    polygon: {
-      color: 'rgba(22, 119, 255, 0.15)',
+export default createBaseOverlay('triangle', 4, ({ coordinates }) => {
+  return [
+    {
+      type: 'polygon',
+      attrs: { coordinates },
+      styles: { style: 'stroke_fill' },
     },
-  },
-  createPointFigures: ({ coordinates }) => {
-    return [
-      {
-        type: 'polygon',
-        attrs: { coordinates },
-        styles: { style: 'stroke_fill' },
-      },
-    ]
-  },
-}
-
-export default triangle
+  ]
+}, { styles: { polygon: { color: COLOR_PRIMARY_ALPHA_15 } } })
