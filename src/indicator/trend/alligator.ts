@@ -37,10 +37,9 @@ const alligator: IndicatorTemplate<AlligatorResult, number> = {
     const teethSmma = calcRMA(median, teethPeriod)
     const lipsSmma = calcRMA(median, lipsPeriod)
 
-    const totalLength = n + Math.max(jawOffset, teethOffset, lipsOffset)
-    const result: AlligatorResult[] = new Array(totalLength)
+    const result: AlligatorResult[] = new Array(n)
 
-    for (let i = 0; i < totalLength; i++) {
+    for (let i = 0; i < n; i++) {
       const item: Partial<AlligatorResult> = {}
 
       const jawSrcIdx = i - jawOffset

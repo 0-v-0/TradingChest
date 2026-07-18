@@ -426,6 +426,8 @@ export default class KLineChartPro implements ChartPro {
     const from = mainData[0].timestamp
     const to = mainData[mainData.length - 1].timestamp
     const compData = await this.#datafeed.getHistoryKLineData(symbol, p, from, to)
+
+    if (this.#disposed) return
     if (compData.length === 0) return
 
     const compPercent = normalizeToPercent(compData)

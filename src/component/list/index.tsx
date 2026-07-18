@@ -1,4 +1,4 @@
-import { Show, type ParentComponent, type ParentProps, type JSX } from 'solid-js'
+import { Show, For, type ParentComponent, type ParentProps, type JSX } from 'solid-js'
 import Empty from '../empty'
 import Loading from '../loading'
 
@@ -14,17 +14,18 @@ const List: ParentComponent<ListProps> = (props) => {
   return (
     <ul style={props.style} class={`klinecharts-pro-list ${props.class ?? ''}`} role="list">
       <Show when={props.loading}>
+        <li role="status" aria-label="Loading" style={{ display: 'none' }} />
         <Loading />
       </Show>
       <Show when={!props.loading && !props.children && !props.dataSource?.length}>
+        <li role="status" aria-label="No data" style={{ display: 'none' }} />
         <Empty />
       </Show>
       <Show when={props.children}>{props.children}</Show>
       <Show when={!props.children && props.renderItem}>
-        {props.dataSource?.map((data) => props.renderItem?.(data))}
-      </Show>
-      <Show when={!props.children && !props.renderItem}>
-        {props.dataSource?.map(() => <li />)}
+        <For each={props.dataSource}>
+          {(data) => props.renderItem?.(data)}
+        </For>
       </Show>
     </ul>
   )

@@ -500,6 +500,11 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   let replayEngine: ReplayEngine | null = null
   let replayDataList: KLineData[] = []
   let subscribeBarCallback: ((data: KLineData) => void) | undefined
+  // The (symbol, period) actually subscribed to. Captured at subscribe time so
+  // unsubscribeBar cancels THIS subscription even if the live signals have already
+  // switched to a new symbol/period by the time klinecharts calls unsubscribeBar.
+  let subscribedSymbol: SymbolInfo | undefined
+  let subscribedPeriod: Period | undefined
 
   const setChartPeriod = (nextPeriod: Period) => {
     if (replayEngine) return
@@ -616,6 +621,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   let resizeRaf = 0
   let crosshairRaf = 0
+  let lastCrosshairData: unknown = undefined
   /** Cached indicator grouping for crosshair data window — invalidated on indicator add/remove */
   let cachedIndicatorGroups: Record<string, Indicator[]> | undefined
   let cachedIndicatorPaneKeys: string[] | undefined
@@ -759,15 +765,20 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
       subscribeBar: (params) => {
         subscribeBarCallback = params.callback
         if (replayEngine) return
-        const s = symbol()
-        const p = period()
-        props.datafeed.subscribe(s, p, (data) => {
+        // Capture the exact symbol/period we are subscribing to.
+        subscribedSymbol = symbol()
+        subscribedPeriod = period()
+        props.datafeed.subscribe(subscribedSymbol, subscribedPeriod, (data) => {
           params.callback(data)
           props.onPriceUpdate?.(data.close)
         })
       },
       unsubscribeBar: () => {
-        props.datafeed.unsubscribe(symbol(), period())
+        if (subscribedSymbol && subscribedPeriod) {
+          props.datafeed.unsubscribe(subscribedSymbol, subscribedPeriod)
+          subscribedSymbol = undefined
+          subscribedPeriod = undefined
+        }
       },
     })
     onTooltipClick = (data: unknown) => {
@@ -818,10 +829,13 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     widget?.subscribeAction('onCandleBarClick', onBarClick)
     // 十字光标变化时更新数据窗口（节流到 ~16ms）
     onCrosshair = (data: unknown) => {
+      // Keep the most recent event; the rAF callback reads this so rapid crosshair
+      // moves within a single frame don't leave the data window showing a stale position.
+      lastCrosshairData = data
       if (crosshairRaf) return
       crosshairRaf = requestAnimationFrame(() => {
         crosshairRaf = 0
-        let crosshair = data as Crosshair | undefined
+        let crosshair = lastCrosshairData as Crosshair | undefined
         // klinecharts v10 bug: subscribeAction callback receives the raw input {x, y, paneId}
         // without kLineData. Read the full internal crosshair state as a fallback.
         if (crosshair && !crosshair.kLineData && widget) {
@@ -899,7 +913,10 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     window.removeEventListener('resize', documentResize)
     if (resizeRaf) cancelAnimationFrame(resizeRaf)
     if (crosshairRaf) cancelAnimationFrame(crosshairRaf)
+    lastCrosshairData = undefined
     subscribeBarCallback = undefined
+    subscribedSymbol = undefined
+    subscribedPeriod = undefined
     cachedIndicatorGroups = undefined
     cachedIndicatorPaneKeys = undefined
     cachedIndicatorEntries = undefined

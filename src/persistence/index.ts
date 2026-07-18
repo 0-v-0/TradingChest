@@ -81,7 +81,11 @@ export function loadLayout(key: string): ChartLayout | null {
  * 删除布局
  */
 export function deleteLayout(key: string): void {
-  localStorage.removeItem(STORAGE_KEY_PREFIX + key)
+  try {
+    localStorage.removeItem(STORAGE_KEY_PREFIX + key)
+  } catch (e) {
+    console.warn('[TradingChest] delete layout failed:', e)
+  }
 }
 
 /**
@@ -89,20 +93,25 @@ export function deleteLayout(key: string): void {
  */
 export function listLayouts(): Array<{ key: string; timestamp: number }> {
   const result: Array<{ key: string; timestamp: number }> = []
-  for (let i = 0; i < localStorage.length; i++) {
-    const storageKey = localStorage.key(i)
-    if (!storageKey?.startsWith(STORAGE_KEY_PREFIX)) continue
-    try {
-      const raw = localStorage.getItem(storageKey)
-      if (!raw) continue
-      const data = JSON.parse(raw) as ChartLayout
-      result.push({
-        key: storageKey.slice(STORAGE_KEY_PREFIX.length),
-        timestamp: data.timestamp,
-      })
-    } catch {
-      /* 忽略损坏的数据 */
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const storageKey = localStorage.key(i)
+      if (!storageKey?.startsWith(STORAGE_KEY_PREFIX)) continue
+      try {
+        const raw = localStorage.getItem(storageKey)
+        if (!raw) continue
+        const data = JSON.parse(raw) as Record<string, unknown>
+        if (typeof data.timestamp !== 'number') continue
+        result.push({
+          key: storageKey.slice(STORAGE_KEY_PREFIX.length),
+          timestamp: data.timestamp,
+        })
+      } catch {
+        /* 忽略损坏的数据 */
+      }
     }
+  } catch (e) {
+    console.warn('[TradingChest] list layouts failed:', e)
   }
   return result.sort((a, b) => b.timestamp - a.timestamp)
 }

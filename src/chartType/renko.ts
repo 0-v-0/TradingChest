@@ -37,15 +37,26 @@ export function calcRenkoBricks(dataList: KLineData[], brickSize: number): Renko
   return bricks
 }
 
-/** Cache key for Renko bricks: data length + last timestamp + period */
+/** Cache key for Renko bricks: data length + last timestamp + period + last candle OHLC */
 interface RenkoCacheKey {
   dataLen: number
   lastTs: number
   period: number
+  lastClose: number
+  lastHigh: number
+  lastLow: number
 }
 
-let _renkoCacheKey: RenkoCacheKey | undefined
-let _renkoCacheBricks: RenkoBrick[] = []
+interface RenkoCache {
+  key?: RenkoCacheKey
+  bricks: RenkoBrick[]
+}
+
+// Per-chart cache (WeakMap keyed by the klinecharts Chart instance):
+//  - realtime ticks change the last candle's OHLC without altering its length or
+//    timestamp, so the last-candle identity must be part of the key;
+//  - a module-level singleton would let multiple chart instances overwrite each other.
+const _renkoCache = new WeakMap<object, RenkoCache>()
 
 const renko: IndicatorTemplate<object, number> = {
   name: 'Renko',
@@ -64,23 +75,35 @@ const renko: IndicatorTemplate<object, number> = {
     const brickSize = Math.max(atrVal, 0.01)
     if (brickSize <= 0) return false
 
-    // Cache bricks: only recalculate when data or period changes
+    // Cache bricks: only recalculate when data, params, or the last candle change.
+    const lastBar = dataList[dataList.length - 1]
     const cacheKey: RenkoCacheKey = {
       dataLen: dataList.length,
-      lastTs: dataList[dataList.length - 1].timestamp,
+      lastTs: lastBar.timestamp,
       period: adjustedPeriod,
+      lastClose: lastBar.close,
+      lastHigh: lastBar.high,
+      lastLow: lastBar.low,
+    }
+    let cache = _renkoCache.get(chart)
+    if (!cache) {
+      cache = { bricks: [] }
+      _renkoCache.set(chart, cache)
     }
     if (
-      !_renkoCacheKey ||
-      _renkoCacheKey.dataLen !== cacheKey.dataLen ||
-      _renkoCacheKey.lastTs !== cacheKey.lastTs ||
-      _renkoCacheKey.period !== cacheKey.period
+      !cache.key ||
+      cache.key.dataLen !== cacheKey.dataLen ||
+      cache.key.lastTs !== cacheKey.lastTs ||
+      cache.key.period !== cacheKey.period ||
+      cache.key.lastClose !== cacheKey.lastClose ||
+      cache.key.lastHigh !== cacheKey.lastHigh ||
+      cache.key.lastLow !== cacheKey.lastLow
     ) {
-      _renkoCacheBricks = calcRenkoBricks(dataList, brickSize)
-      _renkoCacheKey = cacheKey
+      cache.bricks = calcRenkoBricks(dataList, brickSize)
+      cache.key = cacheKey
     }
 
-    const bricks = _renkoCacheBricks
+    const bricks = cache.bricks
     if (bricks.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()

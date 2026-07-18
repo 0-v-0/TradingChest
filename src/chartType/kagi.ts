@@ -100,15 +100,25 @@ export function calcKagi(dataList: KLineData[], reversal: number): KagiSegment[]
   return segments
 }
 
-/** Cache key for Kagi segments: data length + last timestamp + reversal */
+/** Cache key for Kagi segments: data length + last timestamp + reversal + last candle OHLC */
 interface KagiCacheKey {
   dataLen: number
   lastTs: number
   reversal: number
+  lastClose: number
+  lastHigh: number
+  lastLow: number
 }
 
-let _kagiCacheKey: KagiCacheKey | undefined
-let _kagiCacheSegments: KagiSegment[] = []
+interface KagiCache {
+  key?: KagiCacheKey
+  segments: KagiSegment[]
+}
+
+// Per-chart cache (WeakMap keyed by the klinecharts Chart instance) so realtime
+// ticks (last candle OHLC changes) invalidate the cache and multiple charts don't
+// share a single module-level cache.
+const _kagiCache = new WeakMap<object, KagiCache>()
 
 const kagi: IndicatorTemplate<object, number> = {
   name: 'Kagi',
@@ -124,23 +134,35 @@ const kagi: IndicatorTemplate<object, number> = {
 
     const adjustedReversal = Math.max(1, reversal)
 
-    // Cache segments: only recalculate when data or reversal changes
+    // Cache segments: only recalculate when data, params, or the last candle change.
+    const lastBar = dataList[dataList.length - 1]
     const cacheKey: KagiCacheKey = {
       dataLen: dataList.length,
-      lastTs: dataList[dataList.length - 1].timestamp,
+      lastTs: lastBar.timestamp,
       reversal: adjustedReversal,
+      lastClose: lastBar.close,
+      lastHigh: lastBar.high,
+      lastLow: lastBar.low,
+    }
+    let cache = _kagiCache.get(chart)
+    if (!cache) {
+      cache = { segments: [] }
+      _kagiCache.set(chart, cache)
     }
     if (
-      !_kagiCacheKey ||
-      _kagiCacheKey.dataLen !== cacheKey.dataLen ||
-      _kagiCacheKey.lastTs !== cacheKey.lastTs ||
-      _kagiCacheKey.reversal !== cacheKey.reversal
+      !cache.key ||
+      cache.key.dataLen !== cacheKey.dataLen ||
+      cache.key.lastTs !== cacheKey.lastTs ||
+      cache.key.reversal !== cacheKey.reversal ||
+      cache.key.lastClose !== cacheKey.lastClose ||
+      cache.key.lastHigh !== cacheKey.lastHigh ||
+      cache.key.lastLow !== cacheKey.lastLow
     ) {
-      _kagiCacheSegments = calcKagi(dataList, adjustedReversal)
-      _kagiCacheKey = cacheKey
+      cache.segments = calcKagi(dataList, adjustedReversal)
+      cache.key = cacheKey
     }
 
-    const segments = _kagiCacheSegments
+    const segments = cache.segments
     if (segments.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()

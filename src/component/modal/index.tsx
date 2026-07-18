@@ -1,6 +1,9 @@
-import type { ParentComponent, ParentProps, JSX } from 'solid-js'
+import { createEffect, onCleanup, type ParentComponent, type ParentProps, type JSX } from 'solid-js'
 import Button from '../button'
 import type { ButtonProps } from '../button'
+
+let _modalId = 0
+const nextModalId = () => `modal-title-${++_modalId}`
 
 export interface ModalProps extends ParentProps {
   width?: number
@@ -10,19 +13,54 @@ export interface ModalProps extends ParentProps {
 }
 
 const Modal: ParentComponent<ModalProps> = (props) => {
+  const titleId = nextModalId()
+  let dialogRef: HTMLDivElement | undefined
+  let previousFocus: HTMLElement | undefined
+
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       e.preventDefault()
       e.stopPropagation()
       props.onClose?.()
+      return
+    }
+    if (e.key === 'Tab' && dialogRef) {
+      const focusable = dialogRef.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
     }
   }
+
+  createEffect(() => {
+    previousFocus = document.activeElement as HTMLElement | undefined
+    dialogRef?.focus()
+  })
+
+  onCleanup(() => {
+    previousFocus?.focus()
+  })
+
   return (
     <div
+      ref={(el) => { dialogRef = el }}
       class="klinecharts-pro-modal"
       role="dialog"
       aria-modal="true"
-      aria-label={typeof props.title === 'string' ? props.title : undefined}
+      aria-labelledby={props.title ? titleId : undefined}
       tabIndex={-1}
       onKeyDown={handleKeyDown}
       onClick={(e) => {
@@ -32,7 +70,7 @@ const Modal: ParentComponent<ModalProps> = (props) => {
       }}
     >
       <div style={{ width: `${props.width ?? 400}px` }} class="inner">
-        <div class="title-container">
+        <div class="title-container" id={titleId}>
           {props.title}
           <svg
             class="close-icon"
@@ -48,7 +86,7 @@ const Modal: ParentComponent<ModalProps> = (props) => {
               }
             }}
           >
-            <path d="M934.184927 199.723787 622.457206 511.452531l311.727721 311.703161c14.334473 14.229073 23.069415 33.951253 23.069415 55.743582 0 43.430138-35.178197 78.660524-78.735226 78.660524-21.664416 0-41.361013-8.865925-55.642275-23.069415L511.149121 622.838388 199.420377 934.490384c-14.204513 14.20349-33.901111 23.069415-55.642275 23.069415-43.482327 0-78.737272-35.230386-78.737272-78.660524 0-21.792329 8.864902-41.513486 23.094998-55.743582l311.677579-311.703161L88.135828 199.723787c-14.230096-14.255679-23.094998-33.92567-23.094998-55.642275 0-43.430138 35.254945-78.762855 78.737272-78.762855 21.741163 0 41.437761 8.813736 55.642275 23.069415l311.727721 311.727721L822.876842 88.389096c14.281261-14.255679 33.977859-23.069415 55.642275-23.069415 43.557028 0 78.735226 35.332716 78.735226 78.762855C957.254342 165.798117 948.5194 185.468109 934.184927 199.723787" />
+            <path aria-hidden="true" d="M934.184927 199.723787 622.457206 511.452531l311.727721 311.703161c14.334473 14.229073 23.069415 33.951253 23.069415 55.743582 0 43.430138-35.178197 78.660524-78.735226 78.660524-21.664416 0-41.361013-8.865925-55.642275-23.069415L511.149121 622.838388 199.420377 934.490384c-14.204513 14.20349-33.901111 23.069415-55.642275 23.069415-43.482327 0-78.737272-35.230386-78.737272-78.660524 0-21.792329 8.864902-41.513486 23.094998-55.743582l311.677579-311.703161L88.135828 199.723787c-14.230096-14.255679-23.094998-33.92567-23.094998-55.642275 0-43.430138 35.254945-78.762855 78.737272-78.762855 21.741163 0 41.437761 8.813736 55.642275 23.069415l311.727721 311.727721L822.876842 88.389096c14.281261-14.255679 33.977859-23.069415 55.642275-23.069415 43.557028 0 78.735226 35.332716 78.735226 78.762855C957.254342 165.798117 948.5194 185.468109 934.184927 199.723787" />
           </svg>
         </div>
         <div class="content-container">{props.children}</div>

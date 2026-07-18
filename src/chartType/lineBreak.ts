@@ -117,6 +117,20 @@ export function calcLineBreak(dataList: KLineData[], lines: number): LineBreakLi
   return result
 }
 
+interface LineBreakCacheKey {
+  dataLen: number
+  lastTs: number
+  lines: number
+  lastClose: number
+}
+
+interface LineBreakCache {
+  key?: LineBreakCacheKey
+  bricks: LineBreakLine[]
+}
+
+const _lineBreakCache = new WeakMap<object, LineBreakCache>()
+
 const lineBreak: IndicatorTemplate<object, number> = {
   name: 'LineBreak',
   shortName: 'LB',
@@ -130,7 +144,31 @@ const lineBreak: IndicatorTemplate<object, number> = {
     if (!dataList || dataList.length < 2) return false
 
     const adjustedLines = Math.max(2, lines)
-    const lineBreakLines = calcLineBreak(dataList, adjustedLines)
+
+    const lastBar = dataList[dataList.length - 1]
+    const cacheKey: LineBreakCacheKey = {
+      dataLen: dataList.length,
+      lastTs: lastBar.timestamp,
+      lines: adjustedLines,
+      lastClose: lastBar.close,
+    }
+    let cache = _lineBreakCache.get(chart)
+    if (!cache) {
+      cache = { bricks: [] }
+      _lineBreakCache.set(chart, cache)
+    }
+    if (
+      !cache.key ||
+      cache.key.dataLen !== cacheKey.dataLen ||
+      cache.key.lastTs !== cacheKey.lastTs ||
+      cache.key.lines !== cacheKey.lines ||
+      cache.key.lastClose !== cacheKey.lastClose
+    ) {
+      cache.bricks = calcLineBreak(dataList, adjustedLines)
+      cache.key = cacheKey
+    }
+
+    const lineBreakLines = cache.bricks
     if (lineBreakLines.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()

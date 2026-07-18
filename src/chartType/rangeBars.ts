@@ -37,6 +37,22 @@ export function calcRangeBars(dataList: KLineData[], rangeSize: number): RangeBa
   return bars
 }
 
+interface RangeBarsCacheKey {
+  dataLen: number
+  lastTs: number
+  period: number
+  lastClose: number
+  lastHigh: number
+  lastLow: number
+}
+
+interface RangeBarsCache {
+  key?: RangeBarsCacheKey
+  bars: RangeBar[]
+}
+
+const _rangeBarsCache = new WeakMap<object, RangeBarsCache>()
+
 const rangeBars: IndicatorTemplate<object, number> = {
   name: 'RangeBars',
   shortName: 'RB',
@@ -54,7 +70,34 @@ const rangeBars: IndicatorTemplate<object, number> = {
     const rangeSize = Math.max(atrVal, 0.01)
     if (rangeSize <= 0) return false
 
-    const bars = calcRangeBars(dataList, rangeSize)
+    const lastBar = dataList[dataList.length - 1]
+    const cacheKey: RangeBarsCacheKey = {
+      dataLen: dataList.length,
+      lastTs: lastBar.timestamp,
+      period: adjustedPeriod,
+      lastClose: lastBar.close,
+      lastHigh: lastBar.high,
+      lastLow: lastBar.low,
+    }
+    let cache = _rangeBarsCache.get(chart)
+    if (!cache) {
+      cache = { bars: [] }
+      _rangeBarsCache.set(chart, cache)
+    }
+    if (
+      !cache.key ||
+      cache.key.dataLen !== cacheKey.dataLen ||
+      cache.key.lastTs !== cacheKey.lastTs ||
+      cache.key.period !== cacheKey.period ||
+      cache.key.lastClose !== cacheKey.lastClose ||
+      cache.key.lastHigh !== cacheKey.lastHigh ||
+      cache.key.lastLow !== cacheKey.lastLow
+    ) {
+      cache.bars = calcRangeBars(dataList, rangeSize)
+      cache.key = cacheKey
+    }
+
+    const bars = cache.bars
     if (bars.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()

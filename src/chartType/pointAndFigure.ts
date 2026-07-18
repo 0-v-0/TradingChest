@@ -110,10 +110,20 @@ interface PnFCacheKey {
   lastTs: number
   boxSize: number
   reversal: number
+  lastClose: number
+  lastHigh: number
+  lastLow: number
 }
 
-let _pnfCacheKey: PnFCacheKey | undefined
-let _pnfCacheColumns: PnFColumn[] = []
+interface PnFCache {
+  key?: PnFCacheKey
+  columns: PnFColumn[]
+}
+
+// Per-chart cache (WeakMap keyed by the klinecharts Chart instance) so realtime
+// ticks (last candle OHLC changes) invalidate the cache and multiple charts don't
+// share a single module-level cache.
+const _pnfCache = new WeakMap<object, PnFCache>()
 
 const pointAndFigure: IndicatorTemplate<object, number> = {
   name: 'PointAndFigure',
@@ -130,25 +140,37 @@ const pointAndFigure: IndicatorTemplate<object, number> = {
     const adjustedBoxSize = Math.max(boxSize, 0.01)
     const adjustedReversal = Math.max(reversal, 1)
 
-    // Cache columns: only recalculate when data or params change
+    // Cache columns: only recalculate when data, params, or the last candle change.
+    const lastBar = dataList[dataList.length - 1]
     const cacheKey: PnFCacheKey = {
       dataLen: dataList.length,
-      lastTs: dataList[dataList.length - 1].timestamp,
+      lastTs: lastBar.timestamp,
       boxSize: adjustedBoxSize,
       reversal: adjustedReversal,
+      lastClose: lastBar.close,
+      lastHigh: lastBar.high,
+      lastLow: lastBar.low,
+    }
+    let cache = _pnfCache.get(chart)
+    if (!cache) {
+      cache = { columns: [] }
+      _pnfCache.set(chart, cache)
     }
     if (
-      !_pnfCacheKey ||
-      _pnfCacheKey.dataLen !== cacheKey.dataLen ||
-      _pnfCacheKey.lastTs !== cacheKey.lastTs ||
-      _pnfCacheKey.boxSize !== cacheKey.boxSize ||
-      _pnfCacheKey.reversal !== cacheKey.reversal
+      !cache.key ||
+      cache.key.dataLen !== cacheKey.dataLen ||
+      cache.key.lastTs !== cacheKey.lastTs ||
+      cache.key.boxSize !== cacheKey.boxSize ||
+      cache.key.reversal !== cacheKey.reversal ||
+      cache.key.lastClose !== cacheKey.lastClose ||
+      cache.key.lastHigh !== cacheKey.lastHigh ||
+      cache.key.lastLow !== cacheKey.lastLow
     ) {
-      _pnfCacheColumns = calcPointAndFigure(dataList, adjustedBoxSize, adjustedReversal)
-      _pnfCacheKey = cacheKey
+      cache.columns = calcPointAndFigure(dataList, adjustedBoxSize, adjustedReversal)
+      cache.key = cacheKey
     }
 
-    const columns = _pnfCacheColumns
+    const columns = cache.columns
     if (columns.length === 0) return false
 
     const visibleRange = chart.getVisibleRange()
